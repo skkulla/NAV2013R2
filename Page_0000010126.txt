@@ -1,0 +1,229 @@
+OBJECT Page 10126 Posted Bank Rec. Chk Lines Sub
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Bank Rec. Chk Lines Sub;
+               ESM=Sub. l¡ns. cheque. concil. reg.;
+               FRC=Sous-formulaire ligne chŠques rapprochement bancaire report‚;
+               ENC=Posted Bank Rec. Chk Lines Sub];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    ModifyAllowed=No;
+    SourceTable=Table10124;
+    SourceTableView=SORTING(Bank Account No.,Statement No.,Record Type,Line No.)
+                    WHERE(Record Type=CONST(Check));
+    PageType=ListPart;
+    OnOpenPage=BEGIN
+                 OnActivateForm;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1907935204;1 ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 ESM=&L¡nea;
+                                 FRC=&Ligne;
+                                 ENC=&Line];
+                      Image=Line }
+      { 1901967304;2 ;ActionGroup;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions }
+      { 1906302804;3 ;Action    ;
+                      CaptionML=[ENU=&Checks;
+                                 ESM=&Cheques;
+                                 FRC=&ChŠques;
+                                 ENC=&Cheques];
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10125. Unsupported part was commented. Please check it.
+                                 {CurrPage.ChecksSubForm.PAGE.}
+                                 LookupLineDimensions;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1020020;1;Field     ;
+                CaptionML=[ENU=Bank Account No.;
+                           ESM=C¢d. cuenta banco;
+                           FRC=Nø de compte bancaire;
+                           ENC=Bank Account No.];
+                SourceExpr=PostedBankRecHdr."Bank Account No.";
+                Editable=FALSE }
+
+    { 1020022;1;Field     ;
+                CaptionML=[ENU=Statement No.;
+                           ESM=N§ estado de cta. banco;
+                           FRC=Nø de relev‚;
+                           ENC=Statement No.];
+                SourceExpr=PostedBankRecHdr."Statement No.";
+                Editable=FALSE }
+
+    { 1020024;1;Field     ;
+                CaptionML=[ENU=Statement Date;
+                           ESM=Fecha estado de cuenta banco;
+                           FRC=Date du relev‚;
+                           ENC=Statement Date];
+                SourceExpr=PostedBankRecHdr."Statement Date";
+                Editable=FALSE }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Posting Date";
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Document Type";
+                Editable=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Document No.";
+                Editable=FALSE }
+
+    { 1020018;2;Field     ;
+                SourceExpr="External Document No.";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Account Type";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Account No.";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr=Description;
+                Editable=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr=Amount;
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr=Cleared;
+                OnValidate=BEGIN
+                             ClearedOnAfterValidate;
+                           END;
+                            }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Cleared Amount";
+                OnValidate=BEGIN
+                             ClearedAmountOnAfterValidate;
+                           END;
+                            }
+
+    { 1020012;2;Field     ;
+                CaptionML=[ENU=Difference;
+                           ESM=Diferencia;
+                           FRC=Diff‚rence;
+                           ENC=Difference];
+                SourceExpr="Cleared Amount" - Amount;
+                Editable=FALSE }
+
+    { 1020004;2;Field     ;
+                SourceExpr="Bal. Account Type";
+                Visible=FALSE }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Bal. Account No.";
+                Visible=FALSE }
+
+    { 1020008;2;Field     ;
+                SourceExpr="Currency Code";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020010;2;Field     ;
+                SourceExpr="Currency Factor";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020015;1;Field     ;
+                Name=BankStatementCleared;
+                CaptionML=[ENU=Statement;
+                           ESM=Estado de cuenta;
+                           FRC=Relev‚;
+                           ENC=Statement];
+                SourceExpr=PostedBankRecHdr."Cleared With./Chks. Per Stmnt.";
+                Editable=FALSE }
+
+    { 1020017;1;Field     ;
+                Name=TotalCleared;
+                CaptionML=[ENU=Total Cleared;
+                           ESM=Total compensados;
+                           FRC=Total rapproch‚;
+                           ENC=Total Cleared];
+                SourceExpr=PostedBankRecHdr."Total Cleared Checks";
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      PostedBankRecHdr@1020000 : Record 10123;
+
+    PROCEDURE SetupTotals@1020002();
+    BEGIN
+      IF PostedBankRecHdr.GET("Bank Account No.","Statement No.") THEN
+        PostedBankRecHdr.CALCFIELDS("Total Cleared Checks");
+    END;
+
+    PROCEDURE LookupLineDimensions@1020000();
+    BEGIN
+      ShowDimensions;
+    END;
+
+    PROCEDURE GetTableID@1020001() : Integer;
+    VAR
+      Object@1020001 : Record 2000000001;
+    BEGIN
+      Object.SETRANGE(Type,Object.Type::Table);
+      Object.SETRANGE(Name,TABLENAME);
+      Object.FINDFIRST;
+      EXIT(Object.ID);
+    END;
+
+    LOCAL PROCEDURE ClearedOnAfterValidate@19021297();
+    BEGIN
+      CurrPage.UPDATE(TRUE);
+      SetupTotals;
+    END;
+
+    LOCAL PROCEDURE ClearedAmountOnAfterValidate@19016797();
+    BEGIN
+      CurrPage.UPDATE(TRUE);
+      SetupTotals;
+    END;
+
+    LOCAL PROCEDURE OnActivateForm@19002417();
+    BEGIN
+      SetupTotals;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

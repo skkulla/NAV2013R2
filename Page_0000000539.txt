@@ -1,0 +1,49 @@
+OBJECT Page 539 Dimension Value Combinations
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Dimension Value Combinations;
+               ESM=Combinaciones valor dimensi¢n;
+               FRC=Croisements des sections;
+               ENC=Dimension Value Combinations];
+    SaveValues=Yes;
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table349;
+    DataCaptionExpr=GetCaption;
+    PageType=Card;
+  }
+  CONTROLS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE Initialize@1(Row@1000 : Code[20];Column@1001 : Code[20]);
+    BEGIN
+    END;
+
+    PROCEDURE ChangeCombRestriction@11();
+    BEGIN
+    END;
+
+    PROCEDURE ShowCombRestriction@2();
+    BEGIN
+    END;
+
+    PROCEDURE GetCaption@3() : Text[250];
+    BEGIN
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

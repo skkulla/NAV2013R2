@@ -1,0 +1,550 @@
+OBJECT Table 130 Incoming Document
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    OnInsert=BEGIN
+               "Created Date-Time" := ROUNDDATETIME(CURRENTDATETIME,60000);
+               "Created By User ID" := USERSECURITYID;
+             END;
+
+    OnModify=BEGIN
+               "Last Date-Time Modified" := ROUNDDATETIME(CURRENTDATETIME,60000);
+               "Last Modified By User ID" := USERSECURITYID;
+             END;
+
+    OnDelete=BEGIN
+               TESTFIELD(Posted,FALSE);
+               TESTFIELD(Approved,FALSE);
+             END;
+
+    CaptionML=[ENU=Incoming Document;
+               ESM=Documento entrante;
+               FRC=Document entrant;
+               ENC=Incoming Document];
+    LookupPageID=Page190;
+    DrillDownPageID=Page190;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Entry No.           ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Entry No.;
+                                                              ESM=N§ mov.;
+                                                              FRC=Nø s‚quence;
+                                                              ENC=Entry No.] }
+    { 2   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              ESM=Descripci¢n;
+                                                              FRC=Description;
+                                                              ENC=Description] }
+    { 3   ;   ;Created Date-Time   ;DateTime      ;CaptionML=[ENU=Created Date-Time;
+                                                              ESM=Fecha / hora creaci¢n;
+                                                              FRC=Date/heure cr‚ation;
+                                                              ENC=Created Date-Time];
+                                                   Editable=No }
+    { 4   ;   ;Created By User ID  ;GUID          ;TableRelation=User;
+                                                   CaptionML=[ENU=Created By User ID;
+                                                              ESM=Creado por id. usuario;
+                                                              FRC=Cr‚‚ par le code utilisateur;
+                                                              ENC=Created By User ID];
+                                                   Editable=No }
+    { 5   ;   ;Created By User Name;Code50        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(User."User Name" WHERE (User Security ID=FIELD(Created By User ID)));
+                                                   CaptionML=[ENU=Created By User Name;
+                                                              ESM=Creado por nombre de usuario;
+                                                              FRC=Cr‚‚ par nom utilisateur;
+                                                              ENC=Created By User Name];
+                                                   Editable=No }
+    { 6   ;   ;Approved            ;Boolean       ;CaptionML=[ENU=Approved;
+                                                              ESM=Aprobado;
+                                                              FRC=Approuv‚;
+                                                              ENC=Approved];
+                                                   Editable=No }
+    { 7   ;   ;Approved Date-Time  ;DateTime      ;CaptionML=[ENU=Approved Date-Time;
+                                                              ESM=Fecha/hora aprobada;
+                                                              FRC=Date/heure approbation;
+                                                              ENC=Approved Date-Time];
+                                                   Editable=No }
+    { 8   ;   ;Approved By User ID ;GUID          ;TableRelation=User;
+                                                   CaptionML=[ENU=Approved By User ID;
+                                                              ESM=Aprobado por id. usuario;
+                                                              FRC=Approuv‚ par Code utilisateur;
+                                                              ENC=Approved By User ID];
+                                                   Editable=No }
+    { 9   ;   ;Approved By User Name;Code50       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(User."User Name" WHERE (User Security ID=FIELD(Approved By User ID)));
+                                                   CaptionML=[ENU=Approved By User Name;
+                                                              ESM=Aprobado por nombre de usuario;
+                                                              FRC=Approuv‚ par nom utilisateur;
+                                                              ENC=Approved By User Name];
+                                                   Editable=No }
+    { 10  ;   ;Last Date-Time Modified;DateTime   ;CaptionML=[ENU=Last Date-Time Modified;
+                                                              ESM=Fecha-hora £lt. modificaci¢n;
+                                                              FRC=Date-heure de derniŠre modification;
+                                                              ENC=Last Date-Time Modified];
+                                                   Editable=No }
+    { 11  ;   ;Last Modified By User ID;GUID      ;TableRelation=User;
+                                                   CaptionML=[ENU=Last Modified By User ID;
+                                                              ESM=élt. modificaci¢n por id. usuario;
+                                                              FRC=DerniŠre modification par Code utilisateur;
+                                                              ENC=Last Modified By User ID];
+                                                   Editable=No }
+    { 12  ;   ;Last Modified By User Name;Code50  ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(User."User Name" WHERE (User Security ID=FIELD(Last Modified By User ID)));
+                                                   CaptionML=[ENU=Last Modified By User Name;
+                                                              ESM=élt. modificaci¢n por nombre de usuario;
+                                                              FRC=DerniŠre modification par nom utilisateur;
+                                                              ENC=Last Modified By User Name];
+                                                   Editable=No }
+    { 13  ;   ;Posted              ;Boolean       ;CaptionML=[ENU=Posted;
+                                                              ESM=Registrado;
+                                                              FRC=Report‚;
+                                                              ENC=Posted];
+                                                   Editable=No }
+    { 14  ;   ;Posted Date-Time    ;DateTime      ;CaptionML=[ENU=Posted Date-Time;
+                                                              ESM=Fecha / hora de registro;
+                                                              FRC=Date/heure validation;
+                                                              ENC=Posted Date-Time];
+                                                   Editable=No }
+    { 15  ;   ;Posted Document Type;Option        ;CaptionML=[ENU=Posted Document Type;
+                                                              ESM=Tipo de documento registrado;
+                                                              FRC=Type de document report‚;
+                                                              ENC=Posted Document Type];
+                                                   OptionCaptionML=[ENU=Journal,Sales Invoice,Sales Credit Memo,Purchase Invoice,Purchase Credit Memo;
+                                                                    ESM=Diario,Factura venta,Nota de cr‚dito venta,Factura compra,Nota de cr‚dito compra;
+                                                                    FRC=Journal,Facture de vente,Note de cr‚dit de vente,Facture d'achat,Note de cr‚dit d'achat;
+                                                                    ENC=Journal,Sales Invoice,Sales Credit Memo,Purchase Invoice,Purchase Credit Memo];
+                                                   OptionString=Journal,Sales Invoice,Sales Credit Memo,Purchase Invoice,Purchase Credit Memo;
+                                                   Editable=No }
+    { 16  ;   ;Document No.        ;Code20        ;CaptionML=[ENU=Document No.;
+                                                              ESM=N§ documento;
+                                                              FRC=Nø de document;
+                                                              ENC=Document No.];
+                                                   Editable=No }
+    { 17  ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              ESM=Fecha registro;
+                                                              FRC=Date de report;
+                                                              ENC=Posting Date];
+                                                   Editable=No }
+    { 18  ;   ;Status              ;Option        ;OnValidate=BEGIN
+                                                                IF Status = xRec.Status THEN
+                                                                  EXIT;
+
+                                                                CASE Status OF
+                                                                  Status::Approved:
+                                                                    Approve;
+                                                                  Status::Rejected:
+                                                                    Reject;
+                                                                  ELSE
+                                                                    ERROR(InvalidStatusErr);
+                                                                END;
+                                                              END;
+
+                                                   CaptionML=[ENU=Status;
+                                                              ESM=Estado;
+                                                              FRC=tat;
+                                                              ENC=Status];
+                                                   OptionCaptionML=[ENU=New,Approved,Rejected,Posted;
+                                                                    ESM=Nuevos,Aprobados,Rechazados,Registrados;
+                                                                    FRC=Nouveau,Approuv‚,Rejet‚,Report‚;
+                                                                    ENC=New,Approved,Rejected,Posted];
+                                                   OptionString=New,Approved,Rejected,Posted }
+    { 19  ;   ;URL1                ;Text250       ;CaptionML=[ENU=URL1;
+                                                              ESM=URL1;
+                                                              FRC=URL1;
+                                                              ENC=URL1];
+                                                   Editable=No }
+    { 20  ;   ;URL2                ;Text250       ;CaptionML=[ENU=URL2;
+                                                              ESM=URL2;
+                                                              FRC=URL2;
+                                                              ENC=URL2];
+                                                   Editable=No }
+    { 21  ;   ;URL3                ;Text250       ;CaptionML=[ENU=URL3;
+                                                              ESM=URL3;
+                                                              FRC=URL3;
+                                                              ENC=URL3];
+                                                   Editable=No }
+    { 22  ;   ;URL4                ;Text250       ;CaptionML=[ENU=URL4;
+                                                              ESM=URL4;
+                                                              FRC=URL4;
+                                                              ENC=URL4];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+    {    ;Status                                   }
+    {    ;Document No.,Posting Date                }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      NotApproverErr@1000 : TextConst 'ENU=You have not been set up as an approver of incoming documents.;ESM=No ha sido configurado como aprobador de documentos entrantes.;FRC=Vous n''avez pas ‚t‚ configur‚ comme approbateur de documents entrants.;ENC=You have not been set up as an approver of incoming documents.';
+      IncomingDocumentsSetup@1001 : Record 131;
+      NoURLErr@1002 : TextConst 'ENU=You must enter a URL that points to the document.;ESM=Debe introducir una direcci¢n URL que se¤ale al documento.;FRC=Vous devez entrer une URL qui pointe vers le document.;ENC=You must enter a URL that points to the document.';
+      NoDocumentMsg@1008 : TextConst 'ENU=There is no incoming document for this combination of posting date and document number.;ESM=No existe ning£n documento entrante con esta combinaci¢n de fecha de registro y n£mero de documento.;FRC=Il n''existe pas de document entrant pour cette combinaison de date de report et de num‚ro document.;ENC=There is no incoming document for this combination of posting date and document number.';
+      UrlTooLongErr@1003 : TextConst 'ENU=Only URLs with a maximum 1000 characters are allowed.;ESM=S¢lo se permiten URL con un m ximo de 1000 caracteres.;FRC=Seules les URL comportant un maximum de 1ÿ000 caractŠres sont autoris‚es.;ENC=Only URLs with a maximum 1000 characters are allowed.';
+      DocumentType@1005 : 'Invoice,Credit Memo';
+      AlreadyUsedInJnlErr@1004 : TextConst '@@@="%1 = journal batch name, %2=line number.";ENU=The incoming document has already been assigned to journal batch %1, line number. %2.;ESM=El documento entrante ya se ha asignado a la secci¢n de diario %1, n£mero de l¡nea. %2.;FRC=Le document entrant a d‚j… ‚t‚ affect‚ au lot journal %1, num‚ro de ligne %2.;ENC=The incoming document has already been assigned to journal batch %1, line number. %2.';
+      AlreadyUsedInDocHdrErr@1006 : TextConst '@@@="%1=document type, %2=document number, %3=table name, e.g. Sales Header.";ENU=The incoming document has already been assigned to %1 %2 (%3).;ESM=El documento entrante ya se ha asignado a %1 %2 (%3).;FRC=Le document entrant a d‚j… ‚t‚ affect‚ … %1 %2 (%3).;ENC=The incoming document has already been assigned to %1 %2 (%3).';
+      InvalidStatusErr@1007 : TextConst 'ENU=The status of an incoming document can only be changed to approved or rejected.;ESM=El estado de un documento entrante solo se puede cambiar a aprobado o rechazado.;FRC=L''‚tat d''un document entrant peut uniquement ˆtre modifi‚ en approuv‚ ou rejet‚.;ENC=The status of an incoming document can only be changed to approved or rejected.';
+
+    PROCEDURE GetURL@1() : Text;
+    BEGIN
+      EXIT(URL1 + URL2 + URL3 + URL4);
+    END;
+
+    PROCEDURE SetURL@2(URL@1000 : Text);
+    BEGIN
+      TESTFIELD(Posted,FALSE);
+      IF STRLEN(URL) > 1000 THEN
+        ERROR(UrlTooLongErr);
+      URL2 := '';
+      URL3 := '';
+      URL4 := '';
+      URL1 := COPYSTR(URL,1,250);
+      IF STRLEN(URL) > 250 THEN
+        URL2 := COPYSTR(URL,251,250);
+      IF STRLEN(URL) > 500 THEN
+        URL3 := COPYSTR(URL,501,250);
+      IF STRLEN(URL) > 750 THEN
+        URL4 := COPYSTR(URL,751,250);
+
+      ClearApprovedFields;
+    END;
+
+    PROCEDURE Approve@3();
+    VAR
+      IncomingDocumentApprover@1000 : Record 132;
+    BEGIN
+      TESTFIELD(Posted,FALSE);
+      IF GetURL = '' THEN
+        ERROR(NoURLErr);
+      IF NOT IncomingDocumentApprover.GET(USERSECURITYID) THEN
+        ERROR(NotApproverErr);
+      Approved := TRUE;
+      "Approved Date-Time" := CURRENTDATETIME;
+      "Approved By User ID" := USERSECURITYID;
+      Status := Status::Approved;
+    END;
+
+    PROCEDURE Reject@4();
+    BEGIN
+      TESTFIELD(Posted,FALSE);
+      ClearApprovedFields;
+      Status := Status::Rejected;
+    END;
+
+    PROCEDURE CreateGenJnlLine@5();
+    VAR
+      GenJnlLine@1000 : Record 81;
+      LastGenJnlLine@1002 : Record 81;
+      LineNo@1001 : Integer;
+    BEGIN
+      IF "Posted Document Type" <> "Posted Document Type"::Journal THEN
+        TestIfAlreadyExists;
+      TestReadyForCreateDoc;
+      IncomingDocumentsSetup.TESTFIELD("General Journal Template Name");
+      IncomingDocumentsSetup.TESTFIELD("General Journal Batch Name");
+      GenJnlLine.SETRANGE("Journal Template Name",IncomingDocumentsSetup."General Journal Template Name");
+      GenJnlLine.SETRANGE("Journal Batch Name",IncomingDocumentsSetup."General Journal Batch Name");
+      GenJnlLine.SETRANGE("Incoming Document Entry No.","Entry No.");
+      IF NOT GenJnlLine.ISEMPTY THEN
+        EXIT; // instead; go to the document
+
+      GenJnlLine.SETRANGE("Incoming Document Entry No.");
+
+      "Posted Document Type" := "Posted Document Type"::Journal;
+
+      IF GenJnlLine.FINDLAST THEN;
+      LastGenJnlLine := GenJnlLine;
+      LineNo := GenJnlLine."Line No." + 10000;
+      GenJnlLine.INIT;
+      GenJnlLine."Journal Template Name" := IncomingDocumentsSetup."General Journal Template Name";
+      GenJnlLine."Journal Batch Name" := IncomingDocumentsSetup."General Journal Batch Name";
+      GenJnlLine."Line No." := LineNo;
+      GenJnlLine.SetUpNewLine(LastGenJnlLine,0,TRUE);
+      GenJnlLine."Incoming Document Entry No." := "Entry No.";
+      GenJnlLine.Description := COPYSTR(Description,1,MAXSTRLEN(GenJnlLine.Description));
+      GenJnlLine.INSERT(TRUE);
+      IF GenJnlLine.HASLINKS THEN
+        GenJnlLine.DELETELINKS;
+      IF GetURL <> '' THEN
+        GenJnlLine.ADDLINK(GetURL,Description);
+    END;
+
+    PROCEDURE CreatePurchInvoice@6();
+    BEGIN
+      IF "Posted Document Type" <> "Posted Document Type"::"Purchase Invoice" THEN
+        TestIfAlreadyExists;
+      CreatePurchDoc(DocumentType::Invoice);
+      "Posted Document Type" := "Posted Document Type"::"Purchase Invoice";
+    END;
+
+    PROCEDURE CreatePurchCreditMemo@7();
+    BEGIN
+      IF "Posted Document Type" <> "Posted Document Type"::"Purchase Credit Memo" THEN
+        TestIfAlreadyExists;
+      CreatePurchDoc(DocumentType::"Credit Memo");
+      "Posted Document Type" := "Posted Document Type"::"Purchase Credit Memo";
+    END;
+
+    PROCEDURE CreateSalesInvoice@8();
+    BEGIN
+      IF "Posted Document Type" <> "Posted Document Type"::"Sales Invoice" THEN
+        TestIfAlreadyExists;
+      CreateSalesDoc(DocumentType::Invoice);
+      "Posted Document Type" := "Posted Document Type"::"Sales Invoice";
+    END;
+
+    PROCEDURE CreateSalesCreditMemo@9();
+    BEGIN
+      IF "Posted Document Type" <> "Posted Document Type"::"Sales Credit Memo" THEN
+        TestIfAlreadyExists;
+      CreateSalesDoc(DocumentType::"Credit Memo");
+      "Posted Document Type" := "Posted Document Type"::"Sales Credit Memo";
+    END;
+
+    LOCAL PROCEDURE TestReadyForCreateDoc@13();
+    BEGIN
+      TESTFIELD(Posted,FALSE);
+      IncomingDocumentsSetup.Fetch;
+      IF IncomingDocumentsSetup."Require Approval To Create" THEN
+        TESTFIELD(Approved);
+    END;
+
+    LOCAL PROCEDURE TestIfAlreadyExists@33();
+    VAR
+      GenJnlLine@1002 : Record 81;
+      SalesHeader@1001 : Record 36;
+      PurchaseHeader@1000 : Record 38;
+    BEGIN
+      CASE "Posted Document Type" OF
+        "Posted Document Type"::Journal:
+          BEGIN
+            GenJnlLine.SETRANGE("Incoming Document Entry No.","Entry No.");
+            IF GenJnlLine.FINDFIRST THEN
+              ERROR(AlreadyUsedInJnlErr,GenJnlLine."Journal Batch Name",GenJnlLine."Line No.");
+          END;
+        "Posted Document Type"::"Sales Invoice","Posted Document Type"::"Sales Credit Memo":
+          BEGIN
+            SalesHeader.SETRANGE("Incoming Document Entry No.","Entry No.");
+            IF SalesHeader.FINDFIRST THEN
+              ERROR(AlreadyUsedInDocHdrErr,SalesHeader."Document Type",SalesHeader."No.",SalesHeader.TABLECAPTION);
+          END;
+        "Posted Document Type"::"Purchase Invoice","Posted Document Type"::"Purchase Credit Memo":
+          BEGIN
+            PurchaseHeader.SETRANGE("Incoming Document Entry No.","Entry No.");
+            IF PurchaseHeader.FINDFIRST THEN
+              ERROR(AlreadyUsedInDocHdrErr,PurchaseHeader."Document Type",PurchaseHeader."No.",PurchaseHeader.TABLECAPTION);
+          END;
+      END;
+    END;
+
+    PROCEDURE TestReadyForPosting@24();
+    BEGIN
+      TESTFIELD(Posted,FALSE);
+      TESTFIELD(Approved);
+    END;
+
+    PROCEDURE SetPostedDocFields@10(PostingDate@1000 : Date;DocNo@1001 : Code[20]);
+    BEGIN
+      TestReadyForPosting;
+      Posted := TRUE;
+      Status := Status::Posted;
+      "Posted Date-Time" := CURRENTDATETIME;
+      "Document No." := DocNo;
+      "Posting Date" := PostingDate;
+    END;
+
+    PROCEDURE UpdateIncomingDocumentFromPosting@12(IncomingDoumentNo@1000 : Integer;PostingDate@1001 : Date;DocNo@1002 : Code[20]);
+    VAR
+      IncomingDocument@1003 : Record 130;
+    BEGIN
+      IF IncomingDoumentNo = 0 THEN
+        EXIT;
+
+      IF NOT IncomingDocument.GET(IncomingDoumentNo) THEN
+        EXIT;
+
+      IncomingDocument.SetPostedDocFields(PostingDate,DocNo);
+      IncomingDocument.MODIFY;
+    END;
+
+    LOCAL PROCEDURE ClearApprovedFields@22();
+    BEGIN
+      Approved := FALSE;
+      "Approved Date-Time" := 0DT;
+      CLEAR("Approved By User ID");
+    END;
+
+    LOCAL PROCEDURE CreateSalesDoc@14(DocType@1000 : Option);
+    VAR
+      SalesHeader@1001 : Record 36;
+    BEGIN
+      TestReadyForCreateDoc;
+      SalesHeader.SETRANGE("Incoming Document Entry No.","Entry No.");
+      IF NOT SalesHeader.ISEMPTY THEN BEGIN
+        ShowSalesDoc;
+        EXIT;
+      END;
+      SalesHeader.RESET;
+      SalesHeader.INIT;
+      CASE DocType OF
+        DocumentType::Invoice:
+          SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
+        DocumentType::"Credit Memo":
+          SalesHeader."Document Type" := SalesHeader."Document Type"::"Credit Memo";
+      END;
+      SalesHeader.INSERT(TRUE);
+      IF GetURL <> '' THEN
+        SalesHeader.ADDLINK(GetURL,Description);
+      SalesHeader."Incoming Document Entry No." := "Entry No.";
+      SalesHeader.MODIFY;
+      COMMIT;
+      ShowSalesDoc;
+    END;
+
+    LOCAL PROCEDURE ShowSalesDoc@11();
+    VAR
+      SalesHeader@1001 : Record 36;
+    BEGIN
+      SalesHeader.SETRANGE("Incoming Document Entry No.","Entry No.");
+      SalesHeader.FINDFIRST;
+      CASE SalesHeader."Document Type" OF
+        SalesHeader."Document Type"::Invoice:
+          PAGE.RUN(PAGE::"Sales Invoice",SalesHeader);
+        SalesHeader."Document Type"::"Credit Memo":
+          PAGE.RUN(PAGE::"Sales Credit Memo",SalesHeader);
+      END;
+    END;
+
+    LOCAL PROCEDURE CreatePurchDoc@15(DocType@1000 : Option);
+    VAR
+      PurchHeader@1001 : Record 38;
+    BEGIN
+      TestReadyForCreateDoc;
+      PurchHeader.SETRANGE("Incoming Document Entry No.","Entry No.");
+      IF NOT PurchHeader.ISEMPTY THEN BEGIN
+        ShowPurchDoc;
+        EXIT;
+      END;
+      PurchHeader.RESET;
+      PurchHeader.INIT;
+      CASE DocType OF
+        DocumentType::Invoice:
+          PurchHeader."Document Type" := PurchHeader."Document Type"::Invoice;
+        DocumentType::"Credit Memo":
+          PurchHeader."Document Type" := PurchHeader."Document Type"::"Credit Memo";
+      END;
+      PurchHeader.INSERT(TRUE);
+      IF GetURL <> '' THEN
+        PurchHeader.ADDLINK(GetURL,Description);
+      PurchHeader."Incoming Document Entry No." := "Entry No.";
+      PurchHeader.MODIFY;
+      COMMIT;
+      ShowPurchDoc;
+    END;
+
+    LOCAL PROCEDURE ShowPurchDoc@16();
+    VAR
+      PurchHeader@1001 : Record 38;
+    BEGIN
+      PurchHeader.SETRANGE("Incoming Document Entry No.","Entry No.");
+      PurchHeader.FINDFIRST;
+      CASE PurchHeader."Document Type" OF
+        PurchHeader."Document Type"::Invoice:
+          PAGE.RUN(PAGE::"Purchase Invoice",PurchHeader);
+        PurchHeader."Document Type"::"Credit Memo":
+          PAGE.RUN(PAGE::"Purchase Credit Memo",PurchHeader);
+      END;
+    END;
+
+    PROCEDURE SetGenJournalLine@17(VAR GenJnlLine@1000 : Record 81);
+    BEGIN
+      IF GenJnlLine."Incoming Document Entry No." = 0 THEN
+        EXIT;
+      GET(GenJnlLine."Incoming Document Entry No.");
+      TestReadyForCreateDoc;
+      TestIfAlreadyExists;
+      "Posted Document Type" := "Posted Document Type"::Journal;
+      MODIFY;
+      IF NOT DocLinkExists(GenJnlLine) THEN
+        GenJnlLine.ADDLINK(GetURL,Description);
+    END;
+
+    PROCEDURE SetSalesDoc@19(VAR SalesHeader@1000 : Record 36);
+    BEGIN
+      IF SalesHeader."Incoming Document Entry No." = 0 THEN
+        EXIT;
+      GET(SalesHeader."Incoming Document Entry No.");
+      TestReadyForCreateDoc;
+      TestIfAlreadyExists;
+      CASE SalesHeader."Document Type" OF
+        SalesHeader."Document Type"::Invoice:
+          "Posted Document Type" := "Posted Document Type"::"Sales Invoice";
+        SalesHeader."Document Type"::"Credit Memo":
+          "Posted Document Type" := "Posted Document Type"::"Sales Credit Memo";
+      END;
+      MODIFY;
+      IF NOT DocLinkExists(SalesHeader) THEN
+        SalesHeader.ADDLINK(GetURL,Description);
+    END;
+
+    PROCEDURE SetPurchDoc@23(VAR PurchaseHeader@1000 : Record 38);
+    BEGIN
+      IF PurchaseHeader."Incoming Document Entry No." = 0 THEN
+        EXIT;
+      GET(PurchaseHeader."Incoming Document Entry No.");
+      TestReadyForCreateDoc;
+      TestIfAlreadyExists;
+      CASE PurchaseHeader."Document Type" OF
+        PurchaseHeader."Document Type"::Invoice:
+          "Posted Document Type" := "Posted Document Type"::"Purchase Invoice";
+        PurchaseHeader."Document Type"::"Credit Memo":
+          "Posted Document Type" := "Posted Document Type"::"Purchase Credit Memo";
+      END;
+      MODIFY;
+      IF NOT DocLinkExists(PurchaseHeader) THEN
+        PurchaseHeader.ADDLINK(GetURL,Description);
+    END;
+
+    LOCAL PROCEDURE DocLinkExists@18(RecVar@1000 : Variant) : Boolean;
+    VAR
+      RecordLink@1002 : Record 2000000068;
+      RecRef@1001 : RecordRef;
+    BEGIN
+      IF GetURL = '' THEN
+        EXIT(TRUE);
+      RecRef.GETTABLE(RecVar);
+      RecordLink.SETRANGE("Record ID",RecRef.RECORDID);
+      RecordLink.SETRANGE(URL1,URL1);
+      RecordLink.SETRANGE(Description,Description);
+      EXIT(NOT RecordLink.ISEMPTY);
+    END;
+
+    PROCEDURE HyperlinkToDocument@20(DocumentNo@1000 : Code[20];PostingDate@1001 : Date);
+    BEGIN
+      SETRANGE("Document No.",DocumentNo);
+      SETRANGE("Posting Date",PostingDate);
+      IF NOT FINDFIRST THEN BEGIN
+        MESSAGE(NoDocumentMsg);
+        EXIT;
+      END;
+      IF GetURL = '' THEN
+        ERROR(NoURLErr);
+      HYPERLINK(GetURL);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

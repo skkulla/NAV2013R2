@@ -1,0 +1,402 @@
+OBJECT Page 17 G/L Account Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=G/L Account Card;
+               ESM=Ficha cuenta;
+               FRC=Fiche compte GL;
+               ENC=G/L Account Card];
+    SourceTable=Table15;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    OnNewRecord=BEGIN
+                  SetupNewGLAcc(xRec,BelowxRec);
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 36      ;1   ;ActionGroup;
+                      CaptionML=[ENU=A&ccount;
+                                 ESM=&Cuenta;
+                                 FRC=&Compte;
+                                 ENC=A&ccount];
+                      Image=ChartOfAccounts }
+      { 41      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=&Movimientos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      RunObject=Page 20;
+                      RunPageView=SORTING(G/L Account No.);
+                      RunPageLink=G/L Account No.=FIELD(No.);
+                      Promoted=No;
+                      Image=GLRegisters;
+                      PromotedCategory=Process }
+      { 38      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 124;
+                      RunPageLink=Table Name=CONST(G/L Account),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 84      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(15),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 166     ;2   ;Action    ;
+                      CaptionML=[ENU=E&xtended Text;
+                                 ESM=Te&xtos adicionales;
+                                 FRC=&Textes Çtendus;
+                                 ENC=E&xtended Text];
+                      RunObject=Page 391;
+                      RunPageView=SORTING(Table Name,No.,Language Code,All Language Codes,Starting Date,Ending Date);
+                      RunPageLink=Table Name=CONST(G/L Account),
+                                  No.=FIELD(No.);
+                      Image=Text }
+      { 40      ;2   ;Action    ;
+                      CaptionML=[ENU=Receivables-Payables;
+                                 ESM=Cobros y pagos;
+                                 FRC=∑ recevoir - Ö payer;
+                                 ENC=Receivables-Payables];
+                      RunObject=Page 159;
+                      Image=ReceivablesPayables }
+      { 47      ;2   ;Action    ;
+                      CaptionML=[ENU=Where-Used List;
+                                 ESM=Lista punto uso;
+                                 FRC=Liste des cas d'emploi;
+                                 ENC=Where-Used List];
+                      Image=Track;
+                      OnAction=VAR
+                                 CalcGLAccWhereUsed@1000 : Codeunit 100;
+                               BEGIN
+                                 CalcGLAccWhereUsed.CheckGLAcc("No.");
+                               END;
+                                }
+      { 136     ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Balance;
+                                 ESM=&Saldo;
+                                 FRC=&Solde;
+                                 ENC=&Balance];
+                      Image=Balance }
+      { 46      ;2   ;Action    ;
+                      CaptionML=[ENU=G/L &Account Balance;
+                                 ESM=S&aldo cuenta C/G;
+                                 FRC=Solde de &compte du grand livre;
+                                 ENC=G/L &Account Balance];
+                      RunObject=Page 415;
+                      RunPageLink=No.=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Business Unit Filter=FIELD(Business Unit Filter);
+                      Image=GLAccountBalance }
+      { 154     ;2   ;Action    ;
+                      CaptionML=[ENU=G/L &Balance;
+                                 ESM=&Saldo C/G;
+                                 FRC=&Solde du grand livre;
+                                 ENC=G/L &Balance];
+                      RunObject=Page 414;
+                      RunPageOnRec=Yes;
+                      Image=GLBalance }
+      { 138     ;2   ;Action    ;
+                      CaptionML=[ENU=G/L Balance by &Dimension;
+                                 ESM=Saldo C/G &por dimensi¢n;
+                                 FRC=Solde de gr&and livre par dimension;
+                                 ENC=G/L Balance by &Dimension];
+                      RunObject=Page 408;
+                      Image=GLBalanceDimension }
+      { 1906497203;1 ;Action    ;
+                      CaptionML=[ENU=General Posting Setup;
+                                 ESM=Configuraci¢n grupos contables;
+                                 FRC=Config. paramätres report;
+                                 ENC=General Posting Setup];
+                      RunObject=Page 314;
+                      Promoted=Yes;
+                      Image=GeneralPostingSetup;
+                      PromotedCategory=Process }
+      { 1900660103;1 ;Action    ;
+                      CaptionML=[ENU=Tax Posting Setup;
+                                 ESM=Config. grupos registro IVA;
+                                 FRC=Configuration report de taxe;
+                                 ENC=Tax Posting Setup];
+                      RunObject=Page 472;
+                      Promoted=Yes;
+                      Image=VATPostingSetup;
+                      PromotedCategory=Process }
+      { 1900210203;1 ;Action    ;
+                      CaptionML=[ENU=G/L Register;
+                                 ESM=Registro movs. contabilidad;
+                                 FRC=Registre GL;
+                                 ENC=G/L Register];
+                      RunObject=Page 116;
+                      Promoted=Yes;
+                      Image=GLRegisters;
+                      PromotedCategory=Process }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1904257206;1 ;Action    ;
+                      CaptionML=[ENU=Chart of Accounts;
+                                 ESM=Cat†logo de cuentas;
+                                 FRC=Plan comptable;
+                                 ENC=Chart of Accounts];
+                      RunObject=Report 10002;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904842106;1 ;Action    ;
+                      CaptionML=[ENU=Export GIFI Info. to Excel;
+                                 ESM=Exportar info. GIFI a Excel;
+                                 FRC=Exporter donnÇes IGRF vers fichier Excel;
+                                 ENC=Export GIFI Info. to Excel];
+                      RunObject=Report 10005;
+                      Promoted=No;
+                      Image=ExportToExcel;
+                      PromotedCategory=Report }
+      { 1901958806;1 ;Action    ;
+                      CaptionML=[ENU=Consol. Trial Balance;
+                                 ESM=Balance comprobaci¢n consol.;
+                                 FRC=Balance de vÇrification consol.;
+                                 ENC=Consol. Trial Balance];
+                      RunObject=Report 10007;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900210206;1 ;Action    ;
+                      CaptionML=[ENU=G/L Register;
+                                 ESM=Registro movs. contabilidad;
+                                 FRC=Registre GL;
+                                 ENC=G/L Register];
+                      RunObject=Report 10019;
+                      Promoted=No;
+                      Image=GLRegisters;
+                      PromotedCategory=Report }
+      { 1905760806;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance Detail/Summary;
+                                 ESM=Balance compr./resumen;
+                                 FRC=Balance vÇrif. dÇtail/sommaire;
+                                 ENC=Trial Balance Detail/Summary];
+                      RunObject=Report 10021;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902292006;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance, per Global Dim.;
+                                 ESM=Balance comprobaci¢n, por Dim. global;
+                                 FRC=Balance de vÇrification, par dimension globale;
+                                 ENC=Trial Balance, per Global Dim.];
+                      RunObject=Report 10023;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907277506;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance, Spread G. Dim.;
+                                 ESM=Balance comprob., dimen. global extendida;
+                                 FRC=Balance vÇrif., dim. globale Çtendue;
+                                 ENC=Trial Balance, Spread G. Dim.];
+                      RunObject=Report 10025;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 61      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 62      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Apply Template;
+                                 ESM=Aplicar plantilla;
+                                 FRC=Appliquer le modäle;
+                                 ENC=Apply Template];
+                      Image=ApplyTemplate;
+                      OnAction=VAR
+                                 ConfigTemplateMgt@1000 : Codeunit 8612;
+                                 RecRef@1001 : RecordRef;
+                               BEGIN
+                                 RecRef.GETTABLE(Rec);
+                                 ConfigTemplateMgt.UpdateFromTemplateSelection(RecRef);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No.";
+                Importance=Promoted }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name;
+                Importance=Promoted }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Income/Balance";
+                Importance=Promoted }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Debit/Credit" }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Account Type" }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr=Totaling }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="No. of Blank Lines" }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="New Page" }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Search Name" }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr=Balance;
+                Importance=Promoted }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Reconciliation Account" }
+
+    { 57  ;2   ;Field     ;
+                SourceExpr="Automatic Ext. Texts" }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Direct Posting" }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr=Blocked }
+
+    { 32  ;2   ;Field     ;
+                SourceExpr="Last Date Modified" }
+
+    { 1904784501;1;Group  ;
+                CaptionML=[ENU=Posting;
+                           ESM=Registro;
+                           FRC=Report;
+                           ENC=Posting] }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Gen. Posting Type" }
+
+    { 55  ;2   ;Field     ;
+                SourceExpr="Gen. Bus. Posting Group";
+                Importance=Promoted }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Gen. Prod. Posting Group";
+                Importance=Promoted }
+
+    { 39  ;2   ;Field     ;
+                SourceExpr="VAT Bus. Posting Group";
+                Importance=Promoted }
+
+    { 54  ;2   ;Field     ;
+                SourceExpr="VAT Prod. Posting Group";
+                Importance=Promoted }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Tax Group Code" }
+
+    { 59  ;2   ;Field     ;
+                SourceExpr="Default IC Partner G/L Acc. No" }
+
+    { 1904602201;1;Group  ;
+                CaptionML=[ENU=Consolidation;
+                           ESM=Consolidaci¢n;
+                           FRC=Consolidation;
+                           ENC=Consolidation] }
+
+    { 50  ;2   ;Field     ;
+                SourceExpr="Consol. Debit Acc.";
+                Importance=Promoted }
+
+    { 52  ;2   ;Field     ;
+                SourceExpr="Consol. Credit Acc.";
+                Importance=Promoted }
+
+    { 48  ;2   ;Field     ;
+                SourceExpr="Consol. Translation Method";
+                Importance=Promoted }
+
+    { 1904488501;1;Group  ;
+                CaptionML=[ENU=Reporting;
+                           ESM=Notificaci¢n;
+                           FRC=Rapport;
+                           ENC=Reporting] }
+
+    { 64  ;2   ;Field     ;
+                SourceExpr="Exchange Rate Adjustment";
+                Importance=Promoted }
+
+    { 3   ;1   ;Group     ;
+                CaptionML=[ENU=Cost Accounting;
+                           ESM=Contabilidad de costos;
+                           FRC=ComptabilitÇ analytique;
+                           ENC=Cost Accounting];
+                GroupType=Group }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Cost Type No.";
+                Importance=Promoted }
+
+    { 1480000;2;Field     ;
+                SourceExpr="GIFI Code" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1905532107;1;Part   ;
+                SubPageLink=Table ID=CONST(15),
+                            No.=FIELD(No.);
+                PagePartID=Page9083;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

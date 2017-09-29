@@ -1,0 +1,91 @@
+OBJECT Codeunit 1312 Mini Vendor Mgt.
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      NewVendQst@1001 : TextConst 'ENU=This vendor is not registered. Do you want to create a new vendor card for vendor %1?;ESM=Este proveedor no est  registrado. ¨Desea crear una nueva ficha para el proveedor %1?;FRC=Ce fournisseur n''est pas enregistr‚. Voulez-vous cr‚er une nouvelle fiche fournisseur pour le fournisseur %1ÿ?;ENC=This vendor is not registered. Do you want to create a new vendor card for vendor %1?';
+      SelectVendorErr@1000 : TextConst 'ENU=You must select an existing vendor.;ESM=Debe seleccionar un proveedor existente.;FRC=Vous devez s‚lectionner un fournisseur existant.;ENC=You must select an existing vendor.';
+
+    PROCEDURE GetVendorNoByName@56(VendorName@1000 : Text[50]) : Code[20];
+    VAR
+      Vendor@1001 : Record 23;
+    BEGIN
+      Vendor.SETFILTER(Name,VendorName);
+      IF Vendor.COUNT = 1 THEN BEGIN
+        Vendor.FINDFIRST;
+        EXIT(Vendor."No.");
+      END;
+
+      CLEAR(Vendor);
+      Vendor.SETFILTER(Name,'@*' + VendorName + '*');
+      CASE Vendor.COUNT OF
+        0:
+          BEGIN
+            IF CONFIRM(NewVendQst,TRUE,VendorName) THEN
+              EXIT(CreateNewVendor(VendorName));
+            ERROR(SelectVendorErr);
+          END;
+        1:
+          BEGIN
+            Vendor.FINDFIRST;
+            EXIT(Vendor."No.");
+          END;
+        ELSE
+          EXIT(PickVendor(Vendor));
+      END;
+    END;
+
+    LOCAL PROCEDURE CreateNewVendor@59(VendorName@1000 : Text[50]) : Code[20];
+    VAR
+      Vendor@1005 : Record 23;
+      MiniVendorTemplate@1006 : Record 1303;
+      MiniVendorCard@1002 : Page 1330;
+      NewVendorCode@1007 : Code[20];
+    BEGIN
+      NewVendorCode := MiniVendorTemplate.NewVendorFromTemplate;
+      IF NewVendorCode = '' THEN
+        ERROR(SelectVendorErr);
+
+      Vendor.GET(NewVendorCode);
+      Vendor.Name := VendorName;
+      Vendor.MODIFY(TRUE);
+      COMMIT;
+      MiniVendorCard.SETRECORD(Vendor);
+      IF NOT (MiniVendorCard.RUNMODAL = ACTION::OK) THEN
+        ERROR(SelectVendorErr);
+
+      MiniVendorCard.GETRECORD(Vendor);
+
+      EXIT(Vendor."No.");
+    END;
+
+    LOCAL PROCEDURE PickVendor@58(VAR Vendor@1000 : Record 23) : Code[20];
+    VAR
+      MiniVendorList@1001 : Page 1331;
+    BEGIN
+      MiniVendorList.SETTABLEVIEW(Vendor);
+      MiniVendorList.LOOKUPMODE := TRUE;
+      IF MiniVendorList.RUNMODAL <> ACTION::LookupOK THEN
+        ERROR(SelectVendorErr);
+
+      MiniVendorList.GETRECORD(Vendor);
+      EXIT(Vendor."No.");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

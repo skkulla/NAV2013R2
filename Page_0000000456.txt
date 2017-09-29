@@ -1,0 +1,222 @@
+OBJECT Page 456 No. Series
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=No. Series;
+               ESM=Nos. serie;
+               FRC=S‚ries de nø;
+               ENC=No. Series];
+    SourceTable=Table308;
+    PageType=List;
+    RefreshOnActivate=Yes;
+    OnAfterGetRecord=BEGIN
+                       FormUpdateLine;
+                     END;
+
+    OnNewRecord=BEGIN
+                  FormUpdateLine;
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 24      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Series;
+                                 ESM=&Serie;
+                                 FRC=&S‚ries;
+                                 ENC=&Series];
+                      Image=SerialNo }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=Lines;
+                                 ESM=L¡neas;
+                                 FRC=Lignes;
+                                 ENC=Lines];
+                      RunObject=Page 457;
+                      RunPageLink=Series Code=FIELD(Code);
+                      Image=AllLines }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=Relationships;
+                                 ESM=Relaciones;
+                                 FRC=Relations;
+                                 ENC=Relationships];
+                      RunObject=Page 458;
+                      RunPageLink=Code=FIELD(Code);
+                      Image=Relationship }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 22  ;2   ;Field     ;
+                CaptionML=[ENU=Starting Date;
+                           ESM=Fecha inicial;
+                           FRC=Date d‚but;
+                           ENC=Starting Date];
+                SourceExpr=StartDate;
+                Visible=FALSE;
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              DrillDown;
+                            END;
+                             }
+
+    { 20  ;2   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Starting No.;
+                           ESM=N§ inicial;
+                           FRC=Nø d‚but;
+                           ENC=Starting No.];
+                SourceExpr=StartNo;
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              DrillDown;
+                            END;
+                             }
+
+    { 14  ;2   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Ending No.;
+                           ESM=N§ final;
+                           FRC=Dernier nø;
+                           ENC=Ending No.];
+                SourceExpr=EndNo;
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              DrillDown;
+                            END;
+                             }
+
+    { 28  ;2   ;Field     ;
+                CaptionML=[ENU=Last Date Used;
+                           ESM=élt. fecha utilizada;
+                           FRC=DerniŠre date utilis‚e;
+                           ENC=Last Date Used];
+                SourceExpr=LastDateUsed;
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              DrillDown;
+                            END;
+                             }
+
+    { 9   ;2   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Last No. Used;
+                           ESM=élt. n§ utilizado;
+                           FRC=Dernier nø utilis‚;
+                           ENC=Last No. Used];
+                SourceExpr=LastNoUsed;
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              DrillDown;
+                            END;
+                             }
+
+    { 10  ;2   ;Field     ;
+                CaptionML=[ENU=Warning No.;
+                           ESM=N§ advertencia;
+                           FRC=Nø avertissement;
+                           ENC=Warning No.];
+                SourceExpr=WarningNo;
+                Visible=FALSE;
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              DrillDown;
+                            END;
+                             }
+
+    { 16  ;2   ;Field     ;
+                CaptionML=[ENU=Increment-by No.;
+                           ESM=Incremento por n§.;
+                           FRC=Nø ‚chelon;
+                           ENC=Increment-by No.];
+                SourceExpr=IncrementByNo;
+                Visible=FALSE;
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              DrillDown;
+                            END;
+                             }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Default Nos." }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Manual Nos." }
+
+    { 32  ;2   ;Field     ;
+                SourceExpr="Date Order" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      NoSeriesLine@1000 : Record 309;
+      NoSeriesMgt@1001 : Codeunit 396;
+      StartDate@1003 : Date;
+      StartNo@1004 : Code[20];
+      EndNo@1005 : Code[20];
+      LastNoUsed@1006 : Code[20];
+      WarningNo@1007 : Code[20];
+      IncrementByNo@1008 : Integer;
+      LastDateUsed@1009 : Date;
+
+    LOCAL PROCEDURE DrillDown@6();
+    BEGIN
+      NoSeriesMgt.SetNoSeriesLineFilter(NoSeriesLine,Code,0D);
+      IF NoSeriesLine.FIND('-') THEN;
+      NoSeriesLine.SETRANGE("Starting Date");
+      NoSeriesLine.SETRANGE(Open);
+      PAGE.RUNMODAL(0,NoSeriesLine);
+      CurrPage.UPDATE;
+    END;
+
+    LOCAL PROCEDURE FormUpdateLine@3();
+    BEGIN
+      NoSeriesMgt.SetNoSeriesLineFilter(NoSeriesLine,Code,0D);
+      IF NOT NoSeriesLine.FIND('-') THEN
+        NoSeriesLine.INIT;
+      StartDate := NoSeriesLine."Starting Date";
+      StartNo := NoSeriesLine."Starting No.";
+      EndNo := NoSeriesLine."Ending No.";
+      LastNoUsed := NoSeriesLine."Last No. Used";
+      WarningNo := NoSeriesLine."Warning No.";
+      IncrementByNo := NoSeriesLine."Increment-by No.";
+      LastDateUsed := NoSeriesLine."Last Date Used"
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

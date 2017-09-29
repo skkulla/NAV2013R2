@@ -1,0 +1,87 @@
+OBJECT Table 293 Reminder Level
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=Reminder Terms Code,No.;
+    OnDelete=BEGIN
+               ReminderText.SETRANGE("Reminder Terms Code","Reminder Terms Code");
+               ReminderText.SETRANGE("Reminder Level","No.");
+               ReminderText.DELETEALL;
+
+               CurrencyForReminderLevel.SETRANGE("Reminder Terms Code","Reminder Terms Code");
+               CurrencyForReminderLevel.SETRANGE("No.","No.");
+               CurrencyForReminderLevel.DELETEALL;
+             END;
+
+    CaptionML=[ENU=Reminder Level;
+               ESM=Nivel recordatorio;
+               FRC=Niveau rappel;
+               ENC=Reminder Level];
+    LookupPageID=Page432;
+    DrillDownPageID=Page432;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Reminder Terms Code ;Code10        ;TableRelation="Reminder Terms";
+                                                   CaptionML=[ENU=Reminder Terms Code;
+                                                              ESM=C¢d. recordatorio;
+                                                              FRC=Code modalit‚ de rappel;
+                                                              ENC=Reminder Terms Code];
+                                                   NotBlank=Yes }
+    { 2   ;   ;No.                 ;Integer       ;CaptionML=[ENU=No.;
+                                                              ESM=N§;
+                                                              FRC=Nø;
+                                                              ENC=No.];
+                                                   MinValue=1;
+                                                   NotBlank=Yes }
+    { 3   ;   ;Grace Period        ;DateFormula   ;CaptionML=[ENU=Grace Period;
+                                                              ESM=Periodo gracia;
+                                                              FRC=D‚lai de grƒce;
+                                                              ENC=Grace Period] }
+    { 4   ;   ;Additional Fee (LCY);Decimal       ;CaptionML=[ENU=Additional Fee ($);
+                                                              ESM=Recargo fijo ($);
+                                                              FRC=Frais suppl. ($);
+                                                              ENC=Additional Fee ($)];
+                                                   MinValue=0;
+                                                   AutoFormatType=1 }
+    { 5   ;   ;Calculate Interest  ;Boolean       ;CaptionML=[ENU=Calculate Interest;
+                                                              ESM=C lculo inter‚s;
+                                                              FRC=Calculer int‚rˆts;
+                                                              ENC=Calculate Interest] }
+    { 6   ;   ;Due Date Calculation;DateFormula   ;CaptionML=[ENU=Due Date Calculation;
+                                                              ESM=C lculo de fecha de vencimiento;
+                                                              FRC=Calcul date d'‚ch‚ance;
+                                                              ENC=Due Date Calculation] }
+  }
+  KEYS
+  {
+    {    ;Reminder Terms Code,No.                 ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      ReminderLevel@1000 : Record 293;
+      ReminderText@1001 : Record 294;
+      CurrencyForReminderLevel@1002 : Record 329;
+
+    PROCEDURE NewRecord@1();
+    BEGIN
+      ReminderLevel.SETRANGE("Reminder Terms Code","Reminder Terms Code");
+      IF ReminderLevel.FINDLAST THEN;
+      "No." := ReminderLevel."No." + 1;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

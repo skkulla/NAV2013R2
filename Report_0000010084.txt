@@ -1,0 +1,202 @@
+OBJECT Report 10084 Void/Transmit Elec. Payments
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10.00.36366;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Void/Transmit Electronic Payments;
+               ESM=Anular/Transmitir pagos electr¢nicos;
+               FRC=Annuler/transmettre paiements ‚lectroniques;
+               ENC=Void/Transmit Electronic Payments];
+    ProcessingOnly=Yes;
+    OnPreReport=BEGIN
+                  WITH BankAccount DO BEGIN
+                    GET("No.");
+                    TESTFIELD(Blocked,FALSE);
+                    TESTFIELD("Currency Code",'');  // local currency only
+                    TESTFIELD("Export Format");
+
+                    IF UsageType <> UsageType::Transmit THEN
+                      IF NOT CONFIRM(Text000,
+                           FALSE,
+                           UsageType,
+                           TABLECAPTION,
+                           "No.")
+                      THEN
+                        CurrReport.QUIT;
+                  END;
+                END;
+
+  }
+  DATASET
+  {
+    { 7024;    ;DataItem;                    ;
+               DataItemTable=Table81;
+               DataItemTableView=SORTING(Journal Template Name,Journal Batch Name,Line No.)
+                                 WHERE(Document Type=FILTER(Payment|Refund),
+                                       Bank Payment Type=FILTER(Electronic Payment|Electronic Payment-IAT),
+                                       Check Printed=CONST(Yes),
+                                       Check Exported=CONST(Yes),
+                                       Check Transmitted=CONST(No));
+               OnPreDataItem=BEGIN
+                               FirstTime := TRUE;
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  IF "Account Type" = "Account Type"::"Bank Account" THEN BEGIN
+                                    IF "Account No." <> BankAccount."No." THEN
+                                      CurrReport.SKIP;
+                                  END ELSE
+                                    IF "Bal. Account Type" = "Bal. Account Type"::"Bank Account" THEN BEGIN
+                                      IF "Bal. Account No." <> BankAccount."No." THEN
+                                        CurrReport.SKIP;
+                                    END ELSE
+                                      CurrReport.SKIP;
+
+                                  IF FirstTime THEN BEGIN
+                                    FileName := BankAccount."E-Pay Export File Path" + "Export File Name";
+                                    CASE UsageType OF
+                                      UsageType::Void:
+                                        BEGIN
+                                          IF RBMgt.ClientFileExists(FileName) THEN
+                                            RBMgt.DeleteClientFile(FileName)
+                                          ELSE
+                                            ERROR(Text001,FileName);
+                                        END;
+                                      UsageType::Transmit:
+                                        BEGIN
+                                          IF NOT RTCConfirmTransmit THEN
+                                            EXIT;
+                                          IF RBMgt.ClientFileExists(FileName) THEN BEGIN
+                                            CASE BankAccount."Export Format" OF
+                                              BankAccount."Export Format"::US:
+                                                ExportPaymentsACH.TransmitExportedFile(BankAccount."No.","Export File Name");
+                                              BankAccount."Export Format"::CA:
+                                                ExportPaymentsRB.TransmitExportedFile(BankAccount."No.","Export File Name");
+                                              BankAccount."Export Format"::MX:
+                                                ExportPaymentsCecoban.TransmitExportedFile(BankAccount."No.","Export File Name");
+                                              ELSE
+                                                ERROR(
+                                                  Text002,
+                                                  BankAccount."Export Format",
+                                                  BankAccount.FIELDCAPTION("Export Format"),
+                                                  BankAccount.TABLECAPTION,
+                                                  BankAccount."No.");
+                                            END;
+                                            IF RBMgt.ClientFileExists(FileName) THEN BEGIN
+                                              CurrReport.QUIT;
+                                              EXIT;
+                                            END;
+                                          END ELSE
+                                            ERROR(Text003,FileName);
+                                        END;
+                                    END;
+                                    FirstTime := FALSE;
+                                  END;
+                                  CheckManagement.ProcessElectronicPayment("Gen. Journal Line",UsageType);
+
+                                  IF UsageType = UsageType::Void THEN BEGIN
+                                    "Check Exported" := FALSE;
+                                    "Check Printed" := FALSE;
+                                    "Document No." := '';
+                                  END ELSE
+                                    "Check Transmitted" := TRUE;
+
+                                  MODIFY;
+                                END;
+                                 }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+      SaveValues=Yes;
+      OnOpenPage=BEGIN
+                   DisplayUsageType := UsageType;
+                   IF DisplayUsageType = 0 THEN
+                     ERROR(Text004);
+                 END;
+
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             ESM=Opciones;
+                             FRC=Options;
+                             ENC=Options] }
+
+      { 1   ;2   ;Field     ;
+                  CaptionML=[ENU=Bank Account No.;
+                             ESM=C¢d. cuenta banco;
+                             FRC=Nø de compte bancaire;
+                             ENC=Bank Account No.];
+                  SourceExpr=BankAccount."No.";
+                  TableRelation="Bank Account" }
+
+      { 3   ;2   ;Field     ;
+                  CaptionML=[ENU=E-Pay Operation;
+                             ESM=Oper. pago electr.;
+                             FRC=Op‚ration de paiement ‚lectronique;
+                             ENC=CPA Operation];
+                  OptionCaptionML=[ENU=,Void,Transmit;
+                                   ESM=,Anular,Transmitir;
+                                   FRC=,Nul,Transmettre;
+                                   ENC=,Void,Transmit];
+                  SourceExpr=DisplayUsageType;
+                  Editable=FALSE }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      BankAccount@1000 : Record 270;
+      CheckManagement@1001 : Codeunit 367;
+      ExportPaymentsACH@1002 : Codeunit 10090;
+      ExportPaymentsRB@1020000 : Codeunit 10091;
+      ExportPaymentsCecoban@1020002 : Codeunit 10092;
+      RBMgt@1020003 : Codeunit 419;
+      FileName@1003 : Text;
+      FirstTime@1004 : Boolean;
+      UsageType@1005 : ',Void,Transmit';
+      DisplayUsageType@1006 : ',Void,Transmit';
+      Text000@1007 : TextConst 'ENU=Are you SURE you want to %1 all of the Electronic Payments written against %2 %3?;ESM=¨DESEA %1 todos los pagos electr¢nicos de %2 %3?;FRC=Òtes-vous vous CERTAIN de vouloir %1 tous les paiements ‚lectroniques inscrits contre %2 %3?;ENC=Are you SURE you want to %1 all of the Electronic Payments written against %2 %3?';
+      Text001@1008 : TextConst 'ENU=The export file, %1, has already been transmitted. You can no longer void these entries.;ESM=El archivo exportado, %1, ya se ha transmitido. Ya no puede anular estos movimientos.;FRC=Le fichier d''exportation, %1, a d‚j… ‚t‚ transmis. Impossible d''annuler ces ‚critures.;ENC=The export file, %1, has already been transmitted. You can no longer void these entries.';
+      Text002@1009 : TextConst 'ENU=%1 is not a valid %2 in %3 %4.;ESM=%1 no es un valor de %2 v lido en %3 %4.;FRC=%1 n''est pas un %2 valide dans %3 %4.;ENC=%1 is not a valid %2 in %3 %4.';
+      Text003@1010 : TextConst 'ENU=The export file, %1, has already been transmitted.;ESM=El archivo exportado, %1, ya se ha transmitido.;FRC=Le fichier d''exportation, %1, a d‚j… ‚t‚ transmis.;ENC=The export file, %1, has already been transmitted.';
+      Text004@1020001 : TextConst 'ENU=This process can only be run from the Payment Journal;ESM=Este proceso s¢lo puede ejecutarse desde el diario de pagos;FRC=Ce traitement peut seulement ˆtre activ‚ … partir du journal des paiements;ENC=This process can only be run from the Payment Journal';
+      Text005@1480000 : TextConst 'ENU=Has export file, %1, been successfully transmitted?;ESM=¨Se transmiti¢ correctamente el archivo de exportaci¢n %1?;FRC=Le fichier d''exportation %1 a-t-il ‚t‚ correctement transmis?;ENC=Has export file, %1, been successfully transmitted?';
+
+    PROCEDURE SetUsageType@2(NewUsageType@1000 : ',Void,Transmit');
+    BEGIN
+      UsageType := NewUsageType;
+    END;
+
+    PROCEDURE RTCConfirmTransmit@1480000() : Boolean;
+    BEGIN
+      IF NOT CONFIRM(Text005,FALSE,FileName) THEN
+        EXIT(FALSE);
+
+      EXIT(TRUE);
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

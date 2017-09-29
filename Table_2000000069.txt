@@ -1,0 +1,54 @@
+OBJECT Table 2000000069 Client Add-in
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/02/14;
+    Time=12:00:00 PM;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Client Add-in;
+               ESM=Complemento de cliente;
+               FRC=Compl‚ment du client;
+               ENC=Client Add-in];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Control Add-in Name ;Text220       ;CaptionML=[ENU=Control Add-in Name;
+                                                              ESM=Nombre complemento control;
+                                                              FRC=Contr“ler le nom du compl‚ment;
+                                                              ENC=Control Add-in Name] }
+    { 5   ;   ;Public Key Token    ;Text20        ;CaptionML=[ENU=Public Key Token;
+                                                              ESM=Token de clave p£blica;
+                                                              FRC=Jeton cl‚ publique;
+                                                              ENC=Public Key Token] }
+    { 8   ;   ;Version             ;Text25        ;CaptionML=[ENU=Version;
+                                                              ESM=Versi¢n;
+                                                              FRC=Version;
+                                                              ENC=Version] }
+    { 20  ;   ;Description         ;Text250       ;CaptionML=[ENU=Description;
+                                                              ESM=Descripci¢n;
+                                                              FRC=Description;
+                                                              ENC=Description] }
+    { 25  ;   ;Resource            ;BLOB          ;CaptionML=[ENU=Resource;
+                                                              ESM=Recurso;
+                                                              FRC=Ressource;
+                                                              ENC=Resource] }
+  }
+  KEYS
+  {
+    {    ;Control Add-in Name,Public Key Token    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

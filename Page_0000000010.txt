@@ -1,0 +1,86 @@
+OBJECT Page 10 Countries/Regions
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Countries/Regions;
+               ESM=Pa¡ses y regiones;
+               FRC=Pays/R‚gions;
+               ENC=Countries/Regions];
+    SourceTable=Table9;
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 17      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Country/Region;
+                                 ESM=&Pa¡s/regi¢n;
+                                 FRC=&Pays/R‚gion;
+                                 ENC=&Country/Region];
+                      Image=CountryRegion }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Reg. No. Formats;
+                                 ESM=Formatos RFC/Curp;
+                                 FRC=Formats nø d'inscription TPS/TVH;
+                                 ENC=GST/HST Reg. No. Formats];
+                      RunObject=Page 575;
+                      RunPageLink=Country/Region Code=FIELD(Code);
+                      Image=NumberSetup }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Address Format" }
+
+    { 15  ;2   ;Field     ;
+                SourceExpr="Contact Address Format" }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="EU Country/Region Code";
+                Visible=FALSE }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Intrastat Code";
+                Visible=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,494 @@
+OBJECT Page 1357 Mini Posted Purchase Invoice
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posted Purchase Invoice;
+               ESM=Hist¢rico facturas compra;
+               FRC=Facture d'achat report‚e;
+               ENC=Posted Purchase Invoice];
+    InsertAllowed=No;
+    SourceTable=Table122;
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Correct,Navigation;
+                                ESM=Nuevo,Proceso,Informe,Corregir,Exploraci¢n;
+                                FRC=Nouveau,Traitement,Rapport,Correct,Navigation;
+                                ENC=New,Process,Report,Correct,Navigation];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 25      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Correct;
+                                 ESM=Corregir;
+                                 FRC=Corriger;
+                                 ENC=Correct] }
+      { 23      ;2   ;Action    ;
+                      Name=CorrectInvoice;
+                      CaptionML=[ENU=Correct;
+                                 ESM=Corregir;
+                                 FRC=Corriger;
+                                 ENC=Correct];
+                      ToolTipML=[ENU=Create a new open version of this posted purchase invoice where you can make the correction. This posted purchase invoice will be canceled.;
+                                 ESM=Cree una nueva versi¢n abierta de esta factura de compra registrada en la que pueda realizar la correcci¢n. Esta factura de compra registrada se cancelar .;
+                                 FRC=Cr‚ez une nouvelle version ouverte de cette facture d'achat report‚e dans laquelle vous pourrez apporter la correction. Cette facture d'achat report‚e sera annul‚e.;
+                                 ENC=Create a new open version of this posted purchase invoice where you can make the correction. This posted purchase invoice will be cancelled.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Undo;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 CorrectPstdPurchInvYesNo@1000 : Codeunit 1324;
+                               BEGIN
+                                 IF CorrectPstdPurchInvYesNo.CorrectInvoice(Rec) THEN
+                                   CurrPage.CLOSE;
+                               END;
+                                }
+      { 21      ;2   ;Action    ;
+                      Name=CancelInvoice;
+                      CaptionML=[ENU=Cancel;
+                                 ESM=Cancelar;
+                                 FRC=Annuler;
+                                 ENC=Cancel];
+                      ToolTipML=[ENU=Create and post a purchase credit memo that reverses this posted purchase invoice. This posted purchase invoice will be canceled.;
+                                 ESM=Cree y registre una nota de cr‚dito de compra que revierta esta factura de compra registrada. Esta factura de compra registrada se cancelar .;
+                                 FRC=Cr‚ez et reportez une note de cr‚dit d'achat qui inverse cette facture d'achat report‚e. Cette facture d'achat report‚e sera annul‚e.;
+                                 ENC=Create and post a purchase credit memo that reverses this posted purchase invoice. This posted purchase invoice will be cancelled.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Cancel;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 CancelPstdPurchInvYesNo@1000 : Codeunit 1325;
+                               BEGIN
+                                 IF CancelPstdPurchInvYesNo.CancelInvoice(Rec) THEN
+                                   CurrPage.CLOSE;
+                               END;
+                                }
+      { 4       ;2   ;Action    ;
+                      Name=CreateCreditMemo;
+                      CaptionML=[ENU=Create Corrective Credit Memo;
+                                 ESM=Create Corrective Credit Memo;
+                                 FRC=Create Corrective Credit Memo;
+                                 ENC=Create Corrective Credit Memo];
+                      Promoted=Yes;
+                      Image=CreateCreditMemo;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 PurchaseHeader@1001 : Record 38;
+                                 CorrectPostedPurchInvoice@1000 : Codeunit 1313;
+                               BEGIN
+                                 CorrectPostedPurchInvoice.CreateCreditMemoCopyDocument(Rec,PurchaseHeader);
+                                 PAGE.RUN(PAGE::"Mini Purchase Credit Memo",PurchaseHeader);
+                                 CurrPage.CLOSE;
+                               END;
+                                }
+      { 53      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Navigation;
+                                 ESM=Exploraci¢n;
+                                 FRC=Navigation;
+                                 ENC=Navigation];
+                      Image=Invoice }
+      { 11      ;2   ;Action    ;
+                      Name=Vendor;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Vendor;
+                                 ESM=Proveedor;
+                                 FRC=Fournisseur;
+                                 ENC=Vendor];
+                      ToolTipML=[ENU=View or edit detailed information about the vendor on the posted purchase document.;
+                                 ESM=Vea o edite la informaci¢n detallada sobre el proveedor en el documento de compra registrado.;
+                                 FRC=Affichez ou modifiez des informations d‚taill‚es concernant le fournisseur sur le document d'achat report‚.;
+                                 ENC=View or edit detailed information about the vendor on the posted purchase document.];
+                      RunObject=Page 1330;
+                      RunPageLink=No.=FIELD(Buy-from Vendor No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Vendor;
+                      PromotedCategory=Category5 }
+      { 19      ;2   ;Action    ;
+                      Name=ShowCreditMemo;
+                      CaptionML=[ENU=Show Corrective Credit Memo;
+                                 ESM=Mostrar nota de cr‚dito correctiva;
+                                 FRC=Afficher une note de cr‚dit corrective;
+                                 ENC=Show Corrective Credit Memo];
+                      ToolTipML=[ENU=Open the posted purchase credit memo that was created when you canceled the posted purchase invoice.;
+                                 ESM=Abra la nota de cr‚dito de compra registrada que se cre¢ al cancelar la factura de compra registrada.;
+                                 FRC=Ouvrez la note de cr‚dit d'achat report‚e qui a ‚t‚ cr‚‚e lorsque vous avez annul‚ la facture d'achat report‚e.;
+                                 ENC=Open the posted purchase credit memo that was created when you cancelled the posted purchase invoice.];
+                      RunObject=Page 1371;
+                      RunPageLink=No.=FIELD(Canceled By);
+                      Promoted=Yes;
+                      Enabled=Canceled;
+                      PromotedIsBig=Yes;
+                      Image=CreditMemo;
+                      PromotedCategory=Category5 }
+      { 57      ;2   ;Action    ;
+                      Name=Navigate;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      ToolTipML=[ENU=Find all entries and documents that exist for the document number and posting date on the posted purchase document.;
+                                 ESM=Busque todas las entradas y los documentos que existen para el n£mero de documento y la fecha de registro del documento de compra registrado.;
+                                 FRC=Recherchez toutes les ‚critures et tous les documents qui existent pour le num‚ro de document et la date de report sur le document d'achat report‚.;
+                                 ENC=Find all entries and documents that exist for the document number and posting date on the posted purchase document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+      { 13      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Print;
+                                 ESM=Imprimir;
+                                 FRC=Imprimer;
+                                 ENC=Print] }
+      { 56      ;2   ;Action    ;
+                      Name=Print;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=Im&primir;
+                                 FRC=Im&primer;
+                                 ENC=&Print];
+                      Promoted=Yes;
+                      Image=Print;
+                      PromotedCategory=Report;
+                      OnAction=BEGIN
+                                 CurrPage.SETSELECTIONFILTER(PurchInvHeader);
+                                 PurchInvHeader.PrintRecords(NOT AllowDotNetAddIn);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 3   ;2   ;Group     ;
+                Name=VendorDetails;
+                CaptionML=[ENU=Vendor Details;
+                           ESM=Detalles proveedor;
+                           FRC=D‚tails fournisseur;
+                           ENC=Vendor Details];
+                GroupType=Group }
+
+    { 59  ;3   ;Field     ;
+                CaptionML=[ENU=Vendor Name;
+                           ESM=Nombre proveedor;
+                           FRC=Nom du fournisseur;
+                           ENC=Vendor Name];
+                ToolTipML=[ENU=Specifies the name of the vendor who shipped the items.;
+                           ESM=Especifica el nombre del proveedor que envi¢ los productos.;
+                           FRC=Sp‚cifie le nom du fournisseur qui a exp‚di‚ les articles.;
+                           ENC=Specifies the name of the vendor who shipped the items.];
+                SourceExpr="Buy-from Vendor Name";
+                Editable=FALSE }
+
+    { 61  ;3   ;Field     ;
+                CaptionML=[ENU=Address;
+                           ESM=Direcci¢n;
+                           FRC=Adresse;
+                           ENC=Address];
+                ToolTipML=[ENU=Specifies the address of the vendor who shipped the items.;
+                           ESM=Especifica la direcci¢n del proveedor que envi¢ los productos.;
+                           FRC=Sp‚cifie l'adresse du fournisseur.;
+                           ENC=Specifies the address of the vendor who shipped the items.];
+                SourceExpr="Buy-from Address";
+                Editable=FALSE }
+
+    { 63  ;3   ;Field     ;
+                CaptionML=[ENU=Address 2;
+                           ESM=Colonia;
+                           FRC=Adresse 2;
+                           ENC=Address 2];
+                ToolTipML=[ENU=Contains an additional part of the address of the vendor who shipped the items.;
+                           ESM=contiene una parte adicional de la direcci¢n del proveedor que envi¢ los productos.;
+                           FRC=Contient un compl‚ment … l'adresse du fournisseur qui a exp‚di‚ les articles.;
+                           ENC=Contains an additional part of the address of the vendor who shipped the items.];
+                SourceExpr="Buy-from Address 2";
+                Editable=FALSE }
+
+    { 6   ;3   ;Field     ;
+                CaptionML=[ENU=ZIP Code;
+                           ESM=C.P.;
+                           FRC=Code postal;
+                           ENC=Postal/ZIP Code];
+                ToolTipML=[ENU=Specifies the post code of the vendor's address that items are purchased from.;
+                           ESM=Especifica el c¢digo postal de la direcci¢n del proveedor donde se compran los productos.;
+                           FRC=Sp‚cifie le code postal de l'adresse du fournisseur auprŠs duquel les articles sont achet‚s.;
+                           ENC=Specifies the postal/ZIP code of the vendor's address that items are purchased from.];
+                SourceExpr="Buy-from Post Code";
+                Editable=FALSE }
+
+    { 65  ;3   ;Field     ;
+                CaptionML=[ENU=City;
+                           ESM=Municipio/Ciudad;
+                           FRC=Ville;
+                           ENC=City];
+                ToolTipML=[ENU=Specifies the city of the vendor who shipped the items.;
+                           ESM=Especifica el Municipio/Ciudad del proveedor que envi¢ los productos.;
+                           FRC=Sp‚cifie le nom de la ville du fournisseur.;
+                           ENC=Specifies the city of the vendor who shipped the items.];
+                SourceExpr="Buy-from City";
+                Editable=FALSE }
+
+    { 67  ;3   ;Field     ;
+                CaptionML=[ENU=Contact;
+                           ESM=Contacto;
+                           FRC=Contact;
+                           ENC=Contact];
+                ToolTipML=[ENU=Specifies the name of the person to contact at the vendor who shipped the items.;
+                           ESM=Especifica el nombre de la persona de contacto del proveedor que envi¢ los productos.;
+                           FRC=Sp‚cifie le nom de la personne … contacter chez le fournisseur.;
+                           ENC=Specifies the name of the person to contact at the vendor who shipped the items.];
+                SourceExpr="Buy-from Contact";
+                Editable=FALSE }
+
+    { 2   ;2   ;Group     ;
+                Name=InvoiceDetails;
+                CaptionML=[ENU=Invoice Details;
+                           ESM=Detalles factura;
+                           FRC=D‚tails facture;
+                           ENC=Invoice Details];
+                GroupType=Group }
+
+    { 12  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the date the purchase header was posted.;
+                           ESM=Especifica la fecha en que se registr¢ la cabecera de compra.;
+                           FRC=Sp‚cifie la date de validation de l'en-tˆte achat.;
+                           ENC=Specifies the date the purchase header was posted.];
+                SourceExpr="Posting Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 71  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the date on which the purchase document was created.;
+                           ESM=Especifica la fecha en que se cre¢ el documento de compra.;
+                           FRC=Affiche la date document … laquelle le document achat a ‚t‚ cr‚‚.;
+                           ENC=Specifies the date on which the purchase document was created.];
+                SourceExpr="Document Date";
+                Editable=FALSE }
+
+    { 50  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the date on which the invoiced items were expected.;
+                           ESM=Especifica la fecha en que se esperaban los productos facturados.;
+                           FRC=Indique la date de r‚ception pr‚vue des articles factur‚s.;
+                           ENC=Specifies the date on which the invoiced items were expected.];
+                SourceExpr="Expected Receipt Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 14  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's own invoice number.;
+                           ESM=Especifica el n£mero de factura propio del proveedor.;
+                           FRC=Sp‚cifie le num‚ro de facture propre au fournisseur.;
+                           ENC=Specifies the vendor's own invoice number.];
+                SourceExpr="Vendor Invoice No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 83  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the purchase document that the posted invoice was created for.;
+                           ESM=Especifica el n£mero del documento de compra para el cual se cre¢ la factura registrada.;
+                           FRC=Sp‚cifie le num‚ro de document achat pour lequel la facture enregistr‚e a ‚t‚ cr‚‚e.;
+                           ENC=Specifies the number of the purchase document that the posted invoice was created for.];
+                SourceExpr="Pre-Assigned No.";
+                Editable=FALSE }
+
+    { 16  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies how many times the invoice has been printed.;
+                           ESM=Especifica el n£mero de copias impresas de la factura.;
+                           FRC=Indique combien de fois la facture a ‚t‚ imprim‚e.;
+                           ENC=Specifies how many times the invoice has been printed.];
+                SourceExpr="No. Printed";
+                Editable=FALSE }
+
+    { 7   ;2   ;Group     ;
+                Name=PaymentDetails;
+                CaptionML=[ENU=Payment Details;
+                           ESM=Detalles del pago;
+                           FRC=D‚tails de paiement;
+                           ENC=Payment Details];
+                GroupType=Group }
+
+    { 30  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the code to use to find the payment terms that apply to the purchase header.;
+                           ESM=Especifica el c¢digo que usa el sistema para buscar los t‚rminos de pago que se aplican a la cabecera de compra.;
+                           FRC=Indique le code … utiliser pour trouver les conditions de paiement qui s'appliquent … l'en-tˆte achat.;
+                           ENC=Specifies the code to use to find the payment terms that apply to the purchase header.];
+                SourceExpr="Payment Terms Code";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 32  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies when the invoice is due. The program calculates the date using the Payment Terms Code and Document Date fields on the purchase header.;
+                           ESM=Especifica cuando vence la factura. El programa calcula la fecha a partir de los campos C¢d. t‚rminos pago y Fecha emisi¢n documento de la cabecera de compra.;
+                           FRC=Sp‚cifie la date d'‚ch‚ance de la facture. Le programme calcule la date … l'aide des champs Code modalit‚s de paiement et Date document de l'en-tˆte achat.;
+                           ENC=Specifies when the invoice is due. The program calculates the date using the Payment Terms Code and Document Date fields on the purchase header.];
+                SourceExpr="Due Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 84  ;3   ;Field     ;
+                ToolTipML=[ENU=Describes the method of payment for payments to vendors. The program has copied the code from the Payment Method Code field on the purchase header.;
+                           ESM=Describe la forma de pago para los pagos a proveedores. El programa ha copiado el c¢digo del campo C¢d. forma pago de la cabecera de compra.;
+                           FRC=D‚crit le mode de rŠglement qui s'applique aux paiements aux fournisseurs. Le programme a copi‚ le code … partir du champ Code mode de paiement de l'en-tˆte achat.;
+                           ENC=Describes the method of payment for payments to vendors. The program has copied the code from the Payment Method Code field on the purchase header.];
+                SourceExpr="Payment Method Code";
+                Editable=FALSE }
+
+    { 9   ;2   ;Group     ;
+                Name=Status;
+                GroupType=Group }
+
+    { 15  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted purchase invoice is paid.;
+                           ESM=Especifica si la factura de compra registrada se ha pagado.;
+                           FRC=Indique si la facture achat valid‚e est pay‚e.;
+                           ENC=Specifies if the posted purchase invoice is paid.];
+                SourceExpr=Paid }
+
+    { 17  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted purchase invoice has been either corrected or canceled.;
+                           ESM=Especifica si se ha corregido o cancelado la factura de compra registrada.;
+                           FRC=Indique si la facture achat valid‚e a ‚t‚ corrig‚e ou annul‚e.;
+                           ENC=Specifies if the posted purchase invoice has been either corrected or cancelled.];
+                SourceExpr=Canceled }
+
+    { 1907468901;2;Group  ;
+                Name=Currency;
+                CaptionML=[ENU=Currency;
+                           ESM=Divisa;
+                           FRC=Devise;
+                           ENC=Currency];
+                GroupType=Group }
+
+    { 87  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the currency code used to calculate the amounts on the invoice.;
+                           ESM=Especifica el c¢digo de la divisa utilizado para calcular los importes de la factura.;
+                           FRC=Sp‚cifie le code devise utilis‚ pour calculer les montants de la facture.;
+                           ENC=Specifies the currency code used to calculate the amounts on the invoice.];
+                SourceExpr="Currency Code";
+                Importance=Promoted }
+
+    { 52  ;1   ;Part      ;
+                Name=PurchInvLines;
+                SubPageLink=Document No.=FIELD(No.);
+                PagePartID=Page1358 }
+
+    { 5   ;1   ;Group     ;
+                Name=PayToAndShipToAddresses;
+                CaptionML=[ENU=Vendor Addresses;
+                           ESM=Pago-a N§ direcciones proveedor;
+                           FRC=Adresses fournisseur cr‚ancier;
+                           ENC=Vendor Addresses];
+                GroupType=Group }
+
+    { 20  ;2   ;Field     ;
+                CaptionML=[ENU=Name;
+                           ESM=Nombre;
+                           FRC=Nom;
+                           ENC=Name];
+                ToolTipML=[ENU=Specifies the name of the vendor that you received the invoice from.;
+                           ESM=Especifica el nombre del proveedor de quien recibi¢ la factura.;
+                           FRC=Sp‚cifie le nom du fournisseur ayant envoy‚ la facture.;
+                           ENC=Specifies the name of the vendor that you received the invoice from.];
+                SourceExpr="Pay-to Name";
+                Editable=FALSE }
+
+    { 22  ;2   ;Field     ;
+                CaptionML=[ENU=Address;
+                           ESM=Direcci¢n;
+                           FRC=Adresse;
+                           ENC=Address];
+                ToolTipML=[ENU=Specifies the address of the vendor that you received the invoice from.;
+                           ESM=Especifica la direcci¢n del proveedor del que recibi¢ la factura.;
+                           FRC=Sp‚cifie l'adresse du fournisseur ayant envoy‚ la facture.;
+                           ENC=Specifies the address of the vendor that you received the invoice from.];
+                SourceExpr="Pay-to Address";
+                Editable=FALSE }
+
+    { 24  ;2   ;Field     ;
+                CaptionML=[ENU=Address 2;
+                           ESM=Colonia;
+                           FRC=Adresse 2;
+                           ENC=Address 2];
+                ToolTipML=[ENU=Contains an additional part of the address of the vendor that the invoice was received from.;
+                           ESM=Contiene una parte adicional de la direcci¢n del proveedor del que se recibi¢ la factura.;
+                           FRC=Contient un compl‚ment … l'adresse du fournisseur qui vous a fourni la facture.;
+                           ENC=Contains an additional part of the address of the vendor that the invoice was received from.];
+                SourceExpr="Pay-to Address 2";
+                Editable=FALSE }
+
+    { 78  ;2   ;Field     ;
+                CaptionML=[ENU=ZIP Code;
+                           ESM=C.P.;
+                           FRC=Code postal;
+                           ENC=Postal/ZIP Code];
+                ToolTipML=[ENU=Specifies the post code of the vendor's address that payment is made to.;
+                           ESM=Especifica el c¢digo postal de la direcci¢n del proveedor al que se paga.;
+                           FRC=Sp‚cifie le code postal de l'adresse du fournisseur … payer.;
+                           ENC=Specifies the postal/ZIP code of the vendor's address that payment is made to.];
+                SourceExpr="Pay-to Post Code";
+                Editable=FALSE }
+
+    { 26  ;2   ;Field     ;
+                CaptionML=[ENU=City;
+                           ESM=Municipio/Ciudad;
+                           FRC=Ville;
+                           ENC=City];
+                ToolTipML=[ENU=Specifies the city name of the vendor that you received the invoice from.;
+                           ESM=Especifica el nombre del Municipio/Ciudad del proveedor de quien recibi¢ la factura.;
+                           FRC=Sp‚cifie la ville du fournisseur ayant envoy‚ la facture.;
+                           ENC=Specifies the city name of the vendor that you received the invoice from.];
+                SourceExpr="Pay-to City";
+                Editable=FALSE }
+
+    { 28  ;2   ;Field     ;
+                CaptionML=[ENU=Contact;
+                           ESM=Contacto;
+                           FRC=Contact;
+                           ENC=Contact];
+                ToolTipML=[ENU=Specifies the name of the person you should contact at the vendor that you received the invoice from.;
+                           ESM=Especifica el nombre de la persona de contacto del proveedor que le envi¢ la factura.;
+                           FRC=Indique le nom de la personne … contacter chez le fournisseur qui vous a transmis la facture.;
+                           ENC=Specifies the name of the person you should contact at the vendor that you received the invoice from.];
+                SourceExpr="Pay-to Contact";
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      PurchInvHeader@1000 : Record 122;
+      AllowDotNetAddIn@1001 : Boolean INDATASET;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,185 @@
+OBJECT Page 1351 Mini Inventory Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Inventory Setup;
+               ESM=Config. inventario;
+               FRC=Configuration de l'inventaire;
+               ENC=Inventory Setup];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table313;
+    PageType=Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,General,Posting,Journal Templates;
+                                ESM=Nuevo,Proceso,Informe,General,Registro,Libros diario;
+                                FRC=Nouveau,Traitement,Rapport,G‚n‚ral,Report,ModŠles journal;
+                                ENC=New,Process,Report,General,Posting,Journal Templates];
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 10      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=Inventory Periods;
+                                 ESM=Periodos inventario;
+                                 FRC=P‚riodes d'inventaire;
+                                 ENC=Inventory Periods];
+                      ToolTipML=[ENU=Set up periods in combinations with your accounting periods that define when you can post transactions that affect the value of your item inventory. When you close an inventory period, you cannot post any changes to the inventory value, either expected or actual value, before the ending date of the inventory period.;
+                                 ESM=Configure periodos en combinaci¢n con los periodos contables que definen cu ndo puede registrar transacciones que afectan al valor del inventario de productos. Cuando cierra un periodo de inventario, no puede registrar cambios en el valor de inventario, ya sea un valor esperado o real, antes de la fecha final del periodo de inventario.;
+                                 FRC=Param‚trez des p‚riodes en combinaison avec vos p‚riodes comptables qui d‚finissent le moment o— vous pouvez reporter les transactions qui affectent la valeur de votre stock d'articles. Lorsque vous fermez une p‚riode d'inventaire, vous ne pouvez reporter aucune modification apport‚e … la valeur du stock (valeur escompt‚e ou r‚elle) avant la date de fin de la p‚riode inventaire.;
+                                 ENC=Set up periods in combinations with your accounting periods that define when you can post transactions that affect the value of your item inventory. When you close an inventory period, you cannot post any changes to the inventory value, either expected or actual value, before the ending date of the inventory period.];
+                      RunObject=Page 5828;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Period;
+                      PromotedCategory=Category4 }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Units of Measure;
+                                 ESM=Unidades de medida;
+                                 FRC=Unit‚s de mesure;
+                                 ENC=Units of Measure];
+                      ToolTipML=[ENU=Set up the units of measure, such as PSC or HOUR, that you can select from in the Item Units of Measure window that you access from the item card.;
+                                 ESM=Configure las unidades de medida, tal como UDS u HORA, que puede seleccionar en la ventana Unidades medida producto a la que accede desde la ficha de producto.;
+                                 FRC=Param‚trez les unit‚s de mesure parmi lesquelles op‚rer votre s‚lection, par exemple PSC ou HEURE, dans la fenˆtre Unit‚s article … laquelle vous pouvez acc‚der … partir de la fiche article.;
+                                 ENC=Set up the units of measure, such as PSC or HOUR, that you can select from in the Item Units of Measure window that you access from the item card.];
+                      RunObject=Page 209;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=UnitOfMeasure;
+                      PromotedCategory=Category4 }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=Item Discount Groups;
+                                 ESM=Grupos dtos. productos;
+                                 FRC=Groupes d'escompte sur article;
+                                 ENC=Item Discount Groups];
+                      ToolTipML=[ENU=Set up discount group codes that you can use as criteria when you define special discounts on a customer, vendor, or item card.;
+                                 ESM=Configure los c¢digos de grupos de descuento que puede usar como criterios al definir descuentos especiales en una ficha de cliente, proveedor o producto.;
+                                 FRC=Param‚trez des codes groupes escomptes que vous pouvez utiliser comme critŠres lorsque vous d‚finissez des escomptes sp‚ciaux sur une fiche client, fournisseur ou article.;
+                                 ENC=Set up discount group codes that you can use as criteria when you define special discounts on a customer, vendor, or item card.];
+                      RunObject=Page 513;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Discount;
+                      PromotedCategory=Category4 }
+      { 13      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posting;
+                                 ESM=Registro;
+                                 FRC=Report;
+                                 ENC=Posting] }
+      { 14      ;2   ;Action    ;
+                      CaptionML=[ENU=Inventory Posting Setup;
+                                 ESM=Config. contab. inventario;
+                                 FRC=Config. de report d'inventaire;
+                                 ENC=Inventory Posting Setup];
+                      ToolTipML=[ENU=Set up links between inventory posting groups, inventory locations, and general ledger accounts to define where transactions for inventory items are recorded in the general ledger.;
+                                 ESM=Configure los v¡nculos entre los grupos contables de inventario, las ubicaciones de inventario y las cuentas contables para definir d¢nde se deben grabar los productos de inventario en la contabilidad.;
+                                 FRC=Param‚trez des liens entre des groupes de report stock, des magasins et des comptes GL afin de d‚finir l'emplacement d'enregistrement dans le grand livre des transactions pour les articles en stock.;
+                                 ENC=Set up links between inventory posting groups, inventory locations, and general ledger accounts to define where transactions for inventory items are recorded in the general ledger.];
+                      RunObject=Page 5826;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostedInventoryPick;
+                      PromotedCategory=Category5 }
+      { 15      ;2   ;Action    ;
+                      CaptionML=[ENU=Inventory Posting Groups;
+                                 ESM=Grupos contables inventario;
+                                 FRC=Groupes de report des stocks;
+                                 ENC=Inventory Posting Groups];
+                      ToolTipML=[ENU=Set up the posting groups that you assign to item cards to link business transactions made for the item with an inventory account in the general ledger to group amounts for that item type.;
+                                 ESM=Configure los grupos contables que asigna a las fichas de producto para vincular las transacciones empresariales realizadas para el producto con una cuenta de inventario en la contabilidad con importes de grupo para ese tipo de producto.;
+                                 FRC=Param‚trez les groupes de report que vous affectez aux fiches articles pour lier les transactions commerciales effectu‚es pour l'article … un compte stock dans le grand livre afin de regrouper les montants de ce type d'article.;
+                                 ENC=Set up the posting groups that you assign to item cards to link business transactions made for the item with an inventory account in the general ledger to group amounts for that item type.];
+                      RunObject=Page 112;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ItemGroup;
+                      PromotedCategory=Category5 }
+      { 16      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Journal Tempates;
+                                 ESM=Plantillas del diario;
+                                 FRC=ModŠles de journal;
+                                 ENC=Journal Tempates] }
+      { 17      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Journal Templates;
+                                 ESM=Libros diario producto;
+                                 FRC=ModŠles de journaux d'article;
+                                 ENC=Item Journal Templates];
+                      ToolTipML=[ENU=Set up number series and reason codes in the journals that you use for inventory adjustment. By using different templates you can design windows with different layouts and you can assign trace codes, number series, and reports to each template.;
+                                 ESM=Configure n£meros de serie y c¢digos de motivo en los diarios que usa para el ajuste de inventario. Mediante distintos libros, se pueden dise¤ar ventanas con distintos contenidos y asignar c¢digos de seguimiento, n£meros de serie e informes a cada libro.;
+                                 FRC=Param‚trez des s‚ries de num‚ros et des codes motif dans les journaux que vous utilisez pour l'ajustement de l'inventaire. En utilisant diff‚rents modŠles, vous pouvez cr‚er des fenˆtres d'aspects diff‚rents et vous pouvez affecter des codes trace, des s‚ries de num‚ros et des rapports … chaque modŠle.;
+                                 ENC=Set up number series and reason codes in the journals that you use for inventory adjustment. By using different templates you can design windows with different layouts and you can assign trace codes, number series, and reports to each template.];
+                      RunObject=Page 102;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=JournalSetup;
+                      PromotedCategory=Category6 }
+    }
+  }
+  CONTROLS
+  {
+    { 101 ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Setup Fields;
+                           ESM=Configurar campos;
+                           FRC=Champs de configuration;
+                           ENC=Setup Fields];
+                GroupType=Group }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies that the Automatic Cost Posting function is used.;
+                           ESM=Especifica que se utiliza la funci¢n existencias autom t.;
+                           FRC=Sp‚cifie que la fonction Compta. co–ts automatique est utilis‚e.;
+                           ENC=Specifies that the Automatic Cost Posting function is used.];
+                SourceExpr="Automatic Cost Posting" }
+
+    { 36  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies whether to adjust for any cost changes automatically every time that you post inventory transactions. The adjustment process and its consequences are the same as for the Adjust Cost - Item Entries batch job.;
+                           ESM=Especifica si se ajustan los cambios de costo autom ticamente cada vez que se registran transacciones de inventario. El proceso de ajuste y sus consecuencias son los mismos que los del proceso Valorar existencias - movs. producto.;
+                           FRC=Indique s'il faut ajuster automatiquement toute modification de co–ts chaque fois que vous validez des mouvements de stock. Le processus d'ajustement et ses cons‚quences sont identiques … ceux du traitement par lots Ajuster co–t - Ecritures article.;
+                           ENC=Specifies whether to adjust for any cost changes automatically every time that you post inventory transactions. The adjustment process and its consequences are the same as for the Adjust Cost - Item Entries batch job.];
+                SourceExpr="Automatic Cost Adjustment" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if you can post transactions that will bring inventory levels below zero.;
+                           ESM=Especifica si se pueden registrar transacciones que lleven los niveles de inventario por debajo de cero.;
+                           FRC=Indique si vous pouvez valider des transactions qui entraŒneraient des niveaux de stock n‚gatifs.;
+                           ENC=Specifies if you can post transactions that will bring inventory levels below zero.];
+                SourceExpr="Prevent Negative Inventory" }
+
+    { 4   ;2   ;Field     ;
+                Lookup=Yes;
+                CaptionML=[ENU=Item Numbers;
+                           ESM=N£meros producto;
+                           FRC=Num‚ros d'article;
+                           ENC=Item Numbers];
+                ToolTipML=[ENU=Specifies the code for the number series that will be used to assign numbers to items. To see the number series that have been set up in the No. Series table, choose the field.;
+                           ESM=Especifica el c¢digo de las series num‚ricas que se van a utilizar para asignar n£meros a productos. Para consultar la serie num‚rica que se ha configurado en la tabla Nos. serie, seleccione el campo.;
+                           FRC=Affiche le code de la souche num‚ros utilis‚e pour affecter des num‚ros aux articles. Pour visualiser les souches de num‚ros qui ont ‚t‚ d‚finies dans la table S‚ries de nø, cliquez sur le champ.;
+                           ENC=Specifies the code for the number series that will be used to assign numbers to items. To see the number series that have been set up in the No. Series table, choose the field.];
+                SourceExpr="Item Nos.";
+                TableRelation="No. Series".Code }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,105 @@
+OBJECT Page 9815 Std. Password Dialog
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Set Password;
+               ESM=Establecer contrase¤a;
+               FRC=D‚finir le mot de passe;
+               ENC=Set Password];
+    PageType=StandardDialog;
+    OnInit=BEGIN
+             EnableBlankPassword := FALSE;
+           END;
+
+    OnOpenPage=BEGIN
+                 ValidPassword := FALSE;
+               END;
+
+    OnQueryClosePage=BEGIN
+                       ValidPassword := FALSE;
+                       IF CloseAction = ACTION::OK THEN BEGIN
+                         IF SetPassword <> ConfirmPassword THEN
+                           ERROR(PasswordMismatchErr);
+                         IF EnableBlankPasswordState AND (SetPassword = '') THEN BEGIN
+                           IF NOT CONFIRM(ConfirmBlankPasswordQst) THEN
+                             ERROR(PasswordTooSimpleErr);
+                         END ELSE BEGIN
+                           IF NOT IdentityManagement.ValidatePasswordStrength(SetPassword) THEN
+                             ERROR(PasswordTooSimpleErr);
+                         END;
+                         ValidPassword := TRUE;
+                       END
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Field     ;
+                Name=<SetPassword>;
+                ExtendedDatatype=Masked;
+                CaptionML=[ENU=Password;
+                           ESM=Contrase¤a;
+                           FRC=Mot de passe;
+                           ENC=Password];
+                SourceExpr=SetPassword;
+                OnValidate=BEGIN
+                             IF NOT IdentityManagement.ValidatePasswordStrength(SetPassword) THEN
+                               ERROR(PasswordTooSimpleErr);
+                           END;
+                            }
+
+    { 3   ;1   ;Field     ;
+                Name=<ConfirmPassword>;
+                ExtendedDatatype=Masked;
+                CaptionML=[ENU=Confirm Password;
+                           ESM=Confirmar contrase¤a;
+                           FRC=Confirmer mot de passe;
+                           ENC=Confirm Password];
+                SourceExpr=ConfirmPassword;
+                OnValidate=BEGIN
+                             IF SetPassword <> ConfirmPassword THEN
+                               ERROR(PasswordMismatchErr);
+                           END;
+                            }
+
+  }
+  CODE
+  {
+    VAR
+      PasswordMismatchErr@1003 : TextConst 'ENU=The specified passwords are not the same.;ESM=Las contrase¤as especificadas no coinciden.;FRC=Les mots de passe sp‚cifi‚s ne sont pas identiques.;ENC=The specified passwords are not the same.';
+      PasswordTooSimpleErr@1004 : TextConst 'ENU=The specified password does not meet the requirements. It must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.;ESM=La contrase¤a especificada no cumple los requisitos. La contrase¤a especificada debe tener al menos 8 caracteres e incluir, al menos, una letra en may£scula, una letra en min£scula y un n£mero.;FRC=Le mot de passe sp‚cifi‚ ne r‚pond pas aux exigences. Il doit comporter au moins 8ÿcaractŠres et ˆtre compos‚ d''au moins une lettre majuscule, une minuscule et un chiffre.;ENC=The specified password does not meet the requirements. It must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.';
+      PasswordNotValidatedErr@1007 : TextConst 'ENU=The password did not validate correctly, or it was not accepted.;ESM=La contrase¤a no se ha validado correctamente o no ha sido aceptada.;FRC=Le mot de passe n''a pas ‚t‚ correctement valid‚ ou n''a pas ‚t‚ accept‚.;ENC=The password did not validate correctly, or it was not accepted.';
+      ConfirmBlankPasswordQst@1008 : TextConst 'ENU=Exit dialog with empty password?;ESM=¨Desea cerrar el cuadro de di logo con la contrase¤a en blanco?;FRC=Quitter la boŒte de dialogue avec un mot de passe videÿ?;ENC=Exit Dialogue with empty password?';
+      IdentityManagement@1002 : Codeunit 9801;
+      SetPassword@1000 : Text[250] INDATASET;
+      ConfirmPassword@1001 : Text[250] INDATASET;
+      ValidPassword@1005 : Boolean;
+      EnableBlankPasswordState@1006 : Boolean;
+
+    PROCEDURE GetPasswordValue@1() : Text;
+    BEGIN
+      IF ValidPassword = TRUE THEN
+        EXIT(SetPassword);
+
+      ERROR(PasswordNotValidatedErr);
+    END;
+
+    PROCEDURE EnableBlankPassword@2(enable@1000 : Boolean);
+    BEGIN
+      EnableBlankPasswordState := enable;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,105 @@
+OBJECT Page 409 SMTP Mail Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=SMTP Mail Setup;
+               ESM=Configuraci¢n correo SMTP;
+               FRC=Configuration de courrier SMTP;
+               ENC=SMTP Mail Setup];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table409;
+    PageType=Card;
+    OnInit=BEGIN
+             PasswordEditable := TRUE;
+             "User IDEditable" := TRUE;
+           END;
+
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+                 "User IDEditable" := Authentication = Authentication::Basic;
+                 PasswordEditable := Authentication = Authentication::Basic;
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="SMTP Server" }
+
+    { 14  ;2   ;Field     ;
+                DecimalPlaces=0:0;
+                NotBlank=Yes;
+                Numeric=Yes;
+                SourceExpr="SMTP Server Port";
+                MinValue=1 }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Authentication;
+                OnValidate=BEGIN
+                             AuthenticationOnAfterValidate;
+                           END;
+                            }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="User ID";
+                Editable="User IDEditable" }
+
+    { 8   ;2   ;Field     ;
+                ExtendedDatatype=Masked;
+                SourceExpr=Password;
+                Editable=PasswordEditable }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Secure Connection" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      "User IDEditable"@19038101 : Boolean INDATASET;
+      PasswordEditable@19030527 : Boolean INDATASET;
+
+    LOCAL PROCEDURE AuthenticationOnAfterValidate@19028764();
+    BEGIN
+      "User IDEditable" := Authentication = Authentication::Basic;
+      PasswordEditable := Authentication = Authentication::Basic;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

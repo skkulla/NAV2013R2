@@ -1,0 +1,715 @@
+OBJECT Codeunit 8617 Config. Validate Management
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Text001@1010 : TextConst 'ENU=Field %2 in table %1 can only contain %3 characters (%4).;ESM=El campo %2 de la tabla %1 solo puede contener %3 caracteres (%4).;FRC=Le champ %2 de la table %1 ne peut contenir que %3 caractŠres (%4).;ENC=Field %2 in table %1 can only contain %3 characters (%4).';
+      Text002@1009 : TextConst 'ENU=%1 is not a supported data type.;ESM=%1 no es un tipo de datos compatible.;FRC=%1 n''est pas un type de donn‚es pris en charge.;ENC=%1 is not a supported data type.';
+      Text003@1008 : TextConst 'ENU=%1 is not a valid %2.;ESM=%1 no es un %2 v lido.;FRC=%1 n''est pas un %2 valide.;ENC=%1 is not a valid %2.';
+      Text004@1011 : TextConst 'ENU=%1 is not a valid option.\Valid options are %2.;ESM=%1 no es una opci¢n v lida.\Las opciones v lidas son %2.;FRC=%1 n''est pas une option valide.\Les options valides sont %2.;ENC=%1 is not a valid option.\Valid options are %2.';
+
+    PROCEDURE ValidateFieldValue@16(VAR RecRef@1015 : RecordRef;VAR FieldRef@1000 : FieldRef;Value@1001 : Text;SkipValidation@1003 : Boolean;LanguageID@1006 : Integer);
+    VAR
+      Field@1014 : Record 2000000041;
+      OldValue@1004 : Variant;
+      NewValue@1005 : Variant;
+      OptionAsInteger@1002 : Integer;
+      MainLanguageID@1007 : Integer;
+    BEGIN
+      MainLanguageID := GLOBALLANGUAGE;
+
+      IF (LanguageID <> 0) AND (LanguageID <> GLOBALLANGUAGE) THEN
+        GLOBALLANGUAGE(LanguageID);
+
+      Field.GET(RecRef.NUMBER,FieldRef.NUMBER);
+
+      IF Field.Class <> Field.Class::Normal THEN
+        EXIT;
+
+      IF NOT SkipValidation THEN
+        OldValue := FieldRef.VALUE;
+
+      IF Field.Type <> Field.Type::Option THEN BEGIN
+        IF Value <> '' THEN
+          EVALUATE(FieldRef,Value)
+      END ELSE BEGIN
+        OptionAsInteger := GetOptionNo(Value,FieldRef.OPTIONCAPTION);
+        IF OptionAsInteger <> -1 THEN
+          FieldRef.VALUE := OptionAsInteger;
+      END;
+
+      IF NOT SkipValidation THEN BEGIN
+        NewValue := FieldRef.VALUE;
+        FieldRef.VALUE := OldValue;
+        FieldRef.VALIDATE(NewValue);
+      END;
+
+      IF MainLanguageID <> GLOBALLANGUAGE THEN
+        GLOBALLANGUAGE(MainLanguageID);
+    END;
+
+    LOCAL PROCEDURE GetOptionsNumber@11(OptionString@1000 : Text) : Integer;
+    BEGIN
+      EXIT(STRLEN(OptionString) - STRLEN(DELCHR(OptionString,'=',',')));
+    END;
+
+    PROCEDURE OptionNoExists@7(VAR FieldRef@1000 : FieldRef;OptionValue@1006 : Text) : Boolean;
+    VAR
+      OptionNo@1004 : Integer;
+    BEGIN
+      IF EVALUATE(OptionNo,OptionValue) THEN
+        IF OptionNo >= 0 THEN
+          EXIT(OptionNo <= GetOptionsNumber(FieldRef.OPTIONCAPTION));
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE OptionsAreEqual@18(Value@1000 : Text;CurrentOption@1001 : Text) : Boolean;
+    BEGIN
+      EXIT((Value = CurrentOption) OR ((Value = '') AND (DELCHR(CurrentOption,'=',' ') = '')));
+    END;
+
+    PROCEDURE GetOptionNo@20(Value@1007 : Text;OptionString@1006 : Text) : Integer;
+    VAR
+      OptionNo@1001 : Integer;
+      OptionsQty@1000 : Integer;
+    BEGIN
+      Value := UPPERCASE(Value);
+      OptionString := UPPERCASE(OptionString);
+
+      IF (Value = '') AND (STRPOS(OptionString,' ') = 1) THEN
+        EXIT(0);
+      IF (Value <> '') AND (STRPOS(OptionString,Value) = 0) THEN
+        EXIT(-1);
+
+      OptionsQty := GetOptionsNumber(OptionString);
+      IF OptionsQty > 0 THEN BEGIN
+        FOR OptionNo := 0 TO OptionsQty - 1 DO BEGIN
+          IF OptionsAreEqual(Value,COPYSTR(OptionString,1,STRPOS(OptionString,',') - 1)) THEN
+            EXIT(OptionNo);
+          OptionString := DELSTR(OptionString,1,STRPOS(OptionString,','));
+        END;
+        OptionNo += 1;
+      END;
+
+      IF OptionsAreEqual(Value,OptionString) THEN
+        EXIT(OptionNo);
+
+      EXIT(-1);
+    END;
+
+    PROCEDURE GetRelationInfoByIDs@45(TableNo@1010 : Integer;FieldNo@1009 : Integer;VAR RelationTableNo@1000 : Integer;VAR RelationFieldNo@1001 : Integer) : Boolean;
+    VAR
+      Field@1008 : Record 2000000041;
+      RecRef@1003 : RecordRef;
+      RecRef2@1006 : RecordRef;
+      FieldRef2@1005 : FieldRef;
+      FieldRef@1002 : FieldRef;
+      KeyRef2@1007 : KeyRef;
+    BEGIN
+      Field.GET(TableNo,FieldNo);
+      IF Field.RelationTableNo = 0 THEN
+        EXIT(FALSE);
+
+      RecRef.OPEN(TableNo);
+      FieldRef := RecRef.FIELD(FieldNo);
+
+      RecRef2.OPEN(Field.RelationTableNo);
+
+      IF Field.RelationFieldNo <> 0 THEN
+        FieldRef2 := RecRef2.FIELD(Field.RelationFieldNo)
+      ELSE BEGIN
+        KeyRef2 := RecRef2.KEYINDEX(1);
+        IF KeyRef2.FIELDCOUNT > 1 THEN
+          EXIT(FALSE);
+        FieldRef2 := KeyRef2.FIELDINDEX(1);
+      END;
+
+      IF (FieldRef2.TYPE <> FieldRef.TYPE) OR (FieldRef2.LENGTH <> FieldRef.LENGTH) THEN
+        EXIT(FALSE);
+
+      RelationTableNo := Field.RelationTableNo;
+      RelationFieldNo := FieldRef2.NUMBER;
+      EXIT(TRUE);
+    END;
+
+    PROCEDURE GetRelationTableID@1(TableID@1001 : Integer;FieldID@1003 : Integer) : Integer;
+    VAR
+      RecRef@1002 : RecordRef;
+      FieldRef@1000 : FieldRef;
+    BEGIN
+      RecRef.OPEN(TableID);
+      IF RecRef.FIELDEXIST(FieldID) THEN BEGIN
+        FieldRef := RecRef.FIELD(FieldID);
+        EXIT(FieldRef.RELATION);
+      END;
+    END;
+
+    PROCEDURE IsRelationInKeyFields@2(TableNo@1000 : Integer;FieldNo@1001 : Integer) : Boolean;
+    VAR
+      RecRef@1004 : RecordRef;
+      FieldRef@1003 : FieldRef;
+      KeyRef@1002 : KeyRef;
+      I@1005 : Integer;
+    BEGIN
+      RecRef.OPEN(TableNo);
+      KeyRef := RecRef.KEYINDEX(1);
+
+      FOR I := 1 TO KeyRef.FIELDCOUNT DO BEGIN
+        FieldRef := KeyRef.FIELDINDEX(I);
+        IF FieldRef.NUMBER = FieldNo THEN
+          EXIT(TRUE);
+      END;
+    END;
+
+    PROCEDURE ValidateFieldRefRelationAgainstCompanyData@44(FieldRef@1009 : FieldRef;VAR ConfigPackageFieldOrder@1001 : Record 8616) : Text[250];
+    VAR
+      ConfigTryValidate@1005 : Codeunit 8613;
+      RecRef@1000 : RecordRef;
+      RecRef2@1003 : RecordRef;
+      FieldRef2@1004 : FieldRef;
+    BEGIN
+      RecRef := FieldRef.RECORD;
+
+      RecRef2.OPEN(RecRef.NUMBER,TRUE);
+      CopyRecRefFields(RecRef2,RecRef,FieldRef,ConfigPackageFieldOrder);
+      RecRef2.INSERT;
+
+      FieldRef2 := RecRef2.FIELD(FieldRef.NUMBER);
+
+      ConfigTryValidate.SetValidateParameters(FieldRef2,FieldRef.VALUE);
+
+      COMMIT;
+      IF NOT ConfigTryValidate.RUN THEN
+        EXIT(GETLASTERRORTEXT);
+
+      EXIT('');
+    END;
+
+    PROCEDURE CopyRecRefFields@55(RecRef@1000 : RecordRef;SourceRecRef@1001 : RecordRef;FieldRefToExclude@1005 : FieldRef;VAR ConfigPackageFieldOrder@1006 : Record 8616);
+    VAR
+      FieldRef@1003 : FieldRef;
+      SourceFieldRef@1004 : FieldRef;
+    BEGIN
+      ConfigPackageFieldOrder.RESET;
+      ConfigPackageFieldOrder.SETCURRENTKEY("Package Code","Table ID","Processing Order");
+      IF ConfigPackageFieldOrder.FINDSET THEN
+        REPEAT
+          SourceFieldRef := SourceRecRef.FIELD(ConfigPackageFieldOrder."Field ID");
+          IF FieldRefToExclude.NAME = SourceFieldRef.NAME THEN
+            EXIT;
+          FieldRef := RecRef.FIELD(ConfigPackageFieldOrder."Field ID");
+          FieldRef.VALUE := SourceFieldRef.VALUE;
+        UNTIL ConfigPackageFieldOrder.NEXT = 0;
+    END;
+
+    PROCEDURE EvaluateValue@5(VAR FieldRef@1000 : FieldRef;Value@1002 : Text[250];XMLValue@1015 : Boolean) : Text[250];
+    VAR
+      Field@1001 : Record 2000000041;
+      RecordRef@1003 : RecordRef;
+      Date@1012 : Date;
+      DateTime@1011 : DateTime;
+      Time@1014 : Time;
+      Integer@1010 : Integer;
+      BigInteger@1009 : BigInteger;
+      Guid@1013 : GUID;
+      Duration@1008 : Duration;
+      DateFormula@1007 : DateFormula;
+      Decimal@1006 : Decimal;
+      Code@1005 : Code[250];
+      Boolean@1004 : Boolean;
+    BEGIN
+      EVALUATE(Field.Type,FORMAT(FieldRef.TYPE));
+
+      IF (Value <> '') AND NOT IsNormalField(FieldRef) THEN
+        EXIT(Text002);
+
+      CASE Field.Type OF
+        Field.Type::Text:
+          BEGIN
+            RecordRef := FieldRef.RECORD;
+            Field.GET(RecordRef.NUMBER,FieldRef.NUMBER);
+            IF STRLEN(Value) > Field.Len THEN
+              EXIT(STRSUBSTNO(Text001,FieldRef.RECORD.CAPTION,FieldRef.CAPTION,Field.Len,Value));
+            FieldRef.VALUE := Value;
+          END;
+        Field.Type::Code:
+          BEGIN
+            Code := Value;
+            RecordRef := FieldRef.RECORD;
+            Field.GET(RecordRef.NUMBER,FieldRef.NUMBER);
+            IF STRLEN(Value) > Field.Len THEN
+              EXIT(STRSUBSTNO(Text001,FieldRef.RECORD.CAPTION,FieldRef.CAPTION,Field.Len,Value));
+            FieldRef.VALUE := Code;
+          END;
+        Field.Type::Option:
+          BEGIN
+            Integer := -1;
+            IF XMLValue THEN BEGIN
+              IF OptionNoExists(FieldRef,Value) THEN
+                EVALUATE(Integer,Value);
+            END ELSE
+              Integer := GetOptionNo(Value,FieldRef.OPTIONCAPTION);
+
+            IF Integer = -1 THEN
+              EXIT(COPYSTR(STRSUBSTNO(Text004,Value,FieldRef.OPTIONCAPTION),1,250));
+
+            FieldRef.VALUE := Integer;
+          END;
+        Field.Type::Date:
+          BEGIN
+            IF NOT EVALUATE(Date,Value) AND NOT EVALUATE(Date,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::Date)));
+            FieldRef.VALUE := Date;
+          END;
+        Field.Type::DateFormula:
+          BEGIN
+            IF NOT EVALUATE(DateFormula,Value) AND NOT EVALUATE(DateFormula,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::DateFormula)));
+            FieldRef.VALUE := DateFormula;
+          END;
+        Field.Type::DateTime:
+          BEGIN
+            IF NOT EVALUATE(DateTime,Value) AND NOT EVALUATE(DateTime,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::DateTime)));
+            FieldRef.VALUE := DateTime;
+          END;
+        Field.Type::Time:
+          BEGIN
+            IF NOT EVALUATE(Time,Value) AND NOT EVALUATE(Time,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::Time)));
+            FieldRef.VALUE := Time;
+          END;
+        Field.Type::Duration:
+          BEGIN
+            IF NOT EVALUATE(Duration,Value) AND NOT EVALUATE(Duration,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::Duration)));
+            FieldRef.VALUE := Duration;
+          END;
+        Field.Type::Integer:
+          BEGIN
+            IF NOT EVALUATE(Integer,Value) AND NOT EVALUATE(Integer,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::Integer)));
+            FieldRef.VALUE := Integer;
+          END;
+        Field.Type::BigInteger:
+          BEGIN
+            IF NOT EVALUATE(BigInteger,Value) AND NOT EVALUATE(BigInteger,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::BigInteger)));
+            FieldRef.VALUE := BigInteger;
+          END;
+        Field.Type::Decimal:
+          BEGIN
+            IF NOT EVALUATE(Decimal,Value) AND NOT EVALUATE(Decimal,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::Decimal)));
+            FieldRef.VALUE := Decimal;
+          END;
+        Field.Type::Boolean:
+          BEGIN
+            IF NOT EVALUATE(Boolean,Value) AND NOT EVALUATE(Boolean,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::Boolean)));
+            FieldRef.VALUE := Boolean;
+          END;
+        Field.Type::GUID:
+          BEGIN
+            IF NOT EVALUATE(Guid,Value) AND NOT EVALUATE(Guid,Value,XMLFormat) THEN
+              EXIT(STRSUBSTNO(Text003,Value,FORMAT(Field.Type::GUID)));
+            FieldRef.VALUE := Guid;
+          END
+      END;
+    END;
+
+    PROCEDURE IsNormalField@4(FieldRef@1000 : FieldRef) : Boolean;
+    VAR
+      Field@1001 : Record 2000000041;
+    BEGIN
+      EVALUATE(Field.Type,FORMAT(FieldRef.TYPE));
+
+      EXIT(UPPERCASE(FORMAT(FieldRef.CLASS)) = 'NORMAL');
+    END;
+
+    PROCEDURE XMLFormat@6() : Integer;
+    BEGIN
+      EXIT(9);
+    END;
+
+    PROCEDURE IsKeyField@30(TableID@1005 : Integer;FieldID@1006 : Integer) : Boolean;
+    VAR
+      RecRef@1003 : RecordRef;
+      KeyRef@1002 : KeyRef;
+      FieldRef@1001 : FieldRef;
+      KeyFieldCount@1000 : Integer;
+    BEGIN
+      RecRef.OPEN(TableID);
+      KeyRef := RecRef.KEYINDEX(1);
+      FOR KeyFieldCount := 1 TO KeyRef.FIELDCOUNT DO BEGIN
+        FieldRef := KeyRef.FIELDINDEX(KeyFieldCount);
+        IF FieldRef.NUMBER = FieldID THEN
+          EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    PROCEDURE EvaluateTextToFieldRef@28(InputText@1001 : Text[250];VAR FieldRef@1000 : FieldRef;ToValidate@1002 : Boolean) : Boolean;
+    BEGIN
+      IF (FORMAT(FieldRef.CLASS) = 'FlowField') OR (FORMAT(FieldRef.CLASS) = 'FlowFilter') THEN
+        EXIT(TRUE);
+
+      CASE FORMAT(FieldRef.TYPE) OF
+        'Option':
+          EXIT(EvaluateTextToFieldRefOption(InputText,FieldRef,ToValidate));
+        'Integer':
+          EXIT(EvaluateTextToFieldRefInteger(InputText,FieldRef,ToValidate));
+        'Decimal':
+          EXIT(EvaluateTextToFieldRefDecimal(InputText,FieldRef,ToValidate));
+        'Date':
+          EXIT(EvaluateTextToFieldRefDate(InputText,FieldRef,ToValidate));
+        'Time':
+          EXIT(EvaluateTextToFieldRefTime(InputText,FieldRef,ToValidate));
+        'DateTime':
+          EXIT(EvaluateTextToFieldRefDateTime(InputText,FieldRef,ToValidate));
+        'Boolean':
+          EXIT(EvaluateTextToFieldRefBoolean(InputText,FieldRef,ToValidate));
+        'Duration':
+          EXIT(EvaluateTextToFieldRefDuration(InputText,FieldRef,ToValidate));
+        'BigInteger':
+          EXIT(EvaluateTextToFieldRefBigInteger(InputText,FieldRef,ToValidate));
+        'GUID':
+          EXIT(EvaluateTextToFieldRefGUID(InputText,FieldRef,ToValidate));
+        'Code':
+          EXIT(EvaluateTextToFieldRefCodeText(InputText,FieldRef,ToValidate));
+        'Text':
+          EXIT(EvaluateTextToFieldRefCodeText(InputText,FieldRef,ToValidate));
+        'DateFormula':
+          EXIT(EvaluateTextToFieldRefDateFormula(InputText,FieldRef,ToValidate));
+        ELSE
+          EXIT(FALSE);
+      END;
+
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefOption@10(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      IntVar@1004 : Integer;
+      IntVar1@1003 : Integer;
+    BEGIN
+      IntVar := GetOptionNo(InputText,FieldRef.OPTIONCAPTION);
+      IF IntVar = -1 THEN
+        EXIT(FALSE);
+
+      IF ToValidate THEN BEGIN
+        IntVar1 := FieldRef.VALUE;
+        IF IntVar1 <> IntVar THEN
+          FieldRef.VALIDATE(IntVar);
+      END ELSE
+        FieldRef.VALUE := IntVar;
+
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefInteger@13(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      IntVar@1004 : Integer;
+      IntVar1@1003 : Integer;
+    BEGIN
+      IF EVALUATE(IntVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          IntVar1 := FieldRef.VALUE;
+          IF IntVar1 <> IntVar THEN
+            FieldRef.VALIDATE(IntVar);
+        END ELSE
+          FieldRef.VALUE := IntVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefDecimal@22(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      DecimalVar@1004 : Decimal;
+      DecimalVar1@1003 : Decimal;
+    BEGIN
+      IF EVALUATE(DecimalVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          DecimalVar1 := FieldRef.VALUE;
+          IF DecimalVar1 <> DecimalVar THEN
+            FieldRef.VALIDATE(DecimalVar);
+        END ELSE
+          FieldRef.VALUE := DecimalVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefDate@23(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      DateVar@1004 : Date;
+      DateVar1@1003 : Date;
+    BEGIN
+      IF EVALUATE(DateVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          DateVar1 := FieldRef.VALUE;
+          IF DateVar1 <> DateVar THEN
+            FieldRef.VALIDATE(DateVar);
+        END ELSE
+          FieldRef.VALUE := DateVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefTime@26(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      TimeVar@1004 : Time;
+      TimeVar1@1003 : Time;
+    BEGIN
+      IF EVALUATE(TimeVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          TimeVar1 := FieldRef.VALUE;
+          IF TimeVar1 <> TimeVar THEN
+            FieldRef.VALIDATE(TimeVar);
+        END ELSE
+          FieldRef.VALUE := TimeVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefDateTime@31(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      DateTimeVar@1004 : DateTime;
+      DateTimeVar1@1003 : DateTime;
+    BEGIN
+      IF EVALUATE(DateTimeVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          DateTimeVar1 := FieldRef.VALUE;
+          IF DateTimeVar1 <> DateTimeVar THEN
+            FieldRef.VALIDATE(DateTimeVar);
+        END ELSE
+          FieldRef.VALUE := DateTimeVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefBoolean@34(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      BoolVar@1004 : Boolean;
+      BoolVar1@1003 : Boolean;
+    BEGIN
+      IF EVALUATE(BoolVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          BoolVar1 := FieldRef.VALUE;
+          IF BoolVar1 <> BoolVar THEN
+            FieldRef.VALIDATE(BoolVar);
+        END ELSE
+          FieldRef.VALUE := BoolVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefDuration@35(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      DurationVar@1004 : Duration;
+      DurationVar1@1003 : Duration;
+    BEGIN
+      IF EVALUATE(DurationVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          DurationVar1 := FieldRef.VALUE;
+          IF DurationVar1 <> DurationVar THEN
+            FieldRef.VALIDATE(DurationVar);
+        END ELSE
+          FieldRef.VALUE := DurationVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefBigInteger@37(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      BigIntVar@1004 : BigInteger;
+      BigIntVar1@1003 : BigInteger;
+    BEGIN
+      IF EVALUATE(BigIntVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          BigIntVar1 := FieldRef.VALUE;
+          IF BigIntVar1 <> BigIntVar THEN
+            FieldRef.VALIDATE(BigIntVar);
+        END ELSE
+          FieldRef.VALUE := BigIntVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefGUID@51(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      GUIDVar@1004 : GUID;
+      GUIDVar1@1003 : GUID;
+    BEGIN
+      IF EVALUATE(GUIDVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          GUIDVar1 := FieldRef.VALUE;
+          IF GUIDVar1 <> GUIDVar THEN
+            FieldRef.VALIDATE(GUIDVar);
+        END ELSE
+          FieldRef.VALUE := GUIDVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefCodeText@52(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      TextVar@1004 : Text[1024];
+      TextVar1@1003 : Text[1024];
+    BEGIN
+      IF STRLEN(InputText) > FieldRef.LENGTH THEN BEGIN
+        IF ToValidate THEN BEGIN
+          TextVar := FieldRef.VALUE;
+          TextVar1 := PADSTR(InputText,FieldRef.LENGTH);
+          IF TextVar <> TextVar1 THEN
+            FieldRef.VALIDATE(TextVar1);
+        END ELSE
+          FieldRef.VALUE := PADSTR(InputText,FieldRef.LENGTH);
+      END ELSE BEGIN
+        IF ToValidate THEN BEGIN
+          TextVar := FieldRef.VALUE;
+          IF TextVar <> InputText THEN
+            FieldRef.VALIDATE(InputText);
+        END ELSE
+          FieldRef.VALUE := InputText;
+      END;
+
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE EvaluateTextToFieldRefDateFormula@56(InputText@1002 : Text[250];VAR FieldRef@1001 : FieldRef;ToValidate@1000 : Boolean) : Boolean;
+    VAR
+      DateFormulaVar@1004 : DateFormula;
+      DateFormulaVar1@1003 : DateFormula;
+    BEGIN
+      IF EVALUATE(DateFormulaVar,InputText) THEN BEGIN
+        IF ToValidate THEN BEGIN
+          DateFormulaVar1 := FieldRef.VALUE;
+          IF DateFormulaVar1 <> DateFormulaVar THEN
+            FieldRef.VALIDATE(DateFormulaVar);
+        END ELSE
+          FieldRef.VALUE := DateFormulaVar;
+        EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    PROCEDURE CheckName@38(FieldName@1000 : Text[250]) : Text[250];
+    VAR
+      FirstChar@1002 : Text[1];
+    BEGIN
+      FirstChar := PADSTR(FieldName,1);
+
+      CASE FirstChar OF
+        '0','1','2','3','4','5','6','7','8','9':
+          EXIT('_' + FieldName);
+        ELSE
+          EXIT(FieldName);
+      END;
+    END;
+
+    PROCEDURE AddComment@3(VAR FieldRef@1006 : FieldRef) RowComment : Text[1024];
+    VAR
+      FieldBuffer@1000 : ARRAY [250] OF Text[250];
+      Text10@1004 : Text[1];
+      Char10@1005 : Char;
+      StartPos@1003 : Integer;
+      FieldNo@1002 : Integer;
+      i@1001 : Integer;
+    BEGIN
+      StartPos := 1;
+      FieldNo := 1;
+      Char10 := 10;
+      Text10 := FORMAT(Char10);
+
+      RowComment := FORMAT(FieldRef.TYPE) ;
+      CASE FORMAT(FieldRef.TYPE) OF
+        'Text','Code':
+          RowComment := RowComment + FORMAT(FieldRef.LENGTH);
+      END;
+
+      IF FORMAT(FieldRef.TYPE) <> 'Option' THEN
+        EXIT(RowComment);
+
+      CLEAR(FieldBuffer);
+
+      WHILE NOT (StartPos = STRLEN(FieldRef.OPTIONCAPTION) + 1) DO BEGIN
+        IF COPYSTR(FieldRef.OPTIONCAPTION,StartPos,1) <> ',' THEN
+          FieldBuffer[FieldNo] := FieldBuffer[FieldNo] + COPYSTR(FieldRef.OPTIONCAPTION,StartPos,1)
+        ELSE
+          FieldNo := FieldNo + 1;
+        StartPos := StartPos + 1;
+      END;
+
+      FOR i := 1 TO FieldNo DO
+        RowComment := RowComment + Text10 + FORMAT(i - 1) + ': ' + FieldBuffer[i];
+    END;
+
+    LOCAL PROCEDURE LookupObject@21(ObjectType@1002 : Integer;VAR ObjectID@1003 : Integer);
+    VAR
+      Object@1000 : Record 2000000001;
+      Objects@1001 : Page 358;
+    BEGIN
+      CLEAR(Objects);
+      Object.FILTERGROUP(2);
+      Object.SETRANGE(Type,ObjectType);
+      Object.SETFILTER(ID,'..%1|%2|%3',99000999,DATABASE::"Permission Set",DATABASE::Permission);
+      Object.FILTERGROUP(0);
+      Objects.SETTABLEVIEW(Object);
+      Objects.LOOKUPMODE := TRUE;
+      IF Objects.RUNMODAL = ACTION::LookupOK THEN BEGIN
+        Objects.GETRECORD(Object);
+        ObjectID := Object.ID;
+      END;
+    END;
+
+    PROCEDURE LookupTable@62(VAR ObjectID@1000 : Integer);
+    VAR
+      Object@1001 : Record 2000000001;
+    BEGIN
+      LookupObject(Object.Type::Table,ObjectID);
+    END;
+
+    PROCEDURE LookupPage@63(VAR ObjectID@1000 : Integer);
+    VAR
+      Object@1001 : Record 2000000001;
+    BEGIN
+      LookupObject(Object.Type::Page,ObjectID);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,181 @@
+OBJECT Report 10005 Export GIFI Info. to Excel
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Export GIFI Info. to Excel;
+               ESM=Exportar info GIFI a Excel;
+               FRC=Exporter donn‚es IGRF vers fichier Excel;
+               ENC=Export GIFI Info. to Excel];
+    ProcessingOnly=Yes;
+    OnPreReport=BEGIN
+                  CompanyInformation.GET;
+                  FilterString := "G/L Account".GETFILTERS;
+                  GIFIFilterString := "G/L Account".GETFILTER("GIFI Code");
+                  IF AsOfDate = 0D THEN
+                    ERROR(Text001);
+
+                  Subtitle := STRSUBSTNO(Text000,AsOfDate);
+                  RowNo := 1;
+                END;
+
+  }
+  DATASET
+  {
+    { 1338;    ;DataItem;GIFICode            ;
+               DataItemTable=Table10015;
+               DataItemTableView=SORTING(Code);
+               OnPreDataItem=BEGIN
+                               IF GIFIFilterString <> '' THEN
+                                 SETFILTER(Code,GIFIFilterString);
+                               ColNo := 1;
+                               EnterCell(RowNo,ColNo,TABLECAPTION,'',TRUE);
+                               ColNo := ColNo + 1;
+                               IF PrintGIFIName THEN BEGIN
+                                 EnterCell(RowNo,ColNo,FIELDCAPTION(Name),'',TRUE);
+                                 ColNo := ColNo + 1;
+                               END;
+                               EnterCell(RowNo,ColNo,"G/L Account".FIELDCAPTION("Balance at Date"),'',TRUE);
+                               RowNo := RowNo + 1;
+                             END;
+
+               OnPostDataItem=BEGIN
+                                TempExcelBuffer.CreateBookAndOpenExcel(COMPANYNAME,Text003,CompanyInformation.Name,USERID);
+                              END;
+                               }
+
+    { 6710;1   ;DataItem;                    ;
+               DataItemTable=Table15;
+               DataItemTableView=SORTING(GIFI Code);
+               OnPreDataItem=BEGIN
+                               CurrReport.CREATETOTALS("Balance at Date","Add.-Currency Balance at Date");
+                               SETRANGE("Date Filter",0D,AsOfDate);
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  CALCFIELDS("Balance at Date","Add.-Currency Balance at Date");
+                                END;
+
+               OnPostDataItem=BEGIN
+                                IF IncludeZero OR
+                                   ("Balance at Date" <> 0) OR
+                                   ("Add.-Currency Balance at Date" <> 0)
+                                THEN BEGIN
+                                  ColNo := 1;
+                                  EnterCell(RowNo,ColNo,GIFICode.Code,'',FALSE);
+                                  ColNo := ColNo + 1;
+                                  IF PrintGIFIName THEN BEGIN
+                                    EnterCell(RowNo,ColNo,GIFICode.Name,'',FALSE);
+                                    ColNo := ColNo + 1;
+                                  END;
+                                  IF UseAddRptCurr THEN
+                                    EnterCell(RowNo,ColNo,FORMAT("Add.-Currency Balance at Date"),Text002,FALSE)
+                                  ELSE
+                                    EnterCell(RowNo,ColNo,FORMAT("Balance at Date"),Text002,FALSE);
+                                  RowNo := RowNo + 1;
+                                END;
+                              END;
+
+               ReqFilterFields=GIFI Code;
+               DataItemLink=GIFI Code=FIELD(Code) }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+      SaveValues=Yes;
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             ESM=Opciones;
+                             FRC=Options;
+                             ENC=Options] }
+
+      { 1020000;2;Field     ;
+                  CaptionML=[ENU=Balance As Of Date;
+                             ESM=Saldo hasta la fecha;
+                             FRC=Solde en date du;
+                             ENC=Balance As Of Date];
+                  SourceExpr=AsOfDate }
+
+      { 1020006;2;Field     ;
+                  CaptionML=[ENU=Use Add. Rpt. Currency;
+                             ESM=Utilizar Info. divisa adic.;
+                             FRC=Utiliser devise suppl. rapport;
+                             ENC=Use Add. Rpt. Currency];
+                  SourceExpr=UseAddRptCurr }
+
+      { 1020004;2;Field     ;
+                  CaptionML=[ENU=Include GIFI Name;
+                             ESM=Incluir nombre GIFI;
+                             FRC=Inclure le nom GIFI;
+                             ENC=Include GIFI Name];
+                  SourceExpr=PrintGIFIName }
+
+      { 1020002;2;Field     ;
+                  CaptionML=[ENU=Include Unused Codes;
+                             ESM=Incluir c¢digos no utilizados;
+                             FRC=Inclure les codes non utilis‚s;
+                             ENC=Include Unused Codes];
+                  SourceExpr=IncludeZero }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      CompanyInformation@1020002 : Record 79;
+      TempExcelBuffer@1020010 : TEMPORARY Record 370;
+      AsOfDate@1020001 : Date;
+      PrintGIFIName@1020004 : Boolean;
+      UseAddRptCurr@1020009 : Boolean;
+      IncludeZero@1020014 : Boolean;
+      FilterString@1020005 : Text[250];
+      Text000@1020003 : TextConst 'ENU=As Of %1;ESM=Hasta el %1;FRC=En date du %1;ENC=As Of %1';
+      Subtitle@1020006 : Text[30];
+      Text001@1020007 : TextConst 'ENU=You must enter an As Of Date.;ESM=Debe insertar una fecha final.;FRC=Vous devez entrer un En date de.;ENC=You must enter an As Of Date.';
+      RowNo@1020008 : Integer;
+      ColNo@1020011 : Integer;
+      Text002@1020012 : TextConst 'ENU="0_);(0)";ESM="0_);(0)";FRC="0_);(0)";ENC="0_);(0)"';
+      Text003@1020000 : TextConst 'ENU=GIFI;ESM=GIFI;FRC=IGRF;ENC=GIFI';
+      GIFIFilterString@1020013 : Text[250];
+
+    LOCAL PROCEDURE EnterCell@1020000(RowNo@1020000 : Integer;ColumnNo@1020001 : Integer;CellValue@1020002 : Text[250];NumberFormat@1020003 : Text[30];Bold@1020004 : Boolean);
+    BEGIN
+      TempExcelBuffer.INIT;
+      TempExcelBuffer.VALIDATE("Row No.",RowNo);
+      TempExcelBuffer.VALIDATE("Column No.",ColumnNo);
+      IF NumberFormat <> '' THEN BEGIN
+        TempExcelBuffer."Cell Type" := TempExcelBuffer."Cell Type"::Number;
+        TempExcelBuffer.NumberFormat := NumberFormat;
+      END ELSE
+        TempExcelBuffer."Cell Type" := TempExcelBuffer."Cell Type"::Text;
+
+      TempExcelBuffer."Cell Value as Text" := CellValue;
+
+      TempExcelBuffer.Bold := Bold;
+      TempExcelBuffer.INSERT;
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

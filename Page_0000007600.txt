@@ -1,0 +1,117 @@
+OBJECT Page 7600 Base Calendar Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Base Calendar Card;
+               ESM=Ficha calendario base;
+               FRC=Fiche calendrier principal;
+               ENC=Base Calendar Card];
+    SourceTable=Table7600;
+    PageType=ListPlus;
+    OnAfterGetRecord=BEGIN
+                       CurrPage.BaseCalendarEntries.PAGE.SetCalendarCode(Code);
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 15      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Base Calendar;
+                                 ESM=&Calendario base;
+                                 FRC=&Calendrier principal;
+                                 ENC=&Base Calendar];
+                      Image=Calendar }
+      { 10      ;2   ;Action    ;
+                      CaptionML=[ENU=&Where-Used List;
+                                 ESM=Lista punto &uso;
+                                 FRC=&Liste des cas d'emploi;
+                                 ENC=&Where-Used List];
+                      Image=Track;
+                      OnAction=VAR
+                                 WhereUsedList@1001 : Page 7608;
+                                 CalendarMgt@1002 : Codeunit 7600;
+                               BEGIN
+                                 CalendarMgt.CreateWhereUsedEntries(Code);
+                                 WhereUsedList.RUNMODAL;
+                                 CLEAR(WhereUsedList);
+                               END;
+                                }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 8       ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 9       ;2   ;Action    ;
+                      CaptionML=[ENU=&Maintain Base Calendar Changes;
+                                 ESM=&Mantener cambios calendario base;
+                                 FRC=&Conserver modifications calendrier principal;
+                                 ENC=&Maintain Base Calendar Changes];
+                      RunObject=Page 7602;
+                      RunPageLink=Base Calendar Code=FIELD(Code);
+                      Image=Edit }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                CaptionML=[ENU=Code;
+                           ESM=C¢digo;
+                           FRC="Code  ";
+                           ENC=Code];
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Customized Changes Exist;
+                           ESM=Existen cambios personaliz.;
+                           FRC=Modifications personnalis‚es;
+                           ENC=Customized Changes Exist];
+                SourceExpr="Customized Changes Exist" }
+
+    { 23  ;1   ;Part      ;
+                Name=BaseCalendarEntries;
+                PagePartID=Page7604 }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

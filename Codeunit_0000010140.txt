@@ -1,0 +1,276 @@
+OBJECT Codeunit 10140 Deposit-Post
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    TableNo=10140;
+    Permissions=TableData 21=r,
+                TableData 25=r,
+                TableData 271=r,
+                TableData 10143=rim,
+                TableData 10144=rim;
+    OnRun=BEGIN
+            // Perform all testing
+
+            TESTFIELD("Posting Date");
+            TESTFIELD("Total Deposit Amount");
+            TESTFIELD("Document Date");
+            TESTFIELD("Bank Account No.");
+            BankAccount.GET("Bank Account No.");
+            BankAccount.TESTFIELD(Blocked,FALSE);
+
+            IF "Currency Code" = '' THEN
+              Currency.InitRoundingPrecision
+            ELSE BEGIN
+              Currency.GET("Currency Code");
+              Currency.TESTFIELD("Amount Rounding Precision");
+            END;
+
+            SourceCodeSetup.GET;
+            GenJnlTemplate.GET("Journal Template Name");
+
+            CALCFIELDS("Total Deposit Lines");
+            IF "Total Deposit Lines" <> "Total Deposit Amount" THEN
+              ERROR(Text000,FIELDCAPTION("Total Deposit Amount"),FIELDCAPTION("Total Deposit Lines"));
+
+            TotalLines := 0;
+            TotalDepositLinesLCY := 0;
+            CurLine := 0;
+            Window.OPEN(
+              STRSUBSTNO(Text001,"No.") +
+              Text004 +
+              Text002 +
+              Text003);
+
+            // Copy to History Tables
+
+            Window.UPDATE(4,Text005);
+            PostedDepositHeader.LOCKTABLE;
+            PostedDepositLine.LOCKTABLE;
+
+            LOCKTABLE;
+            GenJnlLine.LOCKTABLE;
+
+            PostedDepositHeader.TRANSFERFIELDS(Rec,TRUE);
+            PostedDepositHeader."No. Printed" := 0;
+            PostedDepositHeader.INSERT;
+
+            GenJnlLine.RESET;
+            GenJnlLine.SETRANGE("Journal Template Name","Journal Template Name");
+            GenJnlLine.SETRANGE("Journal Batch Name","Journal Batch Name");
+            IF GenJnlLine.FIND('-') THEN
+              REPEAT
+                TotalLines := TotalLines + 1;
+                Window.UPDATE(2,TotalLines);
+                PostedDepositLine."Deposit No." := "No.";
+                PostedDepositLine."Line No." := TotalLines;
+                PostedDepositLine."Account Type" := GenJnlLine."Account Type";
+                PostedDepositLine."Account No." := GenJnlLine."Account No.";
+                PostedDepositLine."Document Date" := GenJnlLine."Document Date";
+                PostedDepositLine."Document Type" := GenJnlLine."Document Type";
+                PostedDepositLine."Document No." := GenJnlLine."Document No.";
+                PostedDepositLine.Description := GenJnlLine.Description;
+                PostedDepositLine."Currency Code" := GenJnlLine."Currency Code";
+                PostedDepositLine.Amount := -GenJnlLine.Amount;
+                PostedDepositLine."Posting Group" := GenJnlLine."Posting Group";
+                PostedDepositLine."Shortcut Dimension 1 Code" := GenJnlLine."Shortcut Dimension 1 Code";
+                PostedDepositLine."Shortcut Dimension 2 Code" := GenJnlLine."Shortcut Dimension 2 Code";
+                PostedDepositLine."Dimension Set ID" := GenJnlLine."Dimension Set ID";
+                PostedDepositLine."Posting Date" := "Posting Date";
+                PostedDepositLine.INSERT;
+                IF GenJnlTemplate."Force Doc. Balance" THEN
+                  AddBalancingAccount(GenJnlLine,Rec)
+                ELSE
+                  GenJnlLine."Bal. Account No." := '';
+                GenJnlCheckLine.RunCheck(GenJnlLine);
+              UNTIL GenJnlLine.NEXT = 0;
+
+
+            BankCommentLine.RESET;
+            BankCommentLine.SETRANGE("Table Name",BankCommentLine."Table Name"::Deposit);
+            BankCommentLine.SETRANGE("Bank Account No.","Bank Account No.");
+            BankCommentLine.SETRANGE("No.","No.");
+            IF BankCommentLine.FIND('-') THEN
+              REPEAT
+                BankCommentLine2 := BankCommentLine;
+                BankCommentLine2."Table Name" := BankCommentLine2."Table Name"::"Posted Deposit";
+                BankCommentLine2.INSERT;
+              UNTIL BankCommentLine.NEXT = 0;
+
+            // Post to General, and other, Ledgers
+
+            Window.UPDATE(4,Text006);
+            GenJnlLine.RESET;
+            GenJnlLine.SETRANGE("Journal Template Name","Journal Template Name");
+            GenJnlLine.SETRANGE("Journal Batch Name","Journal Batch Name");
+            IF GenJnlLine.FIND('-') THEN
+              REPEAT
+                CurLine := CurLine + 1;
+                Window.UPDATE(2,CurLine);
+                Window.UPDATE(3,ROUND(CurLine / TotalLines * 10000,1));
+                IF GenJnlTemplate."Force Doc. Balance" THEN
+                  AddBalancingAccount(GenJnlLine,Rec)
+                ELSE BEGIN
+                  TotalDepositLinesLCY := TotalDepositLinesLCY + GenJnlLine."Amount (LCY)";
+                  GenJnlLine."Bal. Account No." := '';
+                END;
+                GenJnlLine."Source Code" := SourceCodeSetup.Deposits;
+                GenJnlLine."Source Type" := GenJnlLine."Source Type"::"Bank Account";
+                GenJnlLine."Source No." := "Bank Account No.";
+                GenJnlLine."Source Currency Code" := "Currency Code";
+                GenJnlLine."Source Currency Amount" := GenJnlLine.Amount;
+                GenJnlPostLine.RunWithoutCheck(GenJnlLine);
+
+                PostedDepositLine.GET("No.",CurLine);
+                CASE GenJnlLine."Account Type" OF
+                  GenJnlLine."Account Type"::"G/L Account",
+                  GenJnlLine."Account Type"::"Bank Account":
+                    BEGIN
+                      GLEntry.FINDLAST;
+                      PostedDepositLine."Entry No." := GLEntry."Entry No.";
+                      IF GenJnlTemplate."Force Doc. Balance" AND
+                         (GenJnlLine.Amount * GLEntry.Amount < 0)
+                      THEN
+                        PostedDepositLine."Entry No." := PostedDepositLine."Entry No." - 1;
+                    END;
+                  GenJnlLine."Account Type"::Customer:
+                    BEGIN
+                      CustLedgEntry.FINDLAST;
+                      PostedDepositLine."Entry No." := CustLedgEntry."Entry No.";
+                    END;
+                  GenJnlLine."Account Type"::Vendor:
+                    BEGIN
+                      VendLedgEntry.FINDLAST;
+                      PostedDepositLine."Entry No." := VendLedgEntry."Entry No.";
+                    END;
+                END;
+                IF GenJnlTemplate."Force Doc. Balance" THEN BEGIN
+                  BankAccountLedgerEntry.FINDLAST;
+                  PostedDepositLine."Bank Account Ledger Entry No." := BankAccountLedgerEntry."Entry No.";
+                  IF (GenJnlLine."Account Type" = GenJnlLine."Account Type"::"Bank Account") AND
+                     (GenJnlLine.Amount * BankAccountLedgerEntry.Amount > 0)
+                  THEN
+                    PostedDepositLine."Entry No." := PostedDepositLine."Entry No." - 1;
+                END;
+                PostedDepositLine.MODIFY;
+              UNTIL GenJnlLine.NEXT = 0;
+
+            Window.UPDATE(4,Text007);
+            IF NOT GenJnlTemplate."Force Doc. Balance" THEN BEGIN
+              GenJnlLine.INIT;
+              GenJnlLine."Account Type" := GenJnlLine."Account Type"::"Bank Account";
+              GenJnlLine."Account No." := "Bank Account No.";
+              GenJnlLine."Posting Date" := "Posting Date";
+              GenJnlLine."Document No." := "No.";
+              GenJnlLine."Currency Code" := "Currency Code";
+              GenJnlLine."Currency Factor" := "Currency Factor";
+              GenJnlLine."Posting Group" := "Bank Acc. Posting Group";
+              GenJnlLine."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
+              GenJnlLine."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
+              GenJnlLine."Dimension Set ID" := "Dimension Set ID";
+              GenJnlLine."Source Code" := SourceCodeSetup.Deposits;
+              GenJnlLine."Reason Code" := "Reason Code";
+              GenJnlLine."Document Date" := "Document Date";
+              GenJnlLine."External Document No." := "No.";
+              GenJnlLine."Source Type" := GenJnlLine."Source Type"::"Bank Account";
+              GenJnlLine."Source No." := "Bank Account No.";
+              GenJnlLine."Source Currency Code" := "Currency Code";
+              GenJnlLine.Description := "Posting Description";
+              GenJnlLine.Amount := "Total Deposit Amount";
+              GenJnlLine."Source Currency Amount" := "Total Deposit Amount";
+              GenJnlLine.VALIDATE(Amount);
+              GenJnlLine."Amount (LCY)" := -TotalDepositLinesLCY;
+              GenJnlPostLine.RunWithCheck(GenJnlLine);
+
+              BankAccountLedgerEntry.FINDLAST;    // The last entry is the one we just posted.
+              PostedDepositLine.RESET;
+              PostedDepositLine.SETRANGE("Deposit No.","No.");
+              IF PostedDepositLine.FIND('-') THEN
+                REPEAT
+                  PostedDepositLine."Bank Account Ledger Entry No." := BankAccountLedgerEntry."Entry No.";
+                  PostedDepositLine.MODIFY;
+                UNTIL PostedDepositLine.NEXT = 0;
+            END;
+
+            // Erase Original Document
+            Window.UPDATE(4,Text008);
+
+            BankCommentLine.RESET;
+            BankCommentLine.SETRANGE("Table Name",BankCommentLine."Table Name"::Deposit);
+            BankCommentLine.SETRANGE("Bank Account No.","Bank Account No.");
+            BankCommentLine.SETRANGE("No.","No.");
+            BankCommentLine.DELETEALL;
+
+            GenJnlLine.RESET;
+            GenJnlLine.SETRANGE("Journal Template Name","Journal Template Name");
+            GenJnlLine.SETRANGE("Journal Batch Name","Journal Batch Name");
+            GenJnlLine.DELETEALL;
+            GenJnlBatch.GET("Journal Template Name","Journal Batch Name");
+            IF INCSTR("Journal Batch Name") <> '' THEN BEGIN
+              GenJnlBatch.GET("Journal Template Name","Journal Batch Name");
+              GenJnlBatch.DELETE;
+              GenJnlBatch.Name := INCSTR("Journal Batch Name");
+              IF GenJnlBatch.INSERT THEN;
+            END;
+
+            DELETE;
+
+            COMMIT;
+
+            UpdateAnalysisView.UpdateAll(0,TRUE);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      PostedDepositHeader@1020000 : Record 10143;
+      PostedDepositLine@1020002 : Record 10144;
+      BankCommentLine@1020010 : Record 10122;
+      BankCommentLine2@1020015 : Record 10122;
+      BankAccount@1020012 : Record 270;
+      GenJnlLine@1020005 : Record 81;
+      GenJnlTemplate@1020003 : Record 80;
+      GenJnlBatch@1020041 : Record 232;
+      SourceCodeSetup@1020016 : Record 242;
+      GLEntry@1020004 : Record 17;
+      CustLedgEntry@1020017 : Record 21;
+      VendLedgEntry@1020018 : Record 25;
+      BankAccountLedgerEntry@1020019 : Record 271;
+      Currency@1020036 : Record 4;
+      Window@1020006 : Dialog;
+      GenJnlPostLine@1020007 : Codeunit 12;
+      GenJnlCheckLine@1020040 : Codeunit 11;
+      Text000@1020013 : TextConst 'ENU=The %1 must match the %2.;ESM=El %1 debe coincidir con el %2.;FRC=Le %1 doit correspondre au %2.;ENC=The %1 must match the %2.';
+      Text001@1020020 : TextConst 'ENU=Posting Deposit No. %1...\\;ESM=Registrando dep¢sito nß %1...\\;FRC=Report du dÇpìt n¯ %1...\\;ENC=Posting Deposit No. %1...\\';
+      Text002@1020021 : TextConst 'ENU=Deposit Line  #2########\;ESM=L°nea dep¢sito#2########\;FRC=Ligne de dÇpìt  #2########\;ENC=Deposit Line  #2########\';
+      UpdateAnalysisView@1020039 : Codeunit 410;
+      TotalLines@1020022 : Integer;
+      CurLine@1020023 : Integer;
+      Text003@1020024 : TextConst 'ENU=@3@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@;ESM=@3@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@;FRC=@3@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@;ENC=@3@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@';
+      Text004@1020025 : TextConst 'ENU=Status        #4###################\;ESM=Estado        #4###################\;FRC=êtat            #4###################\;ENC=Status        #4###################\';
+      Text005@1020026 : TextConst 'ENU=Moving Deposit to History;ESM=Moviendo dep¢sito al historial;FRC=DÇplacement du dÇpìt vers l''historique;ENC=Moving Deposit to History';
+      Text006@1020027 : TextConst 'ENU=Posting Lines to Ledgers;ESM=Registrando l°neas en cont.;FRC=Report des lignes dans les grands livres;ENC=Posting Lines to Ledgers';
+      Text007@1020028 : TextConst 'ENU=Posting Bank Entry;ESM=Registrando mov.;FRC=Report de l''Çcriture bancaire;ENC=Posting Bank Entry';
+      Text008@1020029 : TextConst 'ENU=Removing Deposit Entry;ESM=Registrando mov. dep.;FRC=Suppression de l''Çcriture de dÇpìt;ENC=Removing Deposit Entry';
+      TotalDepositLinesLCY@1480000 : Decimal;
+
+    LOCAL PROCEDURE AddBalancingAccount@1020001(VAR GenJnlLine@1020000 : Record 81;DepositHeader@1020001 : Record 10140);
+    BEGIN
+      WITH GenJnlLine DO BEGIN
+        "Bal. Account Type" := "Bal. Account Type"::"Bank Account";
+        "Bal. Account No." := DepositHeader."Bank Account No.";
+        "Balance (LCY)" := 0;
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

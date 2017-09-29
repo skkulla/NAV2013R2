@@ -1,0 +1,63 @@
+OBJECT Page 1251 Account Mapping
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Account Mapping;
+               ESM=Asignaci¢n de cuenta;
+               FRC=Correspondance compte;
+               ENC=Account Mapping];
+    SaveValues=Yes;
+    SourceTable=Table1251;
+    PageType=List;
+    AutoSplitKey=Yes;
+    OnAfterGetCurrRecord=BEGIN
+                           EnableBalSourceNo := IsBalSourceNoEnabled;
+                         END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Mapping Text" }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Debit Acc. No." }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Credit Acc. No." }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Bal. Source Type";
+                OnValidate=BEGIN
+                             EnableBalSourceNo := IsBalSourceNoEnabled;
+                           END;
+                            }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Bal. Source No.";
+                Enabled=EnableBalSourceNo }
+
+  }
+  CODE
+  {
+    VAR
+      EnableBalSourceNo@1000 : Boolean;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,162 @@
+OBJECT Page 9551 Document Service Config
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Online Doc. Storage Config.;
+               ESM=Config. almacenamiento doc. en l¡nea;
+               FRC=Config. stockage doc. en ligne;
+               ENC=Online Doc. Storage Config.];
+    InsertAllowed=No;
+    SourceTable=Table2000000114;
+    DelayedInsert=Yes;
+    PageType=Card;
+    OnInit=BEGIN
+             DynamicEditable := FALSE;
+           END;
+
+    OnOpenPage=BEGIN
+                 IF NOT FINDFIRST THEN BEGIN
+                   INIT;
+                   "Service ID" := 'Service 1';
+                   INSERT(FALSE);
+                 END;
+               END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           DynamicEditable := CurrPage.EDITABLE;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 10      ;    ;ActionContainer;
+                      Name=Container;
+                      CaptionML=[ENU=Container;
+                                 ESM=Envase;
+                                 FRC=Conteneur;
+                                 ENC=Container];
+                      ActionContainerType=ActionItems }
+      { 11      ;1   ;Action    ;
+                      Name=Test Connection;
+                      CaptionML=[ENU=Test Connection;
+                                 ESM=Probar conexi¢n;
+                                 FRC=Tester la connexion;
+                                 ENC=Test Connection];
+                      ToolTipML=[ENU=Test the configuration settings against the online document storage service.;
+                                 ESM=Probar los par metros de configuraci¢n en el servicio de almacenamiento de documentos en l¡nea.;
+                                 FRC=Testez les paramŠtres de configuration en les comparant au service de stockage de documents en ligne.;
+                                 ENC=Test the configuration settings against the online document storage service.];
+                      Promoted=Yes;
+                      Image=ValidateEmailLoggingSetup;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 DocumentServiceManagement@1000 : Codeunit 9510;
+                               BEGIN
+                                 // Save record to make sure the credentials are reset.
+                                 MODIFY;
+                                 DocumentServiceManagement.TestConnection;
+                                 MESSAGE(ValidateSuccessMsg);
+                               END;
+                                }
+      { 9       ;1   ;Action    ;
+                      Name=Set Password;
+                      CaptionML=[ENU=Set Password;
+                                 ESM=Establecer contrase¤a;
+                                 FRC=D‚finir le mot de passe;
+                                 ENC=Set Password];
+                      ToolTipML=[ENU=Set the password for the current User Name;
+                                 ESM=Establecer la contrase¤a para el nombre de usuario actual;
+                                 FRC=D‚finir le mot de passe pour le nom d'utilisateur actuel;
+                                 ENC=Set the password for the current User Name];
+                      Promoted=Yes;
+                      Enabled=DynamicEditable;
+                      Image=EncryptionKeys;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 DocumentServiceAccPwd@1000 : Page 9552;
+                               BEGIN
+                                 IF DocumentServiceAccPwd.RUNMODAL = ACTION::OK THEN BEGIN
+                                   IF CONFIRM(ChangePwdQst) THEN
+                                     Password := DocumentServiceAccPwd.GetData;
+                                 END;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=General;
+                GroupType=Group }
+
+    { 3   ;2   ;Field     ;
+                CaptionML=[ENU=Service ID;
+                           ESM=Id. de servicio;
+                           FRC=Code du service;
+                           ENC=Service ID];
+                SourceExpr="Service ID" }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Description;
+                           ESM=Descripci¢n;
+                           FRC=Description;
+                           ENC=Description];
+                SourceExpr=Description }
+
+    { 5   ;2   ;Field     ;
+                CaptionML=[ENU=Location;
+                           ESM=Almac‚n;
+                           FRC=Emplacement;
+                           ENC=Location];
+                SourceExpr=Location }
+
+    { 7   ;2   ;Field     ;
+                CaptionML=[ENU=Folder;
+                           ESM=Carpeta;
+                           FRC=Dossier;
+                           ENC=Folder];
+                SourceExpr=Folder }
+
+    { 12  ;1   ;Group     ;
+                Name=Shared documents;
+                CaptionML=[ENU=Shared Documents;
+                           ESM=Documentos compartidos;
+                           FRC=Documents partag‚s;
+                           ENC=Shared Documents];
+                GroupType=Group }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Document Repository;
+                           ESM=Repositorio de documentos;
+                           FRC=R‚f‚rentiel de documents;
+                           ENC=Document Repository];
+                SourceExpr="Document Repository" }
+
+    { 8   ;2   ;Field     ;
+                CaptionML=[ENU=User Name;
+                           ESM=Nombre usuario;
+                           FRC=Nom utilisateur;
+                           ENC=User Name];
+                SourceExpr="User Name" }
+
+  }
+  CODE
+  {
+    VAR
+      ChangePwdQst@1002 : TextConst 'ENU=Are you sure that you want to change your password?;ESM=¨Est  seguro de que desea cambiar la contrase¤a?;FRC=Voulez-vous vraiment modifier votre mot de passeÿ?;ENC=Are you sure that you want to change your password?';
+      DynamicEditable@1001 : Boolean;
+      ValidateSuccessMsg@1004 : TextConst 'ENU=The connection settings validated correctly, and the current configuration can connect to the document storage service.;ESM=Los par metros de conexi¢n se validaron correctamente y la configuraci¢n actual puede conectarse al servicio de almacenamiento de documentos en l¡nea.;FRC=Les paramŠtres de connexion ont bien ‚t‚ valid‚s et la configuration actuelle peut se connecter au service de stockage de documents.;ENC=The connection settings validated correctly, and the current configuration can connect to the document storage service.';
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,146 @@
+OBJECT Page 7349 Registered Movement
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Registered Movement;
+               ESM=Movimiento registrado;
+               FRC=Mouvement enregistr‚;
+               ENC=Registered Movement];
+    InsertAllowed=No;
+    SourceTable=Table5772;
+    SourceTableView=WHERE(Type=CONST(Movement));
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    OnOpenPage=VAR
+                 ChangeLocation@1000 : Boolean;
+               BEGIN
+                 ChangeLocation := "Location Code" <> CurrentLocationCode;
+                 CurrentLocationCode := "Location Code";
+                 OpenRegisteredActivityHeader(3,ChangeLocation,CurrentLocationCode,Rec);
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       CurrentLocationCode := "Location Code";
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 100     ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Movement;
+                                 ESM=&Movimiento;
+                                 FRC=&Mouvement;
+                                 ENC=&Movement];
+                      Image=CreateMovement }
+      { 101     ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+L;
+                      CaptionML=[ENU=List;
+                                 ESM=Lista;
+                                 FRC=Liste;
+                                 ENC=List];
+                      Image=OpportunitiesList;
+                      OnAction=BEGIN
+                                 LookupRegisteredActivityHeader("Location Code",Rec);
+                               END;
+                                }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 5776;
+                      RunPageLink=Table Name=CONST(Rgstrd. Whse. Activity Header),
+                                  Type=FIELD(Type),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="No.";
+                Editable=FALSE }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Whse. Activity No.";
+                Editable=FALSE }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Location Code";
+                Editable=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Registering Date";
+                Editable=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Assigned User ID";
+                Editable=FALSE }
+
+    { 15  ;2   ;Field     ;
+                SourceExpr="Assignment Date";
+                Editable=FALSE }
+
+    { 23  ;2   ;Field     ;
+                SourceExpr="Assignment Time";
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                OptionCaptionML=[ENU=" ,Item,,Bin Code,Due Date,,Bin Ranking,Action Type";
+                                 ESM=" ,Producto,,C¢d. ubicaci¢n,Fecha vto.,,Ranking ubicaci¢n,Tipo acci¢n";
+                                 FRC=" ,Article,,Code de zone,D‚lai,,Priorit‚ zone,Type action";
+                                 ENC=" ,Item,,Bin Code,Due Date,,Bin Ranking,Action Type"];
+                SourceExpr="Sorting Method";
+                Editable=FALSE }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No. Printed";
+                Editable=FALSE }
+
+    { 97  ;1   ;Part      ;
+                Name=WhseActivityLines;
+                SubPageView=SORTING(Activity Type,No.,Sorting Sequence No.);
+                SubPageLink=Activity Type=FIELD(Type),
+                            No.=FIELD(No.);
+                PagePartID=Page7350 }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      CurrentLocationCode@1000 : Code[10];
+
+    BEGIN
+    END.
+  }
+}
+

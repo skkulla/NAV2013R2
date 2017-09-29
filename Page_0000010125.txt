@@ -1,0 +1,330 @@
+OBJECT Page 10125 Posted Bank Rec.Worksheet
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posted Bank Rec.Worksheet;
+               ESM=Hoja conciliaci¢n registrada;
+               FRC=Feuille de travail rapprochement bancaire report‚;
+               ENC=Posted Bank Rec.Worksheet];
+    InsertAllowed=No;
+    ModifyAllowed=No;
+    SourceTable=Table10123;
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    OnAfterGetRecord=BEGIN
+                       OnAfterGetCurrRecord;
+                     END;
+
+    OnNewRecord=BEGIN
+                  OnAfterGetCurrRecord;
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 1020050 ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Bank Rec.;
+                                 ESM=Conc. &banco;
+                                 FRC=Rapprochement &bancaire;
+                                 ENC=&Bank Rec.] }
+      { 1020066 ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 10130;
+                      RunPageView=WHERE(Table Name=CONST(Posted Bank Rec.));
+                      RunPageLink=Bank Account No.=FIELD(Bank Account No.),
+                                  No.=FIELD(Statement No.);
+                      Image=ViewComments }
+      { 1020059 ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=C&ard;
+                                 ESM=Fich&a;
+                                 FRC=&Fiche;
+                                 ENC=C&ard];
+                      RunObject=Page 370;
+                      RunPageLink=No.=FIELD(Bank Account No.);
+                      Image=EditLines }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1020030 ;1   ;Action    ;
+                      Name=Print;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=&Imprimir;
+                                 FRC=&Imprimer;
+                                 ENC=&Print];
+                      Promoted=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 CurrPage.SETSELECTIONFILTER(Rec);
+                                 PrintRecords(TRUE);
+                               END;
+                                }
+      { 1020047 ;1   ;Action    ;
+                      Name=Navigate;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      Promoted=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1020000;1;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 1020001;2;Field     ;
+                SourceExpr="Bank Account No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 1020003;2;Field     ;
+                SourceExpr="Statement No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 1020005;2;Field     ;
+                SourceExpr="Statement Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 1020007;2;Field     ;
+                SourceExpr="G/L Balance (LCY)";
+                Editable=FALSE }
+
+    { 1020068;2;Field     ;
+                SourceExpr="G/L Balance";
+                Editable=FALSE }
+
+    { 1020009;2;Field     ;
+                CaptionML=[ENU=+ Positive Adjustments;
+                           ESM=+ Ajustes positivos;
+                           FRC=+ Ajustements positifs;
+                           ENC=+ Positive Adjustments];
+                SourceExpr="Positive Adjustments" - "Negative Bal. Adjustments";
+                Editable=FALSE }
+
+    { 1020033;2;Field     ;
+                CaptionML=[ENU=Subtotal;
+                           ESM=Subtotal;
+                           FRC=Total partiel;
+                           ENC=Subtotal];
+                SourceExpr="G/L Balance" + ("Positive Adjustments" - "Negative Bal. Adjustments");
+                Editable=FALSE }
+
+    { 1020011;2;Field     ;
+                CaptionML=[ENU=- Negative Adjustments;
+                           ESM=- Ajustes negativos;
+                           FRC=- Ajustements n‚gatifs;
+                           ENC=- Negative Adjustments];
+                SourceExpr="Negative Adjustments" - "Positive Bal. Adjustments";
+                Editable=FALSE }
+
+    { 1020036;2;Field     ;
+                CaptionML=[ENU=Ending G/L Balance;
+                           ESM=Saldo C/G final;
+                           FRC=Solde de cl“ture du grand livre;
+                           ENC=Ending G/L Balance];
+                SourceExpr="G/L Balance" + ("Positive Adjustments" - "Negative Bal. Adjustments") + ("Negative Adjustments" - "Positive Bal. Adjustments");
+                Editable=FALSE }
+
+    { 1020038;2;Field     ;
+                CaptionML=[ENU=Difference;
+                           ESM=Diferencia;
+                           FRC=Diff‚rence;
+                           ENC=Difference];
+                SourceExpr=("G/L Balance" + ("Positive Adjustments" - "Negative Bal. Adjustments") + ("Negative Adjustments" - "Positive Bal. Adjustments")) - (("Statement Balance" + "Outstanding Deposits") - "Outstanding Checks");
+                Editable=FALSE }
+
+    { 1020052;2;Field     ;
+                SourceExpr="Cleared With./Chks. Per Stmnt.";
+                Editable=FALSE }
+
+    { 1020054;2;Field     ;
+                SourceExpr="Cleared Inc./Dpsts. Per Stmnt.";
+                Editable=FALSE }
+
+    { 1020013;2;Field     ;
+                CaptionML=[ENU=Balance on Statement;
+                           ESM=Saldo £lt. edo. cta. banco;
+                           FRC=Solde du relev‚;
+                           ENC=Balance on Statement];
+                SourceExpr="Statement Balance";
+                Editable=FALSE }
+
+    { 1020015;2;Field     ;
+                CaptionML=[ENU=+ Outstanding Deposits;
+                           ESM=+ Dep¢sitos pendientes;
+                           FRC=+ D‚p“ts en suspens;
+                           ENC=+ Outstanding Deposits];
+                SourceExpr="Outstanding Deposits";
+                Editable=FALSE }
+
+    { 1020040;2;Field     ;
+                CaptionML=[ENU=Subtotal;
+                           ESM=Subtotal;
+                           FRC=Total partiel;
+                           ENC=Subtotal];
+                SourceExpr="Statement Balance" + "Outstanding Deposits";
+                Editable=FALSE }
+
+    { 1020017;2;Field     ;
+                CaptionML=[ENU=- Outstanding Checks;
+                           ESM=- Cheques pendientes;
+                           FRC=- ChŠques en suspens;
+                           ENC=- Outstanding Cheques];
+                SourceExpr="Outstanding Checks";
+                Editable=FALSE }
+
+    { 1020044;2;Field     ;
+                CaptionML=[ENU=Ending Balance;
+                           ESM=Saldo final;
+                           FRC=Solde de cl“ture;
+                           ENC=Ending Balance];
+                SourceExpr=("Statement Balance" + "Outstanding Deposits") - "Outstanding Checks";
+                Editable=FALSE }
+
+    { 1903609101;1;Group  ;
+                CaptionML=[ENU=Checks;
+                           ESM=Cheques;
+                           FRC=ChŠques;
+                           ENC=Cheques] }
+
+    { 1020046;2;Part      ;
+                Name=ChecksSubForm;
+                SubPageLink=Bank Account No.=FIELD(Bank Account No.),
+                            Statement No.=FIELD(Statement No.),
+                            Record Type=CONST(Check);
+                PagePartID=Page10126 }
+
+    { 1906742101;1;Group  ;
+                CaptionML=[ENU=Deposits/Transfers;
+                           ESM=Dep¢sitos/transferencias;
+                           FRC=D‚p“ts/Transferts;
+                           ENC=Deposits/Transfers] }
+
+    { 1020051;2;Part      ;
+                Name=DepositsSubForm;
+                SubPageView=WHERE(Record Type=CONST(Deposit));
+                SubPageLink=Bank Account No.=FIELD(Bank Account No.),
+                            Statement No.=FIELD(Statement No.);
+                PagePartID=Page10127 }
+
+    { 1907762901;1;Group  ;
+                CaptionML=[ENU=Adjustments;
+                           ESM=Ajustes;
+                           FRC=Ajustements;
+                           ENC=Adjustments] }
+
+    { 1020060;2;Part      ;
+                Name=AdjustmentsSubForm;
+                SubPageView=WHERE(Record Type=CONST(Adjustment));
+                SubPageLink=Bank Account No.=FIELD(Bank Account No.),
+                            Statement No.=FIELD(Statement No.);
+                PagePartID=Page10128 }
+
+    { 1907481501;1;Group  ;
+                CaptionML=[ENU=Control Info;
+                           ESM=Informaci¢n de control;
+                           FRC=Information de contr“le;
+                           ENC=Control Info] }
+
+    { 1020035;2;Field     ;
+                Name=Bank Account No.2;
+                Lookup=No;
+                SourceExpr="Bank Account No.";
+                Editable=FALSE }
+
+    { 1020029;2;Field     ;
+                Name=Statement No.2;
+                SourceExpr="Statement No.";
+                Editable=FALSE }
+
+    { 1020025;2;Field     ;
+                SourceExpr="Currency Code";
+                Editable=FALSE }
+
+    { 1020027;2;Field     ;
+                SourceExpr="Currency Factor";
+                Editable=FALSE }
+
+    { 1020032;2;Field     ;
+                Name=Statement Date2;
+                SourceExpr="Statement Date";
+                Editable=FALSE }
+
+    { 1020048;2;Field     ;
+                SourceExpr="No. Printed";
+                Editable=FALSE }
+
+    { 1020019;2;Field     ;
+                SourceExpr="Date Created";
+                Editable=FALSE }
+
+    { 1020021;2;Field     ;
+                SourceExpr="Time Created";
+                Editable=FALSE }
+
+    { 1020023;2;Field     ;
+                Lookup=No;
+                DrillDown=No;
+                AssistEdit=No;
+                SourceExpr="Created By";
+                Editable=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                Editable=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    PROCEDURE SetupRecord@1020001();
+    BEGIN
+      SETRANGE("Date Filter","Statement Date");
+      CALCFIELDS("Positive Adjustments",
+        "Negative Adjustments",
+        "Positive Bal. Adjustments",
+        "Negative Bal. Adjustments");
+    END;
+
+    LOCAL PROCEDURE OnAfterGetCurrRecord@19077479();
+    BEGIN
+      xRec := Rec;
+      SetupRecord;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

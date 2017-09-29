@@ -1,0 +1,153 @@
+OBJECT Page 361 Res. Availability Lines
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Lines;
+               ESM=L¡neas;
+               FRC=Lignes;
+               ENC=Lines];
+    SaveValues=Yes;
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table2000000007;
+    PageType=ListPart;
+    OnOpenPage=BEGIN
+                 RESET;
+               END;
+
+    OnFindRecord=BEGIN
+                   EXIT(PeriodFormMgt.FindDate(Which,Rec,ResPeriodLength));
+                 END;
+
+    OnNextRecord=BEGIN
+                   EXIT(PeriodFormMgt.NextDate(Steps,Rec,ResPeriodLength));
+                 END;
+
+    OnAfterGetRecord=BEGIN
+                       SetDateFilter;
+                       Res.CALCFIELDS(Capacity,"Qty. on Order (Job)","Qty. Quoted (Job)","Qty. on Service Order");
+                       CapacityAfterOrders := Res.Capacity - Res."Qty. on Order (Job)";
+                       CapacityAfterQuotes := CapacityAfterOrders - Res."Qty. Quoted (Job)";
+                       NetAvailability := CapacityAfterQuotes - Res."Qty. on Service Order";
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                CaptionML=[ENU=Period Start;
+                           ESM=Inicio periodo;
+                           FRC=D‚but p‚riode;
+                           ENC=Period Start];
+                SourceExpr="Period Start" }
+
+    { 14  ;2   ;Field     ;
+                CaptionML=[ENU=Period Name;
+                           ESM=Nombre periodo;
+                           FRC=Nom de p‚riode;
+                           ENC=Period Name];
+                SourceExpr="Period Name" }
+
+    { 4   ;2   ;Field     ;
+                Name=Capacity;
+                CaptionML=[ENU=Capacity;
+                           ESM=Capacidad;
+                           FRC=Capacit‚;
+                           ENC=Capacity];
+                DecimalPlaces=0:5;
+                SourceExpr=Res.Capacity }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Qty. on Order (Job);
+                           ESM=Cdad. pedida en proyectos;
+                           FRC=Qt‚ sur commande (projet);
+                           ENC=Qty. on Order (Job)];
+                DecimalPlaces=0:5;
+                SourceExpr=Res."Qty. on Order (Job)" }
+
+    { 8   ;2   ;Field     ;
+                CaptionML=[ENU=Availability After Orders;
+                           ESM=Disponibilidad despu‚s de pedidos;
+                           FRC=Disponibilit‚ aprŠs commandes;
+                           ENC=Availability After Orders];
+                DecimalPlaces=0:5;
+                SourceExpr=CapacityAfterOrders }
+
+    { 10  ;2   ;Field     ;
+                CaptionML=[ENU=Job Quotes Allocation;
+                           ESM=Asignada en cotizaciones;
+                           FRC=Affectation devis projet;
+                           ENC=Job Quotes Allocation];
+                DecimalPlaces=0:5;
+                SourceExpr=Res."Qty. Quoted (Job)" }
+
+    { 12  ;2   ;Field     ;
+                CaptionML=[ENU=Availability After Quotes;
+                           ESM=Disponib. despu‚s Cotizaciones;
+                           FRC=Disponible aprŠs devis;
+                           ENC=Availability After Quotes];
+                DecimalPlaces=0:5;
+                SourceExpr=CapacityAfterQuotes }
+
+    { 16  ;2   ;Field     ;
+                CaptionML=[ENU=Qty. on Service Order;
+                           ESM=Cdad. en ped. servicio;
+                           FRC=Qt‚ sur commande service;
+                           ENC=Qty. on Service Order];
+                SourceExpr=Res."Qty. on Service Order" }
+
+    { 18  ;2   ;Field     ;
+                CaptionML=[ENU=Net Availability;
+                           ESM=Disponibilidad neta;
+                           FRC=Disponibilit‚ nette;
+                           ENC=Net Availability];
+                SourceExpr=NetAvailability;
+                AutoFormatType=1 }
+
+  }
+  CODE
+  {
+    VAR
+      CapacityAfterOrders@1000 : Decimal;
+      CapacityAfterQuotes@1001 : Decimal;
+      NetAvailability@1002 : Decimal;
+      PeriodFormMgt@1003 : Codeunit 359;
+      ResPeriodLength@1004 : 'Day,Week,Month,Quarter,Year,Period';
+      AmountType@1005 : 'Net Change,Balance at Date';
+      Res@1006 : Record 156;
+
+    PROCEDURE Set@1(VAR NewRes@1000 : Record 156;NewResPeriodLength@1001 : Integer;NewAmountType@1002 : 'Net Change,Balance at Date');
+    BEGIN
+      Res.COPY(NewRes);
+      ResPeriodLength := NewResPeriodLength;
+      AmountType := NewAmountType;
+      CurrPage.UPDATE(FALSE);
+    END;
+
+    LOCAL PROCEDURE SetDateFilter@4();
+    BEGIN
+      IF AmountType = AmountType::"Net Change" THEN
+        Res.SETRANGE("Date Filter","Period Start","Period End")
+      ELSE
+        Res.SETRANGE("Date Filter",0D,"Period End");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

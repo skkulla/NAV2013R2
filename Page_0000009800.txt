@@ -1,0 +1,192 @@
+OBJECT Page 9800 Users
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Users;
+               ESM=Usuarios;
+               FRC=Utilisateurs;
+               ENC=Users];
+    SourceTable=Table2000000120;
+    DelayedInsert=Yes;
+    PageType=List;
+    CardPageID=User Card;
+    OnAfterGetRecord=BEGIN
+                       WindowsUserName := IdentityManagement.UserName("Windows Security ID");
+                     END;
+
+    OnNewRecord=BEGIN
+                  "User Security ID" := CREATEGUID;
+                  WindowsUserName := '';
+                END;
+
+    OnInsertRecord=BEGIN
+                     IF "User Name" = '' THEN
+                       ERROR(Text004,FIELDCAPTION("User Name"));
+                   END;
+
+    ActionList=ACTIONS
+    {
+      { 10      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 9       ;1   ;ActionGroup;
+                      Name=AccessControlGroup;
+                      CaptionML=[ENU=&Access Control;
+                                 ESM=Control de &acceso;
+                                 FRC=&Contr“le d'accŠs;
+                                 ENC=&Access Control] }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="User Security ID";
+                Visible=FALSE }
+
+    { 4   ;2   ;Field     ;
+                Name=User Name;
+                CaptionML=[ENU=User Name;
+                           ESM=Nombre usuario;
+                           FRC=Nom utilisateur;
+                           ENC=User Name];
+                SourceExpr="User Name";
+                OnValidate=BEGIN
+                             ValidateUserName;
+                           END;
+                            }
+
+    { 5   ;2   ;Field     ;
+                Name=Full Name;
+                CaptionML=[ENU=Full Name;
+                           ESM=Nombre completo;
+                           FRC=Nom complet;
+                           ENC=Full Name];
+                SourceExpr="Full Name" }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Windows Security ID";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                Name=Windows User Name;
+                CaptionML=[ENU=Windows User Name;
+                           ESM=Nombre de usuario Windows;
+                           FRC=Nom utilisateur Windows;
+                           ENC=Windows User Name];
+                SourceExpr=WindowsUserName;
+                OnValidate=VAR
+                             UserSID@1000 : Text;
+                           BEGIN
+                             IF WindowsUserName = '' THEN BEGIN
+                               "Windows Security ID" := '';
+                             END ELSE BEGIN
+                               UserSID := SID(WindowsUserName);
+                               WindowsUserName := IdentityManagement.UserName(UserSID);
+                               IF WindowsUserName <> '' THEN BEGIN
+                                 "Windows Security ID" := UserSID;
+                                 ValidateSid;
+                                 SetUserName;
+                               END ELSE BEGIN
+                                 ERROR(Text001,WindowsUserName);
+                               END
+                             END;
+                           END;
+
+                OnAssistEdit=VAR
+                               DSOP@1000 : DotNet "'Microsoft.Dynamics.Nav.Management.DSObjectPickerWrapper, Version=7.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'.Microsoft.Dynamics.Nav.Management.DSObjectPicker.DSObjectPickerWrapper" RUNONCLIENT;
+                               result@1001 : Text;
+                             BEGIN
+                               DSOP := DSOP.DSObjectPickerWrapper;
+                               result := DSOP.InvokeDialogAndReturnSid;
+                               IF result <> '' THEN BEGIN
+                                 "Windows Security ID" := result;
+                                 ValidateSid;
+                                 WindowsUserName := IdentityManagement.UserName("Windows Security ID");
+                                 SetUserName;
+                               END;
+                             END;
+                              }
+
+    { 14  ;2   ;Field     ;
+                Name=License Type;
+                CaptionML=[ENU=License Type;
+                           ESM=Tipo de licencia;
+                           FRC=Type licence;
+                           ENC=License Type];
+                SourceExpr="License Type" }
+
+    { 13  ;2   ;Field     ;
+                Name=Authentication Email;
+                SourceExpr="Authentication Email";
+                Visible=FALSE }
+
+    { 8   ;0   ;Container ;
+                ContainerType=FactBoxArea }
+
+    { 11  ;1   ;Part      ;
+                PartType=System;
+                SystemPartID=Notes }
+
+    { 12  ;1   ;Part      ;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+  }
+  CODE
+  {
+    VAR
+      IdentityManagement@1004 : Codeunit 9801;
+      WindowsUserName@1000 : Text[208];
+      Text001@1003 : TextConst 'ENU=The account %1 is not a valid Windows account.;ESM=La cuenta %1 no es una cuenta Windows v lida.;FRC=%1 n''est pas un compte Windows valide.;ENC=The account %1 is not a valid Windows account.';
+      Text002@1002 : TextConst 'ENU=The account %1 already exists.;ESM=La cuenta %1 ya existe.;FRC=Le compte %1 existe d‚j….;ENC=The account %1 already exists.';
+      Text003@1001 : TextConst 'ENU=The account %1 is not allowed.;ESM=La cuenta %1 no se permite.;FRC=Le compte %1 n''est pas autoris‚.;ENC=The account %1 is not allowed.';
+      Text004@1005 : TextConst 'ENU=%1 cannot be empty.;ESM=%1 no puede estar vac¡o.;FRC=%1 ne peut pas ˆtre vide.;ENC=%1 cannot be empty.';
+
+    PROCEDURE ValidateSid@1();
+    VAR
+      User@1000 : Record 2000000120;
+    BEGIN
+      IF "Windows Security ID" = '' THEN
+        ERROR(Text001,"User Name");
+
+      IF ("Windows Security ID" = 'S-1-1-0') OR ("Windows Security ID" = 'S-1-5-7') THEN
+        ERROR(Text003,"User Name");
+
+      User.SETCURRENTKEY("Windows Security ID");
+      User.SETFILTER("Windows Security ID","Windows Security ID");
+      User.SETFILTER("User Security ID",'<>%1',"User Security ID");
+      IF User.FINDFIRST THEN
+        ERROR(Text002,WindowsUserName);
+    END;
+
+    LOCAL PROCEDURE ValidateUserName@3();
+    VAR
+      UserMgt@1000 : Codeunit 418;
+    BEGIN
+      UserMgt.ValidateUserName(Rec,xRec,WindowsUserName);
+      CurrPage.UPDATE;
+    END;
+
+    LOCAL PROCEDURE SetUserName@4();
+    BEGIN
+      "User Name" := WindowsUserName;
+      ValidateUserName;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

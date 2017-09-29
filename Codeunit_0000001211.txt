@@ -1,0 +1,158 @@
+OBJECT Codeunit 1211 Payment Export Gen. Jnl Check
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    TableNo=81;
+    OnRun=VAR
+            GenJnlBatch@1001 : Record 232;
+            GenJnlLine@1000 : Record 81;
+          BEGIN
+            GenJnlLine.SETRANGE("Journal Template Name","Journal Template Name");
+            GenJnlLine.SETRANGE("Journal Batch Name","Journal Batch Name");
+            GenJnlBatch.GET("Journal Template Name","Journal Batch Name");
+
+            CheckBatchSetup(GenJnlBatch);
+            CheckBankAccount(GenJnlBatch);
+            CheckDocumentType(GenJnlLine);
+            CheckAccountType(GenJnlLine);
+            CheckPaymentMethod(GenJnlLine);
+            CheckSimulatneousPmtInfoCreditorNo(GenJnlLine);
+            CheckEmptyPmtInfo(GenJnlLine);
+            CheckBalAccountType(GenJnlLine,GenJnlBatch);
+            CheckBalAccountNo(GenJnlLine,GenJnlBatch);
+            CheckAmount(GenJnlLine);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      EmptyPaymentDetailsErr@1002 : TextConst '@@@="%1=Field;%2=Field";ENU=%1 or %2 must be used for payments.;ESM=%1 o %2 se debe usar para los pagos.;FRC=%1 ou %2 doit ˆtre utilis‚ pour les paiements.;ENC=%1 or %2 must be used for payments.';
+      FieldMustBeDifferentFromZeroErr@1004 : TextConst 'ENU=%1 must not be zero.;ESM=%1 no debe ser cero.;FRC=%1 doit ˆtre diff‚rent de z‚ro.;ENC=%1 must not be zero.';
+      SimultaneousPaymentDetailsErr@1000 : TextConst '@@@="%1=Field;%2=Field";ENU=%1 and %2 cannot be used simultaneously for payments.;ESM=%1 y %2 no se pueden usar simult neamente para los pagos.;FRC=%1 et %2 ne peuvent pas ˆtre utilis‚s simultan‚ment pour les paiements.;ENC=%1 and %2 cannot be used simultaneously for payments.';
+      WrongBalAccountErr@1001 : TextConst '@@@="%1=Field;%1=Table;%3=Value;%4=Table;%5=Value";ENU=%1 for one or more %2 is different from %3 on %4: %5.;ESM=%1 para uno o m s %2 es distinto de %3 en %4: %5.;FRC=%1 pour un ou plusieurs %2 est diff‚rent de %3 sur %4: %5.;ENC=%1 for one or more %2 is different from %3 on %4: %5.';
+      WrongValueErr@1003 : TextConst '@@@="%1=Field;%2=Table;%3=Value";ENU=%1 for one or more %2 is different from %3.;ESM=%1 para uno o m s %2 es distinto de %3.;FRC=%1 pour un ou plusieurs %2 est diff‚rent de %3.;ENC=%1 for one or more %2 is different from %3.';
+      MissingPmtMethodErr@1005 : TextConst 'ENU=%1 must be used for payments.;ESM=%1 se debe usar para los pagos.;FRC=%1 doit ˆtre utilis‚ pour les paiements.;ENC=%1 must be used for payments.';
+
+    LOCAL PROCEDURE CheckBatchSetup@36(GenJnlBatch@1000 : Record 232);
+    BEGIN
+      GenJnlBatch.TESTFIELD("Bal. Account Type",GenJnlBatch."Bal. Account Type"::"Bank Account");
+      GenJnlBatch.TESTFIELD("Bal. Account No.");
+      GenJnlBatch.TESTFIELD("Allow Payment Export",TRUE);
+    END;
+
+    LOCAL PROCEDURE CheckBankAccount@6(GenJnlBatch@1000 : Record 232);
+    VAR
+      BankAccount@1001 : Record 270;
+    BEGIN
+      BankAccount.GET(GenJnlBatch."Bal. Account No.");
+      BankAccount.TESTFIELD("Payment Export Format");
+    END;
+
+    LOCAL PROCEDURE CheckDocumentType@1(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.SETFILTER("Document Type",'<>%1',GenJnlLine2."Document Type"::Payment);
+
+      IF NOT GenJnlLine2.ISEMPTY THEN
+        ERROR(WrongValueErr,
+          GenJnlLine2.FIELDCAPTION("Document Type"),GenJnlLine2.TABLECAPTION,GenJnlLine2."Document Type"::Payment);
+    END;
+
+    LOCAL PROCEDURE CheckAccountType@50(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.SETFILTER("Account Type",'<>%1',GenJnlLine2."Account Type"::Vendor);
+
+      IF NOT GenJnlLine2.ISEMPTY THEN
+        ERROR(WrongValueErr,
+          GenJnlLine2.FIELDCAPTION("Account Type"),GenJnlLine2.TABLECAPTION,GenJnlLine2."Account Type"::Vendor);
+    END;
+
+    LOCAL PROCEDURE CheckPaymentMethod@4(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.SETRANGE("Payment Method Code",'');
+
+      IF NOT GenJnlLine2.ISEMPTY THEN
+        ERROR(MissingPmtMethodErr,GenJnlLine2.FIELDCAPTION("Payment Method Code"));
+    END;
+
+    LOCAL PROCEDURE CheckSimulatneousPmtInfoCreditorNo@18(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.SETFILTER("Recipient Bank Account",'<>%1','');
+      GenJnlLine2.SETFILTER("Creditor No.",'<>%1','');
+
+      IF NOT GenJnlLine2.ISEMPTY THEN
+        ERROR(SimultaneousPaymentDetailsErr,
+          GenJnlLine2.FIELDCAPTION("Recipient Bank Account"),GenJnlLine2.FIELDCAPTION("Creditor No."));
+    END;
+
+    LOCAL PROCEDURE CheckEmptyPmtInfo@2(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.SETRANGE("Recipient Bank Account",'');
+      GenJnlLine2.SETRANGE("Creditor No.",'');
+
+      IF NOT GenJnlLine2.ISEMPTY THEN
+        ERROR(EmptyPaymentDetailsErr,GenJnlLine2.FIELDCAPTION("Recipient Bank Account"),GenJnlLine2.FIELDCAPTION("Creditor No."));
+    END;
+
+    LOCAL PROCEDURE CheckBalAccountType@22(VAR GenJnlLine@1000 : Record 81;GenJnlBatch@1002 : Record 232);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.SETFILTER("Bal. Account Type",'<>%1',GenJnlLine2."Bal. Account Type"::"Bank Account");
+
+      IF NOT GenJnlLine2.ISEMPTY THEN
+        ERROR(WrongBalAccountErr,GenJnlLine2.FIELDCAPTION("Bal. Account Type"),GenJnlLine2.TABLECAPTION,
+          GenJnlLine2."Bal. Account Type"::"Bank Account",GenJnlBatch.TABLECAPTION,GenJnlBatch.Name);
+    END;
+
+    LOCAL PROCEDURE CheckBalAccountNo@25(VAR GenJnlLine@1000 : Record 81;GenJnlBatch@1002 : Record 232);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.SETRANGE("Bal. Account Type",GenJnlLine2."Bal. Account Type"::"Bank Account");
+      GenJnlLine2.SETFILTER("Bal. Account No.",'<>%1',GenJnlBatch."Bal. Account No.");
+
+      IF NOT GenJnlLine2.ISEMPTY THEN
+        ERROR(WrongBalAccountErr,GenJnlLine2.FIELDCAPTION("Bal. Account No."),GenJnlLine2.TABLECAPTION,
+          GenJnlBatch."Bal. Account No.",GenJnlBatch.TABLECAPTION,GenJnlBatch.Name);
+    END;
+
+    PROCEDURE CheckAmount@3(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.SETRANGE(Amount,0);
+
+      IF NOT GenJnlLine2.ISEMPTY THEN
+        ERROR(FieldMustBeDifferentFromZeroErr,GenJnlLine.FIELDCAPTION(Amount));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

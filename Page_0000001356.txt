@@ -1,0 +1,147 @@
+OBJECT Page 1356 Mini Purchase Invoice List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Purchase Invoice List;
+               ESM=Lista facturas compra;
+               FRC=Liste factures achat;
+               ENC=Purchase Invoice List];
+    SourceTable=Table38;
+    SourceTableView=WHERE(Document Type=CONST(Invoice));
+    PageType=List;
+    CardPageID=Mini Purchase Invoice;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Invoice,Posting;
+                                ESM=Nuevo,Proceso,Informe,Factura,Registro;
+                                FRC=Nouveau,Traitement,Rapport,Facture,Report;
+                                ENC=New,Process,Report,Invoice,Posting];
+    OnOpenPage=BEGIN
+                 SetSecurityFilterOnRespCenter;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1102601017;1 ;ActionGroup;
+                      CaptionML=[ENU=&Invoice;
+                                 ESM=&Factura;
+                                 FRC=Fa&cture;
+                                 ENC=&Invoice];
+                      Image=Invoice }
+      { 3       ;2   ;Action    ;
+                      Name=Vendor;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Vendor;
+                                 ESM=Proveedor;
+                                 FRC=Fournisseur;
+                                 ENC=Vendor];
+                      ToolTipML=[ENU=View or edit detailed information about the vendor on the selected purchase document.;
+                                 ESM=Vea o edite la informaci¢n detallada sobre el proveedor en el documento de compra seleccionado.;
+                                 FRC=Affichez ou modifiez des informations d‚taill‚es concernant le fournisseur sur le document achat s‚lectionn‚.;
+                                 ENC=View or edit detailed information about the vendor on the selected purchase document.];
+                      RunObject=Page 26;
+                      RunPageLink=No.=FIELD(Buy-from Vendor No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Vendor;
+                      PromotedCategory=Category4 }
+      { 50      ;1   ;ActionGroup;
+                      CaptionML=[ENU=P&osting;
+                                 ESM=R&egistro;
+                                 FRC=Rep&ort;
+                                 ENC=P&osting];
+                      Image=Post }
+      { 52      ;2   ;Action    ;
+                      Name=Post;
+                      ShortCutKey=F9;
+                      CaptionML=[ENU=P&ost;
+                                 ESM=R&egistrar;
+                                 FRC=&Reporter;
+                                 ENC=P&ost];
+                      ToolTipML=[ENU=Finalize the selected purchase document. Posting updates the books with the document's amounts and quantities.;
+                                 ESM=Finalice el documento de compra seleccionado. El registro actualiza los libros con los importes y las cantidades del documento.;
+                                 FRC=Finalisez le document d'achat s‚lectionn‚. Le report met … jour la comptabilit‚ avec les montants et les quantit‚s du document.;
+                                 ENC=Finalize the selected purchase document. Posting updates the books with the document's amounts and quantities.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostOrder;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Post(CODEUNIT::"Purch.-Post (Yes/No)");
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the purchase header you are setting up: a quote, order, invoice, or credit memo.;
+                           ESM=Especifica el n£mero de la cabecera de compra que est  configurando: cotizaci¢n, pedido, factura o nota de cr‚dito.;
+                           FRC=Indique le num‚ro de l'en-tˆte achat que vous cr‚ezÿ: un devis, une commande, une facture ou un avoir.;
+                           ENC=Specifies the number of the purchase header you are setting up: a quote, order, invoice, or credit memo.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the vendor who ships the items.;
+                           ESM=Especifica el nombre del proveedor que env¡a los productos.;
+                           FRC=Sp‚cifie le nom du fournisseur qui exp‚die les articles.;
+                           ENC=Specifies the name of the vendor who ships the items.];
+                SourceExpr="Buy-from Vendor Name" }
+
+    { 1102601007;2;Field  ;
+                ToolTipML=[ENU=Specifies when the invoice is due. The program calculates the date using the Payment Terms Code and Document Date fields.;
+                           ESM=Especifica cuando vence la factura. El programa calcula la fecha a partir de los campos C¢d. t‚rminos pago y Fecha emisi¢n documento.;
+                           FRC=Sp‚cifie la date d'‚ch‚ance de la facture. Le programme calcule la date … l'aide des champs Code modalit‚s de paiement et Date document.;
+                           ENC=Specifies when the invoice is due. The program calculates the date using the Payment Terms Code and Document Date fields.];
+                SourceExpr="Due Date";
+                Visible=FALSE }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Shows the sum of the amounts in the Amount field on the associated purchase lines.;
+                           ESM=Muestra la suma de los importes del campo Importe de las l¡neas de compra asociadas.;
+                           FRC=Affiche la somme des montants du champ Montant sur les lignes achat associ‚es.;
+                           ENC=Shows the sum of the amounts in the Amount field on the associated purchase lines.];
+                SourceExpr=Amount }
+
+  }
+  CODE
+  {
+    VAR
+      MiniLinesInstructionMgt@1000 : Codeunit 1320;
+      OpenPostedPurchaseInvQst@1001 : TextConst 'ENU=The invoice has been posted and moved to the Posted Purchase Invoice list.\\Do you want to open the posted invoice?;ESM=La factura se ha registrado y se movi¢ a la lista de facturas de compra registradas.\\¨Desea abrir la factura registrada?;FRC=La facture a ‚t‚ report‚e et d‚plac‚e dans la liste des factures d''achat report‚es.\\Souhaitez-vous ouvrir la facture report‚e?;ENC=The invoice has been posted and moved to the Posted Purchase Invoice list.\\Do you want to open the posted invoice?';
+
+    LOCAL PROCEDURE Post@4(PostingCodeunitID@1000 : Integer);
+    BEGIN
+      MiniLinesInstructionMgt.PurchaseCheckAllLinesHaveQuantityAssigned(Rec);
+      SendToPosting(PostingCodeunitID);
+      ShowPostedConfirmationMessage;
+    END;
+
+    LOCAL PROCEDURE ShowPostedConfirmationMessage@7();
+    VAR
+      PurchInvHeader@1000 : Record 122;
+    BEGIN
+      PurchInvHeader.SETFILTER("Pre-Assigned No.","No.");
+      IF PurchInvHeader.FINDFIRST THEN
+        IF DIALOG.CONFIRM(OpenPostedPurchaseInvQst,FALSE) THEN
+          PAGE.RUN(PAGE::"Mini Posted Purchase Invoice",PurchInvHeader);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

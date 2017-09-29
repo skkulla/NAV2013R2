@@ -1,0 +1,175 @@
+OBJECT Report 297 Batch Post Sales Invoices
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Batch Post Sales Invoices;
+               ESM=Reg. lotes facturas ventas;
+               FRC=Ex‚cuter en lot factures de vente;
+               ENC=Batch Post Sales Invoices];
+    ProcessingOnly=Yes;
+  }
+  DATASET
+  {
+    { 6640;    ;DataItem;                    ;
+               DataItemTable=Table36;
+               DataItemTableView=SORTING(Document Type,No.)
+                                 WHERE(Document Type=CONST(Invoice));
+               ReqFilterHeadingML=[ENU=Sales Invoice;
+                                   ESM=Factura venta;
+                                   FRC=Facture vente;
+                                   ENC=Sales Invoice];
+               OnPreDataItem=BEGIN
+                               IF ReplacePostingDate AND (PostingDateReq = 0D) THEN
+                                 ERROR(Text000);
+
+                               ApprovalTemplate.SETCURRENTKEY("Table ID","Document Type",Enabled);
+                               ApprovalTemplate.SETRANGE("Table ID",DATABASE::"Sales Header");
+                               ApprovalTemplate.SETRANGE("Document Type","Document Type"::Invoice);
+                               ApprovalTemplate.SETRANGE(Enabled,TRUE);
+                               IF ApprovalTemplate.FINDFIRST THEN
+                                 SETRANGE(Status,Status::Released);
+
+                               CounterTotal := COUNT;
+                               Window.OPEN(Text001);
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  IF CalcInvDisc THEN
+                                    CalculateInvoiceDiscount;
+
+                                  Counter := Counter + 1;
+                                  Window.UPDATE(1,"No.");
+                                  Window.UPDATE(2,ROUND(Counter / CounterTotal * 10000,1));
+                                  CLEAR(SalesPost);
+                                  SalesPost.SetPostingDate(ReplacePostingDate,ReplaceDocumentDate,PostingDateReq);
+                                  IF SalesPost.RUN("Sales Header") THEN BEGIN
+                                    CounterOK := CounterOK + 1;
+                                    IF MARKEDONLY THEN
+                                      MARK(FALSE);
+                                  END;
+                                END;
+
+               OnPostDataItem=BEGIN
+                                Window.CLOSE;
+                                MESSAGE(Text002,CounterOK,CounterTotal);
+                              END;
+
+               ReqFilterFields=No.,Status }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+      SaveValues=Yes;
+      OnOpenPage=BEGIN
+                   SalesSetup.GET;
+                   CalcInvDisc := SalesSetup."Calc. Inv. Discount";
+                   ReplacePostingDate := FALSE;
+                   ReplaceDocumentDate := FALSE;
+                 END;
+
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             ESM=Opciones;
+                             FRC=Options;
+                             ENC=Options] }
+
+      { 1   ;2   ;Field     ;
+                  Name=PostingDate;
+                  CaptionML=[ENU=Posting Date;
+                             ESM=Fecha registro;
+                             FRC=Date de report;
+                             ENC=Posting Date];
+                  SourceExpr=PostingDateReq }
+
+      { 2   ;2   ;Field     ;
+                  Name=ReplacePostingDate;
+                  CaptionML=[ENU=Replace Posting Date;
+                             ESM=Reemplazar fecha reg.;
+                             FRC=Remplacer la date de report;
+                             ENC=Replace Posting Date];
+                  SourceExpr=ReplacePostingDate;
+                  OnValidate=BEGIN
+                               IF ReplacePostingDate THEN
+                                 MESSAGE(Text003);
+                             END;
+                              }
+
+      { 3   ;2   ;Field     ;
+                  CaptionML=[ENU=Replace Document Date;
+                             ESM=Reemplazar fecha documento;
+                             FRC=Remplacer date document;
+                             ENC=Replace Document Date];
+                  SourceExpr=ReplaceDocumentDate }
+
+      { 5   ;2   ;Field     ;
+                  CaptionML=[ENU=Calc. Inv. Discount;
+                             ESM=Calc. dto. factura;
+                             FRC=Calculer escompte facture;
+                             ENC=Calc. Inv. Discount];
+                  SourceExpr=CalcInvDisc;
+                  OnValidate=BEGIN
+                               SalesSetup.GET;
+                               SalesSetup.TESTFIELD("Calc. Inv. Discount",FALSE);
+                             END;
+                              }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=Please enter the posting date.;ESM=Introduzca la fecha registro.;FRC=Entrez la date de report.;ENC=Please enter the posting date.';
+      Text001@1001 : TextConst 'ENU=Posting invoices   #1########## @2@@@@@@@@@@@@@;ESM=Reg. facturas      #1########## @2@@@@@@@@@@@@@;FRC=Reporter factures  #1########## @2@@@@@@@@@@@@@;ENC=Posting invoices   #1########## @2@@@@@@@@@@@@@';
+      Text002@1002 : TextConst 'ENU=%1 invoices out of a total of %2 have now been posted.;ESM=Se han registrado %1 facturas de un total de %2.;FRC=%1 factures sur un total de %2 ont maintenant ‚t‚ report‚es.;ENC=%1 invoices out of a total of %2 have now been posted.';
+      Text003@1003 : TextConst 'ENU=The exchange rate associated with the new posting date on the sales header will not apply to the sales lines.;ESM=El tipo cambio asociado con la nueva fecha registro en cab. venta no ser  aplicado en l¡ns. venta.;FRC=Le taux de change associ‚ … la nouvelle date de report sur l''en-tˆte de vente ne s''appliquera pas aux lignes de vente.;ENC=The exchange rate associated with the new posting date on the sales header will not apply to the sales lines.';
+      SalesLine@1005 : Record 37;
+      SalesSetup@1006 : Record 311;
+      ApprovalTemplate@1004 : Record 464;
+      SalesCalcDisc@1007 : Codeunit 60;
+      SalesPost@1008 : Codeunit 80;
+      Window@1009 : Dialog;
+      PostingDateReq@1010 : Date;
+      CounterTotal@1011 : Integer;
+      Counter@1012 : Integer;
+      CounterOK@1013 : Integer;
+      ReplacePostingDate@1014 : Boolean;
+      ReplaceDocumentDate@1015 : Boolean;
+      CalcInvDisc@1016 : Boolean;
+
+    PROCEDURE CalculateInvoiceDiscount@1();
+    BEGIN
+      SalesLine.RESET;
+      SalesLine.SETRANGE("Document Type","Sales Header"."Document Type");
+      SalesLine.SETRANGE("Document No.","Sales Header"."No.");
+      IF SalesLine.FINDFIRST THEN
+        IF SalesCalcDisc.RUN(SalesLine) THEN BEGIN
+          "Sales Header".GET("Sales Header"."Document Type","Sales Header"."No.");
+          COMMIT;
+        END;
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

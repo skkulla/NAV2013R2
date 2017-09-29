@@ -1,0 +1,75 @@
+OBJECT Page 358 Objects
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/17/01;
+    Time=12:00:00 PM;
+    Version List=NAVW13.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Objects;
+               ESM=Objetos;
+               FRC=Objets;
+               ENC=Objects];
+    SourceTable=Table2000000001;
+    PageType=List;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr=Type;
+                Visible=FALSE }
+
+    { 2   ;2   ;Field     ;
+                CaptionML=[ENU=ID;
+                           ESM=ID;
+                           FRC=Code;
+                           ENC=ID];
+                SourceExpr=ID }
+
+    { 4   ;2   ;Field     ;
+                DrillDown=No;
+                CaptionML=[ENU=Name;
+                           ESM=Nombre;
+                           FRC=Nom;
+                           ENC=Name];
+                SourceExpr=Caption }
+
+    { 12  ;2   ;Field     ;
+                CaptionML=[ENU=Object Name;
+                           ESM=Nombre objeto;
+                           FRC=Nom d'objet;
+                           ENC=Object Name];
+                SourceExpr=Name;
+                Visible=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

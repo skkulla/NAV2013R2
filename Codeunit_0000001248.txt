@@ -1,0 +1,67 @@
+OBJECT Codeunit 1248 Process Bank Acc. Rec Lines
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    TableNo=274;
+    OnRun=VAR
+            PostingExch@1001 : Record 1220;
+            ProcessPostingExch@1002 : Codeunit 1201;
+            RecRef@1000 : RecordRef;
+          BEGIN
+            PostingExch.GET("Posting Exch. Entry No.");
+            RecRef.GETTABLE(Rec);
+            ProcessPostingExch.ProcessColumnMapping(PostingExch,RecRef);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      ProgressWindowMsg@1000 : TextConst 'ENU=Wait while the operation is being completed.;ESM=Espere mientras se completa la operaci¢n.;FRC=Patientez pendant l''ex‚cution de l''op‚ration.;ENC=Wait while the operation is being completed.';
+
+    PROCEDURE ImportBankStatement@6(BankAccRecon@1004 : Record 273);
+    VAR
+      BankAcc@1000 : Record 270;
+      PostExchDef@1001 : Record 1222;
+      PostExchMapping@1002 : Record 1224;
+      PostExchLineDef@1005 : Record 1227;
+      PostExch@1003 : Record 1220;
+      BankAccReconLine@1006 : Record 274;
+      ProgressWindow@1008 : Dialog;
+    BEGIN
+      BankAcc.GET(BankAccRecon."Bank Account No.");
+      BankAcc.GetPostExchDef(PostExchDef);
+
+      IF NOT PostExch.ImportToPostExch(PostExchDef)THEN
+        EXIT;
+
+      ProgressWindow.OPEN(ProgressWindowMsg);
+
+      CreateBankAccRecLineTemplate(BankAccReconLine,BankAccRecon,PostExch);
+      PostExchLineDef.SETRANGE("Posting Exch. Def Code",PostExchDef.Code);
+      PostExchLineDef.FINDFIRST;
+      PostExchMapping.GET(PostExchDef.Code,PostExchLineDef.Code,DATABASE::"Bank Acc. Reconciliation Line");
+
+      CODEUNIT.RUN(PostExchMapping."Mapping Codeunit",BankAccReconLine);
+      ProgressWindow.CLOSE;
+    END;
+
+    LOCAL PROCEDURE CreateBankAccRecLineTemplate@9(VAR BankAccReconLine@1000 : Record 274;BankAccRecon@1002 : Record 273;PostExch@1001 : Record 1220);
+    BEGIN
+      BankAccReconLine.INIT;
+      BankAccReconLine."Statement No." := BankAccRecon."Statement No.";
+      BankAccReconLine."Bank Account No." := BankAccRecon."Bank Account No.";
+      BankAccReconLine."Posting Exch. Entry No." := PostExch."Entry No.";
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

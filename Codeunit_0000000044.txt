@@ -1,0 +1,44 @@
+OBJECT Codeunit 44 NASManagement
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE NASHandler@1(NASID@1000 : Text[260]);
+    VAR
+      Parameter@1008 : Text[260];
+      ParamStr@1007 : Text[260];
+      SepPosition@1006 : Integer;
+    BEGIN
+      ParamStr := UPPERCASE(NASID);
+      REPEAT
+        SepPosition := STRPOS(ParamStr,',');
+        IF SepPosition > 0 THEN
+          Parameter := COPYSTR(ParamStr,1,SepPosition - 1)
+        ELSE
+          Parameter := ParamStr;
+
+        CASE Parameter OF
+          'JOBQUEUE':
+            CODEUNIT.RUN(CODEUNIT::"Job Queue - NAS Start Up");
+        END;
+        ParamStr := COPYSTR(ParamStr,SepPosition + 1);
+      UNTIL SepPosition = 0;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

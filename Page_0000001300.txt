@@ -1,0 +1,1193 @@
+OBJECT Page 1300 Mini Customer Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Customer Card;
+               ESM=Ficha cliente;
+               FRC=Fiche client;
+               ENC=Customer Card];
+    SourceTable=Table18;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,New Document,Customer,History,Prices and Discounts,View,Help;
+                                ESM=Nuevo,Proceso,Informe,Nuevo documento,Cliente,Historial,Precios y descuentos,Ver,Ayuda;
+                                FRC=Nouveau,Traitement,Rapport,Nouveau document,Client,Historique,Prix et escomptes,Vue,Aide;
+                                ENC=New,Process,Report,New Document,Customer,History,Prices and Discounts,View,Help];
+    OnOpenPage=BEGIN
+                 CurrPage.PriceAndLineDisc.PAGE.InitPage(FALSE);
+                 ShowMainView := ShouldBeLoadedInSetupView;
+                 ShowCharts := "No." <> '';
+                 IF ShowCharts THEN
+                   CurrPage.AgedAccReceivableChart.PAGE.SetPerCustomer;
+
+                 SETFILTER("Date Filter",MiniCustomerMgt.GetCurrentYearFilter);
+               END;
+
+    OnAfterGetRecord=VAR
+                       AgedAccReceivable@1000 : Codeunit 763;
+                     BEGIN
+                       BlockedCustomer := (Blocked = Blocked::All);
+                       BalanceExhausted := 10000 <= CalcCreditLimitLCYExpendedPct;
+
+                       DaysPastDueDate := AgedAccReceivable.InvoicePaymentDaysAverage("No.");
+                       AttentionToPaidDay := DaysPastDueDate > 0;
+                     END;
+
+    OnNewRecord=BEGIN
+                  ShowMainView := TRUE
+                END;
+
+    OnAfterGetCurrRecord=VAR
+                           SalesPriceAndLineDiscBuff@1000 : Record 1304;
+                         BEGIN
+                           IF xRec."No." <> "No." THEN
+                             ShowPricesAndLineDisc := SalesPriceAndLineDiscBuff.CustHasLines(Rec);
+
+                           IF ShowPricesAndLineDisc THEN
+                             GetSalesPricesAndSalesLineDisc;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 3       ;1   ;ActionGroup;
+                      Name=NewDocument;
+                      CaptionML=[ENU=New Document;
+                                 ESM=Nuevo documento;
+                                 FRC=Nouveau document;
+                                 ENC=New Document] }
+      { 1906384905;2 ;Action    ;
+                      Name=NewSalesInvoice;
+                      CaptionML=[ENU=Sales Invoice;
+                                 ESM=Factura venta;
+                                 FRC=Facture vente;
+                                 ENC=Sales Invoice];
+                      ToolTipML=[ENU=Create an invoice for the customer.;
+                                 ESM=Crear una factura para el cliente.;
+                                 FRC=CrÇez une facture pour le client.;
+                                 ENC=Create an invoice for the customer.];
+                      Promoted=Yes;
+                      Image=Invoice;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewInvoice;
+                               END;
+                                }
+      { 88      ;2   ;Action    ;
+                      Name=NewSalesQuote;
+                      CaptionML=[ENU=Sales Quote;
+                                 ESM=Cotizaci¢n venta;
+                                 FRC=Devis;
+                                 ENC=Sales Quote];
+                      ToolTipML=[ENU=Create a quote for the customer.;
+                                 ESM=Crear una cotizaci¢n para el cliente;
+                                 FRC=CrÇez un devis pour le client.;
+                                 ENC=Create a quote for the customer.];
+                      Promoted=Yes;
+                      Image=Quote;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewQuote;
+                               END;
+                                }
+      { 1902583505;2 ;Action    ;
+                      Name=NewSalesCreditMemo;
+                      CaptionML=[ENU=Sales Credit Memo;
+                                 ESM=Nota crÇdito venta;
+                                 FRC=Note de crÇdit de vente;
+                                 ENC=Sales Credit Memo];
+                      ToolTipML=[ENU=Create a credit memo for the customer.;
+                                 ESM=Crear una nota de crÇdito para el cliente.;
+                                 FRC=CrÇez une note de crÇdit pour le client.;
+                                 ENC=Create a credit memo for the customer.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CreditMemo;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewCreditMemo;
+                               END;
+                                }
+      { 32      ;1   ;ActionGroup;
+                      Name=Customer;
+                      CaptionML=[ENU=Customer;
+                                 ESM=Cliente;
+                                 FRC=Client;
+                                 ENC=Customer];
+                      Image=Customer }
+      { 20      ;2   ;Action    ;
+                      Name=<Recurrent Sales Lines>;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Recurring Sales Lines;
+                                 ESM=L°neas de ventas peri¢dicas;
+                                 FRC=Lignes vente rÇcurrentes;
+                                 ENC=Recurring Sales Lines];
+                      ToolTipML=[ENU=Set up recurring sales lines for the customer, such as a monthly replenishment order, that can quickly be inserted on a sales document for the customer.;
+                                 ESM=Configurar l°neas de ventas peri¢dicas para el cliente, como una orden de reposici¢n mensual, que se pueden insertar r†pidamente en un documento de venta para el cliente.;
+                                 FRC=DÇfinissez des lignes vente rÇcurrentes pour le client, par exemple un ordre de rÇapprovisionnement mensuel, qui peuvent àtre rapidement insÇrÇes dans un document vente pour le client.;
+                                 ENC=Set up recurring sales lines for the customer, such as a monthly replenishment order, that can quickly be inserted on a sales document for the customer.];
+                      RunObject=Page 1314;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=CustomerCode;
+                      PromotedCategory=Category5 }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 ESM=Bancos;
+                                 FRC=Comptes bancaires;
+                                 ENC=Bank Accounts];
+                      ToolTipML=[ENU=Set up information about the customer's bank account.;
+                                 ESM=Configurar informaci¢n sobre el banco del cliente.;
+                                 FRC=Configurez les informations concernant le compte bancaire du client.;
+                                 ENC=Set up information about the customer's bank account.];
+                      RunObject=Page 424;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=BankAccount;
+                      PromotedCategory=Category5 }
+      { 30      ;2   ;Action    ;
+                      CaptionML=[ENU=Ship-&to Addresses;
+                                 ESM=Di&recci¢n env°o;
+                                 FRC=&Adresses destinataire;
+                                 ENC=Ship-&to Addresses];
+                      ToolTipML=[ENU=Set up the alternate address where the customer wants the item delivered if different from their regular address.;
+                                 ESM=Configurar la direcci¢n alternativa donde el cliente desea que se entregue el producto, si difiere de su direcci¢n habitual.;
+                                 FRC=Configurez l'autre adresse oó le client souhaite faire livrer l'article, si elle est diffÇrente de l'adresse habituelle.;
+                                 ENC=Set up the alternate address where the customer wants the item delivered if different from their regular address.];
+                      RunObject=Page 301;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=ShipAddress;
+                      PromotedCategory=Category5 }
+      { 22      ;2   ;Action    ;
+                      CaptionML=[ENU=Cross Re&ferences;
+                                 ESM=Referencias cru&zadas;
+                                 FRC=&RÇfÇrences externes;
+                                 ENC=Cross Re&ferences];
+                      ToolTipML=[ENU=Set up the customer's own identification of items that you sell to the customer. Cross-references to the customer's item number means that their item number is automatically shown on sales documents instead of the number that you use.;
+                                 ESM=Configurar la identificaci¢n propia del cliente de los productos que se le venden. Las referencias cruzadas con el n£mero de producto del cliente significan que su n£mero de producto se muestra autom†ticamente en los documentos de venta, en lugar del n£mero que usa usted.;
+                                 FRC=Configurez la maniäre dont le client identifie les articles que vous lui vendez. Les rÇfÇrences externes au numÇro d'article du client impliquent que le numÇro d'article est automatiquement affichÇ sur les documents vente au lieu du numÇro que vous utilisez.;
+                                 ENC=Set up the customer's own identification of items that you sell to the customer. Cross-references to the customer's item number means that their item number is automatically shown on sales documents instead of the number that you use.];
+                      RunObject=Page 5723;
+                      RunPageView=SORTING(Cross-Reference Type,Cross-Reference Type No.);
+                      RunPageLink=Cross-Reference Type=CONST(Customer),
+                                  Cross-Reference Type No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Change;
+                      PromotedCategory=Category5 }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Online Map;
+                                 ESM=Online Map;
+                                 FRC=Online Map;
+                                 ENC=Online Map];
+                      ToolTipML=[ENU=View the customer's address on your preferred map website.;
+                                 ESM=Ver la direcci¢n del cliente en su sitio web de mapas favorito.;
+                                 FRC=Affichez l'adresse du client sur votre site Web de mappage par dÇfaut.;
+                                 ENC=View the customer's address on your preferred map website.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Map;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 DisplayMap;
+                               END;
+                                }
+      { 31      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      ToolTipML=[ENU=Set up default dimensions for the customer, such as an area or customer group code. You can assign dimension codes to transactions to distribute costs and analyze historical information.;
+                                 ESM=Configurar dimensiones predeterminadas para el cliente, como un †rea o un c¢digo de grupo de clientes. Puede asignar c¢digos de dimensi¢n a transacciones para distribuir los costos y analizar la informaci¢n hist¢rica.;
+                                 FRC=Configurez les dimensions par dÇfaut pour le client, comme un code de groupe de clients ou de zone. Vous pouvez affecter des codes de dimension aux transactions dans le but de rÇpartir les coñts et d'analyser les informations d'historique.;
+                                 ENC=Set up default dimensions for the customer, such as an area or customer group code. You can assign dimension codes to transactions to distribute costs and analyse historical information.];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(18),
+                                  No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category5 }
+      { 5       ;1   ;ActionGroup;
+                      Name=History;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      Image=History }
+      { 80      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=&Movimientos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      ToolTipML=[ENU=View the history of transactions for the customer.;
+                                 ESM=Ver el historial de transacciones del cliente.;
+                                 FRC=Affichez l'historique des transactions pour le client.;
+                                 ENC=View the history of transactions for the customer.];
+                      RunObject=Page 25;
+                      RunPageView=SORTING(Customer No.);
+                      RunPageLink=Customer No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=CustomerLedger;
+                      PromotedCategory=Category6 }
+      { 76      ;1   ;ActionGroup;
+                      Name=View;
+                      CaptionML=[ENU=View;
+                                 ESM=Vista;
+                                 FRC=Affichage;
+                                 ENC=View] }
+      { 49      ;2   ;Action    ;
+                      Name=ShowMainView;
+                      CaptionML=[ENU=Financial Details;
+                                 ESM=Detalles financieros;
+                                 FRC=DÇtails financiers;
+                                 ENC=Financial Details];
+                      ToolTipML=[ENU=View core information for the customer, such as addresses, invoicing details, and payment details.;
+                                 ESM=Ver informaci¢n principal para el cliente, como direcciones, detalles de facturaci¢n y detalles de pago.;
+                                 FRC=Permet d'afficher des informations essentielles pour le client, comme les adresses, ainsi que les dÇtails de facturation et de paiement.;
+                                 ENC=View core information for the customer, such as addresses, invoicing details, and payment details.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Setup;
+                      PromotedCategory=Category8;
+                      OnAction=BEGIN
+                                 ShowMainView := NOT ShowMainView;
+                               END;
+                                }
+      { 47      ;2   ;Action    ;
+                      CaptionML=[ENU=Prices and Line Discounts;
+                                 ESM=Precios y descuentos de l°nea;
+                                 FRC=Prix et escomptes ligne;
+                                 ENC=Prices and Line Discounts];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=SalesLineDisc;
+                      PromotedCategory=Category8;
+                      OnAction=BEGIN
+                                 ShowPricesAndLineDisc := NOT ShowPricesAndLineDisc;
+                               END;
+                                }
+      { 82      ;1   ;ActionGroup;
+                      Name=PricesandDiscounts;
+                      CaptionML=[ENU=Prices and Discounts;
+                                 ESM=Precios y descuentos;
+                                 FRC=Prix et escomptes;
+                                 ENC=Prices and Discounts];
+                      Image=Sales }
+      { 83      ;2   ;Action    ;
+                      CaptionML=[ENU=Invoice &Discounts;
+                                 ESM=Dto. &factura;
+                                 FRC=&Escomptes facture;
+                                 ENC=Invoice &Discounts];
+                      ToolTipML=[ENU=Set up different discounts that are applied to invoices for the customer. An invoice discount is automatically granted to the customer when the total on a sales invoice exceeds a certain amount.;
+                                 ESM=Configurar descuentos diferentes que se aplican a las facturas para el cliente. Un descuento de factura se concede autom†ticamente al cliente cuando el total de una factura de venta supera un importe determinado.;
+                                 FRC=Configurez des escomptes diffÇrents qui seront appliquÇs aux factures du client. Un escompte de facture est automatiquement accordÇ au client lorsque le total de la facture de vente dÇpasse un certain montant.;
+                                 ENC=Set up different discounts that are applied to invoices for the customer. An invoice discount is automatically granted to the customer when the total on a sales invoice exceeds a certain amount.];
+                      RunObject=Page 23;
+                      RunPageLink=Code=FIELD(Invoice Disc. Code);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CalculateInvoiceDiscount;
+                      PromotedCategory=Category7 }
+      { 113     ;2   ;Action    ;
+                      CaptionML=[ENU=Prices;
+                                 ESM=Precios;
+                                 FRC=Prix;
+                                 ENC=Prices];
+                      ToolTipML=[ENU=Set up different prices for items that you sell to the customer. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.;
+                                 ESM=Configure precios distintos para los productos que vende al cliente. Un precio de producto se concede autom†ticamente en las l°neas de factura cuando se cumplen los criterios especificados, como el cliente, la cantidad o la fecha final.;
+                                 FRC=ParamÇtrez des prix diffÇrents pour les articles que vous vendez au client. Un prix article est automatiquement affectÇ sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le client, la quantitÇ ou la date de fin.;
+                                 ENC=Set up different prices for items that you sell to the customer. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.];
+                      RunObject=Page 7002;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Customer),
+                                  Sales Code=FIELD(No.);
+                      Image=Price }
+      { 136     ;2   ;Action    ;
+                      CaptionML=[ENU=Line Discounts;
+                                 ESM=Descuentos l°nea;
+                                 FRC=Ligne Escomptes;
+                                 ENC=Line Discounts];
+                      ToolTipML=[ENU=Set up different discounts for items that you sell to the customer. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.;
+                                 ESM=Configure descuentos distintos para los productos que vende al cliente. Un descuento de producto se concede autom†ticamente en las l°neas de factura cuando se cumplen los criterios especificados, como el cliente, la cantidad o la fecha final.;
+                                 FRC=ParamÇtrez des escomptes diffÇrents pour les articles que vous vendez au client. Un escompte article est automatiquement affectÇ sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le client, la quantitÇ ou la date de fin.;
+                                 ENC=Set up different discounts for items that you sell to the customer. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.];
+                      RunObject=Page 7004;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Customer),
+                                  Sales Code=FIELD(No.);
+                      Image=LineDiscount }
+      { 28      ;1   ;ActionGroup;
+                      Name=DataTemplate;
+                      CaptionML=[ENU=Data Template;
+                                 ESM=Plantilla datos;
+                                 FRC=Modäle donnÇes;
+                                 ENC=Data Template] }
+      { 167     ;2   ;Action    ;
+                      Name=SaveAsTemplate;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Save as Template;
+                                 ESM=Guardar como Plantilla;
+                                 FRC=Sauvegarder comme modäle;
+                                 ENC=Save as Template];
+                      ToolTipML=[ENU=Save the customer card as a template that can be reused to create new customer cards. Customer templates contain preset information to help you fill fields on customer cards.;
+                                 ESM=Guarde la ficha de cliente como plantilla que se podr† usar para crear nuevas fichas de cliente. Las plantillas de cliente contienen informaci¢n predefinida para ayudarle a completar los cambios de las fichas de cliente.;
+                                 FRC=Enregistrez la fiche client comme modäle que vous pourrez rÇutiliser pour crÇer de nouvelles fiches client. Les modäles client contiennent des informations prÇdÇfinies pour vous aider Ö complÇter les fiches client.;
+                                 ENC=Save the customer card as a template that can be reused to create new customer cards. Customer templates contain preset information to help you fill fields on customer cards.];
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=New;
+                      OnAction=VAR
+                                 TempMiniCustomerTemplate@1000 : TEMPORARY Record 1300;
+                               BEGIN
+                                 TempMiniCustomerTemplate.SaveAsTemplate(Rec);
+                               END;
+                                }
+      { 81      ;2   ;Action    ;
+                      Name=Templates;
+                      CaptionML=[ENU=Templates;
+                                 ESM=Plantillas;
+                                 FRC=Modäles;
+                                 ENC=Templates];
+                      ToolTipML=[ENU=View or edit customer templates.;
+                                 ESM=Vea o edite las plantillas de cliente.;
+                                 FRC=Affichez ou modifiez des modäles client.;
+                                 ENC=View or edit customer templates.];
+                      RunObject=Page 1340;
+                      RunPageView=WHERE(Table ID=CONST(18));
+                      PromotedIsBig=Yes;
+                      Image=Template }
+      { 84      ;1   ;ActionGroup;
+                      Name=Reports;
+                      CaptionML=[ENU=Reports;
+                                 ESM=Informes;
+                                 FRC=Rapports;
+                                 ENC=Reports];
+                      Image=Reports }
+      { 85      ;2   ;ActionGroup;
+                      Name=FinanceReports;
+                      CaptionML=[ENU=Finance Reports;
+                                 ESM=Informes financieros;
+                                 FRC=Rapports financiers;
+                                 ENC=Finance Reports];
+                      Image=Report }
+      { 1902299006;3 ;Action    ;
+                      Name=Report Customer - Balance to Date;
+                      CaptionML=[ENU=Customer - Balance to Date;
+                                 ESM=Cliente - Saldo por fechas;
+                                 FRC=Client - Solde Ö ce jour;
+                                 ENC=Customer - Balance to Date];
+                      ToolTipML=[ENU=View, print, or save a list with customers' payment history up until a certain date. You can use the report to extract your total sales income at the close of an accounting period or fiscal year.;
+                                 ESM=Ver, imprimir o guardar una lista con el historial de pago de los clientes hasta una fecha determinada. Puede usar el informe para extraer el ingreso total de venta al cierre de un per°odo contable o del a§o fiscal.;
+                                 FRC=Affichez, imprimez ou enregistrez une liste reprenant l'historique de paiement des clients jusqu'Ö une certaine date. Vous pouvez utiliser ce rapport pour extraire vos revenus de vente totaux Ö la clìture d'une pÇriode comptable ou d'un exercice financier.;
+                                 ENC=View, print, or save a list with customers' payment history up until a certain date. You can use the report to extract your total sales income at the close of an accounting period or fiscal year.];
+                      Image=Report;
+                      OnAction=VAR
+                                 Customer@1001 : Record 18;
+                               BEGIN
+                                 Customer.SETRANGE("No.","No.");
+                                 REPORT.RUNMODAL(REPORT::"Customer - Balance to Date",TRUE,TRUE,Customer);
+                               END;
+                                }
+      { 9       ;3   ;Action    ;
+                      Name=Report Statement;
+                      CaptionML=[ENU=Statement;
+                                 ESM=Estado de cuenta;
+                                 FRC=RelevÇ;
+                                 ENC=Statement];
+                      ToolTipML=[ENU=View, print, or save a list of a customer's transactions for a selected period, for example, to send to the customer at the close of an accounting period. You can choose to have all overdue balances displayed regardless of the period specified, or you can choose to include an aging band.;
+                                 ESM=Ver, imprimir o guardar una lista de transacciones del cliente durante un per°odo seleccionado, por ejemplo, para enviar al cliente al cierre de un per°odo contable. Permite visualizar todos los saldos vencidos, sea cual sea el per°odo especificado, o bien elegir que se incluya una ficha desplegable de antigÅedad.;
+                                 FRC=Affichez, imprimez ou enregistrez une liste des transactions d'un client pendant une pÇriode sÇlectionnÇe, par exemple, pour l'envoyer au client Ö la clìture d'une pÇriode comptable. Vous pouvez choisir d'afficher tous les soldes Çchus, sans tenir compte de la pÇriode spÇcifiÇe, ou d'inclure une bande chronologique.;
+                                 ENC=View, print, or save a list of a customer's transactions for a selected period, for example, to send to the customer at the close of an accounting period. You can choose to have all overdue balances displayed regardless of the period specified, or you can choose to include an aging band.];
+                      Image=Report;
+                      OnAction=VAR
+                                 Customer@1000 : Record 18;
+                               BEGIN
+                                 Customer.SETRANGE("No.","No.");
+                                 REPORT.RUNMODAL(REPORT::Statement,TRUE,TRUE,Customer);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Customer;
+                           ESM=Cliente;
+                           FRC=Client;
+                           ENC=Customer];
+                GroupType=Group }
+
+    { 26  ;2   ;Group     ;
+                GroupType=Group }
+
+    { 2   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the customer. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.;
+                           ESM=Especifica el n£mero del cliente. El campo se rellena autom†ticamente a partir de un n£mero de serie definido o el n£mero se especifica manualmente porque se ha habilitado la entrada manual de n£meros en la configuraci¢n de n£mero de serie.;
+                           FRC=Indique le numÇro du client. Le champ est renseignÇ soit automatiquement Ö partir d'une souche de numÇros dÇfinie, soit vous entrez manuellement le numÇro car vous avez activÇ la saisie manuelle de numÇro dans le paramÇtrage de la souche de numÇros.;
+                           ENC=Specifies the number of the customer. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.];
+                SourceExpr="No.";
+                Importance=Promoted;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's name. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el nombre del cliente. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le nom du client. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the customer's name. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Name;
+                Importance=Promoted }
+
+    { 23  ;3   ;Field     ;
+                Name=<Blocked>;
+                CaptionML=[ENU=Blocked;
+                           ESM=Bloqueado;
+                           FRC=BloquÇ;
+                           ENC=Blocked];
+                OptionCaptionML=[ENU=" ,,,All";
+                                 ESM=" ,,,Todo";
+                                 FRC=" ,,,Tous";
+                                 ENC=" ,,,All"];
+                SourceExpr=BlockedCustomer;
+                OnValidate=BEGIN
+                             IF BlockedCustomer THEN
+                               Blocked := Blocked::All
+                             ELSE
+                               Blocked := Blocked::" ";
+                           END;
+                            }
+
+    { 17  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies when the customer card was last modified.;
+                           ESM=Especifica cu†ndo se modific¢ la ficha cliente por £ltima vez.;
+                           FRC=Indique la date Ö laquelle la fiche client a ÇtÇ modifiÇe pour la derniäre fois.;
+                           ENC=Specifies when the customer card was last modified.];
+                SourceExpr="Last Date Modified" }
+
+    { 63  ;2   ;Group     ;
+                Editable=false;
+                GroupType=Group }
+
+    { 62  ;3   ;Field     ;
+                Name=TotalSales2;
+                CaptionML=[ENU=Total Sales;
+                           ESM=Total ventas;
+                           FRC=Total des ventes;
+                           ENC=Total Sales];
+                ToolTipML=[ENU=Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all completed and open sales invoices and credit memos.;
+                           ESM=Especifica el volumen de ventas total con el cliente en el ejercicio actual. Se calcula a partir de los importes sin IVA en todas las facturas y las notas de crÇdito de venta abiertas y completadas.;
+                           FRC=Indique votre chiffre de vente total avec le client pour l'exercice comptable en cours. Il est calculÇ Ö partir des montants HT sur toutes les factures vente et avoirs terminÇs et ouverts.;
+                           ENC=Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all completed and open sales invoices and credit memos.];
+                SourceExpr=GetTotalSales;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+    { 57  ;3   ;Field     ;
+                CaptionML=[ENU=Costs ($);
+                           ESM=Costos ($);
+                           FRC=Coñts ($);
+                           ENC=Costs ($)];
+                ToolTipML=[ENU=Specifies how much cost you have incurred from the customer in the current fiscal year. It is calculated as the sum of unit costs of all the goods you have sold to the customer. This includes any changes that occurred in your purchase prices of the goods.;
+                           ESM=Especifica el costo en que ha incurrido del cliente en el ejercicio actual. Se calcula como la suma de costos unitarios de todos los productos que haya vendido al cliente. Esto incluye los cambios que se han producido en los precios de compra de los productos.;
+                           FRC=Indique les coñts que vous avez subi pour le client pour l'exercice comptable en cours. Il est calculÇ comme la somme des coñts unitaires de tous les produits que vous avez vendus au client. Cela inclut toutes les modifications qui se sont produites au niveau de vos prix d'achat des biens.;
+                           ENC=Specifies how much cost you have incurred from the customer in the current fiscal year. It is calculated as the sum of unit costs of all the goods you have sold to the customer. This includes any changes that occurred in your purchase prices of the goods.];
+                SourceExpr=CustSalesLCY - CustProfit - AdjmtCostLCY;
+                AutoFormatType=1 }
+
+    { 45  ;3   ;Field     ;
+                CaptionML=[ENU=Profit ($);
+                           ESM=Bfß bruto ($);
+                           FRC=Profit ($);
+                           ENC=Profit ($)];
+                ToolTipML=[ENU=Specifies how much profit you have made from the customer in the current fiscal year. The calculation takes into account any changes that occurred in purchase prices of the sold goods.;
+                           ESM=Especifica las ganancias que ha obtenido del cliente en el ejercicio actual. El c†lculo tiene en cuenta los cambios que ocurrieran en los precios de compra de los productos vendidos.;
+                           FRC=Indique la marge que vous avez rÇalisÇe pour le client pour l'exercice comptable en cours. Le calcul tient compte de toutes les modifications apportÇes aux prix d'achat des biens vendus.;
+                           ENC=Specifies how much profit you have made from the customer in the current fiscal year. The calculation takes into account any changes that occurred in purchase prices of the sold goods.];
+                SourceExpr=AdjCustProfit;
+                AutoFormatType=1 }
+
+    { 51  ;3   ;Field     ;
+                CaptionML=[ENU=Profit %;
+                           ESM=% Bfß bruto;
+                           FRC=% profit;
+                           ENC=Profit %];
+                ToolTipML=[ENU=Specifies how much profit you have made from the customer in the current fiscal year, expressed as a percentage of the customer's total sales. The calculation takes into account any changes that occurred in purchase prices of the sold goods.;
+                           ESM=Especifica el beneficio que ha realizado del cliente en el ejercicio actual, expresado como porcentaje de las ventas totales del cliente. El c†lculo tiene en cuenta los cambios que ocurrieran en los precios de compra de los productos vendidos.;
+                           FRC=Indique la marge que vous avez rÇalisÇe pour le client pour l'exercice comptable en cours, exprimÇe en pourcentage des ventes totales du client. Le calcul tient compte de toutes les modifications apportÇes aux prix d'achat des biens vendus.;
+                           ENC=Specifies how much profit you have made from the customer in the current fiscal year, expressed as a percentage of the customer's total sales. The calculation takes into account any changes that occurred in purchase prices of the sold goods.];
+                DecimalPlaces=1:1;
+                SourceExpr=AdjProfitPct }
+
+    { 65  ;1   ;Group     ;
+                CaptionML=[ENU=Address & Contact;
+                           ESM=Direcci¢n y contacto;
+                           FRC=Adresse et contact;
+                           ENC=Address & Contact];
+                GroupType=Group }
+
+    { 19  ;2   ;Group     ;
+                Name=AddressDetails;
+                CaptionML=[ENU=Address;
+                           ESM=Direcci¢n;
+                           FRC=Adresse;
+                           ENC=Address];
+                GroupType=Group }
+
+    { 6   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's address. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica la direcci¢n del cliente. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie l'adresse du client. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the customer's address. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Address }
+
+    { 8   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies another line of the customer's address. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica otra l°nea de la direcci¢n del cliente. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=Indique une autre ligne de l'adresse du client. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies another line of the customer's address. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr="Address 2" }
+
+    { 90  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's post code.;
+                           ESM=Especifica el c¢digo de registro del cliente.;
+                           FRC=SpÇcifie le code postal du client.;
+                           ENC=Specifies the customer's postal/ZIP code.];
+                SourceExpr="Post Code";
+                Importance=Promoted }
+
+    { 10  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's city.;
+                           ESM=Especifica el Municipio/Ciudad del cliente.;
+                           FRC=SpÇcifie la ville du client.;
+                           ENC=Specifies the customer's city.];
+                SourceExpr=City }
+
+    { 91  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a country/region code for the customer. To see the country/region codes and address formats in the Countries/Regions window, click the field.;
+                           ESM=Especifica un c¢digo de pa°s/regi¢n para el cliente. Para ver los c¢digos de pa°s o regi¢n y los formatos de direcci¢n de la ventana Pa°ses y regiones, haga clic en el campo.;
+                           FRC=SpÇcifie le code pays/rÇgion du client. Pour visualiser les codes pays/rÇgion et les formats adresse dans la fenàtre Pays/RÇgions, cliquez sur le champ.;
+                           ENC=Specifies a country/region code for the customer. To see the country/region codes and address formats in the Countries/Regions window, click the field.];
+                SourceExpr="Country/Region Code" }
+
+    { 21  ;2   ;Group     ;
+                Name=ContactDetails;
+                CaptionML=[ENU=Contact;
+                           ESM=Contacto;
+                           FRC=Contact;
+                           ENC=Contact];
+                GroupType=Group }
+
+    { 12  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's telephone number. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el n£mero de telÇfono del cliente. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le numÇro de tÇlÇphone du client. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the customer's telephone number. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr="Phone No." }
+
+    { 107 ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's e-mail address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           ESM=Especifica la direcci¢n de correo electr¢nico del cliente. Puede introducir un m†ximo de 80 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie l'adresse e-mail du client. Vous pouvez entrer au maximum 80ˇcaractäres, des chiffres ou des lettres.;
+                           ENC=Specifies the customer's e-mail address. You can enter a maximum of 80 characters, both numbers and letters.];
+                SourceExpr="E-Mail";
+                Importance=Promoted }
+
+    { 109 ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's home page address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           ESM=Especifica la direcci¢n de la p†gina Web del cliente. Puede introducir un m†ximo de 80 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie l'adresse de la page d'accueil du client. Vous pouvez entrer au maximum 80ˇcaractäres, des chiffres ou des lettres.;
+                           ENC=Specifies the customer's home page address. You can enter a maximum of 80 characters, both numbers and letters.];
+                SourceExpr="Home Page" }
+
+    { 16  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the person you regularly contact when you do business with this customer. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el nombre de la persona con la que contacta normalmente cuando trata con este cliente. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le nom de la personne que vous contactez rÇguliärement lorsque vous traitez avec ce client. Vous pouvez saisir au maximum 30ˇcaractäres, des chiffres ou des lettres.;
+                           ENC=Specifies the name of the person you regularly contact when you do business with this customer. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Contact;
+                Importance=Promoted }
+
+    { 1905885101;1;Group  ;
+                Name=Invoicing;
+                CaptionML=[ENU=Invoicing;
+                           ESM=Facturaci¢n;
+                           FRC=Facturation;
+                           ENC=Invoicing];
+                Visible=ShowMainView;
+                GroupType=Group }
+
+    { 64  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the maximum amount by which you allow the customer to exceed the payment balance before warnings are issued.;
+                           ESM=Especifica el importe m†ximo por el que se permite al cliente superar los saldos del pago antes de que se emitan las advertencias.;
+                           FRC=SpÇcifie le montant maximal selon lequel vous autorisez au client Ö dÇpasser le solde de paiement avant que des alertes ne soient Çmises.;
+                           ENC=Specifies the maximum amount by which you allow the customer to exceed the payment balance before warnings are issued.];
+                SourceExpr="Credit Limit (LCY)" }
+
+    { 25  ;2   ;Group     ;
+                Name=PostingDetails;
+                CaptionML=[ENU=Posting Details;
+                           ESM=Detalles del registro;
+                           FRC=DÇtails du report;
+                           ENC=Posting Details];
+                GroupType=Group }
+
+    { 34  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a different customer's number. To see the customer numbers in the Customer table, click the field.;
+                           ESM=Especifica un n£mero de cliente diferente. Si desea ver los n£meros de cliente de la tabla Cliente, haga clic en el campo.;
+                           FRC=SpÇcifie un autre numÇro de client. Pour visualiser les numÇros de client de la table Client, cliquez sur le champ.;
+                           ENC=Specifies a different customer's number. To see the customer numbers in the Customer table, click the field.];
+                SourceExpr="Bill-to Customer No.";
+                LookupPageID=Mini Customer List;
+                DrillDownPageID=Mini Customer List }
+
+    { 70  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's trade type to link transactions made for this customer with the appropriate general ledger account according to the general posting setup.;
+                           ESM=Especifica el tipo de comercio del cliente para vincular las transacciones realizadas para este cliente a la cuenta contable correspondiente seg£n la configuraci¢n de registro general.;
+                           FRC=SpÇcifie le type commercial du client pour lier les transactions effectuÇes pour ce client au compte gÇnÇral appropriÇ en fonction des paramätres de validation gÇnÇraux.;
+                           ENC=Specifies the customer's trade type to link transactions made for this customer with the appropriate general ledger account according to the general posting setup.];
+                SourceExpr="Gen. Bus. Posting Group";
+                Importance=Promoted }
+
+    { 58  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's VAT specification to link transactions made for this customer with the appropriate general ledger account according to the VAT posting setup.;
+                           ESM=Especifica la especificaci¢n de IVA del cliente para vincular las transacciones realizadas para este cliente a la cuenta contable correspondiente seg£n la configuraci¢n de registro de IVA.;
+                           FRC=SpÇcifie le dÇtail TVA du client pour lier les transactions effectuÇes pour ce client au compte gÇnÇral appropriÇ en fonction des paramätres de validation TVA.;
+                           ENC=Specifies the customer's tax specification to link transactions made for this customer with the appropriate general ledger account according to the tax posting setup.];
+                SourceExpr="VAT Bus. Posting Group" }
+
+    { 38  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's market type to link business transactions made for the customer with the appropriate account in the general ledger.;
+                           ESM=Especifica el tipo del mercado del cliente para vincular las transacciones de negocio realizadas para el cliente con la cuenta correspondiente en la contabilidad.;
+                           FRC=SpÇcifie le type du marchÇ du client pour lier les transactions commerciales effectuÇes pour le client avec le compte appropriÇ dans la comptabilitÇ.;
+                           ENC=Specifies the customer's market type to link business transactions made for the customer with the appropriate account in the general ledger.];
+                SourceExpr="Customer Posting Group";
+                Importance=Promoted }
+
+    { 36  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies how many copies of a sales invoice for the customer will be printed at a time. For example, enter 2 if you always keep a copy in your files in addition to the one that you send to the customer.;
+                           ESM=Especifica cu†ntas copias de una factura de venta para el cliente se imprimir†n al mismo tiempo. Por ejemplo, escriba 2 si mantiene siempre una copia los archivos adem†s del que se env°a al cliente.;
+                           FRC=Indique le nombre de copies imprimÇes Ö la fois pour une facture vente pour le client. Par exemple, saisissez 2 si vous conservez toujours une copie dans vos fichiers en plus de celle que vous envoyez au client.;
+                           ENC=Specifies how many copies of a sales invoice for the customer will be printed at a time. For example, enter 2 if you always keep a copy in your files in addition to the one that you send to the customer.];
+                SourceExpr="Invoice Copies" }
+
+    { 27  ;2   ;Group     ;
+                Name=PricesandDiscounts;
+                CaptionML=[ENU=Prices and Discounts;
+                           ESM=Precios y descuentos;
+                           FRC=Prix et escomptes;
+                           ENC=Prices and Discounts];
+                GroupType=Group }
+
+    { 40  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer price group code, which you can use as a criterion to set up special sales prices in the Sales Prices window.;
+                           ESM=Especifica el c¢digo de grupo de precio de cliente, que puede utilizar como criterio para configurar precios de venta especiales en la ventana Precios ventas.;
+                           FRC=SpÇcifie le code groupe prix client, que vous pouvez utiliser comme critäre pour configurer des prix spÇcifiques dans la fenàtre Prix de vente.;
+                           ENC=Specifies the customer price group code, which you can use as a criterion to set up special sales prices in the Sales Prices window.];
+                SourceExpr="Customer Price Group";
+                Importance=Promoted }
+
+    { 44  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer discount group code, which you can use as a criterion to set up special discounts in the Sales Line Discounts window.;
+                           ESM=Especifica el c¢digo del grupo de descuento de cliente, que puede utilizar como criterio para configurar descuentos especiales en la ventana Descuentos l°nea ventas.;
+                           FRC=SpÇcifie le code groupe remises client, que vous pouvez utiliser comme critäre pour configurer des remises spÇcifiques dans la fenàtre Escomptes de ligne de vente.;
+                           ENC=Specifies the customer discount group code, which you can use as a criterion to set up special discounts in the Sales Line Discounts window.];
+                SourceExpr="Customer Disc. Group";
+                Importance=Promoted }
+
+    { 46  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if a sales line discount is calculated when a special sales price is offered according to setup in the Sales Prices window.;
+                           ESM=Especifica si se calcula un descuento de la l°nea de venta cuando se ofrece un precio de venta especial para configuraci¢n en la ventana Precios ventas.;
+                           FRC=Indique si une remise ligne vente est calculÇe lorsqu'un prix spÇcial est proposÇ en fonction du paramÇtrage de la fenàtre Prix de vente.;
+                           ENC=Specifies if a sales line discount is calculated when a special sales price is offered according to setup in the Sales Prices window.];
+                SourceExpr="Allow Line Disc." }
+
+    { 129 ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Unit Price and Line Amount fields on sales lines for this customer should be shown with or without VAT.;
+                           ESM=Especifica si los campos Precio unitario y Importe l°nea de las l°neas de venta de este cliente se deben mostrar con o sin IVA.;
+                           FRC=SpÇcifie si les champs Prix unitaire et Montant ligne des lignes vente pour ce client sont affichÇs avec ou sans la TVA.;
+                           ENC=Specifies if the Unit Price and Line Amount fields on sales lines for this customer should be shown with or without tax.];
+                SourceExpr="Prices Including VAT" }
+
+    { 1907468901;2;Group  ;
+                Name=ForeignTrade;
+                CaptionML=[ENU=Foreign Trade;
+                           ESM=Comercio exterior;
+                           FRC=Commerce Çtranger;
+                           ENC=Foreign Trade];
+                GroupType=Group }
+
+    { 67  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a default currency code for the customer.;
+                           ESM=Especifica un c¢digo de divisa predeterminado para el cliente.;
+                           FRC=SpÇcifie un code devise par dÇfaut pour le client.;
+                           ENC=Specifies a default currency code for the customer.];
+                SourceExpr="Currency Code";
+                Importance=Promoted }
+
+    { 66  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the language to be used on printouts for this customer.;
+                           ESM=Especifica el idioma que se va a usar en las copias impresas para este cliente.;
+                           FRC=Indique la langue Ö utiliser sur les impressions destinÇes Ö ce client.;
+                           ENC=Specifies the language to be used on printouts for this customer.];
+                SourceExpr="Language Code" }
+
+    { 69  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's VAT registration number. You can enter a maximum of 20 characters, both numbers and letters.;
+                           ESM=Especifica el n£mero RFC del cliente. Puede introducir un m†ximo de 20 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le numÇro de groupe compta. produit TVA du client. Vous pouvez entrer un maximum de 20ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the customer's GST/HST registration number. You can enter a maximum of 20 characters, both numbers and letters.];
+                SourceExpr="VAT Registration No." }
+
+    { 1901677601;1;Group  ;
+                Name=Payments;
+                CaptionML=[ENU=Payments;
+                           ESM=Pagos;
+                           FRC=Paiements;
+                           ENC=Payments];
+                Visible=ShowMainView;
+                GroupType=Group }
+
+    { 48  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how to apply payments to entries for this customer. Select Manual to manually specify the document that a payment applies to. This is the default method. Select Apply to Oldest to automatically apply payments to the oldest open customer ledger entry.;
+                           ESM=Especifica c¢mo liquidar pagos en los movimientos para este cliente. Seleccione Manual para especificar manualmente el documento al que se aplica un pago. êste es el mÇtodo predeterminado. Seleccione Liq. por antigÅedad para aplicar autom†ticamente los pagos al movimiento de cliente pendiente m†s antiguo.;
+                           FRC=SpÇcifie la maniäre de lettrer les paiements aux Çcritures pour ce client. SÇlectionnez Manuel pour spÇcifier manuellement le document auquel un paiement s'applique. Il s'agit de la mÇthode par dÇfaut. SÇlectionnez Au plus ancien pour lettrer automatiquement les paiements Ö l'Çcriture comptable client ouverte la plus ancienne.;
+                           ENC=Specifies how to apply payments to entries for this customer. Select Manual to manually specify the document that a payment applies to. This is the default method. Select Apply to Oldest to automatically apply payments to the oldest open customer ledger entry.];
+                SourceExpr="Application Method" }
+
+    { 50  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a code that indicates the payment terms that you require of the customer. The payment terms code you define in this field is inserted on sales invoices for the customer.;
+                           ESM=Especifica un c¢digo que indica los tÇrminos de pago que requiere del cliente. El c¢digo de tÇrminos de pago que define en este campo se inserta en las facturas de venta para el cliente.;
+                           FRC=Indique un code qui indique les conditions de paiement que vous demandez au client. Le code condition de paiement que vous dÇfinissez dans ce champ est insÇrÇ sur les factures vente pour le client.;
+                           ENC=Specifies a code that indicates the payment terms that you require of the customer. The payment terms code you define in this field is inserted on sales invoices for the customer.];
+                SourceExpr="Payment Terms Code";
+                Importance=Promoted }
+
+    { 11  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how the customer usually submits payment, such as bank transfer or check. The payment method code that you select in this field is inserted on sales invoices for the customer.;
+                           ESM=Especifica c¢mo suele enviar el cliente el pago, como transferencia bancaria o cheque. El c¢digo de forma de pago que selecciona en este campo se inserta en las facturas de venta para el cliente.;
+                           FRC=SpÇcifie le mode de paiement gÇnÇralement utilisÇ par le client, tel que par transfert bancaire ou par chäque. Le code mode de räglement que vous sÇlectionnez dans ce champ est insÇrÇ sur les factures vente pour le client.;
+                           ENC=Specifies how the customer usually submits payment, such as bank transfer or cheque. The payment method code that you select in this field is inserted on sales invoices for the customer.];
+                SourceExpr="Payment Method Code";
+                Importance=Promoted }
+
+    { 15  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how reminders about late payments are handled for this customer.;
+                           ESM=Especifica c¢mo se controlan los avisos sobre los pagos con retraso para este cliente.;
+                           FRC=SpÇcifie la maniäre dont les relances concernant les retards de paiement sont traitÇes pour ce client.;
+                           ENC=Specifies how reminders about late payments are handled for this customer.];
+                SourceExpr="Reminder Terms Code";
+                Importance=Promoted }
+
+    { 52  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies finance charges are calculated for the customer. A finance charge terms code contains information about the interest calculation method, interest rate, and so on.;
+                           ESM=Especifica que los intereses cobrados se calculan para el cliente. Los c¢digos interÇs guardan informaci¢n relativa al mÇtodo de c†lculo del interÇs, el tipo de interÇs y dem†s.;
+                           FRC=SpÇcifie les intÇràts calculÇs pour le client. Un code Conditions intÇràts de retard affiche les informations relatives au mode de calcul des intÇràts, au taux d'intÇràt, etc.;
+                           ENC=Specifies finance charges are calculated for the customer. A finance charge terms code contains information about the interest calculation method, interest rate, and so on.];
+                SourceExpr="Fin. Charge Terms Code";
+                Importance=Promoted }
+
+    { 54  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies whether to include this customer when you print the Statement report.;
+                           ESM=Especifica si desea incluir a este cliente al imprimir el informe Estado de cuenta.;
+                           FRC=Indique si vous souhaitez inclure ou non ce client lorsque vous imprimez l'Çtat RelevÇ.;
+                           ENC=Specifies whether to include this customer when you print the Statement report.];
+                SourceExpr="Print Statements" }
+
+    { 60  ;2   ;Field     ;
+                ToolTipML=[ENU=Shows the number of the last statement that was printed for this customer.;
+                           ESM=Muestra el n£mero del £ltimo estado de cuenta impreso de este cliente.;
+                           FRC=Affiche le numÇro du dernier relevÇ imprimÇ pour ce client.;
+                           ENC=Shows the number of the last statement that was printed for this customer.];
+                SourceExpr="Last Statement No." }
+
+    { 143 ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies that the customer is not allowed payment tolerance.;
+                           ESM=Especifica que no se permite tolerancia de pago al cliente.;
+                           FRC=SpÇcifie que le client n'a droit Ö aucun Çcart de räglement.;
+                           ENC=Specifies that the customer is not allowed payment tolerance.];
+                SourceExpr="Block Payment Tolerance" }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer bank account that will be used by default when you process refunds to the customer.;
+                           ESM=Especifica el banco de cliente que se utilizar† de forma predeterminada al procesar el reembolso al cliente.;
+                           FRC=SpÇcifie le compte bancaire client qui sera utilisÇ par dÇfaut lorsque vous traitez des remboursements client.;
+                           ENC=Specifies the customer bank account that will be used by default when you process refunds to the customer.];
+                SourceExpr="Preferred Bank Account" }
+
+    { 56  ;1   ;Group     ;
+                Name=Statistics;
+                CaptionML=[ENU=Statistics;
+                           ESM=Estad°sticas;
+                           FRC=Statistiques;
+                           ENC=Statistics];
+                Editable=false;
+                GroupType=Group }
+
+    { 55  ;2   ;Group     ;
+                Name=Balance;
+                GroupType=Group }
+
+    { 53  ;3   ;Field     ;
+                CaptionML=[ENU=Money Owed - Current;
+                           ESM=Dinero adeudado - Actual;
+                           FRC=Montant dñ - En cours;
+                           ENC=Money Owed - Current];
+                ToolTipML=[ENU=Specifies the payment amount that the customer owes for completed sales. This value is also known as the customer's balance.;
+                           ESM=Especifica el importe de pago que el cliente debe para las ventas completadas. Este valor tambiÇn se conoce como el saldo del cliente.;
+                           FRC=SpÇcifie le montant räglement que le client doit rÇgler pour les ventes terminÇes. Cette valeur est Çgalement connue comme le solde du client.;
+                           ENC=Specifies the payment amount that the customer owes for completed sales. This value is also known as the customer's balance.];
+                SourceExpr="Balance (LCY)" }
+
+    { 68  ;3   ;Field     ;
+                CaptionML=[ENU=Money Owed - Expected;
+                           ESM=Dinero adeudado - Previsto;
+                           FRC=Montant dñ - PrÇvu;
+                           ENC=Money Owed - Expected];
+                ToolTipML=[ENU=Specifies the payment amount that the customer will owe when ongoing sales invoices and credit memos are completed.;
+                           ESM=Especifica el importe de pago que el cliente deber† cuando se completen las facturas de venta y las notas de crÇdito en curso.;
+                           FRC=SpÇcifie le montant räglement que le client doit lorsque les factures vente et les avoirs en cours sont terminÇs.;
+                           ENC=Specifies the payment amount that the customer will owe when ongoing sales invoices and credit memos are completed.];
+                SourceExpr=GetMoneyOwedExpected;
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownMoneyOwedExpected("No.");
+                            END;
+                             }
+
+    { 43  ;3   ;Field     ;
+                CaptionML=[ENU=Money Owed - Total;
+                           ESM=Dinero adeudado - Total;
+                           FRC=Montant dñ - Total;
+                           ENC=Money Owed - Total];
+                ToolTipML=[ENU=Specifies the payment amount that the customer owes for completed sales plus sales that are still ongoing. The value is the sum of the values in the Money Owed - Current and Money Owed - Expected fields.;
+                           ESM=Especifica el importe de pago que el cliente debe para las ventas completadas m†s las ventas que est†n en curso. El valor es la suma de los valores de los campos Dinero adeudado - Actual y Dinero adeudado - Previsto.;
+                           FRC=SpÇcifie le montant räglement que le client doit rÇgler pour les ventes terminÇes et pour celles toujours en cours. La valeur indiquÇe est la somme des valeurs des champs Montant dñ - En cours et Montant dñ - PrÇvu.;
+                           ENC=Specifies the payment amount that the customer owes for completed sales plus sales that are still ongoing. The value is the sum of the values in the Money Owed - Current and Money Owed - Expected fields.];
+                SourceExpr="Balance (LCY)" + GetMoneyOwedExpected;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+    { 42  ;3   ;Field     ;
+                Name=CreditLimit;
+                CaptionML=[ENU=Credit Limit;
+                           ESM=L°mite de crÇdito;
+                           FRC=Limite de crÇdit;
+                           ENC=Credit Limit];
+                ToolTipML=[ENU=Specifies the maximum amount by which you allow the customer to exceed the payment balance before warnings are issued.;
+                           ESM=Especifica el importe m†ximo por el que se permite al cliente superar los saldos del pago antes de que se emitan las advertencias.;
+                           FRC=SpÇcifie le montant maximal selon lequel vous autorisez au client Ö dÇpasser le solde de paiement avant que des alertes ne soient Çmises.;
+                           ENC=Specifies the maximum amount by which you allow the customer to exceed the payment balance before warnings are issued.];
+                SourceExpr="Credit Limit (LCY)" }
+
+    { 41  ;3   ;Field     ;
+                ExtendedDatatype=Ratio;
+                CaptionML=[ENU=Usage Of Credit Limit;
+                           ESM=Utilizaci¢n del l°mite de crÇdito;
+                           FRC=Utilisation de la limite de crÇdit;
+                           ENC=Usage Of Credit Limit];
+                ToolTipML=[ENU=Specifies how much of the customer's payment balance consists of credit. The gauge shows the value in the Money Owed - Total field as a percentage of the value in the Credit Limit field.;
+                           ESM=Especifica quÇ cantidad del saldo del pago del cliente consiste en haber. El marcador muestra el valor del campo Dinero adeudado - Total como un porcentaje del valor del campo L°mite de crÇdito.;
+                           FRC=Indique la partie de crÇdit du solde de paiement du client. La mesure indique la valeur du champ Montant dñ - Total sous la forme d'un pourcentage de la valeur du champ Limite de crÇdit.;
+                           ENC=Specifies how much of the customer's payment balance consists of credit. The gauge shows the value in the Money Owed - Total field as a percentage of the value in the Credit Limit field.];
+                SourceExpr=CalcCreditLimitLCYExpendedPct;
+                Style=Attention;
+                StyleExpr=BalanceExhausted }
+
+    { 39  ;2   ;Group     ;
+                CaptionML=[ENU=Payments;
+                           ESM=Pagos;
+                           FRC=Paiements;
+                           ENC=Payments];
+                GroupType=Group }
+
+    { 37  ;3   ;Field     ;
+                Name=Balance Due;
+                ToolTipML=[ENU=Specifies payments from the customer that are overdue per today's date.;
+                           ESM=Especifica los pagos del cliente que est†n vencidos seg£n la fecha actual.;
+                           FRC=SpÇcifie les paiements effectuÇs par le client Çchus pour la date du jour.;
+                           ENC=Specifies payments from the customer that are overdue per today's date.];
+                SourceExpr=CalcOverdueBalance;
+                CaptionClass=FORMAT(STRSUBSTNO(OverduePaymentsCap,FORMAT(WORKDATE)));
+                OnDrillDown=VAR
+                              DtldCustLedgEntry@1000 : Record 379;
+                              CustLedgEntry@1001 : Record 21;
+                            BEGIN
+                              DtldCustLedgEntry.SETFILTER("Customer No.","No.");
+                              COPYFILTER("Global Dimension 1 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                              COPYFILTER("Global Dimension 2 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                              COPYFILTER("Currency Filter",DtldCustLedgEntry."Currency Code");
+                              CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
+                            END;
+                             }
+
+    { 35  ;3   ;Field     ;
+                CaptionML=[ENU=Payments This Year;
+                           ESM=Pagos de este a§o;
+                           FRC=Paiements cette annÇe;
+                           ENC=Payments This Year];
+                ToolTipML=[ENU=Specifies the sum of payments received from the customer in the current fiscal year.;
+                           ESM=Especifica la suma de pagos recibidos del cliente en el ejercicio actual.;
+                           FRC=SpÇcifie la somme des paiements reáus du client pour l'exercice comptable en cours.;
+                           ENC=Specifies the sum of payments received from the customer in the current fiscal year.];
+                SourceExpr="Payments (LCY)" }
+
+    { 33  ;3   ;Field     ;
+                CaptionML=[ENU=Average Collection Period (Days);
+                           ESM=Per°odo de pago medio (d°as);
+                           FRC=DÇlai de räglement moyen (jours);
+                           ENC=Average Collection Period (Days)];
+                ToolTipML=[ENU=Specifies how long the customer typically takes to pay invoices in the current fiscal year. This is the average number of days from which invoices are issued until the customer pays the invoice.;
+                           ESM=Especifica el tiempo que emplea el cliente normalmente para pagar las facturas en el ejercicio actual. Es el n£mero medio de d°as desde que se emiten las facturas hasta que el cliente pague la factura.;
+                           FRC=SpÇcifie le dÇlai apräs lequel le client paie gÇnÇralement les factures pour l'exercice comptable en cours. Il s'agit du nombre de jours moyen entre la date d'Çmission des factures et le moment oó le client paie la facture.;
+                           ENC=Specifies how long the customer typically takes to pay invoices in the current fiscal year. This is the average number of days from which invoices are issued until the customer pays the invoice.];
+                DecimalPlaces=0:1;
+                SourceExpr=MiniCustomerMgt.AvgDaysToPay("No.") }
+
+    { 79  ;3   ;Field     ;
+                Name=DaysPaidPastDueDate;
+                CaptionML=[ENU=Average Late Payments (Days);
+                           ESM=Promedio de pagos vencidos (d°as);
+                           FRC=Moyenne retard de paiements (jours);
+                           ENC=Average Late Payments (Days)];
+                ToolTipML=[ENU=Specifies the average number of days the customer is late with payments.;
+                           ESM=Especifica el n£mero promedio de d°as de retraso en los pagos del cliente.;
+                           FRC=Indique le nombre moyen de jours de retard de paiement du client.;
+                           ENC=Specifies the average number of days the customer is late with payments.];
+                DecimalPlaces=0:1;
+                SourceExpr=DaysPastDueDate;
+                Style=Attention;
+                StyleExpr=AttentionToPaidDay }
+
+    { 59  ;2   ;Group     ;
+                CaptionML=[ENU=Sales This Year;
+                           ESM=Ventas de este a§o;
+                           FRC=Ventes cette annÇe;
+                           ENC=Sales This Year];
+                GroupType=Group }
+
+    { 61  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your sales to the customer in the current fiscal year based on completed sales invoices. The figure in parenthesis shows the number of invoices.;
+                           ESM=Especifica las ventas al cliente en el ejercicio actual seg£n las facturas de venta completadas. La cifra que figura en parÇntesis muestra el n£mero de facturas.;
+                           FRC=Indique les ventes effectuÇes au client pour l'exercice comptable en cours sur la base des factures vente terminÇes. Le chiffre qui figure entre parenthäses correspond au nombre de factures.;
+                           ENC=Specifies your sales to the customer in the current fiscal year based on completed sales invoices. The figure in parenthesis shows the number of invoices.];
+                SourceExpr=GetAmountOnPostedInvoices;
+                CaptionClass=STRSUBSTNO(PostedInvoicesCap,FORMAT(NoPostedInvoices));
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownOnPostedInvoices("No.")
+                            END;
+                             }
+
+    { 71  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your refunds to the customer in the current fiscal year based on completed sales credit memos. The figure in parenthesis shows the number of credit memos.;
+                           ESM=Especifica los reembolsos al cliente en el ejercicio actual seg£n las notas de crÇdito de venta completadas. La cifra que figura en parÇntesis muestra el n£mero de notas de crÇdito.;
+                           FRC=Indique les remboursements effectuÇs au client pour l'exercice comptable en cours sur la base des avoirs vente terminÇs. Le chiffre qui figure entre parenthäses correspond au nombre d'avoirs.;
+                           ENC=Specifies your refunds to the customer in the current fiscal year based on completed sales credit memos. The figure in parenthesis shows the number of credit memos.];
+                SourceExpr=GetAmountOnCrMemo;
+                CaptionClass=STRSUBSTNO(CreditMemosCap,FORMAT(NoPostedCrMemos));
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownOnPostedCrMemo("No.")
+                            END;
+                             }
+
+    { 72  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your expected sales to the customer in the current fiscal year based on open sales invoices. The figure in parenthesis shows the number of open invoices.;
+                           ESM=Especifica las ventas esperadas al cliente en el ejercicio actual seg£n las facturas de venta abiertas. La cifra que figura en parÇntesis muestra el n£mero de facturas abiertas.;
+                           FRC=Indique les ventes prÇvues au client pour l'exercice comptable en cours sur la base des factures vente ouvertes. Le chiffre qui figure entre parenthäses correspond au nombre de factures ouvertes.;
+                           ENC=Specifies your expected sales to the customer in the current fiscal year based on open sales invoices. The figure in parenthesis shows the number of open invoices.];
+                SourceExpr=GetAmountOnOutstandingInvoices;
+                CaptionClass=STRSUBSTNO(OutstandingInvoicesCap,FORMAT(NoOutstandingInvoices));
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownOnOutstandingInvoices("No.")
+                            END;
+                             }
+
+    { 73  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your expected refunds to the customer in the current fiscal year based on open sales credit memos. The figure in parenthesis shows the number of open credit memos.;
+                           ESM=Especifica los reembolsos esperados al cliente en el ejercicio actual seg£n las notas de crÇdito de venta abiertas. La cifra que figura en parÇntesis muestra el n£mero de notas de crÇdito abiertas.;
+                           FRC=Indique les remboursements prÇvus au client pour l'exercice comptable en cours sur la base des avoirs vente ouverts. Le chiffre qui figure entre parenthäses correspond au nombre d'avoirs ouverts.;
+                           ENC=Specifies your expected refunds to the customer in the current fiscal year based on open sales credit memos. The figure in parenthesis shows the number of open credit memos.];
+                SourceExpr=GetAmountOnOutstandingCrMemos;
+                CaptionClass=STRSUBSTNO(OutstandingCrMemosCap,FORMAT(NoOutstandingCrMemos));
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownOnOutstandingCrMemos("No.")
+                            END;
+                             }
+
+    { 74  ;3   ;Field     ;
+                CaptionML=[ENU=Invoice Discounts;
+                           ESM=Dto. factura;
+                           FRC=Escomptes facture;
+                           ENC=Invoice Discounts];
+                ToolTipML=[ENU=Specifies the total of all invoice discounts that you have granted to the customer in the current fiscal year.;
+                           ESM=Especifica el total de todos los descuentos en factura que se han concedido al cliente en el ejercicio actual.;
+                           FRC=Indique le total de toutes les remises facture que vous avez accordÇs au client pour l'exercice comptable en cours.;
+                           ENC=Specifies the total of all invoice discounts that you have granted to the customer in the current fiscal year.];
+                SourceExpr=CustInvDiscAmountLCY }
+
+    { 75  ;3   ;Field     ;
+                CaptionML=[ENU=Total Sales;
+                           ESM=Total ventas;
+                           FRC=Total des ventes;
+                           ENC=Total Sales];
+                ToolTipML=[ENU=Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all completed and open sales invoices and credit memos.;
+                           ESM=Especifica el volumen de ventas total con el cliente en el ejercicio actual. Se calcula a partir de los importes sin IVA en todas las facturas y las notas de crÇdito de venta abiertas y completadas.;
+                           FRC=Indique votre chiffre de vente total avec le client pour l'exercice comptable en cours. Il est calculÇ Ö partir des montants HT sur toutes les factures vente et avoirs terminÇs et ouverts.;
+                           ENC=Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all completed and open sales invoices and credit memos.];
+                SourceExpr=Totals;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+    { 24  ;2   ;Part      ;
+                Name=AgedAccReceivableChart;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page768;
+                Visible=ShowCharts;
+                PartType=Page }
+
+    { 86  ;1   ;Part      ;
+                Name=PriceAndLineDisc;
+                PagePartID=Page1345;
+                Visible=ShowPricesAndLineDisc;
+                PartType=Page }
+
+    { 13  ;1   ;Field     ;
+                Name=PageReady;
+                ControlAddIn=[Microsoft.Dynamics.Nav.Client.PageReady;PublicKeyToken=31bf3856ad364e35] }
+
+  }
+  CODE
+  {
+    VAR
+      MiniCustomerMgt@1000 : Codeunit 1302;
+      BlockedCustomer@1007 : Boolean;
+      ShowMainView@1002 : Boolean;
+      OverduePaymentsCap@1005 : TextConst '@@@=Overdue Payments as of 27-02-2012;ENU=Overdue Payments as of %1;ESM=Pagos vencidos a %1;FRC=Paiements Çchus au %1;ENC=Overdue Payments as of %1';
+      ShowPricesAndLineDisc@1003 : Boolean;
+      ShowCharts@1028 : Boolean INDATASET;
+      CustSalesLCY@1010 : Decimal;
+      AdjmtCostLCY@1024 : Decimal;
+      AdjCustProfit@1009 : Decimal;
+      CustProfit@1011 : Decimal;
+      AdjProfitPct@1008 : Decimal;
+      CustInvDiscAmountLCY@1006 : Decimal;
+      CustPaymentsLCY@1004 : Decimal;
+      BalanceExhausted@1012 : Boolean;
+      PostedInvoicesCap@1014 : TextConst '@@@=Invoices (5);ENU=Invoices (%1);ESM=Facturas (%1);FRC=Factures (%1);ENC=Invoices (%1)';
+      CreditMemosCap@1015 : TextConst '@@@=Credit Memos (3);ENU=Credit Memos (%1);ESM=Notas de crÇdito (%1);FRC=Notes de crÇdit (%1);ENC=Credit Memos (%1)';
+      OutstandingInvoicesCap@1016 : TextConst '@@@=Outstanding Invoices (4);ENU=Outstanding Invoices (%1);ESM=Facturas pendientes (%1);FRC=Factures en attente (%1);ENC=Outstanding Invoices (%1)';
+      NoPostedInvoices@1018 : Integer;
+      NoPostedCrMemos@1017 : Integer;
+      NoOutstandingInvoices@1020 : Integer;
+      NoOutstandingCrMemos@1019 : Integer;
+      AmountOnPostedInvoices@1021 : Decimal;
+      AmountOnPostedCrMemos@1013 : Decimal;
+      OutstandingCrMemosCap@1022 : TextConst 'ENU=Outstanding Credit Memos (%1);ESM=Notas de crÇdito pendientes (%1);FRC=Notes de crÇdit en souffrance (%1);ENC=Outstanding Credit Memos (%1)';
+      AmountOnOutstandingInvoices@1023 : Decimal;
+      AmountOnOutstandingCrMemos@1001 : Decimal;
+      Totals@1025 : Decimal;
+      DaysPastDueDate@1026 : Decimal;
+      AttentionToPaidDay@1027 : Boolean;
+
+    LOCAL PROCEDURE GetTotalSales@6() : Decimal;
+    BEGIN
+      NoPostedInvoices := 0;
+      NoPostedCrMemos := 0;
+      NoOutstandingInvoices := 0;
+      NoOutstandingCrMemos := 0;
+      Totals := 0;
+
+      AmountOnPostedInvoices := MiniCustomerMgt.CalcAmountsOnPostedInvoices("No.",NoPostedInvoices);
+      AmountOnPostedCrMemos := MiniCustomerMgt.CalcAmountsOnPostedCrMemos("No.",NoPostedCrMemos);
+
+      AmountOnOutstandingInvoices := MiniCustomerMgt.CalculateAmountsOnUnpostedInvoices("No.",NoOutstandingInvoices);
+      AmountOnOutstandingCrMemos := MiniCustomerMgt.CalculateAmountsOnUnpostedCrMemos("No.",NoOutstandingCrMemos);
+
+      Totals := AmountOnPostedInvoices + AmountOnPostedCrMemos + AmountOnOutstandingInvoices + AmountOnOutstandingCrMemos;
+
+      MiniCustomerMgt.CalculateStatistic(
+        Rec,
+        AdjmtCostLCY,AdjCustProfit,AdjProfitPct,
+        CustInvDiscAmountLCY,CustPaymentsLCY,CustSalesLCY,
+        CustProfit);
+      EXIT(Totals)
+    END;
+
+    LOCAL PROCEDURE GetAmountOnPostedInvoices@5() : Decimal;
+    BEGIN
+      EXIT(AmountOnPostedInvoices)
+    END;
+
+    LOCAL PROCEDURE GetAmountOnCrMemo@8() : Decimal;
+    BEGIN
+      EXIT(AmountOnPostedCrMemos)
+    END;
+
+    LOCAL PROCEDURE GetAmountOnOutstandingInvoices@9() : Decimal;
+    BEGIN
+      EXIT(AmountOnOutstandingInvoices)
+    END;
+
+    LOCAL PROCEDURE GetAmountOnOutstandingCrMemos@10() : Decimal;
+    BEGIN
+      EXIT(AmountOnOutstandingCrMemos)
+    END;
+
+    LOCAL PROCEDURE GetMoneyOwedExpected@11() : Decimal;
+    BEGIN
+      EXIT(MiniCustomerMgt.CalculateAmountsWithVATOnUnpostedDocuments("No."))
+    END;
+
+    LOCAL PROCEDURE GetSalesPricesAndSalesLineDisc@4();
+    BEGIN
+      IF "No." <> CurrPage.PriceAndLineDisc.PAGE.GetLoadedCustNo THEN BEGIN
+        CurrPage.PriceAndLineDisc.PAGE.LoadCustomer(Rec);
+        CurrPage.PriceAndLineDisc.PAGE.UPDATE(FALSE);
+      END;
+    END;
+
+    LOCAL PROCEDURE ShouldBeLoadedInSetupView@2() : Boolean;
+    BEGIN
+      EXIT('' IN [Address,
+                  "Post Code",
+                  City,
+                  "Customer Posting Group",
+                  "Gen. Bus. Posting Group",
+                  "VAT Bus. Posting Group"]);
+    END;
+
+    EVENT PageReady@-13::AddInReady@0();
+    VAR
+      MiniCustomerTemplate@1000 : Record 1300;
+      NewCustomerCode@1001 : Code[20];
+    BEGIN
+      IF "No." = '' THEN BEGIN
+        NewCustomerCode := MiniCustomerTemplate.NewCustomerFromTemplate;
+        IF NewCustomerCode <> '' THEN BEGIN
+          GET(NewCustomerCode);
+          CurrPage.UPDATE;
+        END;
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

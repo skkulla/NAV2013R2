@@ -1,0 +1,34 @@
+OBJECT Codeunit 1240 Read Post Exch. from File
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36366;
+  }
+  PROPERTIES
+  {
+    TableNo=1220;
+    OnRun=VAR
+            TempBlob@1000 : Record 99008535;
+            FileMgt@1001 : Codeunit 419;
+          BEGIN
+            INIT;
+            "File Name" := COPYSTR(FileMgt.BLOBImportWithFilter(TempBlob,ImportBankStmtTxt,'',FileFilterTxt,FileFilterExtensionTxt),1,250);
+            IF "File Name" <> '' THEN
+              "File Content" := TempBlob.Blob;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      ImportBankStmtTxt@1007 : TextConst 'ENU=Select File to Import;ESM=Seleccionar archivo para importar;FRC=S‚lectionner fichier … importer;ENC=Select File to Import';
+      FileFilterTxt@1006 : TextConst 'ENU="All Files(*.*)|*.*|XML Files(*.xml)|*.xml|Text Files(*.txt;*.csv;*.asc)|*.txt;*.csv;*.asc";ESM="All Files(*.*)|*.*|XML Files(*.xml)|*.xml|Text Files(*.txt;*.csv;*.asc)|*.txt;*.csv;*.asc";FRC="All Files(*.*)|*.*|XML Files(*.xml)|*.xml|Text Files(*.txt;*.csv;*.asc)|*.txt;*.csv;*.asc";ENC="All Files(*.*)|*.*|XML Files(*.xml)|*.xml|Text Files(*.txt;*.csv;*.asc)|*.txt;*.csv;*.asc"';
+      FileFilterExtensionTxt@1005 : TextConst '@@@={Locked};ENU=txt,csv,asc,xml;ESM=txt,csv,asc,xml;FRC=txt,csv,asc,xml;ENC=txt,csv,asc,xml';
+
+    BEGIN
+    END.
+  }
+}
+

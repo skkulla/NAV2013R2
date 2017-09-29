@@ -1,0 +1,727 @@
+OBJECT Codeunit 2 Company-Initialize
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800,NAVNA7.10.00.35800;
+  }
+  PROPERTIES
+  {
+    OnRun=VAR
+            ApplicationLaunchMgt@1001 : Codeunit 403;
+            AddOnIntegrMgt@1000 : Codeunit 5403;
+            Window@1002 : Dialog;
+          BEGIN
+            Window.OPEN(Text000);
+
+            InitSetupTables;
+            AddOnIntegrMgt.InitMfgSetup;
+            InitSourceCodeSetup;
+            InitApprovalSetup;
+            InitStandardTexts;
+            InitReportSelection;
+            InitJobWIPMethods;
+            InitBankExportImportSetup;
+            InitRapidStart;
+            InitIRS1099Form;
+            ApplicationLaunchMgt.InsertStyleSheets;
+            InsertClientAddIns;
+
+            Window.CLOSE;
+
+            IF STRPOS(COMPANYNAME,Text093) = 1 THEN
+              EXIT;
+
+            COMMIT;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=Initializing company...;ESM=Iniciando empresa...;FRC=Initialisation de la compagnie...;ENC=Initializing company...';
+      SEPACTCodeTxt@1076 : TextConst '@@@=No need to translate - but can be translated at will.;ENU=SEPACT;ESM=SEPACT;FRC=VIREM. SEPA;ENC=SEPACT';
+      SEPACTNameTxt@1083 : TextConst 'ENU=SEPA Credit Transfer;ESM=Transferencia de crÇdito SEPA;FRC=Virement SEPA;ENC=SEPA Credit Transfer';
+      SEPADDCodeTxt@1033 : TextConst '@@@=No need to translate - but can be translated at will.;ENU=SEPADD;ESM=SEPADD;FRC=PRêL. SEPA;ENC=SEPADD';
+      SEPADDNameTxt@1020 : TextConst 'ENU=SEPA Direct Debit;ESM=Adeudo directo SEPA;FRC=PrÇlävement SEPA;ENC=SEPA Direct Debit';
+      Text001@1001 : TextConst 'ENU=SALES;ESM=VENTAS;FRC=VENTES;ENC=SALES';
+      Text002@1002 : TextConst 'ENU=Sales;ESM=Ventas;FRC=Ventes;ENC=Sales';
+      Text003@1003 : TextConst 'ENU=PURCHASES;ESM=COMPRAS;FRC=ACHATS;ENC=PURCHASES';
+      Text004@1004 : TextConst 'ENU=Purchases;ESM=Compras;FRC=Achats;ENC=Purchases';
+      Text005@1005 : TextConst 'ENU=DELETE;ESM=ELIMIN;FRC=SUPPR;ENC=DELETE';
+      Text006@1006 : TextConst 'ENU=INVTPCOST;ESM=AJUEXIS;FRC=STKCOMPTA;ENC=INVTPCOST';
+      Text007@1007 : TextConst 'ENU=EXCHRATADJ;ESM=AJUDIVISA;FRC=CPTAAJTCHG;ENC=EXCHRATADJ';
+      Text010@1010 : TextConst 'ENU=CLSINCOME;ESM=ASTOREGUL;FRC=CPTACLGEST;ENC=CLSINCOME';
+      Text011@1011 : TextConst 'ENU=CONSOLID;ESM=CONSOL;FRC=RAPPROCH;ENC=CONSOLID';
+      Text012@1012 : TextConst 'ENU=Consolidation;ESM=Consolidaci¢n;FRC=Consolidation;ENC=Consolidation';
+      Text013@1013 : TextConst 'ENU=GENJNL;ESM=DIAGEN;FRC=COMPTA;ENC=GENJNL';
+      Text014@1014 : TextConst 'ENU=SALESJNL;ESM=DIAVENTAS;FRC=VTEOD;ENC=SALESJNL';
+      Text015@1015 : TextConst 'ENU=PURCHJNL;ESM=DIACOMPRAS;FRC=ACHATOD;ENC=PURCHJNL';
+      Text016@1016 : TextConst 'ENU=CASHRECJNL;ESM=DIACOBROS;FRC=VTEREGLT;ENC=CASHRECJNL';
+      Text017@1017 : TextConst 'ENU=PAYMENTJNL;ESM=DIAPAGOS;FRC=ACHPAIEMT;ENC=PAYMENTJNL';
+      Text018@1018 : TextConst 'ENU=ITEMJNL;ESM=DIAPRODS;FRC=JNARTICLE;ENC=ITEMJNL';
+      Text020@1019 : TextConst 'ENU=PHYSINVJNL;ESM=DIAINVFIS;FRC=STKINVENT;ENC=PHYSINVJNL';
+      Text022@1021 : TextConst 'ENU=RESJNL;ESM=DIAREC;FRC=RESSOURCES;ENC=RESJNL';
+      Text023@1022 : TextConst 'ENU=JOBJNL;ESM=DIAPROY;FRC=PROJETS;ENC=JOBJNL';
+      Text024@1023 : TextConst 'ENU=SALESAPPL;ESM=LIQVENTA;FRC=VTELETTR;ENC=SALESAPPL';
+      Text025@1024 : TextConst 'ENU=Sales Entry Application;ESM=Liq. movimiento de venta;FRC=Affectation Çcritures de vente;ENC=Sales Entry Application';
+      Text026@1025 : TextConst 'ENU=PURCHAPPL;ESM=LIQCOMPRA;FRC=ACHLETTR;ENC=PURCHAPPL';
+      Text027@1026 : TextConst 'ENU=Purchase Entry Application;ESM=Liq. movimiento de compra;FRC=Affectation Çcritures d''achats;ENC=Purchase Entry Application';
+      Text028@1027 : TextConst 'ENU=TAXSTMT;ESM=DECLAIVA;FRC=CPTADCLTVA;ENC=TAXSTMT';
+      Text029@1028 : TextConst 'ENU=COMPRGL;ESM=CMPRCG;FRC=CPTACOMPR;ENC=COMPRGL';
+      Text030@1029 : TextConst 'ENU=COMPRTAX;ESM=CMPRIVA;FRC=TVACOMPR;ENC=COMPRTAX';
+      Text031@1030 : TextConst 'ENU=COMPRCUST;ESM=CMPRCLIE;FRC=CLTCOMPR;ENC=COMPRCUST';
+      Text032@1031 : TextConst 'ENU=COMPRVEND;ESM=CMPRPROV;FRC=FNSCOMPR;ENC=COMPRVEND';
+      Text035@1034 : TextConst 'ENU=COMPRRES;ESM=CMPRREC;FRC=RESSCOMPR;ENC=COMPRRES';
+      Text036@1035 : TextConst 'ENU=COMPRJOB;ESM=CMPRPROY;FRC=PROJCOMPR;ENC=COMPRJOB';
+      Text037@1036 : TextConst 'ENU=COMPRBANK;ESM=CMPRBANCO;FRC=BQECOMPR;ENC=COMPRBANK';
+      Text038@1037 : TextConst 'ENU=COMPRCHECK;ESM=CMPRCHEQ;FRC=CHQCOMPR;ENC=COMPRCHEQ';
+      Text039@1038 : TextConst 'ENU=FINVOIDCHK;ESM=ANUTOTCHEQ;FRC=CHQANNU;ENC=FINVOIDCHK';
+      Text040@1039 : TextConst 'ENU=Financially Voided Check;ESM=Anulaci¢n total cheque;FRC=Chäque annulÇ financiärement;ENC=Financially Voided Cheque';
+      Text041@1040 : TextConst 'ENU=REMINDER;ESM=RECORDAT;FRC=RELANCES;ENC=REMINDER';
+      Text042@1041 : TextConst 'ENU=Reminder;ESM=Recordatorio;FRC=Rappel;ENC=Reminder';
+      Text043@1042 : TextConst 'ENU=FINCHRG;ESM=INTERES;FRC=VTEINTERET;ENC=FINCHRG';
+      Text044@1043 : TextConst 'ENU=Finance Charge Memo;ESM=Documento interÇs;FRC=Note de frais financiers;ENC=Finance Charge Memo';
+      Text045@1044 : TextConst 'ENU=FAGLJNL;ESM=AFDIAGEN;FRC=IMMOOD;ENC=FAGLJNL';
+      Text046@1045 : TextConst 'ENU=FAJNL;ESM=DIAAF;FRC=IMMOECO;ENC=FAJNL';
+      Text047@1046 : TextConst 'ENU=INSJNL;ESM=DIASEG;FRC=IMMOASSUR;ENC=INSJNL';
+      Text048@1047 : TextConst 'ENU=COMPRFA;ESM=CMPRAF;FRC=IMMOCOMPR;ENC=COMPRFA';
+      Text049@1048 : TextConst 'ENU=COMPRMAINT;ESM=CMPRMTTO;FRC=MAINTCOMPR;ENC=COMPRMAINT';
+      Text050@1049 : TextConst 'ENU=COMPRINS;ESM=CMPRSEG;FRC=ASSURCOMPR;ENC=COMPRINS';
+      Text051@1050 : TextConst 'ENU=ADJADDCURR;ESM=AJUDIVADIC;FRC=AJTDEVREP;ENC=ADJADDCURR';
+      Text052@1051 : TextConst 'ENU=MD;ESM=AM;FRC=DM;ENC=MD';
+      Text053@1052 : TextConst 'ENU=Monthly Depreciation;ESM=Amortizaci¢n mensual;FRC=Amortissement mensuel;ENC=Monthly Depreciation';
+      Text054@1053 : TextConst 'ENU=SC;ESM=CE;FRC=FDE;ENC=SC';
+      Text055@1054 : TextConst 'ENU=Shipping Charge;ESM=Cargo por env°o;FRC=Frais de livraison;ENC=Shipping Charge';
+      Text056@1055 : TextConst 'ENU=SUC;ESM=VC;FRC=VSC;ENC=SUC';
+      Text057@1056 : TextConst 'ENU=Sale under Contract;ESM=Venta contratada;FRC=Vente sous contrat;ENC=Sale under Contract';
+      Text058@1057 : TextConst 'ENU=TE;ESM=GV;FRC=FD;ENC=TE';
+      Text059@1058 : TextConst 'ENU=Travel Expenses;ESM=Gastos viaje;FRC=DÇpenses voyage;ENC=Travel Expenses';
+      Text063@1062 : TextConst 'ENU=TRANSFER;ESM=TRANSFER;FRC=TRANSFERT;ENC=TRANSFER';
+      Text064@1063 : TextConst 'ENU=Transfer;ESM=Transferencia;FRC=Transfert;ENC=Transfer';
+      Text065@1064 : TextConst 'ENU=RECLASSJNL;ESM=RECLAS.JNL;FRC=FRECLASS;ENC=RECLASSJNL';
+      Text066@1065 : TextConst 'ENU=REVALJNL;ESM=REVALJNL;FRC=FREEVAL;ENC=REVALJNL';
+      Text067@1066 : TextConst 'ENU=CONSUMPJNL;ESM=CONSUMJNL;FRC=FCONSO;ENC=CONSUMPJNL';
+      Text068@1067 : TextConst 'ENU=INVTADJMT;ESM=AJUSINVEN;FRC=AJSTK;ENC=INVTADJMT';
+      Text069@1069 : TextConst 'ENU=POINOUTJNL;ESM=REGINVDCON;FRC=FPRODOF;ENC=POINOUTJNL';
+      Text070@1073 : TextConst 'ENU=CAPACITJNL;ESM=DIARCAPAC;FRC=FCAPACITE;ENC=CAPACITJNL';
+      Text071@1107 : TextConst 'ENU=WHITEM;ESM=PROALM;FRC=ARTMAG;ENC=WHITEM';
+      Text072@1105 : TextConst 'ENU=WHPHYSINVT;ESM=INVFISALM;FRC=ACTSALAIRE;ENC=WHPHYSINVT';
+      Text073@1068 : TextConst 'ENU=WHRCLSSJNL;ESM=DIARECLALM;FRC=FCLASSMAG;ENC=WHRCLSSJNL';
+      Text074@1070 : TextConst 'ENU=SERVICE;ESM=SERVICIO;FRC=SERVICE;ENC=SERVICE';
+      Text075@1074 : TextConst 'ENU=Service Management;ESM=Gesti¢n servicios;FRC=Gestion des services;ENC=Service Management';
+      Text076@1075 : TextConst 'ENU=BANKREC;ESM=BANCREC;FRC=RAPPBANC;ENC=BANKREC';
+      Text077@1077 : TextConst 'ENU=WHPUTAWAY;ESM=UBICARALM;FRC=RANGENTREP;ENC=WHPUTAWAY';
+      Text078@1078 : TextConst 'ENU=WHPICK;ESM=PICKALM;FRC=PRêLENTREP;ENC=WHPICK';
+      Text079@1079 : TextConst 'ENU=WHMOVEMENT;ESM=MOVIMALM;FRC=MOUVENTREP;ENC=WHMOVEMENT';
+      Text080@1080 : TextConst 'ENU=Whse. Put-away;ESM=Ubicaciones;FRC=Rangement d''entrepìt;ENC=Whse. Put-away';
+      Text081@1081 : TextConst 'ENU=Whse. Pick;ESM=Picking alm.;FRC=PrÇlävement magasin;ENC=Whse. Pick';
+      Text082@1082 : TextConst 'ENU=Whse. Movement;ESM=Movimiento alm.;FRC=Mouvement d''entrepìt;ENC=Whse. Movement';
+      Text083@1100 : TextConst 'ENU=COMPRWHSE;ESM=COMPRALM;FRC=COMPENTREP;ENC=COMPRWHSE';
+      Text084@1106 : TextConst 'ENU=INTERCOMP;ESM=INTERCOMP;FRC=INTERCOMP;ENC=INTERCOMP';
+      Text085@1108 : TextConst 'ENU=Intercompany;ESM=Empresas vinculadas;FRC=Intercompanie;ENC=Intercompany';
+      Text086@1114 : TextConst 'ENU=UNAPPSALES;ESM=DESLVENTA;FRC=ANNULVENTE;ENC=UNAPPSALES';
+      Text087@1113 : TextConst 'ENU=Unapplied Sales Entry Application;ESM=Liquidaci¢n de mov. venta desliquidados;FRC=Affectation de l''Çcriture de vente annulÇe;ENC=Unapplied Sales Entry Application';
+      Text088@1112 : TextConst 'ENU=UNAPPPURCH;ESM=DESLCOMPR;FRC=ANNULACHAT;ENC=UNAPPPURCH';
+      Text089@1111 : TextConst 'ENU=Unapplied Purchase Entry Application;ESM=Liquidaci¢n de mov. compra desliquidados;FRC=Affectation de l''Çcriture d''achat annulÇe;ENC=Unapplied Purchase Entry Application';
+      Text090@1110 : TextConst 'ENU=REVERSAL;ESM=RETROCES;FRC=CONTREPASS;ENC=REVERSAL';
+      Text091@1109 : TextConst 'ENU="Reversal Entry ";ESM="Mov. retrocesi¢n ";FRC="êcriture de contrepassation ";ENC="Reversal Entry "';
+      Text092@1115 : TextConst 'ENU=PRODORDER;ESM=ORDENPROD;FRC=ORDREPROD;ENC=PRODORDER';
+      Text093@1059 : TextConst 'ENU=CRONUS;ESM=CRONUS;FRC=CRONUS;ENC=CRONUS';
+      Text99000004@1071 : TextConst 'ENU=FLUSHING;ESM=CONSAUT;FRC=CONSOAUTO;ENC=FLUSHING';
+      Text99000005@1072 : TextConst 'ENU=Flushing;ESM=Consumo autom†tico;FRC=Justification;ENC=Flushing';
+      Text096@1008 : TextConst 'ENU=JOBGLJNL;ESM=DIRGLPROY;FRC=JOBGLJNL;ENC=JOBGLJNL';
+      Text097@1009 : TextConst 'ENU=JOBGLWIP;ESM=WIPGLPROY;FRC=JOBGLWIP;ENC=JOBGLWIP';
+      Text098@1122 : TextConst 'ENU=WIP Entry;ESM=Movimiento WIP;FRC=êcriture TEC;ENC=WIP Entry';
+      Text099@1123 : TextConst 'ENU=Date Compress Job Ledge;ESM=Compactar por fechas mov. proyecto;FRC=Compr. date Çcritures projet;ENC=Date Compress Job Ledge';
+      Text100@1032 : TextConst '@@@="{Locked} ";ENU=COMPRIBUDG;ESM=COMPRIBUDG;FRC=COMPRIBUDG;ENC=COMPRIBUDG';
+      Text101@1117 : TextConst 'ENU=Completed Contract;ESM=Contrato completado;FRC=Contrat complÇtÇ;ENC=Completed Contract';
+      Text102@1116 : TextConst 'ENU=Cost of Sales;ESM=Costo de ventas;FRC=Coñt des ventes;ENC=Cost of Sales';
+      Text103@1101 : TextConst 'ENU=Cost Value;ESM=Costo;FRC=Valeur de coñt;ENC=Cost Value';
+      Text104@1061 : TextConst 'ENU=Sales Value;ESM=Valor ventas;FRC=Valeur des ventes;ENC=Sales Value';
+      Text105@1060 : TextConst 'ENU=Percentage of Completion;ESM=Porcentaje de compleci¢n;FRC=Pourcentage d''achävement;ENC=Percentage of Completion';
+      Text106@1084 : TextConst 'ENU=POC;ESM=PdC;FRC=POC;ENC=POC';
+      Text109@1127 : TextConst '@@@=Uppercase of the translation of cash flow work sheet with a max of 10 char;ENU=CFWKSH;ESM=HFE;FRC=CFWKSH;ENC=CFWKSH';
+      Text110@1128 : TextConst 'ENU=Cash Flow Worksheet;ESM=Hoja flujos efectivo;FRC=Feuille trÇsorerie;ENC=Cash Flow Worksheet';
+      Text107@1121 : TextConst '@@@=Uppercase of the translation of assembly with a max of 10 char;ENU=ASSEMBLY;ESM=ENSAMBLADO;FRC=ASSEMBLAGE;ENC=ASSEMBLY';
+      Text108@1125 : TextConst 'ENU=Assembly;ESM=Ensamblado;FRC=Assemblage;ENC=Assembly';
+      Text111@1130 : TextConst 'ENU=GL;ESM=CG;FRC=Compta.;ENC=GL';
+      Text112@1131 : TextConst 'ENU=G/L Entry to Cost Accounting;ESM=Mov. en contabilidad costos CG;FRC=êcriture dans ComptabilitÇ analytique;ENC=G/L Entry to Cost Accounting';
+      Text113@1132 : TextConst '@@@=Uppercase of the translation of cost accounting journal with a max of 10 char;ENU=CAJOUR;ESM=DIARIOCOS;FRC=CAJOUR;ENC=CAJOUR';
+      Text114@1133 : TextConst 'ENU=Cost Journal;ESM=Diario costos;FRC=Journal de coñts;ENC=Cost Journal';
+      Text115@1134 : TextConst '@@@=Uppercase of the translation of allocation with a max of 10 char;ENU=ALLOC;ESM=ASIGN;FRC=ALLOC;ENC=ALLOC';
+      Text116@1135 : TextConst 'ENU=Cost Allocation;ESM=Asignaci¢n costos;FRC=Affectation des coñts;ENC=Cost Allocation';
+      Text117@1137 : TextConst '@@@=Uppercase of the translation of Transfer Budget to Actual with a max of 10 char;ENU=TRABUD;ESM=TRANSPPTO;FRC=TRABUD;ENC=TRABUD';
+      Text118@1138 : TextConst 'ENU=Transfer Budget to Actual;ESM=Transferir presupuesto a real;FRC=TransfÇrer le budget vers RÇel;ENC=Transfer Budget to Actual';
+      Text1020000@1020011 : TextConst 'ENU=BANKRECADJ;ESM=AJTECONCIL;FRC=BANKRECADJ;ENC=BANKRECADJ';
+      Text1020001@1020010 : TextConst 'ENU=Bank Rec. Adjustment;ESM=Ajuste conciliaci¢n;FRC=Ajustement rappr. bancaire;ENC=Bank Rec. Adjustment';
+      Text1020002@1020012 : TextConst 'ENU=BANKDEP;ESM=DEPBANC;FRC=BANKDEP;ENC=BANKDEP';
+      Text1020003@1020013 : TextConst 'ENU=Bank Deposit;ESM=Dep. bancario;FRC=DÇpìt bancaire;ENC=Bank Deposit';
+
+    LOCAL PROCEDURE InitSetupTables@3();
+    VAR
+      GLSetup@1025 : Record 98;
+      SalesSetup@1024 : Record 311;
+      PurchSetup@1023 : Record 312;
+      InvtSetup@1022 : Record 313;
+      ResourcesSetup@1021 : Record 314;
+      JobsSetup@1020 : Record 315;
+      HumanResourcesSetup@1019 : Record 5218;
+      MarketingSetup@1018 : Record 5079;
+      InteractionTemplateSetup@1017 : Record 5122;
+      ServiceMgtSetup@1016 : Record 5911;
+      NonstockItemSetup@1015 : Record 5719;
+      FASetup@1014 : Record 5603;
+      ApprovalSetup@1011 : Record 452;
+      CashFlowSetup@1007 : Record 843;
+      CostAccSetup@1006 : Record 1108;
+      WhseSetup@1004 : Record 5769;
+      AssemblySetup@1002 : Record 905;
+      VATReportSetup@1000 : Record 743;
+      ConfigSetup@1001 : Record 8627;
+      CompanyInfo@1003 : Record 79;
+    BEGIN
+      WITH GLSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH SalesSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH MarketingSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH InteractionTemplateSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH ServiceMgtSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH PurchSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH InvtSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH ResourcesSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH JobsSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH FASetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH HumanResourcesSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH WhseSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH NonstockItemSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH ApprovalSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH CashFlowSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH CostAccSetup DO
+        IF WRITEPERMISSION THEN
+          IF NOT FINDFIRST THEN BEGIN
+            INIT;
+            INSERT;
+          END;
+
+      WITH AssemblySetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH VATReportSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH ConfigSetup DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+
+      WITH CompanyInfo DO
+        IF NOT FINDFIRST THEN BEGIN
+          INIT;
+          INSERT;
+        END;
+    END;
+
+    LOCAL PROCEDURE InitSourceCodeSetup@9();
+    VAR
+      SourceCode@1001 : Record 230;
+      SourceCodeSetup@1000 : Record 242;
+    BEGIN
+      IF NOT (SourceCodeSetup.FINDFIRST OR SourceCode.FINDFIRST) THEN
+        WITH SourceCodeSetup DO BEGIN
+          INIT;
+          InsertSourceCode(Sales,Text001,Text002);
+          InsertSourceCode(Purchases,Text003,Text004);
+          InsertSourceCode("Deleted Document",Text005,COPYSTR(FIELDCAPTION("Deleted Document"),1,30));
+          InsertSourceCode("Inventory Post Cost",Text006,ReportName(REPORT::"Post Inventory Cost to G/L"));
+          InsertSourceCode("Exchange Rate Adjmt.",Text007,ReportName(REPORT::"Adjust Exchange Rates"));
+          InsertSourceCode("Close Income Statement",Text010,ReportName(REPORT::"Close Income Statement"));
+          InsertSourceCode(Consolidation,Text011,Text012);
+          InsertSourceCode("General Journal",Text013,PageName(PAGE::"General Journal"));
+          InsertSourceCode("Sales Journal",Text014,PageName(PAGE::"Sales Journal"));
+          InsertSourceCode("Purchase Journal",Text015,PageName(PAGE::"Purchase Journal"));
+          InsertSourceCode("Cash Receipt Journal",Text016,PageName(PAGE::"Cash Receipt Journal"));
+          InsertSourceCode("Payment Journal",Text017,PageName(PAGE::"Payment Journal"));
+          InsertSourceCode("Item Journal",Text018,PageName(PAGE::"Item Journal"));
+          InsertSourceCode(Transfer,Text063,Text064);
+          InsertSourceCode("Item Reclass. Journal",Text065,PageName(PAGE::"Item Reclass. Journal"));
+          InsertSourceCode("Phys. Inventory Journal",Text020,PageName(PAGE::"Phys. Inventory Journal"));
+          InsertSourceCode("Revaluation Journal",Text066,PageName(PAGE::"Revaluation Journal"));
+          InsertSourceCode("Consumption Journal",Text067,PageName(PAGE::"Consumption Journal"));
+          InsertSourceCode("Output Journal",Text069,PageName(PAGE::"Output Journal"));
+          InsertSourceCode("Production Journal",Text092,PageName(PAGE::"Production Journal"));
+          InsertSourceCode("Capacity Journal",Text070,PageName(PAGE::"Capacity Journal"));
+          InsertSourceCode("Resource Journal",Text022,PageName(PAGE::"Resource Journal"));
+          InsertSourceCode("Job Journal",Text023,PageName(PAGE::"Job Journal"));
+          InsertSourceCode("Job G/L Journal",Text096,PageName(PAGE::"Job G/L Journal"));
+          InsertSourceCode("Job G/L WIP",Text097,Text098);
+          InsertSourceCode("Sales Entry Application",Text024,Text025);
+          InsertSourceCode("Unapplied Sales Entry Appln.",Text086,Text087);
+          InsertSourceCode("Unapplied Purch. Entry Appln.",Text088,Text089);
+          InsertSourceCode(Reversal,Text090,Text091);
+          InsertSourceCode("Purchase Entry Application",Text026,Text027);
+          InsertSourceCode("VAT Settlement",Text028,ReportName(REPORT::"Calc. and Post VAT Settlement"));
+          InsertSourceCode("Compress G/L",Text029,ReportName(REPORT::"Date Compress General Ledger"));
+          InsertSourceCode("Compress VAT Entries",Text030,ReportName(REPORT::"Date Compress VAT Entries"));
+          InsertSourceCode("Compress Cust. Ledger",Text031,ReportName(REPORT::"Date Compress Customer Ledger"));
+          InsertSourceCode("Compress Vend. Ledger",Text032,ReportName(REPORT::"Date Compress Vendor Ledger"));
+          InsertSourceCode("Compress Res. Ledger",Text035,ReportName(REPORT::"Date Compress Resource Ledger"));
+          InsertSourceCode("Compress Job Ledger",Text036,Text099);
+          InsertSourceCode("Compress Bank Acc. Ledger",Text037,ReportName(REPORT::"Date Compress Bank Acc. Ledger"));
+          InsertSourceCode("Compress Check Ledger",Text038,ReportName(REPORT::"Delete Check Ledger Entries"));
+          InsertSourceCode("Financially Voided Check",Text039,Text040);
+          InsertSourceCode(Reminder,Text041,Text042);
+          InsertSourceCode("Finance Charge Memo",Text043,Text044);
+          InsertSourceCode("Trans. Bank Rec. to Gen. Jnl.",Text076,ReportName(REPORT::"Trans. Bank Rec. to Gen. Jnl."));
+          InsertSourceCode("Fixed Asset G/L Journal",Text045,PageName(PAGE::"Fixed Asset G/L Journal"));
+          InsertSourceCode("Fixed Asset Journal",Text046,PageName(PAGE::"Fixed Asset Journal"));
+          InsertSourceCode("Insurance Journal",Text047,PageName(PAGE::"Insurance Journal"));
+          InsertSourceCode("Compress FA Ledger",Text048,ReportName(REPORT::"Date Compress FA Ledger"));
+          InsertSourceCode("Compress Maintenance Ledger",Text049,ReportName(REPORT::"Date Compress Maint. Ledger"));
+          InsertSourceCode("Compress Insurance Ledger",Text050,ReportName(REPORT::"Date Compress Insurance Ledger"));
+          InsertSourceCode("Adjust Add. Reporting Currency",Text051,ReportName(REPORT::"Adjust Add. Reporting Currency"));
+          InsertSourceCode(Flushing,Text99000004,Text99000005);
+          InsertSourceCode("Adjust Cost",Text068,ReportName(REPORT::"Adjust Cost - Item Entries"));
+          InsertSourceCode("Compress Item Budget",Text100,ReportName(REPORT::"Date Comp. Item Budget Entries"));
+          InsertSourceCode("Whse. Item Journal",Text071,PageName(PAGE::"Whse. Item Journal"));
+          InsertSourceCode("Whse. Phys. Invt. Journal",Text072,PageName(PAGE::"Whse. Phys. Invt. Journal"));
+          InsertSourceCode("Whse. Reclassification Journal",Text073,PageName(PAGE::"Whse. Reclassification Journal"));
+          InsertSourceCode("Compress Whse. Entries",Text083,ReportName(REPORT::"Date Compress Whse. Entries"));
+          InsertSourceCode("Whse. Put-away",Text077,Text080);
+          InsertSourceCode("Whse. Pick",Text078,Text081);
+          InsertSourceCode("Whse. Movement",Text079,Text082);
+          InsertSourceCode("Service Management",Text074,Text075);
+          InsertSourceCode("IC General Journal",Text084,Text085);
+          InsertSourceCode("Cash Flow Worksheet",Text109,Text110);
+          InsertSourceCode(Assembly,Text107,Text108);
+          InsertSourceCode("G/L Entry to CA",Text111,Text112);
+          InsertSourceCode("Cost Journal",Text113,Text114);
+          InsertSourceCode("Cost Allocation",Text115,Text116);
+          InsertSourceCode("Transfer Budget to Actual",Text117,Text118);
+          InsertSourceCode("Bank Rec. Adjustment",Text1020000,Text1020001);
+          InsertSourceCode(Deposits,Text1020002,Text1020003);
+          INSERT;
+        END;
+    END;
+
+    LOCAL PROCEDURE InitApprovalSetup@10();
+    VAR
+      ApprovalCode@1000 : Record 453;
+      ApprovalTemplates@1001 : Record 464;
+      ApprovalsMgt@1002 : Codeunit 439;
+    BEGIN
+      IF NOT (ApprovalCode.FINDFIRST AND ApprovalTemplates.FINDFIRST) THEN
+        ApprovalsMgt.SetupDefualtApprovals;
+    END;
+
+    LOCAL PROCEDURE InitStandardTexts@11();
+    VAR
+      StandardText@1000 : Record 7;
+    BEGIN
+      IF NOT StandardText.FINDFIRST THEN BEGIN
+        InsertStandardText(Text052,Text053);
+        InsertStandardText(Text054,Text055);
+        InsertStandardText(Text056,Text057);
+        InsertStandardText(Text058,Text059);
+      END;
+    END;
+
+    LOCAL PROCEDURE InitReportSelection@13();
+    VAR
+      ReportSelections@1000 : Record 77;
+    BEGIN
+      WITH ReportSelections DO
+        IF NOT FINDFIRST THEN BEGIN
+          InsertRepSelection(Usage::"S.Quote",'1',REPORT::"Sales Quote");
+          // InsertRepSelection(Usage::"S.Blanket",'1',REPORT::"Blanket Sales Order");
+          InsertRepSelection(Usage::"S.Blanket",'1',REPORT::"Sales Blanket Order");
+          InsertRepSelection(Usage::"S.Order",'1',REPORT::"Sales Order");
+          InsertRepSelection(Usage::"S.Work Order",'1',REPORT::"Work Order");
+          InsertRepSelection(Usage::"S.Invoice",'1',REPORT::"Sales Invoice");
+          // InsertRepSelection(Usage::"S.Return",'1',REPORT::"Return Order Confirmation");
+          InsertRepSelection(Usage::"S.Return",'1',REPORT::"Return Authorization");
+          InsertRepSelection(Usage::"S.Cr.Memo",'1',REPORT::"Sales Credit Memo");
+          InsertRepSelection(Usage::"S.Shipment",'1',REPORT::"Sales Shipment");
+          InsertRepSelection(Usage::"S.Ret.Rcpt.",'1',REPORT::"Return Receipt");
+          InsertRepSelection(Usage::"S.Test",'1',REPORT::"Sales Document - Test");
+          InsertRepSelection(Usage::"P.Quote",'1',REPORT::"Purchase Quote");
+          // InsertRepSelection(Usage::"P.Blanket",'1',REPORT::"Blanket Purchase Order");
+          InsertRepSelection(Usage::"P.Blanket",'1',REPORT::"Purchase Blanket Order");
+          InsertRepSelection(Usage::"P.Order",'1',REPORT::"Purchase Order");
+          InsertRepSelection(Usage::"P.Invoice",'1',REPORT::"Purchase Invoice");
+          InsertRepSelection(Usage::"P.Return",'1',REPORT::"Return Order");
+          InsertRepSelection(Usage::"P.Cr.Memo",'1',REPORT::"Purchase Credit Memo");
+          InsertRepSelection(Usage::"P.Receipt",'1',REPORT::"Purchase Receipt");
+          InsertRepSelection(Usage::"P.Ret.Shpt.",'1',REPORT::"Return Shipment");
+          InsertRepSelection(Usage::"P.Test",'1',REPORT::"Purchase Document - Test");
+          InsertRepSelection(Usage::"B.Check",'1',REPORT::Check);
+          InsertRepSelection(Usage::Reminder,'1',REPORT::Reminder);
+          InsertRepSelection(Usage::"Fin.Charge",'1',REPORT::"Finance Charge Memo");
+          InsertRepSelection(Usage::"Rem.Test",'1',REPORT::"Reminder - Test");
+          InsertRepSelection(Usage::"F.C.Test",'1',REPORT::"Finance Charge Memo - Test");
+          InsertRepSelection(Usage::Inv1,'1',REPORT::"Transfer Order");
+          InsertRepSelection(Usage::Inv2,'1',REPORT::"Transfer Shipment");
+          InsertRepSelection(Usage::Inv3,'1',REPORT::"Transfer Receipt");
+          InsertRepSelection(Usage::"Invt. Period Test",'1',REPORT::"Close Inventory Period - Test");
+          InsertRepSelection(Usage::"B.Stmt",'1',REPORT::"Bank Reconciliation");
+          InsertRepSelection(Usage::"B.Recon.Test",'1',REPORT::"Bank Rec. Test Report");
+          InsertRepSelection(Usage::"Prod. Order",'1',REPORT::"Prod. Order - Job Card");
+          InsertRepSelection(Usage::M1,'1',REPORT::"Prod. Order - Job Card");
+          InsertRepSelection(Usage::M2,'1',REPORT::"Prod. Order - Mat. Requisition");
+          InsertRepSelection(Usage::M3,'1',REPORT::"Prod. Order - Shortage List");
+          InsertRepSelection(Usage::"SM.Quote",'1',REPORT::"Service Quote");
+          InsertRepSelection(Usage::"SM.Order",'1',REPORT::"Service Order");
+          InsertRepSelection(Usage::"SM.Invoice",'1',REPORT::"Service Invoice-Sales Tax");
+          InsertRepSelection(Usage::"SM.Credit Memo",'1',REPORT::"Service Credit Memo-Sales Tax");
+          InsertRepSelection(Usage::"SM.Shipment",'1',REPORT::"Service - Shipment");
+          InsertRepSelection(Usage::"SM.Contract Quote",'1',REPORT::"Service Contract Quote");
+          InsertRepSelection(Usage::"SM.Contract",'1',REPORT::"Service Contract");
+          InsertRepSelection(Usage::"SM.Test",'1',REPORT::"Service Document - Test");
+          InsertRepSelection(Usage::"Asm. Order",'1',REPORT::"Assembly Order");
+          InsertRepSelection(Usage::"P.Assembly Order",'1',REPORT::"Posted Assembly Order");
+          InsertRepSelection(Usage::"S.Test Prepmt.",'1',REPORT::"Sales Prepmt. Document Test");
+          InsertRepSelection(Usage::"P.Test Prepmt.",'1',REPORT::"Purchase Prepmt. Doc. - Test");
+          InsertRepSelection(Usage::"S.Arch. Quote",'1',REPORT::"Archived Sales Quote");
+          InsertRepSelection(Usage::"S.Arch. Order",'1',REPORT::"Archived Sales Order");
+          InsertRepSelection(Usage::"P.Arch. Quote",'1',REPORT::"Archived Purchase Quote");
+          InsertRepSelection(Usage::"P.Arch. Order",'1',REPORT::"Archived Purchase Order");
+          InsertRepSelection(Usage::"P. Arch. Return Order",'1',REPORT::"Arch.Purch. Return Order");
+          InsertRepSelection(Usage::"S. Arch. Return Order",'1',REPORT::"Arch. Sales Return Order");
+          InsertRepSelection(Usage::"S.Order Pick Instruction",'1',REPORT::"Pick Instruction");
+        END;
+    END;
+
+    LOCAL PROCEDURE InitJobWIPMethods@15();
+    VAR
+      JobWIPMethod@1000 : Record 1006;
+    BEGIN
+      IF NOT JobWIPMethod.FINDFIRST THEN BEGIN
+        InsertJobWIPMethod(Text101,Text101,JobWIPMethod."Recognized Costs"::"At Completion",
+          JobWIPMethod."Recognized Sales"::"At Completion",4);
+        InsertJobWIPMethod(Text102,Text102,JobWIPMethod."Recognized Costs"::"Cost of Sales",
+          JobWIPMethod."Recognized Sales"::"Contract (Invoiced Price)",2);
+        InsertJobWIPMethod(Text103,Text103,JobWIPMethod."Recognized Costs"::"Cost Value",
+          JobWIPMethod."Recognized Sales"::"Contract (Invoiced Price)",0);
+        InsertJobWIPMethod(Text104,Text104,JobWIPMethod."Recognized Costs"::"Usage (Total Cost)",
+          JobWIPMethod."Recognized Sales"::"Sales Value",1);
+        InsertJobWIPMethod(Text106,Text105,JobWIPMethod."Recognized Costs"::"Usage (Total Cost)",
+          JobWIPMethod."Recognized Sales"::"Percentage of Completion",3);
+      END;
+    END;
+
+    LOCAL PROCEDURE InitBankExportImportSetup@14();
+    VAR
+      BankExportImportSetup@1000 : Record 1200;
+    BEGIN
+      InsertBankExportImportSetup(SEPACTCodeTxt,SEPACTNameTxt,BankExportImportSetup.Direction::Export,
+        CODEUNIT::"SEPA CT-Export File",XMLPORT::"SEPA CT pain.001.001.03");
+      InsertBankExportImportSetup(SEPADDCodeTxt,SEPADDNameTxt,BankExportImportSetup.Direction::Export,
+        CODEUNIT::"SEPA DD-Export File",XMLPORT::"SEPA DD pain.008.001.02");
+    END;
+
+    LOCAL PROCEDURE InitRapidStart@12();
+    VAR
+      ConfigSetup@1000 : Record 8627;
+      Profile@1001 : Record 2000000072;
+    BEGIN
+      IF STRPOS(COMPANYNAME,Text093) = 1 THEN
+        EXIT;
+
+      WITH ConfigSetup DO BEGIN
+        GET;
+        IF "Your Profile Code" = '' THEN BEGIN
+          Profile.SETRANGE("Role Center ID",PAGE::"RapidStart Services RC");
+          IF Profile.FINDFIRST THEN BEGIN
+            "Your Profile Code" := Profile."Profile ID";
+            MODIFY;
+
+            IF Profile.WRITEPERMISSION THEN
+              SelectDefaultRoleCenter("Your Profile Code");
+          END;
+        END;
+      END;
+    END;
+
+    LOCAL PROCEDURE InitIRS1099Form@1020004();
+    VAR
+      IRS1099FormBox@1020000 : Record 10010;
+    BEGIN
+      WITH IRS1099FormBox DO
+        IF NOT FINDFIRST THEN BEGIN
+          InsertIRS1099('B','Proceeds From Broker+Barter Exchange Transactions',0.0);
+          InsertIRS1099('B-02','Stocks, bonds, etc.',0.0);
+          InsertIRS1099('B-03','Bartering',0.0);
+          InsertIRS1099('B-04','Federal income tax withheld',0.0);
+          InsertIRS1099('B-06','Profit/loss realized - this year',0.0);
+          InsertIRS1099('B-07','Unreal. profit/loss on open contracts - last year',0.0);
+          InsertIRS1099('B-08','Unreal. profit/loss on open contracts - this year',0.0);
+          InsertIRS1099('B-09','Aggregate profit/loss',0.0);
+          InsertIRS1099('DIV','Dividends+Distributions',0.0);
+          InsertIRS1099('DIV-01-A','Ordinary dividends',10.0);
+          InsertIRS1099('DIV-01-B','Qualified dividends',10.0);
+          InsertIRS1099('DIV-02-A','Total capital gains distribution',0.0);
+          InsertIRS1099('DIV-02-B','Unrecap. sec. 1250 gain',10.0);
+          InsertIRS1099('DIV-02-C','Section 1202 gain',0.0);
+          InsertIRS1099('DIV-02-D','Collectibles (28%)gain',0.0);
+          InsertIRS1099('DIV-03','Nontaxable distributions',10.0);
+          InsertIRS1099('DIV-04','Federal income tax withheld',-1.0);
+          InsertIRS1099('DIV-05','Investment expenses',10.0);
+          InsertIRS1099('DIV-06','Foreign tax paid',-1.0);
+          InsertIRS1099('DIV-08','Cash',600.0);
+          InsertIRS1099('DIV-09','Noncash (Fair market value)',600.0);
+          InsertIRS1099('INT','Interest Income',0.0);
+          InsertIRS1099('INT-01','Interest income not included in Box 3',10.0);
+          InsertIRS1099('INT-02','Early withdrawal penalty',-1.0);
+          InsertIRS1099('INT-03','Interest on US Savings, Bonds+Treas. obligations',10.0);
+          InsertIRS1099('INT-04','Federal income tax withheld',-1.0);
+          InsertIRS1099('INT-05','Investment Expenses',10.0);
+          InsertIRS1099('INT-06','Foreign tax paid',-1.0);
+          InsertIRS1099('INT-08','Tax-Exempt Interest',10.0);
+          InsertIRS1099('INT-09','Specified Private Activity Bond Interest',10.0);
+          InsertIRS1099('MISC','Miscellaneous Income',0.0);
+          InsertIRS1099('MISC-01','Rents',600.0);
+          InsertIRS1099('MISC-02','Royalties',10.0);
+          InsertIRS1099('MISC-03','Other Income',600.0);
+          InsertIRS1099('MISC-04','Federal income tax withheld',-1.0);
+          InsertIRS1099('MISC-05','Fishing boat proceeds',1.0);
+          InsertIRS1099('MISC-06','Medical+health care payments',600.0);
+          InsertIRS1099('MISC-07','Nonemployee compensation',600.0);
+          InsertIRS1099('MISC-08','Substitute payments in lieu of dividends/interest',10.0);
+          InsertIRS1099('MISC-09','Direct sales of consumer products for resale',5000.0);
+          InsertIRS1099('MISC-10','Crop insurance proceeds',1.0);
+          InsertIRS1099('MISC-13','Golden Parachute payments',0.0);
+          InsertIRS1099('MISC-14','Gross legal proceeds',0.0);
+          InsertIRS1099('MISC-15-A','Section 409A Deferrals',600.0);
+          InsertIRS1099('MISC-15-B','Section 409A Income',0.0);
+          InsertIRS1099('MISC-16','State income tax withheld',-1.0);
+          InsertIRS1099('R','Pensions/Ann./Retirement/Profit-Shar.Plans/IRAs...',0.0);
+          InsertIRS1099('R-01','Gross distribution',0.0);
+          InsertIRS1099('R-02A','Taxable Amount',0.0);
+          InsertIRS1099('R-03','Amount in Box 2 eligible for capital gain election',0.0);
+          InsertIRS1099('R-04','Federal income tax withheld',0.0);
+          InsertIRS1099('R-05','Employee contributions/insurance premiums',0.0);
+          InsertIRS1099('R-06','Net unreal. appreciation in employers securities',0.0);
+          InsertIRS1099('R-10','State income tax withheld',0.0);
+          InsertIRS1099('R-12','Local income tax withheld',0.0);
+          InsertIRS1099('S','Proceeds From Real Estate Transactions',0.0);
+          InsertIRS1099('S-02','Gross proceeds',0.0);
+        END;
+    END;
+
+    LOCAL PROCEDURE InsertSourceCode@1(VAR SourceCodeDefCode@1000 : Code[10];Code@1001 : Code[10];Description@1002 : Text[50]);
+    VAR
+      SourceCode@1003 : Record 230;
+    BEGIN
+      SourceCodeDefCode := Code;
+      SourceCode.INIT;
+      SourceCode.Code := Code;
+      SourceCode.Description := Description;
+      SourceCode.INSERT;
+    END;
+
+    LOCAL PROCEDURE InsertStandardText@4(Code@1000 : Code[20];Description@1001 : Text[50]);
+    VAR
+      StandardText@1002 : Record 7;
+    BEGIN
+      StandardText.INIT;
+      StandardText.Code := Code;
+      StandardText.Description := Description;
+      StandardText.INSERT;
+    END;
+
+    LOCAL PROCEDURE InsertRepSelection@2(ReportUsage@1000 : Integer;Sequence@1001 : Code[10];ReportID@1002 : Integer);
+    VAR
+      ReportSelections@1003 : Record 77;
+    BEGIN
+      ReportSelections.INIT;
+      ReportSelections.Usage := ReportUsage;
+      ReportSelections.Sequence := Sequence;
+      ReportSelections."Report ID" := ReportID;
+      ReportSelections.INSERT;
+    END;
+
+    LOCAL PROCEDURE PageName@5(PageID@1000 : Integer) : Text[50];
+    VAR
+      ObjectTranslation@1001 : Record 377;
+    BEGIN
+      EXIT(COPYSTR(ObjectTranslation.TranslateObject(ObjectTranslation."Object Type"::Page,PageID),1,30));
+    END;
+
+    LOCAL PROCEDURE ReportName@6(ReportID@1000 : Integer) : Text[50];
+    VAR
+      ObjectTranslation@1001 : Record 377;
+    BEGIN
+      EXIT(COPYSTR(ObjectTranslation.TranslateObject(ObjectTranslation."Object Type"::Report,ReportID),1,30));
+    END;
+
+    LOCAL PROCEDURE InsertClientAddIns@8();
+    BEGIN
+      InsertClientAddIn(
+        'Microsoft.Dynamics.NAV.MicrosoftDynamicsOnlineConnectControl','31bf3856ad364e35','',
+        'Microsoft Dynamics Online Connect control add-in','');
+      InsertClientAddIn(
+        'Microsoft.Dynamics.Nav.Client.BusinessChart','31bf3856ad364e35','',
+        'Microsoft Dynamics BusinessChart control add-in',
+        APPLICATIONPATH + 'Add-ins\BusinessChart\Microsoft.Dynamics.Nav.Client.BusinessChart.zip');
+      InsertClientAddIn(
+        'Interactive Timeline Visualization Add-in','31bf3856ad364e35','',
+        'Interactive visualizion for a timeline of events','');
+      InsertClientAddIn(
+        'Microsoft.Dynamics.Nav.Client.PingPong','31bf3856ad364e35','',
+        'Microsoft Dynamics PingPong control add-in','');
+      InsertClientAddIn(
+        'Microsoft.Dynamics.Nav.Client.VideoPlayer','31bf3856ad364e35','',
+        'Microsoft Dynamics VideoPlayer control add-in',
+        APPLICATIONPATH + 'Add-ins\VideoPlayer\Microsoft.Dynamics.Nav.Client.VideoPlayer.zip');
+      InsertClientAddIn(
+        'Microsoft.Dynamics.Nav.Client.PageReady','31bf3856ad364e35','',
+        'Microsoft Dynamics PageReady control add-in',
+        APPLICATIONPATH + 'Add-ins\PageReady\Microsoft.Dynamics.Nav.Client.PageReady.zip');
+    END;
+
+    LOCAL PROCEDURE InsertClientAddIn@17(ControlAddInName@1000 : Text[220];PublicKeyToken@1001 : Text[20];Version@1002 : Text[25];Description@1003 : Text[250];ResourceFilePath@1005 : Text[250]);
+    VAR
+      ClientAddIn@1004 : Record 2000000069;
+    BEGIN
+      IF NOT ClientAddIn.GET(ControlAddInName,PublicKeyToken) THEN BEGIN
+        ClientAddIn.INIT;
+        ClientAddIn."Control Add-in Name" := ControlAddInName;
+        ClientAddIn."Public Key Token" := PublicKeyToken;
+        ClientAddIn.Version := Version;
+        ClientAddIn.Description := Description;
+        IF EXISTS(ResourceFilePath) THEN
+          ClientAddIn.Resource.IMPORT(ResourceFilePath);
+        ClientAddIn.INSERT;
+      END;
+    END;
+
+    LOCAL PROCEDURE InsertJobWIPMethod@7(Code@1000 : Code[20];Description@1001 : Text[50];RecognizedCosts@1002 : Option;RecognizedSales@1003 : Option;SystemDefinedIndex@1004 : Integer);
+    VAR
+      JobWIPMethod@1005 : Record 1006;
+    BEGIN
+      JobWIPMethod.INIT;
+      JobWIPMethod.Code := Code;
+      JobWIPMethod.Description := Description;
+      JobWIPMethod."WIP Cost" := TRUE;
+      JobWIPMethod."WIP Sales" := TRUE;
+      JobWIPMethod."Recognized Costs" := RecognizedCosts;
+      JobWIPMethod."Recognized Sales" := RecognizedSales;
+      JobWIPMethod.Valid := TRUE;
+      JobWIPMethod."System Defined" := TRUE;
+      JobWIPMethod."System-Defined Index" := SystemDefinedIndex;
+      JobWIPMethod.INSERT;
+    END;
+
+    LOCAL PROCEDURE InsertIRS1099@1020000(Code@1020001 : Code[10];Description@1001 : Text[50];Minimum@1002 : Decimal);
+    VAR
+      IRS1099FormBox@1020000 : Record 10010;
+    BEGIN
+      IRS1099FormBox.INIT;
+      IRS1099FormBox.Code := Code;
+      IRS1099FormBox.Description := Description;
+      IRS1099FormBox."Minimum Reportable" := Minimum;
+      IRS1099FormBox.INSERT;
+    END;
+
+    LOCAL PROCEDURE InsertBankExportImportSetup@16(CodeTxt@1000 : Text[20];NameTxt@1001 : Text[100];DirectionOpt@1002 : Option;CodeunitID@1003 : Integer;XMLPortID@1004 : Integer);
+    VAR
+      BankExportImportSetup@1005 : Record 1200;
+    BEGIN
+      WITH BankExportImportSetup DO BEGIN
+        INIT;
+        Code := CodeTxt;
+        Name := NameTxt;
+        Direction := DirectionOpt;
+        "Processing Codeunit ID" := CodeunitID;
+        "Processing XMLport ID" := XMLPortID;
+        INSERT;
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

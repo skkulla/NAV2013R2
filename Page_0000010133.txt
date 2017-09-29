@@ -1,0 +1,116 @@
+OBJECT Page 10133 Bank Rec. Lines
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/20/02;
+    Time=12:00:00 PM;
+    Version List=NAVUS3.60;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Bank Rec. Lines;
+               ESM=L¡neas concil.;
+               FRC=Lignes rapprochement bancaire;
+               ENC=Bank Rec. Lines];
+    SourceTable=Table10121;
+    PageType=List;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Bank Account No.";
+                Visible=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Statement No.";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Line No.";
+                Visible=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Record Type" }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Posting Date" }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Document Type" }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Document No." }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Account Type";
+                Visible=FALSE }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Account No.";
+                Visible=FALSE }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr=Amount }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr=Cleared }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Cleared Amount" }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Bal. Account Type" }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Bal. Account No." }
+
+    { 32  ;2   ;Field     ;
+                SourceExpr="Currency Code";
+                Visible=FALSE }
+
+    { 34  ;2   ;Field     ;
+                SourceExpr="Currency Factor";
+                Visible=FALSE }
+
+    { 36  ;2   ;Field     ;
+                SourceExpr="External Document No." }
+
+    { 38  ;2   ;Field     ;
+                SourceExpr="Bank Ledger Entry No.";
+                Visible=FALSE }
+
+    { 40  ;2   ;Field     ;
+                SourceExpr="Check Ledger Entry No.";
+                Visible=FALSE }
+
+    { 42  ;2   ;Field     ;
+                SourceExpr="Adj. Source Record ID";
+                Visible=FALSE }
+
+    { 44  ;2   ;Field     ;
+                SourceExpr="Adj. Source Document No.";
+                Visible=FALSE }
+
+    { 46  ;2   ;Field     ;
+                SourceExpr="Adj. No. Series";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,236 @@
+OBJECT Page 36603 Credit & Collections Mgr. RC
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Home;
+               ESM=Inicio;
+               FRC=Origine;
+               ENC=Home];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Listing;
+                                 ESM=Listado clientes;
+                                 FRC=Liste des clients;
+                                 ENC=Customer Listing];
+                      RunObject=Report 10045 }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Balance to Date;
+                                 ESM=Saldo del cliente a la fecha;
+                                 FRC=Solde … ce jour du client;
+                                 ENC=Customer Balance to Date];
+                      RunObject=Report 121 }
+      { 16      ;1   ;Action    ;
+                      CaptionML=[ENU=Aged Accounts Receivable;
+                                 ESM=Antigedad cobros;
+                                 FRC=Comptes clients class‚s chronologiquement;
+                                 ENC=Aged Accounts Receivable];
+                      RunObject=Report 10040;
+                      Image=Report }
+      { 41      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Account Detail;
+                                 ESM=Movimientos del cliente;
+                                 FRC=D‚tails du compte client;
+                                 ENC=Customer Account Detail];
+                      RunObject=Report 10042 }
+      { 20      ;1   ;Separator  }
+      { 1020002 ;1   ;Action    ;
+                      CaptionML=[ENU=Cash Applied;
+                                 ESM=Efectivo aplicado;
+                                 FRC=Montant comptant affect‚;
+                                 ENC=Cash Applied];
+                      RunObject=Report 10041 }
+      { 1020003 ;1   ;Action    ;
+                      CaptionML=[ENU=Projected Cash Payments;
+                                 ESM=Pagos al contado pronost.;
+                                 FRC=Paiements encaisse pr‚vus;
+                                 ENC=Projected Cash Payments];
+                      RunObject=Report 10098 }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 1020001 ;1   ;Action    ;
+                      CaptionML=[ENU=Approvals;
+                                 ESM=Aprobaciones;
+                                 FRC=Approbations;
+                                 ENC=Approvals];
+                      RunObject=Page 658;
+                      Image=Approvals }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 ESM=Clientes;
+                                 FRC=Clients;
+                                 ENC=Customers];
+                      RunObject=Page 36629 }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=Balance;
+                                 ESM=Saldo;
+                                 FRC=Solde;
+                                 ENC=Balance];
+                      RunObject=Page 36629;
+                      RunPageView=WHERE(Balance on Date (LCY)=FILTER(>0));
+                      Image=Balance }
+      { 42      ;1   ;Action    ;
+                      CaptionML=[ENU=Unlimited Credit;
+                                 ESM=Cr‚dito ilimitado;
+                                 FRC=Cr‚dit illimit‚;
+                                 ENC=Unlimited Credit];
+                      RunObject=Page 36629;
+                      RunPageView=WHERE(Credit Limit (LCY)=CONST(0)) }
+      { 1020000 ;1   ;Action    ;
+                      CaptionML=[ENU=Limited Credit;
+                                 ESM=Cr‚dito limitado;
+                                 FRC=Cr‚dit limit‚;
+                                 ENC=Limited Credit];
+                      RunObject=Page 36629;
+                      RunPageView=WHERE(Credit Limit (LCY)=FILTER(<>0)) }
+      { 1020004 ;1   ;Action    ;
+                      CaptionML=[ENU=Invoices by Due Date;
+                                 ESM=Facturas por fecha vencimiento;
+                                 FRC=Factures par date d'‚ch‚ance;
+                                 ENC=Invoices by Due Date];
+                      RunObject=Page 25;
+                      RunPageView=SORTING(Open,Due Date)
+                                  WHERE(Open=CONST(Yes),
+                                        Document Type=FILTER(Invoice|Credit Memo)) }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Orders;
+                                 ESM=Pedidos venta;
+                                 FRC=Documents de vente;
+                                 ENC=Sales Orders];
+                      RunObject=Page 10009 }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Return Orders;
+                                 ESM=Devoluciones venta;
+                                 FRC=Retours vente;
+                                 ENC=Sales Return Orders];
+                      RunObject=Page 10009;
+                      RunPageView=WHERE(Document Type=CONST(Return Order)) }
+      { 92      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Invoices;
+                                 ESM=Facturas venta;
+                                 FRC=Factures vente;
+                                 ENC=Sales Invoices];
+                      RunObject=Page 9301 }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=Reminders;
+                                 ESM=Recordatorios;
+                                 FRC=Rappels;
+                                 ENC=Reminders];
+                      RunObject=Page 436;
+                      Image=Reminder }
+      { 7       ;1   ;Action    ;
+                      CaptionML=[ENU=Finance Charge Memos;
+                                 ESM=Docs. inter‚s;
+                                 FRC=Notes de frais financiers;
+                                 ENC=Finance Charge Memos];
+                      RunObject=Page 448;
+                      Image=FinChargeMemo }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posted Documents;
+                                 ESM=Docs. registrados;
+                                 FRC=Documents report‚s;
+                                 ENC=Posted Documents];
+                      Image=FiledPosted }
+      { 11      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Shipments;
+                                 ESM=Hist¢rico remisiones de venta;
+                                 FRC=Livraisons de ventes report‚es;
+                                 ENC=Posted Sales Shipments];
+                      RunObject=Page 142 }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Invoices;
+                                 ESM=Lista hist. facturas venta;
+                                 FRC=Factures ventes report‚es;
+                                 ENC=Posted Sales Invoices];
+                      RunObject=Page 143 }
+      { 10      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Return Receipts;
+                                 ESM=Hist¢ricos recep. devoluci¢n;
+                                 FRC=R‚ceptions de retour report‚es;
+                                 ENC=Posted Return Receipts];
+                      RunObject=Page 6662 }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Credit Memos;
+                                 ESM=Notas de cr‚dito ventas registradas;
+                                 FRC=Notes cr‚dit ventes report‚es;
+                                 ENC=Posted Sales Credit Memos];
+                      RunObject=Page 144 }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=Issued Reminders;
+                                 ESM=Recordatorios emitidos;
+                                 FRC=Rappels ‚mis;
+                                 ENC=Issued Reminders];
+                      RunObject=Page 440;
+                      Image=OrderReminder }
+      { 30      ;2   ;Action    ;
+                      CaptionML=[ENU=Issued Fin. Charge Memos;
+                                 ESM=Docs. de inter‚s emitidos;
+                                 FRC=Notes de frais fin. ‚mises;
+                                 ENC=Issued Fin. Charge Memos];
+                      RunObject=Page 452 }
+      { 47      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Deposits;
+                                 ESM=Dep¢sitos registrados;
+                                 FRC=D‚p“ts report‚s;
+                                 ENC=Posted Deposits];
+                      RunObject=Page 10147 }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 64      ;1   ;Separator ;
+                      CaptionML=[ENU=New;
+                                 ESM=Nuevo;
+                                 FRC=Nouveau;
+                                 ENC=New];
+                      IsHeader=Yes }
+      { 105     ;1   ;Action    ;
+                      CaptionML=[ENU=Fin. Charge Memo;
+                                 ESM=Doc. inter‚s;
+                                 FRC=Note de frais fin.;
+                                 ENC=Fin. Charge Memo];
+                      RunObject=Page 446 }
+      { 106     ;1   ;Action    ;
+                      CaptionML=[ENU=Reminder;
+                                 ESM=Recordatorio;
+                                 FRC=Rappel;
+                                 ENC=Reminder];
+                      RunObject=Page 434;
+                      Image=Reminder }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1905739008;2;Part   ;
+                PagePartID=Page36623;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                PartType=Page }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

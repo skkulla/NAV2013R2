@@ -1,0 +1,284 @@
+OBJECT Page 656 Approval Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Approval Setup;
+               ESM=Configuraci¢n aprobaci¢n;
+               FRC=Configuration d'approbation;
+               ENC=Approval Setup];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table452;
+    PageType=Card;
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 4       ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Mail Templates;
+                                 ESM=&Plantillas correo;
+                                 FRC=&ModŠles de courriel;
+                                 ENC=&Mail Templates];
+                      Image=Template }
+      { 22      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Approval Mail Template;
+                                 ESM=Plantilla correo aprobaci¢n;
+                                 FRC=ModŠle de courriel d'approbation;
+                                 ENC=Approval Mail Template];
+                      Image=Template }
+      { 23      ;3   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Import;
+                                 ESM=Importar;
+                                 FRC=Importer;
+                                 ENC=Import];
+                      Image=Import;
+                      OnAction=BEGIN
+                                 CALCFIELDS("Approval Template");
+                                 IF "Approval Template".HASVALUE THEN
+                                   AppTemplateExists := TRUE;
+
+                                 IF FileMgt.BLOBImport(TempBlob,'*.HTM') = '' THEN
+                                   EXIT;
+
+                                 "Approval Template" := TempBlob.Blob;
+
+                                 IF AppTemplateExists THEN
+                                   IF NOT CONFIRM(Text002,FALSE,FIELDCAPTION("Approval Template")) THEN
+                                     EXIT;
+
+                                 CurrPage.SAVERECORD;
+                               END;
+                                }
+      { 24      ;3   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=E&xport;
+                                 ESM=E&xportar;
+                                 FRC=E&xporter;
+                                 ENC=E&xport];
+                      Image=Export;
+                      OnAction=BEGIN
+                                 CALCFIELDS("Approval Template");
+                                 IF "Approval Template".HASVALUE THEN BEGIN
+                                   TempBlob.Blob := "Approval Template";
+                                   FileMgt.BLOBExport(TempBlob,'*.HTM',TRUE);
+                                 END;
+                               END;
+                                }
+      { 25      ;3   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Delete;
+                                 ESM=Eliminar;
+                                 FRC=Supprimer;
+                                 ENC=Delete];
+                      Image=Delete;
+                      OnAction=BEGIN
+                                 CALCFIELDS("Approval Template");
+                                 IF "Approval Template".HASVALUE THEN
+                                   IF CONFIRM(Text003,FALSE,FIELDCAPTION("Approval Template")) THEN BEGIN
+                                     CLEAR("Approval Template");
+                                     CurrPage.SAVERECORD;
+                                   END;
+                               END;
+                                }
+      { 26      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Overdue Mail Template;
+                                 ESM=Plantilla correo vencida;
+                                 FRC=ModŠle de courriel de retard;
+                                 ENC=Overdue Mail Template];
+                      Image=Overdue }
+      { 27      ;3   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Import;
+                                 ESM=Importar;
+                                 FRC=Importer;
+                                 ENC=Import];
+                      Image=Import;
+                      OnAction=BEGIN
+                                 CALCFIELDS("Overdue Template");
+                                 OverdueTemplateExists := "Overdue Template".HASVALUE;
+
+                                 IF FileMgt.BLOBImport(TempBlob,'*.HTM') = '' THEN
+                                   EXIT;
+
+                                 "Overdue Template" := TempBlob.Blob;
+
+                                 IF OverdueTemplateExists THEN
+                                   IF NOT CONFIRM(Text002,FALSE,FIELDCAPTION("Overdue Template")) THEN
+                                     EXIT;
+
+                                 CurrPage.SAVERECORD;
+                               END;
+                                }
+      { 28      ;3   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=E&xport;
+                                 ESM=E&xportar;
+                                 FRC=E&xporter;
+                                 ENC=E&xport];
+                      Image=Export;
+                      OnAction=BEGIN
+                                 CALCFIELDS("Overdue Template");
+                                 IF "Overdue Template".HASVALUE THEN BEGIN
+                                   TempBlob.Blob := "Overdue Template";
+                                   FileMgt.BLOBExport(TempBlob,'*.HTM',TRUE);
+                                 END;
+                               END;
+                                }
+      { 29      ;3   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Delete;
+                                 ESM=Eliminar;
+                                 FRC=Supprimer;
+                                 ENC=Delete];
+                      Image=Delete;
+                      OnAction=BEGIN
+                                 CALCFIELDS("Overdue Template");
+                                 IF "Overdue Template".HASVALUE THEN
+                                   IF CONFIRM(Text003,FALSE,FIELDCAPTION("Overdue Template")) THEN BEGIN
+                                     CLEAR("Overdue Template");
+                                     CurrPage.SAVERECORD;
+                                   END;
+                               END;
+                                }
+      { 81      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Overdue;
+                                 ESM=&Vencidos;
+                                 FRC=&En retard;
+                                 ENC=&Overdue];
+                      Image=Overdue }
+      { 75      ;2   ;Action    ;
+                      CaptionML=[ENU=Send Overdue Mails;
+                                 ESM=Enviar correos vencidos;
+                                 FRC=Envoyer les courriers des retards;
+                                 ENC=Send Overdue Mails];
+                      Image=OverdueMail;
+                      OnAction=BEGIN
+                                 IF CONFIRM(STRSUBSTNO(Text004,TODAY),TRUE) THEN BEGIN
+                                   ApprMgtNotification.LaunchCheck(TODAY);
+                                   "Last Run Date" := TODAY;
+                                   "Last Run Time" := TIME;
+                                   MODIFY;
+                                   CurrPage.UPDATE;
+                                 END;
+                               END;
+                                }
+      { 76      ;2   ;Action    ;
+                      CaptionML=[ENU=Overdue Log Entries;
+                                 ESM=Movs. registro vencidos;
+                                 FRC=Consignations de retard;
+                                 ENC=Overdue Log Entries];
+                      RunObject=Page 666;
+                      Image=OverdueEntries }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=&User Setup;
+                                 ESM=&Configuraci¢n usuarios;
+                                 FRC=Configuration des &utilisateurs;
+                                 ENC=&User Setup];
+                      RunObject=Page 663;
+                      Promoted=Yes;
+                      Image=UserSetup;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Due Date Formula" }
+
+    { 44  ;2   ;Field     ;
+                SourceExpr="Approval Administrator" }
+
+    { 46  ;2   ;Field     ;
+                SourceExpr="Request Rejection Comment" }
+
+    { 1906593001;1;Group  ;
+                CaptionML=[ENU=Notification;
+                           ESM=Notificaci¢n;
+                           FRC=Notification;
+                           ENC=Notification] }
+
+    { 21  ;2   ;Group     ;
+                CaptionML=[ENU=Notify User about:;
+                           ESM=Notificar usuario sobre:;
+                           FRC=Aviser l'utilisateur … propos de :;
+                           ENC=Notify User about:] }
+
+    { 9   ;3   ;Field     ;
+                SourceExpr=Approvals }
+
+    { 8   ;3   ;Field     ;
+                SourceExpr=Cancellations }
+
+    { 7   ;3   ;Field     ;
+                SourceExpr=Rejections }
+
+    { 10  ;3   ;Field     ;
+                SourceExpr=Delegations }
+
+    { 16  ;2   ;Group     ;
+                CaptionML=[ENU=Overdue Approvals;
+                           ESM=Aprobaciones vencidas;
+                           FRC=Approbations en retard;
+                           ENC=Overdue Approvals] }
+
+    { 13  ;3   ;Field     ;
+                SourceExpr="Last Run Date";
+                Editable=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      TempBlob@1001 : Record 99008535;
+      ApprMgtNotification@1003 : Codeunit 440;
+      FileMgt@1000 : Codeunit 419;
+      OverdueTemplateExists@1004 : Boolean;
+      Text002@1006 : TextConst 'ENU=Do you want to replace the existing %1?;ESM=¨Desea sustituir la %1 existente?;FRC=Souhaitez-vous remplacer le %1 existantÿ?;ENC=Do you want to replace the existing %1?';
+      Text003@1005 : TextConst 'ENU=Do you want to delete the template %1?;ESM=¨Desea eliminar la plantilla %1?;FRC=D‚sirez-vous supprimer le modŠle %1?;ENC=Do you want to delete the template %1?';
+      AppTemplateExists@1007 : Boolean;
+      Text004@1008 : TextConst 'ENU=Do you want to run the overdue check by the %1?;ESM=¨Desea ejecutar la comprobaci¢n de vencidos a %1?;FRC=Souhaitez-vous ex‚cuter la v‚rification de retard par le %1?;ENC=Do you want to run the overdue check by the %1?';
+
+    BEGIN
+    END.
+  }
+}
+

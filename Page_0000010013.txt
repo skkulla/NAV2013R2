@@ -1,0 +1,44 @@
+OBJECT Page 10013 Vendor Locations
+{
+  OBJECT-PROPERTIES
+  {
+    Date=02/13/07;
+    Time=12:00:00 PM;
+    Version List=NAVNA5.00.00.01;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Vendor Locations;
+               ESM=Almacenes proveedor;
+               FRC=Emplacements fournisseur;
+               ENC=Vendor Locations];
+    SourceTable=Table10013;
+    DataCaptionFields=Vendor No.;
+    PageType=List;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1480000;1;Group     ;
+                GroupType=Repeater }
+
+    { 1480001;2;Field     ;
+                SourceExpr="Location Code" }
+
+    { 1480003;2;Field     ;
+                SourceExpr="Business Presence" }
+
+    { 1480005;2;Field     ;
+                SourceExpr="Alt. Tax Area Code" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

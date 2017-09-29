@@ -1,0 +1,268 @@
+OBJECT Report 10030 Budget Amount by Period
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Budget Amount by Period;
+               ESM=Imp. ppto. por per¡odo;
+               FRC=Montant budget par p‚riode;
+               ENC=Budget Amount by Period];
+    ProcessingOnly=Yes;
+    OnPreReport=BEGIN
+                  GLSetup.GET;
+                  GlobalDim1Code := GLSetup."Global Dimension 1 Code";
+                  GlobalDim2Code := GLSetup."Global Dimension 2 Code";
+                END;
+
+  }
+  DATASET
+  {
+    { 6710;    ;DataItem;                    ;
+               DataItemTable=Table15;
+               DataItemTableView=SORTING(No.);
+               MaxIteration=1;
+               OnPreDataItem=BEGIN
+                               IF DistributeAmt = 0 THEN
+                                 ERROR(Text001);
+                               IF BudgetDate = 0D THEN
+                                 ERROR(Text002);
+                               IF NoPeriods = 0 THEN
+                                 ERROR(Text003);
+                             END;
+
+               ReqFilterFields=No.,Global Dimension 1 Filter,Global Dimension 2 Filter,Budget Filter }
+
+    { 5444;    ;DataItem;                    ;
+               DataItemTable=Table2000000026;
+               DataItemTableView=SORTING(Number);
+               OnPreDataItem=BEGIN
+                               CASE Rounding OF
+                                 Rounding::Pennies:
+                                   Precision := 0.05;
+                                 Rounding::Dollars:
+                                   Precision := 1;
+                                 Rounding::Hundreds:
+                                   Precision := 100;
+                                 Rounding::Thousands:
+                                   Precision := 1000;
+                                 Rounding::Millions:
+                                   Precision := 1000000;
+                               END;
+
+                               PercentChg := PercentChg / 100;
+                               IF PercentChg <= 1 THEN
+                                 PercentChg := 1 + PercentChg;
+                               IF AmountType = AmountType::"Total Amount" THEN BEGIN
+                                 IF PercentChg <> 1 THEN
+                                   BaseAmount := DistributeAmt / (((PercentChg - POWER(PercentChg,NoPeriods)) / (1 - PercentChg) ) + 1)
+                                 ELSE
+                                   BaseAmount := DistributeAmt / NoPeriods;
+                               END ELSE
+                                 BaseAmount := DistributeAmt;
+
+                               GLBudgetEntry.RESET;
+                               IF GLBudgetEntry.FINDLAST THEN
+                                 EntryNo := GLBudgetEntry."Entry No.";
+                             END;
+
+               OnAfterGetRecord=VAR
+                                  TempDimSetEntry@1020000 : TEMPORARY Record 480;
+                                  DimensionValue@1020001 : Record 349;
+                                  DimMgt@1020002 : Codeunit 408;
+                                BEGIN
+                                  CurrentPeriod := CurrentPeriod + 1;
+                                  IF CurrentPeriod > NoPeriods THEN
+                                    CurrReport.BREAK
+                                    ;
+                                  IF CurrentPeriod > 1 THEN BEGIN
+                                    BaseAmount := BaseAmount * PercentChg;
+                                    BudgetDate := NextDate(BudgetDate);
+                                  END;
+                                  EntryNo := EntryNo + 10000;
+                                  GLBudgetEntry.INIT;
+                                  GLBudgetEntry."Entry No." := EntryNo;
+                                  GLBudgetEntry."Budget Name" := "G/L Account".GETFILTER("Budget Filter");
+                                  GLBudgetEntry."G/L Account No." := "G/L Account"."No.";
+                                  GLBudgetEntry.Date := BudgetDate;
+                                  IF "G/L Account".GETFILTER("Global Dimension 1 Filter") <> '' THEN BEGIN
+                                    GLBudgetEntry."Global Dimension 1 Code" := "G/L Account".GETRANGEMIN("Global Dimension 1 Filter");
+                                    IF DimensionValue.GET(GlobalDim1Code,GLBudgetEntry."Global Dimension 1 Code") THEN BEGIN
+                                      TempDimSetEntry.INIT;
+                                      TempDimSetEntry."Dimension Code" := DimensionValue."Dimension Code";
+                                      TempDimSetEntry."Dimension Value Code" := DimensionValue.Code;
+                                      TempDimSetEntry."Dimension Value ID" := DimensionValue."Dimension Value ID";
+                                      TempDimSetEntry.INSERT;
+                                    END;
+                                  END;
+                                  IF "G/L Account".GETFILTER("Global Dimension 2 Filter") <> '' THEN BEGIN
+                                    GLBudgetEntry."Global Dimension 2 Code" := "G/L Account".GETRANGEMIN("Global Dimension 2 Filter");
+                                    IF DimensionValue.GET(GlobalDim1Code,GLBudgetEntry."Global Dimension 2 Code") THEN BEGIN
+                                      TempDimSetEntry.INIT;
+                                      TempDimSetEntry."Dimension Code" := DimensionValue."Dimension Code";
+                                      TempDimSetEntry."Dimension Value Code" := DimensionValue.Code;
+                                      TempDimSetEntry."Dimension Value ID" := DimensionValue."Dimension Value ID";
+                                      TempDimSetEntry.INSERT;
+                                    END;
+                                  END;
+                                  GLBudgetEntry."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
+                                  GLBudgetEntry.Amount := ROUND(BaseAmount,Precision);
+                                  GLBudgetEntry.INSERT;
+                                END;
+                                 }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+      SaveValues=Yes;
+      OnOpenPage=BEGIN
+                   IF PeriodLength = 0 THEN
+                     PeriodLength := PeriodLength::Month;
+                   IF Rounding = 0 THEN
+                     Rounding := Rounding::Dollars;
+                   IF NoPeriods = 0 THEN
+                     NoPeriods := 12;
+                 END;
+
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             ESM=Opciones;
+                             FRC=Options;
+                             ENC=Options] }
+
+      { 7   ;2   ;Field     ;
+                  CaptionML=[ENU=Budget Beginning Date;
+                             ESM=Fecha inicial ppto.;
+                             FRC=Date de d‚but budget;
+                             ENC=Budget Beginning Date];
+                  SourceExpr=BudgetDate }
+
+      { 5   ;2   ;Field     ;
+                  CaptionML=[ENU=No. of Periods;
+                             ESM=N§ de periodos;
+                             FRC=Nombre de p‚riodes;
+                             ENC=No. of Periods];
+                  SourceExpr=NoPeriods }
+
+      { 10  ;2   ;Field     ;
+                  CaptionML=[ENU=Period Length;
+                             ESM=Longitud periodo;
+                             FRC=Dur‚e de la p‚riode;
+                             ENC=Period Length];
+                  OptionCaptionML=[ENU=,Day,Week,Month,Quarter,Year,Accounting Period;
+                                   ESM=,D¡a,Semana,Mes,Trimestre,A¤o,Periodo contable;
+                                   FRC=,Jour,Semaine,Mois,Trimestre,Ann‚e,P‚riode comptable;
+                                   ENC=,Day,Week,Month,Quarter,Year,Accounting Period];
+                  SourceExpr=PeriodLength }
+
+      { 3   ;2   ;Field     ;
+                  CaptionML=[ENU=Budget Amount;
+                             ESM=Imp. ppto.;
+                             FRC=Montant budget;
+                             ENC=Budget Amount];
+                  SourceExpr=DistributeAmt }
+
+      { 12  ;2   ;Field     ;
+                  CaptionML=[ENU=Amount Type;
+                             ESM=Tipo importe;
+                             FRC=Type de montant;
+                             ENC=Amount Type];
+                  OptionCaptionML=[ENU=Total Amount,Beginning Amount;
+                                   ESM=Importe total,Importe inicial;
+                                   FRC=Montant total,Montant de d‚part;
+                                   ENC=Total Amount,Beginning Amount];
+                  SourceExpr=AmountType }
+
+      { 8   ;2   ;Field     ;
+                  CaptionML=[ENU=Period Percent Change;
+                             ESM=Cambio porcen. per¡odo;
+                             FRC=Pourcentage changement de la p‚riode;
+                             ENC=Period Percent Change];
+                  SourceExpr=PercentChg }
+
+      { 14  ;2   ;Field     ;
+                  CaptionML=[ENU=Round To;
+                             ESM=Redondear a;
+                             FRC=Arrondir …;
+                             ENC=Round To];
+                  OptionCaptionML=[ENU=,Pennies,Dollars,Hundreds,Thousands,Millions;
+                                   ESM=,Centavos,Pesos,Cientos,Miles,Millones;
+                                   FRC=,Cents,Dollars,Centaines,Milliers,Millions;
+                                   ENC=,Pennies,Dollars,Hundreds,Thousands,Millions];
+                  SourceExpr=Rounding }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      GLBudgetEntry@1000 : Record 96;
+      AcctPeriod@1001 : Record 50;
+      GLSetup@1020001 : Record 98;
+      DistributeAmt@1002 : Decimal;
+      BaseAmount@1003 : Decimal;
+      PercentChg@1004 : Decimal;
+      Precision@1005 : Decimal;
+      BudgetDate@1006 : Date;
+      AmountType@1007 : 'Total Amount,Beginning Amount';
+      Rounding@1008 : ',Pennies,Dollars,Hundreds,Thousands,Millions';
+      PeriodLength@1009 : ',Day,Week,Month,Quarter,Year,Accounting Period';
+      NoPeriods@1010 : Integer;
+      CurrentPeriod@1011 : Integer;
+      EntryNo@1012 : Integer;
+      Text000@1014 : TextConst 'ENU=There are not enough accounting periods set up to complete this budget.;ESM=No hay suficientes per¡odos contables para completar este presupuesto.;FRC=Il n''y a pas assez de p‚riodes comptables configur‚es pour compl‚ter ce budget.;ENC=There are not enough accounting periods set up to complete this budget.';
+      Text001@1015 : TextConst 'ENU=Please enter an amount to budget.;ESM=Inserte un importe para ppto.;FRC=Entrez un montant au budget.;ENC=Please enter an amount to budget.';
+      Text002@1016 : TextConst 'ENU=Please enter a beginning date.;ESM=Introduzca una fecha inicial.;FRC=Entrez une date de d‚but;ENC=Please enter a beginning date.';
+      Text003@1017 : TextConst 'ENU=Please enter the number of periods to budget.;ESM=Inserte el n§ de per¡odos para presupuestar.;FRC=Entrez un nombre de p‚riodes au budget.;ENC=Please enter the number of periods to budget.';
+      GlobalDim1Code@1020002 : Code[20];
+      GlobalDim2Code@1020003 : Code[20];
+
+    PROCEDURE NextDate@1(CurrentDate@1000 : Date) : Date;
+    VAR
+      CalculatedDate@1001 : Date;
+    BEGIN
+      CASE PeriodLength OF
+        PeriodLength::Day:
+          CalculatedDate := CALCDATE('<+1D>',CurrentDate);
+        PeriodLength::Week:
+          CalculatedDate := CALCDATE('<+1W>',CurrentDate);
+        PeriodLength::Month:
+          CalculatedDate := CALCDATE('<+1M>',CurrentDate);
+        PeriodLength::Quarter:
+          CalculatedDate := CALCDATE('<+1Q>',CurrentDate);
+        PeriodLength::Year:
+          CalculatedDate := CALCDATE('<+1Y>',CurrentDate);
+        PeriodLength::"Accounting Period":
+          BEGIN
+            AcctPeriod.SETFILTER("Starting Date",'>%1',CurrentDate);
+            IF NOT AcctPeriod.FINDFIRST THEN
+              ERROR(Text000);
+            CalculatedDate := AcctPeriod."Starting Date";
+          END;
+      END;
+      EXIT(CalculatedDate);
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

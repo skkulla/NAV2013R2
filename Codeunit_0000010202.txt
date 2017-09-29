@@ -1,0 +1,122 @@
+OBJECT Codeunit 10202 Entry Application Management
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE GetAppliedCustEntries@1020000(VAR AppliedCustLedgEntry@1020000 : TEMPORARY Record 21;CustLedgEntry@1020001 : Record 21;UseLCY@1480000 : Boolean);
+    VAR
+      DtldCustLedgEntry@1020003 : Record 379;
+      PmtDtldCustLedgEntry@1020004 : Record 379;
+      PmtCustLedgEntry@1020015 : Record 21;
+      ClosingCustLedgEntry@1020002 : Record 21;
+      AmountToApply@1020005 : Decimal;
+    BEGIN
+      // Temporary Table, AppliedCustLedgEntry, to be filled in with everything that CustLedgEntry applied to.
+      // Note that within AppliedCustLedgEntry, the "Amount to Apply" field will be filled in with the Amount Applied.
+      // IF UseLCY is TRUE, Amount Applied will be in LCY, else it will be in the application currency
+      AppliedCustLedgEntry.RESET;
+      AppliedCustLedgEntry.DELETEALL;
+
+      DtldCustLedgEntry.SETCURRENTKEY("Cust. Ledger Entry No.");
+      DtldCustLedgEntry.SETRANGE("Cust. Ledger Entry No.",CustLedgEntry."Entry No.");
+      DtldCustLedgEntry.SETRANGE("Entry Type",DtldCustLedgEntry."Entry Type"::Application);
+      DtldCustLedgEntry.SETRANGE(Unapplied,FALSE);
+      IF DtldCustLedgEntry.FIND('-') THEN
+        REPEAT
+          PmtDtldCustLedgEntry.SETFILTER("Cust. Ledger Entry No.",'<>%1',CustLedgEntry."Entry No.");
+          PmtDtldCustLedgEntry.SETRANGE("Entry Type",DtldCustLedgEntry."Entry Type"::Application);
+          PmtDtldCustLedgEntry.SETRANGE("Transaction No.",DtldCustLedgEntry."Transaction No.");
+          PmtDtldCustLedgEntry.FINDSET;
+          REPEAT
+            IF UseLCY THEN
+              AmountToApply := -PmtDtldCustLedgEntry."Amount (LCY)"
+            ELSE
+              AmountToApply := -PmtDtldCustLedgEntry.Amount;
+            PmtCustLedgEntry.GET(PmtDtldCustLedgEntry."Cust. Ledger Entry No.");
+            AppliedCustLedgEntry := PmtCustLedgEntry;
+            IF AppliedCustLedgEntry.FIND THEN BEGIN
+              AppliedCustLedgEntry."Amount to Apply" += AmountToApply;
+              AppliedCustLedgEntry.MODIFY;
+            END ELSE BEGIN
+              AppliedCustLedgEntry := PmtCustLedgEntry;
+              AppliedCustLedgEntry."Amount to Apply" := AmountToApply;
+              IF CustLedgEntry."Closed by Entry No." <> 0 THEN BEGIN
+                ClosingCustLedgEntry.GET(PmtDtldCustLedgEntry."Cust. Ledger Entry No.");
+                  IF ClosingCustLedgEntry."Closed by Entry No." <> AppliedCustLedgEntry."Entry No." THEN
+                    AppliedCustLedgEntry."Pmt. Disc. Given (LCY)" := 0;
+                END;
+               AppliedCustLedgEntry.INSERT;
+            END;
+          UNTIL PmtDtldCustLedgEntry.NEXT = 0;
+        UNTIL DtldCustLedgEntry.NEXT = 0;
+    END;
+
+    PROCEDURE GetAppliedVendEntries@1020001(VAR AppliedVendLedgEntry@1020001 : TEMPORARY Record 25;VendLedgEntry@1020000 : Record 25;UseLCY@1480000 : Boolean);
+    VAR
+      DtldVendLedgEntry@1020003 : Record 380;
+      PmtDtldVendLedgEntry@1020007 : Record 380;
+      PmtVendLedgEntry@1020006 : Record 25;
+      ClosingVendLedgEntry@1020002 : Record 25;
+      AmountToApply@1020005 : Decimal;
+      PaymentDiscount@1020004 : Decimal;
+    BEGIN
+      // Temporary Table, AppliedVendLedgEntry, to be filled in with everything that VendLedgEntry applied to.
+      // Note that within AppliedVendLedgEntry, the "Amount to Apply" field will be filled in with the Amount Applied.
+      // IF UseLCY is TRUE, Amount Applied will be in LCY, else it will be in the application currency
+      AppliedVendLedgEntry.RESET;
+      AppliedVendLedgEntry.DELETEALL;
+
+      DtldVendLedgEntry.SETCURRENTKEY("Vendor Ledger Entry No.");
+      DtldVendLedgEntry.SETRANGE("Vendor Ledger Entry No.",VendLedgEntry."Entry No.");
+      DtldVendLedgEntry.SETRANGE("Entry Type",DtldVendLedgEntry."Entry Type"::Application);
+      DtldVendLedgEntry.SETRANGE(Unapplied,FALSE);
+      IF DtldVendLedgEntry.FIND('-') THEN
+        REPEAT
+          PmtDtldVendLedgEntry.SETFILTER("Vendor Ledger Entry No.",'<>%1',VendLedgEntry."Entry No.");
+          PmtDtldVendLedgEntry.SETRANGE("Entry Type",DtldVendLedgEntry."Entry Type"::Application);
+          PmtDtldVendLedgEntry.SETRANGE("Transaction No.",DtldVendLedgEntry."Transaction No.");
+          PmtDtldVendLedgEntry.FINDSET;
+          REPEAT
+            PaymentDiscount := 0;
+            IF PmtDtldVendLedgEntry."Posting Date" <= PmtDtldVendLedgEntry."Initial Entry Due Date" THEN
+              PaymentDiscount := PmtDtldVendLedgEntry."Remaining Pmt. Disc. Possible";
+            IF UseLCY THEN
+              AmountToApply := -PmtDtldVendLedgEntry."Amount (LCY)" - PaymentDiscount
+            ELSE
+              AmountToApply := -PmtDtldVendLedgEntry.Amount - PaymentDiscount;
+            PmtVendLedgEntry.GET(PmtDtldVendLedgEntry."Vendor Ledger Entry No.");
+            AppliedVendLedgEntry := PmtVendLedgEntry;
+            IF AppliedVendLedgEntry.FIND THEN BEGIN
+              AppliedVendLedgEntry."Amount to Apply" += AmountToApply;
+              AppliedVendLedgEntry.MODIFY;
+            END ELSE BEGIN
+              AppliedVendLedgEntry := PmtVendLedgEntry;
+              AppliedVendLedgEntry."Amount to Apply" := AmountToApply;
+              IF VendLedgEntry."Closed by Entry No." <> 0 THEN BEGIN
+                ClosingVendLedgEntry.GET(PmtDtldVendLedgEntry."Vendor Ledger Entry No.");
+                  IF ClosingVendLedgEntry."Closed by Entry No." <> AppliedVendLedgEntry."Entry No." THEN
+                    AppliedVendLedgEntry."Pmt. Disc. Rcd.(LCY)" := 0;
+                END;
+              AppliedVendLedgEntry.INSERT;
+            END;
+          UNTIL PmtDtldVendLedgEntry.NEXT = 0;
+        UNTIL DtldVendLedgEntry.NEXT = 0;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,304 @@
+OBJECT Page 1341 Mini Customer Template Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Customer Template;
+               ESM=Plantilla cliente;
+               FRC=Modäle client;
+               ENC=Customer Template];
+    SourceTable=Table1300;
+    DataCaptionExpr="Template Name";
+    PageType=Card;
+    SourceTableTemporary=Yes;
+    CardPageID=Mini Customer Template Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Reports,Master Data;
+                                ESM=Nuevo,Proceso,Informes,Datos Maestros;
+                                FRC=Nouveau,Traitement,Rapports,DonnÇes principales;
+                                ENC=New,Process,Reports,Master Data];
+    OnDeleteRecord=BEGIN
+                     CheckTemplateNameProvided
+                   END;
+
+    OnQueryClosePage=BEGIN
+                       IF Code <> '' THEN
+                         CheckTemplateNameProvided
+                     END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           SetDimensionsEnabled;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 27      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 30      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Master Data;
+                                 ESM=Datos maestros;
+                                 FRC=DonnÇes principales;
+                                 ENC=Master Data];
+                      ActionContainerType=NewDocumentItems }
+      { 31      ;2   ;Action    ;
+                      Name=Default Dimensions;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      ToolTipML=[ENU=View or edit any dimensions that are set up for the customer that you want to reuse for the template.;
+                                 ESM=Vea o edite las dimensiones que se han configurado para el cliente que desea reutilizar para la plantilla.;
+                                 FRC=Affichez ou modifiez les dimensions configurÇes pour le client que vous souhaitez rÇutiliser pour le modäle.;
+                                 ENC=View or edit any dimensions that are set up for the customer that you want to reuse for the template.];
+                      RunObject=Page 1343;
+                      RunPageLink=Table Id=CONST(18),
+                                  Master Record Template Code=FIELD(Code);
+                      Promoted=Yes;
+                      Enabled=DimensionsEnabled;
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category4 }
+    }
+  }
+  CONTROLS
+  {
+    { 29  ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 28  ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 26  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the template.;
+                           ESM=Especifica el nombre de la plantilla.;
+                           FRC=Indique le nom du modäle.;
+                           ENC=Specifies the name of the template.];
+                SourceExpr="Template Name";
+                OnValidate=BEGIN
+                             SetDimensionsEnabled;
+                           END;
+                            }
+
+    { 25  ;1   ;Group     ;
+                Name=AddressDetails;
+                CaptionML=[ENU=Address Details;
+                           ESM=Detalles direcci¢n;
+                           FRC=Info. adresse;
+                           ENC=Address Details];
+                GroupType=Group }
+
+    { 24  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's post code.;
+                           ESM=Especifica el c¢digo de registro del cliente.;
+                           FRC=SpÇcifie le code postal du client.;
+                           ENC=Specifies the customer's postal/ZIP code.];
+                SourceExpr="Post Code";
+                Importance=Promoted }
+
+    { 23  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's city.;
+                           ESM=Especifica el Municipio/Ciudad del cliente.;
+                           FRC=SpÇcifie la ville du client.;
+                           ENC=Specifies the customer's city.];
+                SourceExpr=City }
+
+    { 22  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a country/region code for the customer. To see the country/region codes and address formats in the Countries/Regions window, choose the field.;
+                           ESM=Especifica un c¢digo de pa°s/regi¢n para el cliente. Para ver los c¢digos de pa°s o regi¢n y los formatos de direcci¢n de la ventana Pa°ses y regiones, elija el campo.;
+                           FRC=SpÇcifie le code pays/rÇgion du client. Pour visualiser les codes pays/rÇgion et les formats adresse dans la fenàtre Pays/RÇgions, cliquez sur le champ.;
+                           ENC=Specifies a country/region code for the customer. To see the country/region codes and address formats in the Countries/Regions window, choose the field.];
+                SourceExpr="Country/Region Code" }
+
+    { 21  ;1   ;Group     ;
+                Name=Invoicing;
+                CaptionML=[ENU=Invoicing;
+                           ESM=Facturaci¢n;
+                           FRC=Facturation;
+                           ENC=Invoicing];
+                GroupType=Group }
+
+    { 20  ;2   ;Group     ;
+                Name=PostingDetails;
+                CaptionML=[ENU=Posting Details;
+                           ESM=Detalles del registro;
+                           FRC=DÇtails du report;
+                           ENC=Posting Details];
+                GroupType=Group }
+
+    { 19  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's trade type to link transactions made for this customer with the appropriate general ledger account according to the general posting setup.;
+                           ESM=Especifica el tipo de comercio del cliente para vincular las transacciones realizadas para este cliente a la cuenta contable correspondiente seg£n la configuraci¢n de registro general.;
+                           FRC=SpÇcifie le type commercial du client pour lier les transactions effectuÇes pour ce client au compte gÇnÇral appropriÇ en fonction des paramätres de validation gÇnÇraux.;
+                           ENC=Specifies the customer's trade type to link transactions made for this customer with the appropriate general ledger account according to the general posting setup.];
+                SourceExpr="Gen. Bus. Posting Group";
+                Importance=Promoted }
+
+    { 18  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's VAT specification to link transactions made for this customer with the appropriate general ledger account according to the VAT posting setup.;
+                           ESM=Especifica la especificaci¢n de IVA del cliente para vincular las transacciones realizadas para este cliente a la cuenta contable correspondiente seg£n la configuraci¢n de registro de IVA.;
+                           FRC=SpÇcifie le dÇtail TVA du client pour lier les transactions effectuÇes pour ce client au compte gÇnÇral appropriÇ en fonction des paramätres de validation TVA.;
+                           ENC=Specifies the customer's tax specification to link transactions made for this customer with the appropriate general ledger account according to the tax posting setup.];
+                SourceExpr="VAT Bus. Posting Group" }
+
+    { 17  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's market type to link business transactions made for the customer with the appropriate account in the general ledger.;
+                           ESM=Especifica el tipo del mercado del cliente para vincular las transacciones de negocio realizadas para el cliente con la cuenta correspondiente en la contabilidad.;
+                           FRC=SpÇcifie le type du marchÇ du client pour lier les transactions commerciales effectuÇes pour le client avec le compte appropriÇ dans la comptabilitÇ.;
+                           ENC=Specifies the customer's market type to link business transactions made for the customer with the appropriate account in the general ledger.];
+                SourceExpr="Customer Posting Group";
+                Importance=Promoted }
+
+    { 16  ;2   ;Group     ;
+                Name=PricesandDiscounts;
+                CaptionML=[ENU=Prices and Discounts;
+                           ESM=Precios y descuentos;
+                           FRC=Prix et escomptes;
+                           ENC=Prices and Discounts];
+                GroupType=Group }
+
+    { 15  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer price group code, which you can use as a criterion to set up special sales prices in the Sales Prices window.;
+                           ESM=Especifica el c¢digo de grupo de precio de cliente, que puede utilizar como criterio para configurar precios de venta especiales en la ventana Precios ventas.;
+                           FRC=SpÇcifie le code groupe prix client, que vous pouvez utiliser comme critäre pour configurer des prix spÇcifiques dans la fenàtre Prix de vente.;
+                           ENC=Specifies the customer price group code, which you can use as a criterion to set up special sales prices in the Sales Prices window.];
+                SourceExpr="Customer Price Group";
+                Importance=Promoted }
+
+    { 14  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer discount group code, which you can use as a criterion to set up special discounts in the Sales Line Discounts window.;
+                           ESM=Especifica el c¢digo del grupo de descuento de cliente, que puede utilizar como criterio para configurar descuentos especiales en la ventana Descuentos l°nea ventas.;
+                           FRC=SpÇcifie le code groupe remises client, que vous pouvez utiliser comme critäre pour configurer des remises spÇcifiques dans la fenàtre Escomptes de ligne de vente.;
+                           ENC=Specifies the customer discount group code, which you can use as a criterion to set up special discounts in the Sales Line Discounts window.];
+                SourceExpr="Customer Disc. Group";
+                Importance=Promoted }
+
+    { 13  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if a sales line discount is calculated when a special sales price is offered according to setup in the Sales Prices window.;
+                           ESM=Especifica si se calcula un descuento de la l°nea de venta cuando se ofrece un precio de venta especial para configuraci¢n en la ventana Precios ventas.;
+                           FRC=Indique si une remise ligne vente est calculÇe lorsqu'un prix spÇcial est proposÇ en fonction du paramÇtrage de la fenàtre Prix de vente.;
+                           ENC=Specifies if a sales line discount is calculated when a special sales price is offered according to setup in the Sales Prices window.];
+                SourceExpr="Allow Line Disc." }
+
+    { 12  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Unit Price and Line Amount fields on sales lines for this customer should be shown with or without VAT.;
+                           ESM=Especifica si los campos Precio unitario y Importe l°nea de las l°neas de venta de este cliente se deben mostrar con o sin IVA.;
+                           FRC=SpÇcifie si les champs Prix unitaire et Montant ligne des lignes vente pour ce client sont affichÇs avec ou sans la TVA.;
+                           ENC=Specifies if the Unit Price and Line Amount fields on sales lines for this customer should be shown with or without tax.];
+                SourceExpr="Prices Including VAT" }
+
+    { 11  ;2   ;Group     ;
+                Name=ForeignTrade;
+                CaptionML=[ENU=Foreign Trade;
+                           ESM=Comercio exterior;
+                           FRC=Commerce Çtranger;
+                           ENC=Foreign Trade];
+                GroupType=Group }
+
+    { 10  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a default currency code for the customer.;
+                           ESM=Especifica un c¢digo de divisa predeterminado para el cliente.;
+                           FRC=SpÇcifie un code devise par dÇfaut pour le client.;
+                           ENC=Specifies a default currency code for the customer.];
+                SourceExpr="Currency Code";
+                Importance=Promoted }
+
+    { 9   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the language to be used on printouts for this customer.;
+                           ESM=Especifica el idioma que se va a usar en las copias impresas para este cliente.;
+                           FRC=Indique la langue Ö utiliser sur les impressions destinÇes Ö ce client.;
+                           ENC=Specifies the language to be used on printouts for this customer.];
+                SourceExpr="Language Code" }
+
+    { 8   ;1   ;Group     ;
+                Name=Payments;
+                CaptionML=[ENU=Payments;
+                           ESM=Pagos;
+                           FRC=Paiements;
+                           ENC=Payments];
+                GroupType=Group }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how to apply payments to entries for this customer. Select Manual to manually specify the document that a payment applies to. This is the default method. Select Apply to Oldest to automatically apply payments to the oldest open customer ledger entry.;
+                           ESM=Especifica c¢mo liquidar pagos en los movimientos para este cliente. Seleccione Manual para especificar manualmente el documento al que se aplica un pago. êste es el mÇtodo predeterminado. Seleccione Liq. por antigÅedad para aplicar autom†ticamente los pagos al movimiento de cliente pendiente m†s antiguo.;
+                           FRC=SpÇcifie la maniäre de lettrer les paiements aux Çcritures pour ce client. SÇlectionnez Manuel pour spÇcifier manuellement le document auquel un paiement s'applique. Il s'agit de la mÇthode par dÇfaut. SÇlectionnez Au plus ancien pour lettrer automatiquement les paiements Ö l'Çcriture comptable client ouverte la plus ancienne.;
+                           ENC=Specifies how to apply payments to entries for this customer. Select Manual to manually specify the document that a payment applies to. This is the default method. Select Apply to Oldest to automatically apply payments to the oldest open customer ledger entry.];
+                SourceExpr="Application Method" }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies at which terms you require the customer to pay for products. The payment terms code that you define in this field is inserted on sales invoices for the customer.;
+                           ESM=Especifica en quÇ tÇrminos requiere al cliente que pague los productos. El c¢digo de tÇrminos de pago que define en este campo se inserta en las facturas de venta para el cliente.;
+                           FRC=SpÇcifie les conditions selon lesquelles vous voulez que le client rägle des biens. Le code condition de paiement que vous dÇfinissez dans ce champ est insÇrÇ sur les factures vente pour le client.;
+                           ENC=Specifies at which terms you require the customer to pay for products. The payment terms code that you define in this field is inserted on sales invoices for the customer.];
+                SourceExpr="Payment Terms Code";
+                Importance=Promoted }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how payment for the sales document must be submitted, such as bank transfer or check. By default, the payment method from the customer card is entered.;
+                           ESM=Especifica c¢mo debe enviarse el pago para el documento de venta, por ejemplo, el cheque o la transferencia bancaria. De manera predeterminada, se especifica la forma de pago de la ficha del cliente.;
+                           FRC=SpÇcifie la maniäre dont le paiement du document vente doit àtre rÇalisÇ, par exemple par transfert bancaire ou par chäque. Par dÇfaut, le mode de räglement de la fiche client est indiquÇ.;
+                           ENC=Specifies how payment for the sales document must be submitted, such as bank transfer or cheque. By default, the payment method from the customer card is entered.];
+                SourceExpr="Payment Method Code";
+                Importance=Promoted }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how reminders about late payments are handled for this customer.;
+                           ESM=Especifica c¢mo se controlan los avisos sobre los pagos con retraso para este cliente.;
+                           FRC=SpÇcifie la maniäre dont les relances concernant les retards de paiement sont traitÇes pour ce client.;
+                           ENC=Specifies how reminders about late payments are handled for this customer.];
+                SourceExpr="Reminder Terms Code";
+                Importance=Promoted }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the finance charges that are calculated for the customer. A finance charge term contains information about the interest calculation method, interest rate, and so on.;
+                           ESM=Especifica que los intereses cobrados que se calculan para el cliente. Las condiciones de interÇs guardan informaci¢n relativa al mÇtodo de c†lculo del interÇs, el tipo de interÇs y dem†s.;
+                           FRC=SpÇcifie les intÇràts calculÇs pour le client. Une condition intÇràts de retard affiche les informations relatives au mode de calcul des intÇràts, au taux d'intÇràt, etc.;
+                           ENC=Specifies the finance charges that are calculated for the customer. A finance charge term contains information about the interest calculation method, interest rate, and so on.];
+                SourceExpr="Fin. Charge Terms Code";
+                Importance=Promoted }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies whether to include this customer when you print the Statement report.;
+                           ESM=Especifica si desea incluir a este cliente al imprimir el informe Estado de cuenta.;
+                           FRC=Indique si vous souhaitez inclure ou non ce client lorsque vous imprimez l'Çtat RelevÇ.;
+                           ENC=Specifies whether to include this customer when you print the Statement report.];
+                SourceExpr="Print Statements" }
+
+    { 1   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies that the customer is not allowed payment tolerance.;
+                           ESM=Especifica que no se permite tolerancia de pago al cliente.;
+                           FRC=SpÇcifie que le client n'a droit Ö aucun Çcart de räglement.;
+                           ENC=Specifies that the customer is not allowed payment tolerance.];
+                SourceExpr="Block Payment Tolerance" }
+
+  }
+  CODE
+  {
+    VAR
+      DimensionsEnabled@1000 : Boolean INDATASET;
+      ProvideTemplateNameErr@1001 : TextConst '@@@=%1 Template Name;ENU=You must enter a %1.;ESM=Debe especificar un %1.;FRC=Vous devez entrer un %1.;ENC=You must enter a %1.';
+
+    LOCAL PROCEDURE SetDimensionsEnabled@4();
+    BEGIN
+      DimensionsEnabled := "Template Name" <> '';
+    END;
+
+    LOCAL PROCEDURE CheckTemplateNameProvided@2();
+    BEGIN
+      IF "Template Name" = '' THEN
+        ERROR(STRSUBSTNO(ProvideTemplateNameErr,FIELDCAPTION("Template Name")));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

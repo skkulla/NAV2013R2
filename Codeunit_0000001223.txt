@@ -1,0 +1,147 @@
+OBJECT Codeunit 1223 SEPA CT-Check Line
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    TableNo=81;
+    OnRun=BEGIN
+            DeletePaymentFileErrors;
+            CheckGenJnlLine(Rec);
+            CheckBank(Rec);
+            CheckCustVend(Rec);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      MustBeBankAccErr@1003 : TextConst 'ENU=The balancing account must be a bank account.;ESM=La cuenta de contrapartida debe ser una cuenta bancaria.;FRC=Le compte de contrepartie doit ˆtre un compte bancaire.;ENC=The balancing account must be a bank account.';
+      MustBeVendorOrCustomerErr@1001 : TextConst 'ENU=The account must be a vendor or customer account.;ESM=La cuenta debe ser una cuenta de proveedor o de cliente.;FRC=Le compte doit ˆtre un compte fournisseur ou client.;ENC=The account must be a vendor or customer account.';
+      MustBeVendPmtOrCustRefundErr@1008 : TextConst 'ENU=Only vendor payments and customer refunds are allowed.;ESM=Solo se permiten pagos de proveedor y reembolsos de cliente.;FRC=Seuls les paiements fournisseur et les remboursement client sont autoris‚s.;ENC=Only vendor payments and customer refunds are allowed.';
+      MustBePositiveErr@1000 : TextConst 'ENU=The amount must be positive.;ESM=El importe debe ser positivo.;FRC=Le montant doit ˆtre positif.;ENC=The amount must be positive.';
+      TransferDateErr@1002 : TextConst 'ENU=The earliest possible transfer date is today.;ESM=La fecha de transferencia m s pr¢xima posible es hoy.;FRC=La date de transfert la plus proche possible est aujourd''hui.;ENC=The earliest possible transfer date is today.';
+      EuroCurrErr@1004 : TextConst 'ENU=Only transactions in euro (EUR) are allowed.;ESM=Solo se permiten transacciones en pesos (MXN).;FRC=Seules les transactions en euros (EUR) sont autoris‚es.;ENC=Only transactions in euro (EUR) are allowed.';
+      MissingBankAccErr@1005 : TextConst '@@@="%1=customer or vendor.";ENU=%1 has no bank account.;ESM=%1 no tiene cuenta bancaria.;FRC=%1 n''a pas de compte bancaire.;ENC=%1 has no bank account.';
+      FieldBlankErr@1006 : TextConst '@@@="%1=table name, %2=field name. Example: Customer must have a value in Name.";ENU=%1 must have a value in %2.;ESM=%1 debe tener un valor en %2.;FRC=%1 doit avoir une valeur dans %2.;ENC=%1 must have a value in %2.';
+      FieldKeyBlankErr@1007 : TextConst '@@@="%1=table name, %2=key field value, %3=field name. Example: Customer 10000 must have a value in Name.";ENU=%1 %2 must have a value in %3.;ESM=%1 %2 debe tener un valor en %3.;FRC=%1 %2 doit avoir une valeur dans %3.;ENC=%1 %2 must have a value in %3.';
+
+    PROCEDURE CheckGenJnlLine@2(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GLSetup@1002 : Record 98;
+    BEGIN
+      GLSetup.GET;
+      WITH GenJnlLine DO BEGIN
+        IF "Bal. Account Type" <> "Bal. Account Type"::"Bank Account" THEN
+          InsertPaymentFileError(MustBeBankAccErr);
+
+        IF "Bal. Account No." = '' THEN
+          AddFieldEmptyError(GenJnlLine,TABLECAPTION,FIELDCAPTION("Bal. Account No."),'');
+
+        IF "Recipient Bank Account" = '' THEN
+          AddFieldEmptyError(GenJnlLine,TABLECAPTION,FIELDCAPTION("Recipient Bank Account"),'');
+
+        IF NOT ("Account Type" IN ["Account Type"::Vendor,"Account Type"::Customer]) THEN
+          InsertPaymentFileError(MustBeVendorOrCustomerErr);
+
+        IF (("Account Type" = "Account Type"::Vendor) AND ("Document Type" <> "Document Type"::Payment)) OR
+           (("Account Type" = "Account Type"::Customer) AND ("Document Type" <> "Document Type"::Refund))
+        THEN
+          InsertPaymentFileError(STRSUBSTNO(MustBeVendPmtOrCustRefundErr));
+
+        IF Amount <= 0 THEN
+          InsertPaymentFileError(MustBePositiveErr);
+
+        IF "Currency Code" <> GLSetup.GetCurrencyCode('EUR') THEN
+          InsertPaymentFileError(EuroCurrErr);
+
+        IF "Posting Date" < TODAY THEN
+          InsertPaymentFileError(TransferDateErr);
+      END;
+    END;
+
+    PROCEDURE CheckBank@3(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      BankAccount@1001 : Record 270;
+    BEGIN
+      WITH GenJnlLine DO
+        IF BankAccount.GET("Bal. Account No.") THEN BEGIN
+          IF BankAccount.IBAN = '' THEN
+            AddFieldEmptyError(GenJnlLine,BankAccount.TABLECAPTION,BankAccount.FIELDCAPTION(IBAN),"Bal. Account No.");
+          IF BankAccount."SWIFT Code" = '' THEN
+            AddFieldEmptyError(GenJnlLine,BankAccount.TABLECAPTION,BankAccount.FIELDCAPTION("SWIFT Code"),"Bal. Account No.");
+        END;
+    END;
+
+    PROCEDURE CheckCustVend@4(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      Customer@1004 : Record 18;
+      CustomerBankAccount@1003 : Record 287;
+      Vendor@1002 : Record 23;
+      VendorBankAccount@1001 : Record 288;
+    BEGIN
+      WITH GenJnlLine DO BEGIN
+        IF "Account No." = '' THEN BEGIN
+          InsertPaymentFileError(MustBeVendorOrCustomerErr);
+          EXIT;
+        END;
+        CASE "Account Type" OF
+          "Account Type"::Customer:
+            BEGIN
+              Customer.GET("Account No.");
+              IF Customer.Name = '' THEN
+                AddFieldEmptyError(GenJnlLine,Customer.TABLECAPTION,Customer.FIELDCAPTION(Name),"Account No.");
+              IF "Recipient Bank Account" = '' THEN
+                InsertPaymentFileError(STRSUBSTNO(MissingBankAccErr,Customer.TABLECAPTION))
+              ELSE BEGIN
+                CustomerBankAccount.GET(Customer."No.","Recipient Bank Account");
+                IF CustomerBankAccount."SWIFT Code" = '' THEN
+                  AddFieldEmptyError(
+                    GenJnlLine,CustomerBankAccount.TABLECAPTION,CustomerBankAccount.FIELDCAPTION("SWIFT Code"),
+                    "Recipient Bank Account");
+                IF CustomerBankAccount.IBAN = '' THEN
+                  AddFieldEmptyError(
+                    GenJnlLine,CustomerBankAccount.TABLECAPTION,CustomerBankAccount.FIELDCAPTION(IBAN),"Recipient Bank Account");
+              END;
+            END;
+          "Account Type"::Vendor:
+            BEGIN
+              Vendor.GET("Account No.");
+              IF Vendor.Name = '' THEN
+                AddFieldEmptyError(GenJnlLine,Vendor.TABLECAPTION,Vendor.FIELDCAPTION(Name),"Account No.");
+              IF "Recipient Bank Account" = '' THEN
+                InsertPaymentFileError(STRSUBSTNO(MissingBankAccErr,Vendor.TABLECAPTION))
+              ELSE BEGIN
+                VendorBankAccount.GET(Vendor."No.","Recipient Bank Account");
+                IF VendorBankAccount."SWIFT Code" = '' THEN
+                  AddFieldEmptyError(
+                    GenJnlLine,VendorBankAccount.TABLECAPTION,VendorBankAccount.FIELDCAPTION("SWIFT Code"),"Recipient Bank Account");
+                IF VendorBankAccount.IBAN = '' THEN
+                  AddFieldEmptyError(
+                    GenJnlLine,VendorBankAccount.TABLECAPTION,VendorBankAccount.FIELDCAPTION(IBAN),"Recipient Bank Account");
+              END;
+            END;
+        END;
+      END;
+    END;
+
+    PROCEDURE AddFieldEmptyError@1(VAR GenJnlLine@1002 : Record 81;TableCaption@1000 : Text;FieldCaption@1001 : Text;KeyValue@1003 : Text);
+    VAR
+      ErrorText@1004 : Text;
+    BEGIN
+      IF KeyValue = '' THEN
+        ErrorText := STRSUBSTNO(FieldBlankErr,TableCaption,FieldCaption)
+      ELSE
+        ErrorText := STRSUBSTNO(FieldKeyBlankErr,TableCaption,KeyValue,FieldCaption);
+      GenJnlLine.InsertPaymentFileError(ErrorText);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,113 @@
+OBJECT Page 36728 Bank Rec Worksheet FactBox
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Bank Rec Worksheet;
+               ESM=Hoja conciliaci¢n;
+               FRC=Feuille de travail rapprochement bancaire;
+               ENC=Bank Rec Worksheet];
+    SourceTable=Table10120;
+    PageType=CardPart;
+    OnOpenPage=BEGIN
+                 CalcLineInfo;
+               END;
+
+    OnFindRecord=BEGIN
+                   EXIT(FIND(Which));
+                 END;
+
+    OnAfterGetRecord=BEGIN
+                       CalcLineInfo;
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1020000;1;Field     ;
+                Lookup=No;
+                SourceExpr="Bank Account No.";
+                Editable=FALSE }
+
+    { 1020005;1;Field     ;
+                SourceExpr="Statement No.";
+                Editable=FALSE }
+
+    { 1020009;1;Field     ;
+                SourceExpr="Statement Date";
+                Editable=FALSE }
+
+    { 1020002;1;Field     ;
+                SourceExpr="Currency Code" }
+
+    { 1020001;1;Field     ;
+                SourceExpr="Currency Factor" }
+
+    { 1020013;1;Field     ;
+                SourceExpr="Date Created";
+                Editable=FALSE }
+
+    { 1020014;1;Field     ;
+                SourceExpr="Time Created";
+                Editable=FALSE }
+
+    { 1020015;1;Field     ;
+                Lookup=No;
+                DrillDown=No;
+                AssistEdit=No;
+                SourceExpr="Created By";
+                Editable=FALSE }
+
+    { 1020016;1;Field     ;
+                SourceExpr="Cleared With./Chks. Per Stmnt." }
+
+    { 1020018;1;Field     ;
+                SourceExpr="Total Cleared Checks" }
+
+    { 1020020;1;Field     ;
+                SourceExpr="Cleared Inc./Dpsts. Per Stmnt." }
+
+    { 1020022;1;Field     ;
+                SourceExpr="Total Cleared Deposits" }
+
+    { 1020030;1;Field     ;
+                Name=TotalAdjustments;
+                CaptionML=[ENU=Total Adjustments;
+                           ESM=Ajustes totales;
+                           FRC=Total des ajustements;
+                           ENC=Total Adjustments];
+                SourceExpr="Total Adjustments" - "Total Balanced Adjustments" }
+
+  }
+  CODE
+  {
+    VAR
+      CurrentDate@1018 : Date;
+
+    PROCEDURE CalcLineInfo@1020001();
+    BEGIN
+      SETRANGE("Bank Account No.");
+      SETRANGE("Statement No.");
+
+      IF CurrentDate <> WORKDATE THEN
+        CurrentDate := WORKDATE;
+
+      SETRANGE("Date Filter",0D,CurrentDate);
+
+      CALCFIELDS("Total Cleared Checks","Total Cleared Deposits",
+        "Total Adjustments","Total Balanced Adjustments");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

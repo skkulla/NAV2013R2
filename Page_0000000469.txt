@@ -1,0 +1,68 @@
+OBJECT Page 469 Tax Area List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Tax Area List;
+               ESM=Lista  reas impuesto;
+               FRC=Liste r‚gions fiscales;
+               ENC=Tax Area List];
+    SourceTable=Table318;
+    PageType=List;
+    CardPageID=Tax Area;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 1020000;2;Field     ;
+                SourceExpr=Country }
+
+    { 1020002;2;Field     ;
+                ToolTipML=[ENU=Enables external tax calculations when third party tax engine is purchased and integrated.;
+                           ESM=Permite c lculos de impuestos externos cuando se compra e integra un motor de impuestos de terceros.;
+                           FRC=Permet des calculs fiscaux externes lors de l'achat et de l'int‚gration d'un moteur fiscal tiers.;
+                           ENC=Enables external tax calculations when third party tax engine is purchased and integrated.];
+                SourceExpr="Use External Tax Engine" }
+
+    { 1480000;2;Field     ;
+                SourceExpr="Round Tax";
+                Visible=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

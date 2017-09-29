@@ -1,0 +1,330 @@
+OBJECT Codeunit 1315 Mini Chart Management
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      AccountSchedulesChartSetup@6002 : Record 762;
+      TempEntryNoAmountBuf@1008 : TEMPORARY Record 386;
+      SalesByCustGrpChartSetup@1015 : Record 1319;
+      AccSchedChartManagement@6001 : Codeunit 762;
+      TopTenCustomersChartMgt@6006 : Codeunit 1316;
+      AgedInventoryChartMgt@1005 : Codeunit 1317;
+      SalesByCustGrpChartMgt@1017 : Codeunit 1319;
+      AgedAccReceivable@1006 : Codeunit 763;
+      AgedAccPayable@1009 : Codeunit 764;
+      Period@1004 : ' ,Next,Previous';
+      MediumStatusTxt@1001 : TextConst '@@@=%1 Account Schedule Chart Setup Name, %2 Period Length, %3 Current time;ENU=%1 | View by %2;ESM=%1 | Vista por %2;FRC=%1 | Afficher par %2;ENC=%1 | View by %2';
+      LongStatusTxt@1000 : TextConst '@@@="%1 Account Schedule Chart Setup Name, %2 = Start Date, %3 = End Date, %4 Period Length, %5 Current time";ENU=%1 | %2..%3 | %4;ESM=%1 | %2..%3 | %4;FRC=%1 | %2..%3 | %4;ENC=%1 | %2..%3 | %4';
+      TopTenCustomerChartNameTxt@1170000000 : TextConst 'ENU=Top Ten Customers by Sales Value;ESM=Primeros diez clientes por valor de ventas;FRC=Dix premiers clients par valeur des ventes;ENC=Top Ten Customers by Sales Value';
+      AgedInventoryChartNameTxt@1170000001 : TextConst 'ENU=Aged Inventory;ESM=Inventario antiguo;FRC=Inventaire classÇ chronologiquement;ENC=Aged Inventory';
+      SalesByCustomerGroupNameTxt@1016 : TextConst 'ENU=Sales Trends by Customer Groups;ESM=Tendencias de ventas por grupos de clientes;FRC=Tendances de ventes par groupes clients;ENC=Sales Trends by Customer Groups';
+      SalesByCustomerGroupDescriptionTxt@1018 : TextConst 'ENU=The chart shows sales trends by customer group in the selected period.;ESM=El gr†fico muestra las tendencias de ventas por grupo de clientes en el per°odo seleccionado.;FRC=Le graphique montre les tendances de ventes par groupe clients au cours de la pÇriode sÇlectionnÇe.;ENC=The chart shows sales trends by customer group in the selected period.';
+      TopTenCustomersChartDescriptionTxt@1002 : TextConst 'ENU=This chart shows the ten customers with the highest total sales value. The last column shows the sum of sales values of all other customers.;ESM=Este gr†fico muestra los 10 clientes con las ventas totales m†s altas. La £ltima columna muestra la suma de las ventas de los dem†s clientes.;FRC="Ce graphique affiche les 10ˇclients au total des ventes le plus ÇlevÇ. Derniäre colonne = somme des valeurs de ventes de tous les autres clients.";ENC=This chart shows the ten customers with the highest total sales value. The last column shows the sum of sales values of all other customers.';
+      AgedInventoryChartDescriptionTxt@1003 : TextConst 'ENU=This chart shows the total inventory value, grouped by the number of days that the items are on inventory.;ESM=Este gr†fico solo muestra el valor de inventario total, agrupado por el n£mero de d°as que los productos permanecen en inventario.;FRC=Ce graphique affiche la valeur totale de l''inventaire, groupÇe en fonction du nombre de jours pendant lesquels les articles sont dans l''inventaire.;ENC=This chart shows the total inventory value, grouped by the number of days that the items are on inventory.';
+      AgedAccReceivableNameTxt@1007 : TextConst 'ENU=Aged Accounts Receivable;ESM=AntigÅedad cobros;FRC=ComptabilitÇ client ÉgÇe;ENC=Aged Accounts Receivable';
+      AgedAccPayableNameTxt@1010 : TextConst 'ENU=Aged Accounts Payable;ESM=AntigÅedad pagos;FRC=Comptes fournisseurs classÇs chronologiquement;ENC=Aged Accounts Payable';
+      XCashFlowChartNameTxt@1013 : TextConst 'ENU=Cash Flow;ESM=Flujo de caja;FRC=TrÇsorerie;ENC=Cash Flow';
+      XIncomeAndExpenseChartNameTxt@1012 : TextConst 'ENU=Income & Expense;ESM=Ingresos y gastos;FRC=Revenus et dÇpenses;ENC=Income & Expense';
+      XCashCycleChartNameTxt@1011 : TextConst 'ENU=Cash Cycle;ESM=Ciclo de efectivo;FRC=Cycle trÇsorerie;ENC=Cash Cycle';
+      NoEnabledChartsFoundErr@1014 : TextConst 'ENU=There are no enabled charts. Choose Select Chart to see a list of charts that you can enable.;ESM=No hay gr†ficos habilitados. Elija Seleccionar gr†fico para ver una lista de gr†ficos que se pueden habilitar.;FRC=Aucun graphique n''est activÇ. Choisissez SÇlectionner un graphique pour afficher la liste des graphiques que vous pouvez activer.;ENC=There are no enabled charts. Choose Select Chart to see a list of charts that you can enable.';
+
+    PROCEDURE AddinReady@6000(VAR MiniChartDefinition@6000 : Record 1310;VAR BusinessChartBuffer@6001 : Record 485);
+    VAR
+      MiniLastUsedChart@1170000000 : Record 1311;
+      LastChartRecorded@1000 : Boolean;
+      LastChartExists@1001 : Boolean;
+      LastChartEnabled@1002 : Boolean;
+    BEGIN
+      LastChartRecorded := MiniLastUsedChart.GET(USERID);
+      LastChartExists := LastChartRecorded AND MiniChartDefinition.GET(MiniLastUsedChart.CodeUnitID,MiniLastUsedChart.ChartName);
+      LastChartEnabled := LastChartExists AND MiniChartDefinition.Enabled;
+      IF NOT LastChartEnabled THEN BEGIN
+        MiniChartDefinition.SETRANGE(Enabled,TRUE);
+        IF NOT MiniChartDefinition.FINDFIRST THEN
+          DIALOG.ERROR(NoEnabledChartsFoundErr);
+      END;
+      SetDefaultPeriodLength(MiniChartDefinition,BusinessChartBuffer);
+      UpdateChart(MiniChartDefinition,BusinessChartBuffer,Period::" ");
+    END;
+
+    PROCEDURE ChartDescription@1(MiniChartDefinition@1000 : Record 1310) : Text;
+    BEGIN
+      CASE MiniChartDefinition.CodeUnitID OF
+        CODEUNIT::"Acc. Sched. Chart Management":
+          EXIT(AccountSchedulesChartSetup.Description);
+        CODEUNIT::"Top Ten Customers Chart Mgt.":
+          EXIT(TopTenCustomersChartDescriptionTxt);
+        CODEUNIT::"Aged Inventory Chart Mgt.":
+          EXIT(AgedInventoryChartDescriptionTxt);
+        CODEUNIT::"Sales by Cust. Grp. Chart Mgt.":
+          EXIT(SalesByCustomerGroupDescriptionTxt);
+        CODEUNIT::"Aged Acc. Receivable":
+          EXIT(AgedAccReceivable.Description(FALSE));
+        CODEUNIT::"Aged Acc. Payable":
+          EXIT(AgedAccPayable.Description);
+      END;
+    END;
+
+    PROCEDURE CashFlowChartName@3() : Text[30];
+    BEGIN
+      EXIT(XCashFlowChartNameTxt)
+    END;
+
+    PROCEDURE CashCycleChartName@5() : Text[30];
+    BEGIN
+      EXIT(XCashCycleChartNameTxt)
+    END;
+
+    PROCEDURE IncomeAndExpenseChartName@6() : Text[30];
+    BEGIN
+      EXIT(XIncomeAndExpenseChartNameTxt)
+    END;
+
+    PROCEDURE DataPointClicked@6001(VAR BusinessChartBuffer@6000 : Record 485;VAR MiniChartDefinition@6001 : Record 1310);
+    BEGIN
+      CASE MiniChartDefinition.CodeUnitID OF
+        CODEUNIT::"Acc. Sched. Chart Management":
+          AccSchedChartManagement.DrillDown(BusinessChartBuffer,AccountSchedulesChartSetup);
+        CODEUNIT::"Top Ten Customers Chart Mgt.":
+          TopTenCustomersChartMgt.DrillDown(BusinessChartBuffer);
+        CODEUNIT::"Aged Inventory Chart Mgt.":
+          AgedInventoryChartMgt.DrillDown(BusinessChartBuffer);
+        CODEUNIT::"Sales by Cust. Grp. Chart Mgt.":
+          SalesByCustGrpChartMgt.DrillDown(BusinessChartBuffer);
+        CODEUNIT::"Aged Acc. Receivable":
+          AgedAccReceivable.DrillDownByGroup(BusinessChartBuffer,TempEntryNoAmountBuf);
+        CODEUNIT::"Aged Acc. Payable":
+          AgedAccPayable.DrillDown(BusinessChartBuffer,TempEntryNoAmountBuf);
+      END;
+    END;
+
+    PROCEDURE PopulateChartDefinitionTable@2();
+    BEGIN
+      InsertChartDefinition(CODEUNIT::"Top Ten Customers Chart Mgt.",TopTenCustomerChartNameTxt);
+      InsertChartDefinition(CODEUNIT::"Aged Inventory Chart Mgt.",AgedInventoryChartNameTxt);
+      InsertChartDefinition(CODEUNIT::"Sales by Cust. Grp. Chart Mgt.",SalesByCustomerGroupNameTxt);
+      InsertChartDefinition(CODEUNIT::"Aged Acc. Receivable",AgedAccReceivableNameTxt);
+      InsertChartDefinition(CODEUNIT::"Aged Acc. Payable",AgedAccPayableNameTxt);
+      InsertChartDefinition(CODEUNIT::"Acc. Sched. Chart Management",XCashFlowChartNameTxt);
+      InsertChartDefinition(CODEUNIT::"Acc. Sched. Chart Management",XIncomeAndExpenseChartNameTxt);
+      InsertChartDefinition(CODEUNIT::"Acc. Sched. Chart Management",XCashCycleChartNameTxt);
+    END;
+
+    PROCEDURE SelectChart@6011(VAR BusinessChartBuffer@6002 : Record 485;VAR MiniChartDefinition@6001 : Record 1310);
+    VAR
+      MiniChartList@6000 : Page 1391;
+    BEGIN
+      MiniChartList.LOOKUPMODE(TRUE);
+      IF MiniChartList.RUNMODAL = ACTION::LookupOK THEN BEGIN
+        MiniChartList.GETRECORD(MiniChartDefinition);
+        SetDefaultPeriodLength(MiniChartDefinition,BusinessChartBuffer);
+        UpdateChart(MiniChartDefinition,BusinessChartBuffer,Period::" ");
+      END;
+    END;
+
+    PROCEDURE SetDefaultPeriodLength@7002(MiniChartDefinition@1170000001 : Record 1310;VAR BusChartBuf@1170000000 : Record 485);
+    VAR
+      BusChartUserSetup@1000 : Record 487;
+    BEGIN
+      CASE MiniChartDefinition.CodeUnitID OF
+        CODEUNIT::"Aged Inventory Chart Mgt.":
+          SetPeriodLength(MiniChartDefinition,BusChartBuf,BusChartBuf."Period Length"::Month,TRUE);
+        CODEUNIT::"Aged Acc. Receivable":
+          BEGIN
+            BusChartUserSetup.InitSetupCU(CODEUNIT::"Aged Acc. Receivable");
+            SetPeriodLength(MiniChartDefinition,BusChartBuf,BusChartUserSetup."Period Length",TRUE);
+          END;
+        CODEUNIT::"Aged Acc. Payable":
+          BEGIN
+            BusChartUserSetup.InitSetupCU(CODEUNIT::"Aged Acc. Payable");
+            SetPeriodLength(MiniChartDefinition,BusChartBuf,BusChartUserSetup."Period Length",TRUE);
+          END;
+        CODEUNIT::"Acc. Sched. Chart Management":
+          BEGIN
+            AccountSchedulesChartSetup.GET('',MiniChartDefinition.ChartName);
+            SetPeriodLength(MiniChartDefinition,BusChartBuf,AccountSchedulesChartSetup."Period Length",TRUE);
+          END;
+      END;
+    END;
+
+    PROCEDURE SetPeriodLength@7001(MiniChartDefinition@1000 : Record 1310;VAR BusChartBuf@1170000000 : Record 485;PeriodLength@1170000001 : Option;IsInitState@1002 : Boolean);
+    VAR
+      NewStartDate@1001 : Date;
+    BEGIN
+      CASE MiniChartDefinition.CodeUnitID OF
+        CODEUNIT::"Acc. Sched. Chart Management":
+          BEGIN
+            AccountSchedulesChartSetup.GET('',MiniChartDefinition.ChartName);
+            AccountSchedulesChartSetup.SetPeriodLength(PeriodLength);
+            BusChartBuf."Period Length" := PeriodLength;
+            IF AccountSchedulesChartSetup."Look Ahead" THEN
+              NewStartDate := GetBaseDate(BusChartBuf,IsInitState)
+            ELSE
+              NewStartDate :=
+                CALCDATE(
+                  STRSUBSTNO(
+                    '<-%1%2>',AccountSchedulesChartSetup."No. of Periods",BusChartBuf.GetPeriodLength),
+                  GetBaseDate(BusChartBuf,IsInitState));
+            IF AccountSchedulesChartSetup."Start Date" <> NewStartDate THEN BEGIN
+              AccountSchedulesChartSetup.VALIDATE("Start Date",NewStartDate);
+              AccountSchedulesChartSetup.MODIFY(TRUE);
+            END;
+          END;
+        CODEUNIT::"Sales by Cust. Grp. Chart Mgt.":
+          SalesByCustGrpChartSetup.SetPeriodLength(PeriodLength);
+        ELSE
+          BusChartBuf."Period Length" := PeriodLength;
+      END;
+    END;
+
+    PROCEDURE UpdateChart@6012(VAR MiniChartDefinition@6001 : Record 1310;VAR BusinessChartBuffer@6000 : Record 485;Period@6002 : Option);
+    BEGIN
+      CASE MiniChartDefinition.CodeUnitID OF
+        CODEUNIT::"Acc. Sched. Chart Management":
+          BEGIN
+            AccSchedChartManagement.GetSetupRecordset(AccountSchedulesChartSetup,MiniChartDefinition.ChartName,0);
+            AccSchedChartManagement.UpdateData(BusinessChartBuffer,Period,AccountSchedulesChartSetup);
+          END;
+        CODEUNIT::"Aged Inventory Chart Mgt.":
+          AgedInventoryChartMgt.UpdateChart(BusinessChartBuffer);
+        CODEUNIT::"Sales by Cust. Grp. Chart Mgt.":
+          BEGIN
+            SalesByCustGrpChartSetup.SetPeriod(Period);
+            SalesByCustGrpChartMgt.UpdateChart(BusinessChartBuffer);
+          END;
+        CODEUNIT::"Aged Acc. Receivable":
+          BEGIN
+            BusinessChartBuffer."Period Filter Start Date" := WORKDATE;
+            AgedAccReceivable.UpdateDataPerGroup(BusinessChartBuffer,TempEntryNoAmountBuf);
+            AgedAccReceivable.SaveSettings(BusinessChartBuffer);
+          END;
+        CODEUNIT::"Aged Acc. Payable":
+          BEGIN
+            BusinessChartBuffer."Period Filter Start Date" := WORKDATE;
+            AgedAccPayable.UpdateData(BusinessChartBuffer,TempEntryNoAmountBuf);
+            AgedAccPayable.SaveSettings(BusinessChartBuffer)
+          END
+        ELSE
+          TopTenCustomersChartMgt.UpdateChart(BusinessChartBuffer);
+      END;
+      UpdateLastUsedChart(MiniChartDefinition);
+    END;
+
+    PROCEDURE UpdateNextPrevious@6002(VAR MiniChartDefinition@6001 : Record 1310) : Boolean;
+    BEGIN
+      EXIT(MiniChartDefinition.CodeUnitID IN
+        [CODEUNIT::"Acc. Sched. Chart Management",
+         CODEUNIT::"Sales by Cust. Grp. Chart Mgt."]);
+    END;
+
+    PROCEDURE UpdateStatusText@6003(VAR MiniChartDefinition@6000 : Record 1310;VAR BusinessChartBuffer@1000 : Record 485;VAR StatusText@6001 : Text);
+    VAR
+      StartDate@1001 : Date;
+      EndDate@1002 : Date;
+    BEGIN
+      StartDate := BusinessChartBuffer."Period Filter Start Date";
+      EndDate := BusinessChartBuffer."Period Filter End Date";
+      CASE MiniChartDefinition.CodeUnitID OF
+        CODEUNIT::"Acc. Sched. Chart Management":
+          WITH AccountSchedulesChartSetup DO
+            CASE "Base X-Axis on" OF
+              "Base X-Axis on"::Period:
+                StatusText := STRSUBSTNO(MediumStatusTxt,MiniChartDefinition.ChartName,"Period Length");
+              "Base X-Axis on"::"Acc. Sched. Line",
+              "Base X-Axis on"::"Acc. Sched. Column":
+                StatusText := STRSUBSTNO(LongStatusTxt,MiniChartDefinition.ChartName,StartDate,EndDate,"Period Length");
+            END;
+        CODEUNIT::"Sales by Cust. Grp. Chart Mgt.",
+        CODEUNIT::"Aged Acc. Receivable",
+        CODEUNIT::"Aged Acc. Payable",
+        CODEUNIT::"Aged Inventory Chart Mgt.":
+          StatusText := STRSUBSTNO(MediumStatusTxt,MiniChartDefinition.ChartName,BusinessChartBuffer."Period Length");
+        ELSE
+          StatusText := MiniChartDefinition.ChartName;
+      END;
+    END;
+
+    PROCEDURE UpdateLastUsedChart@4(MiniChartDefinition@1001 : Record 1310);
+    VAR
+      MiniLastUsedChart@1000 : Record 1311;
+    BEGIN
+      WITH MiniLastUsedChart DO
+        IF GET(USERID) THEN BEGIN
+          VALIDATE(CodeUnitID,MiniChartDefinition.CodeUnitID);
+          VALIDATE(ChartName,MiniChartDefinition.ChartName);
+          MODIFY;
+        END ELSE BEGIN
+          VALIDATE(UID,USERID);
+          VALIDATE(CodeUnitID,MiniChartDefinition.CodeUnitID);
+          VALIDATE(ChartName,MiniChartDefinition.ChartName);
+          INSERT;
+        END;
+    END;
+
+    LOCAL PROCEDURE InsertChartDefinition@7(ChartCodeunitId@1000 : Integer;ChartName@1001 : Text[60]);
+    VAR
+      MiniChartDefinition@1002 : Record 1310;
+    BEGIN
+      IF NOT MiniChartDefinition.GET(ChartCodeunitId,ChartName) THEN BEGIN
+        MiniChartDefinition.CodeUnitID := ChartCodeunitId;
+        MiniChartDefinition.ChartName := ChartName;
+        MiniChartDefinition.Enabled := TRUE;
+        MiniChartDefinition.INSERT;
+      END;
+    END;
+
+    LOCAL PROCEDURE GetPeriodLength@31() : Text[1];
+    BEGIN
+      CASE AccountSchedulesChartSetup."Period Length" OF
+        AccountSchedulesChartSetup."Period Length"::Day:
+          EXIT('D');
+        AccountSchedulesChartSetup."Period Length"::Week:
+          EXIT('W');
+        AccountSchedulesChartSetup."Period Length"::Month:
+          EXIT('M');
+        AccountSchedulesChartSetup."Period Length"::Quarter:
+          EXIT('Q');
+        AccountSchedulesChartSetup."Period Length"::Year:
+          EXIT('Y');
+      END;
+    END;
+
+    LOCAL PROCEDURE GetBaseDate@8(VAR BusChartBuf@1005 : Record 485;IsInitState@1001 : Boolean) : Date;
+    VAR
+      ColumnIndex@1000 : Integer;
+      StartDate@1002 : Date;
+      EndDate@1003 : Date;
+    BEGIN
+      IF AccountSchedulesChartSetup."Look Ahead" THEN
+        ColumnIndex := 0
+      ELSE
+        ColumnIndex := AccountSchedulesChartSetup."No. of Periods" - 1;
+
+      IF IsInitState THEN
+        EXIT(WORKDATE);
+
+      BusChartBuf.GetPeriodFromMapColumn(ColumnIndex,StartDate,EndDate);
+
+      IF AccountSchedulesChartSetup."Look Ahead" THEN
+        EXIT(StartDate);
+
+      EXIT(CALCDATE(STRSUBSTNO('<1%1>',GetPeriodLength),EndDate));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,367 @@
+OBJECT Table 1222 Posting Exch. Def
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36366;
+  }
+  PROPERTIES
+  {
+    OnInsert=BEGIN
+               Name := Code;
+             END;
+
+    OnModify=BEGIN
+               ValidateRec;
+             END;
+
+    OnDelete=VAR
+               PostingExchLineDef@1000 : Record 1227;
+             BEGIN
+               PostingExchLineDef.SETRANGE("Posting Exch. Def Code",Code);
+               PostingExchLineDef.DELETEALL(TRUE);
+             END;
+
+    CaptionML=[ENU=Posting Exch. Def;
+               ESM=Def. intercambio registro;
+               FRC=DÇf. Çchge report;
+               ENC=Posting Exch. Def];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Code20        ;CaptionML=[ENU=Code;
+                                                              ESM=C¢digo;
+                                                              FRC=Code;
+                                                              ENC=Code] }
+    { 2   ;   ;Name                ;Text100       ;CaptionML=[ENU=Name;
+                                                              ESM=Nombre;
+                                                              FRC=Nom;
+                                                              ENC=Name] }
+    { 3   ;   ;Type                ;Option        ;OnValidate=BEGIN
+                                                                CheckSupportedCombinations;
+                                                                IF IsSupportedCombination THEN
+                                                                  SetProcessingID;
+                                                                CheckLineDefCount;
+                                                              END;
+
+                                                   CaptionML=[ENU=Type;
+                                                              ESM=Tipo;
+                                                              FRC=Type;
+                                                              ENC=Type];
+                                                   OptionCaptionML=[ENU=Bank Statement Import,Payment Export,Payroll Import;
+                                                                    ESM=Importaci¢n estado de cuenta banco,Exportaci¢n pagos,Importaci¢n n¢minas;
+                                                                    FRC=Importation relevÇ bancaire,Exportation paiement,Importation salaires;
+                                                                    ENC=Bank Statement Import,Payment Export,Payroll Import];
+                                                   OptionString=Bank Statement Import,Payment Export,Payroll Import }
+    { 4   ;   ;Processing XMLport  ;Integer       ;TableRelation=AllObjWithCaption."Object ID" WHERE (Object Type=CONST(XMLport));
+                                                   OnValidate=BEGIN
+                                                                CheckSupportedCombinations;
+                                                                CheckProcessingObjects;
+                                                              END;
+
+                                                   CaptionML=[ENU=Processing XMLport;
+                                                              ESM=Procesando XMLPort;
+                                                              FRC=XMLPort de traitement;
+                                                              ENC=Processing XMLport] }
+    { 5   ;   ;Header Lines        ;Integer       ;CaptionML=[ENU=Header Lines;
+                                                              ESM=L°neas de encabezado;
+                                                              FRC=Lignes en-tàte;
+                                                              ENC=Header Lines] }
+    { 8   ;   ;Header Tag          ;Text250       ;CaptionML=[ENU=Header Tag;
+                                                              ESM=Etiqueta de encabezado;
+                                                              FRC=êtiquette d'en-tàte;
+                                                              ENC=Header Tag] }
+    { 9   ;   ;Footer Tag          ;Text250       ;CaptionML=[ENU=Footer Tag;
+                                                              ESM=Etiqueta de pie de p†gina;
+                                                              FRC=êtiquette de pied de page;
+                                                              ENC=Footer Tag] }
+    { 10  ;   ;Column Separator    ;Option        ;InitValue=Comma;
+                                                   CaptionML=[ENU=Column Separator;
+                                                              ESM=Separador de columnas;
+                                                              FRC=SÇparateur de colonnes;
+                                                              ENC=Column Separator];
+                                                   OptionCaptionML=[ENU=,Tab,Semicolon,Comma,Space;
+                                                                    ESM=,Tabulador,Punto y coma,Coma,Espacio;
+                                                                    FRC=,Tabulation,Point-virgule,Virgule,Espace;
+                                                                    ENC=,Tab,Semicolon,Comma,Space];
+                                                   OptionString=,Tab,Semicolon,Comma,Space }
+    { 11  ;   ;File Encoding       ;Option        ;InitValue=WINDOWS;
+                                                   CaptionML=[ENU=File Encoding;
+                                                              ESM=Codificaci¢n de archivos;
+                                                              FRC=Encodage du fichier;
+                                                              ENC=File Encoding];
+                                                   OptionCaptionML=[ENU=MS-DOS,UTF-8,UTF-16,WINDOWS;
+                                                                    ESM=MS-DOS,UTF-8,UTF-16,WINDOWS;
+                                                                    FRC=MS-DOS,UTF-8,UTF-16,WINDOWS;
+                                                                    ENC=MS-DOS,UTF-8,UTF-16,WINDOWS];
+                                                   OptionString=MS-DOS,UTF-8,UTF-16,WINDOWS }
+    { 13  ;   ;File Type           ;Option        ;OnValidate=BEGIN
+                                                                CheckSupportedCombinations;
+                                                                IF IsSupportedCombination THEN
+                                                                  SetProcessingID;
+                                                              END;
+
+                                                   CaptionML=[ENU=File Type;
+                                                              ESM=Tipo de archivo;
+                                                              FRC=Type de fichier;
+                                                              ENC=File Type];
+                                                   OptionCaptionML=[ENU=Xml,Variable Text,Fixed Text;
+                                                                    ESM=Xml,Texto variable,Texto fijo;
+                                                                    FRC=XML,Texte variable,Texte fixe;
+                                                                    ENC=Xml,Variable Text,Fixed Text];
+                                                   OptionString=Xml,Variable Text,Fixed Text }
+    { 14  ;   ;Importing Codeunit  ;Integer       ;TableRelation=AllObjWithCaption."Object ID" WHERE (Object Type=CONST(Codeunit));
+                                                   CaptionML=[ENU=Importing Codeunit;
+                                                              ESM=Importando Codeunit;
+                                                              FRC=Importation du Codeunit;
+                                                              ENC=Importing Codeunit] }
+    { 15  ;   ;Processing Codeunit ;Integer       ;TableRelation=AllObjWithCaption."Object ID" WHERE (Object Type=CONST(Codeunit));
+                                                   OnValidate=BEGIN
+                                                                CheckSupportedCombinations;
+                                                                CheckProcessingObjects;
+                                                              END;
+
+                                                   CaptionML=[ENU=Processing Codeunit;
+                                                              ESM=Codeunit de procesamiento;
+                                                              FRC=Codeunit de traitement;
+                                                              ENC=Processing Codeunit] }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+    {    ;Type                                     }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      ColumnSeparatorMissingErr@1001 : TextConst 'ENU=Column separator is missing in the definition.;ESM=Falta el separador de columnas en la definici¢n.;FRC=Il manque un sÇparateur de colonnes dans la dÇfinition.;ENC=Column separator is missing in the definition.';
+      OnlySupportOneLineDefErr@1006 : TextConst 'ENU=Data exchange setup of type Import can only have one %1;ESM=La configuraci¢n de intercambio de datos del tipo Importar puede tener un solo %1;FRC=La configuration d''Çchange de donnÇes de type Importation ne peuvent avoir qu''un seul %1;ENC=Data exchange setup of type Import can only have one %1';
+      ProcessingCodeunitMsg@1003 : TextConst 'ENU=When both %1 and %2 are set, %1 takes precedence.;ESM=Cuando se han configurado %1 y %2 %1 tiene prioridad.;FRC=Si %1 et %2 sont dÇfinis, %1 est prioritaire.;ENC=When both %1 and %2 are set, %1 takes precedence.';
+      CustomProcessingMustBeSetTxt@1004 : TextConst 'ENU=You can only combine type %1 with file type %2 if you use a custom %3 or %4.;ESM=Solo se puede combinar el tipo %1 con el tipo de archivo %2 si usa un %3 o un %4 personalizado.;FRC=Vous pouvez uniquement combiner le type %1 avec le type de fichier %2 si vous utilisez un %3 ou %4 personnalisÇ.;ENC=You can only combine type %1 with file type %2 if you use a custom %3 or %4.';
+      InvalidProcessingIDsForCombinationMsg@1000 : TextConst '@@@="%1=FIELDCAPTION for Processing Codeunit,%2=Processing Codeunit,%3=FIELDCAPTION for Processing XMLport,%4=Processing XMLport,%5=Type,%6=File Type";ENU=%1: %2 and/or %3:%4 cannot be used when combining Type: %5 with File Type: %6.;ESM=%1: %2 o %3:%4 no se puede usar al combinar el tipo %5 con el tipo de archivo %6.;FRC=%1 : %2 et/ou %3 :%4 ne peuvent pas àtre utilisÇs si le Type : %5 est combinÇ avec le type de fichier : %6.;ENC=%1: %2 and/or %3:%4 cannot be used when combining Type: %5 with File Type: %6.';
+
+    PROCEDURE InsertRec@1(Code@1000 : Code[20];Name@1001 : Text[100];Type@1002 : Option;ProcessingXMLport@1003 : Integer;HeaderCount@1004 : Integer;HeaderTag@1005 : Text[250];FooterTag@1006 : Text[250]);
+    BEGIN
+      INIT;
+      VALIDATE(Code,Code);
+      VALIDATE(Name,Name);
+      VALIDATE(Type,Type);
+      VALIDATE("Processing XMLport",ProcessingXMLport);
+      VALIDATE("Header Lines",HeaderCount);
+      VALIDATE("Header Tag",HeaderTag);
+      VALIDATE("Footer Tag",FooterTag);
+      INSERT;
+    END;
+
+    PROCEDURE InsertRecForExport@4(Code@1000 : Code[20];Name@1001 : Text[100];ParamaterType@1002 : Option;ProcessingXMLport@1003 : Integer;FileType@1004 : Option);
+    BEGIN
+      INIT;
+      VALIDATE(Code,Code);
+      VALIDATE(Name,Name);
+      "File Type" := FileType;
+      Type := ParamaterType;
+      VALIDATE("File Type",FileType);
+      VALIDATE(Type,Type);
+
+      VALIDATE("Processing XMLport",ProcessingXMLport);
+      INSERT;
+    END;
+
+    PROCEDURE ValidateRec@2();
+    BEGIN
+      TESTFIELD(Code);
+      TESTFIELD(Name);
+
+      IF (NOT IsSupportedCombination) AND (NOT IsCustomProcessingSet) THEN
+        ERROR(
+          CustomProcessingMustBeSetTxt,Type,"File Type",
+          FIELDCAPTION("Processing Codeunit"),FIELDCAPTION("Processing XMLport"));
+
+      IF "File Type" <> "File Type"::Xml THEN
+        TESTFIELD("Processing XMLport");
+      IF "File Type" = "File Type"::"Variable Text" THEN
+        TESTFIELD("Column Separator");
+    END;
+
+    PROCEDURE ColumnSeparatorChar@3() : Text;
+    VAR
+      SeparatorChar@1000 : Text;
+    BEGIN
+      CASE "Column Separator" OF
+        "Column Separator"::Tab:
+          BEGIN
+            SeparatorChar[1] := 9;
+            EXIT(SeparatorChar);
+          END;
+        "Column Separator"::Semicolon:
+          EXIT(';');
+        "Column Separator"::Comma:
+          EXIT(',');
+        "Column Separator"::Space:
+          EXIT(' ');
+        ELSE
+          ERROR(ColumnSeparatorMissingErr)
+      END
+    END;
+
+    PROCEDURE CheckEnableDisableIsNonXMLFileType@9() : Boolean;
+    BEGIN
+      EXIT("File Type" <> "File Type"::Xml)
+    END;
+
+    PROCEDURE CheckEnableDisableIsImportType@18() : Boolean;
+    BEGIN
+      IF Type = Type::"Payment Export" THEN
+        EXIT(FALSE);
+      EXIT("File Type" <> "File Type"::Xml);
+    END;
+
+    PROCEDURE CheckEnableDisableIsBankStatementImportType@15() : Boolean;
+    BEGIN
+      EXIT(Type = Type::"Bank Statement Import");
+    END;
+
+    PROCEDURE CheckEnableDisableDelimitedFileType@8() : Boolean;
+    BEGIN
+      EXIT("File Type" = "File Type"::"Variable Text");
+    END;
+
+    LOCAL PROCEDURE CheckSupportedCombinations@10();
+    BEGIN
+      IF NOT IsSupportedCombination THEN BEGIN
+        IF IsKnownXMLPort(FALSE) OR IsKnownProcessingCodeUnit(FALSE) THEN BEGIN
+          MESSAGE(InvalidProcessingIDsForCombinationMsg,
+            FIELDCAPTION("Processing Codeunit"),"Processing Codeunit",
+            FIELDCAPTION("Processing XMLport"),"Processing XMLport",
+            Type,"File Type");
+          "Processing XMLport" := 0;
+          "Processing Codeunit" := 0;
+        END ELSE
+          IF NOT IsCustomProcessingSet THEN
+            MESSAGE(
+              CustomProcessingMustBeSetTxt,Type,"File Type",
+              FIELDCAPTION("Processing Codeunit"),FIELDCAPTION("Processing XMLport"));
+      END;
+    END;
+
+    PROCEDURE SetProcessingID@6();
+    BEGIN
+      IF NOT IsKnownXMLPort(TRUE) THEN
+        EXIT;
+
+      IF "File Type" = "File Type"::Xml THEN BEGIN
+        "Processing XMLport" := 0;
+        IF "Importing Codeunit" = 0 THEN
+          "Importing Codeunit" := CODEUNIT::"Read Post Exch. from File";
+        EXIT;
+      END;
+
+      CASE Type OF
+        Type::"Bank Statement Import",
+        Type::"Payroll Import":
+          BEGIN
+            "Processing XMLport" := XMLPORT::"Posting Exch. Import - CSV";
+            IF "Importing Codeunit" = 0 THEN
+              "Importing Codeunit" := CODEUNIT::"Read Post Exch. from File";
+          END;
+        Type::"Payment Export":
+          BEGIN
+            "Importing Codeunit" := 0;
+            IF "File Type" = "File Type"::"Variable Text" THEN
+              "Processing XMLport" := XMLPORT::"Export Generic CSV";
+            IF "File Type" = "File Type"::"Fixed Text" THEN
+              "Processing XMLport" := XMLPORT::"Export Generic Fixed Width";
+          END;
+      END;
+    END;
+
+    PROCEDURE CheckLineDefCount@5();
+    VAR
+      PostingExchLineDef@1000 : Record 1227;
+    BEGIN
+      IF Type <> Type::"Payment Export" THEN BEGIN
+        PostingExchLineDef.SETRANGE("Posting Exch. Def Code",Code);
+        IF PostingExchLineDef.COUNT > 1 THEN
+          FIELDERROR(Type,STRSUBSTNO(OnlySupportOneLineDefErr,PostingExchLineDef.TABLECAPTION));
+      END;
+    END;
+
+    PROCEDURE IsBankOrPayrollType@11() : Boolean;
+    BEGIN
+      EXIT(Type IN [Type::"Bank Statement Import",Type::"Payroll Import",Type::"Payment Export"]);
+    END;
+
+    LOCAL PROCEDURE IsFixedWidthAndImport@19() : Boolean;
+    BEGIN
+      EXIT(("File Type" = "File Type"::"Fixed Text") AND (Type <> Type::"Payment Export"));
+    END;
+
+    LOCAL PROCEDURE IsXMLAndExport@20() : Boolean;
+    BEGIN
+      EXIT(("File Type" = "File Type"::Xml) AND (Type = Type::"Payment Export"));
+    END;
+
+    PROCEDURE IsXML@7() : Boolean;
+    BEGIN
+      EXIT("File Type" = "File Type"::Xml);
+    END;
+
+    LOCAL PROCEDURE IsSupportedCombination@13() : Boolean;
+    BEGIN
+      EXIT((NOT IsXMLAndExport) AND (NOT IsFixedWidthAndImport));
+    END;
+
+    LOCAL PROCEDURE IsKnownXMLPort@23(ConsiderZeroAsKnown@1000 : Boolean) : Boolean;
+    VAR
+      IsZero@1001 : Boolean;
+    BEGIN
+      IF ConsiderZeroAsKnown THEN
+        IsZero := "Processing XMLport" = 0;
+
+      EXIT(IsZero OR ("Processing XMLport" IN
+                      [XMLPORT::"Posting Exch. Import - CSV",
+                       XMLPORT::"Export Generic CSV",
+                       XMLPORT::"Export Generic Fixed Width"]))
+    END;
+
+    LOCAL PROCEDURE IsKnownProcessingCodeUnit@17(ConsiderZeroAsKnown@1000 : Boolean) : Boolean;
+    VAR
+      IsZero@1001 : Boolean;
+    BEGIN
+      IF ConsiderZeroAsKnown THEN
+        IsZero := "Processing Codeunit" = 0;
+
+      EXIT(IsZero OR ("Processing Codeunit" = CODEUNIT::"SEPA DD-Export File"))
+    END;
+
+    LOCAL PROCEDURE IsCustomProcessingSet@31() : Boolean;
+    BEGIN
+      EXIT(("Processing Codeunit" > 0) OR ("Processing XMLport" > 0));
+    END;
+
+    LOCAL PROCEDURE CheckProcessingObjects@14();
+    BEGIN
+      IF ("Processing Codeunit" > 0) AND ("Processing XMLport" > 0) THEN
+        MESSAGE(ProcessingCodeunitMsg,FIELDCAPTION("Processing Codeunit"),FIELDCAPTION("Processing XMLport"));
+    END;
+
+    PROCEDURE CheckCreateTemplateColumns@12(VAR ResultingMessage@1000 : Text) : Boolean;
+    VAR
+      PostingExchColDef@1001 : Record 1223;
+    BEGIN
+      IF IsXML THEN
+        EXIT(FALSE);
+
+      ResultingMessage := PostingExchColDef.GetTemplateCreationMessage(Code);
+      EXIT(PostingExchColDef.IsTemplateCreationSupported(Code));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

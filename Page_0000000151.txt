@@ -1,0 +1,868 @@
+OBJECT Page 151 Customer Statistics
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Customer Statistics;
+               ESM=Estad¡sticas cliente;
+               FRC=Statistiques client;
+               ENC=Customer Statistics];
+    LinksAllowed=No;
+    SourceTable=Table18;
+    PageType=Card;
+    OnAfterGetRecord=VAR
+                       CostCalcMgt@1000 : Codeunit 5836;
+                     BEGIN
+                       IF CurrentDate <> WORKDATE THEN BEGIN
+                         CurrentDate := WORKDATE;
+                         DateFilterCalc.CreateAccountingPeriodFilter(CustDateFilter[1],CustDateName[1],CurrentDate,0);
+                         DateFilterCalc.CreateFiscalYearFilter(CustDateFilter[2],CustDateName[2],CurrentDate,0);
+                         DateFilterCalc.CreateFiscalYearFilter(CustDateFilter[3],CustDateName[3],CurrentDate,-1);
+                       END;
+
+                       SETRANGE("Date Filter",0D,CurrentDate);
+
+                       FOR i := 1 TO 4 DO BEGIN
+                         SETFILTER("Date Filter",CustDateFilter[i]);
+                         CALCFIELDS(
+                           "Sales (LCY)","Profit (LCY)","Inv. Discounts (LCY)","Inv. Amounts (LCY)","Pmt. Discounts (LCY)",
+                           "Pmt. Disc. Tolerance (LCY)","Pmt. Tolerance (LCY)",
+                           "Fin. Charge Memo Amounts (LCY)","Cr. Memo Amounts (LCY)","Payments (LCY)",
+                           "Reminder Amounts (LCY)","Refunds (LCY)","Other Amounts (LCY)");
+                         CustSalesLCY[i] := "Sales (LCY)";
+                         CustProfit[i] := "Profit (LCY)" + CostCalcMgt.NonInvtblCostAmt(Rec);
+                         AdjmtCostLCY[i] := CustSalesLCY[i] - CustProfit[i] + CostCalcMgt.CalcCustActualCostLCY(Rec);
+                         AdjCustProfit[i] := CustProfit[i] + AdjmtCostLCY[i];
+
+                         IF "Sales (LCY)" <> 0 THEN BEGIN
+                           ProfitPct[i] := ROUND(100 * CustProfit[i] / "Sales (LCY)",0.1);
+                           AdjProfitPct[i] := ROUND(100 * AdjCustProfit[i] / "Sales (LCY)",0.1);
+                         END ELSE BEGIN
+                           ProfitPct[i] := 0;
+                           AdjProfitPct[i] := 0;
+                         END;
+
+                         InvAmountsLCY[i] := "Inv. Amounts (LCY)";
+                         CustInvDiscAmountLCY[i] := "Inv. Discounts (LCY)";
+                         CustPaymentDiscLCY[i] := "Pmt. Discounts (LCY)";
+                         CustPaymentDiscTolLCY[i] := "Pmt. Disc. Tolerance (LCY)";
+                         CustPaymentTolLCY[i] := "Pmt. Tolerance (LCY)";
+                         CustReminderChargeAmtLCY[i] := "Reminder Amounts (LCY)";
+                         CustFinChargeAmtLCY[i] := "Fin. Charge Memo Amounts (LCY)";
+                         CustCrMemoAmountsLCY[i] := "Cr. Memo Amounts (LCY)";
+                         CustPaymentsLCY[i] := "Payments (LCY)";
+                         CustRefundsLCY[i] := "Refunds (LCY)";
+                         CustOtherAmountsLCY[i] := "Other Amounts (LCY)";
+                       END;
+                       SETRANGE("Date Filter",0D,CurrentDate);
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 67  ;2   ;Field     ;
+                SourceExpr="Balance (LCY)";
+                OnDrillDown=VAR
+                              DtldCustLedgEntry@1000 : Record 379;
+                              CustLedgEntry@1001 : Record 21;
+                            BEGIN
+                              DtldCustLedgEntry.SETRANGE("Customer No.","No.");
+                              COPYFILTER("Global Dimension 1 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                              COPYFILTER("Global Dimension 2 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                              COPYFILTER("Currency Filter",DtldCustLedgEntry."Currency Code");
+                              CustLedgEntry.DrillDownOnEntries(DtldCustLedgEntry);
+                            END;
+                             }
+
+    { 13  ;2   ;Group     ;
+                Name=Sales;
+                CaptionML=[ENU=Sales;
+                           ESM=Ventas;
+                           FRC=Ventes;
+                           ENC=Sales];
+                GroupType=Group }
+
+    { 2   ;3   ;Field     ;
+                SourceExpr="Outstanding Orders (LCY)" }
+
+    { 4   ;3   ;Field     ;
+                SourceExpr="Shipped Not Invoiced (LCY)" }
+
+    { 11  ;3   ;Field     ;
+                SourceExpr="Outstanding Invoices (LCY)" }
+
+    { 3   ;2   ;Group     ;
+                Name=Service;
+                CaptionML=[ENU=Service;
+                           ESM=Servicio;
+                           FRC=Service;
+                           ENC=Service];
+                GroupType=Group }
+
+    { 109 ;3   ;Field     ;
+                SourceExpr="Outstanding Serv. Orders (LCY)" }
+
+    { 111 ;3   ;Field     ;
+                SourceExpr="Serv Shipped Not Invoiced(LCY)" }
+
+    { 5   ;3   ;Field     ;
+                SourceExpr="Outstanding Serv.Invoices(LCY)" }
+
+    { 10  ;2   ;Field     ;
+                CaptionML=[ENU=Total ($);
+                           ESM=Total ($);
+                           FRC=Total ($);
+                           ENC=Total ($)];
+                SourceExpr=GetTotalAmountLCY;
+                AutoFormatType=1;
+                Importance=Promoted;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Credit Limit (LCY)" }
+
+    { 15  ;2   ;Field     ;
+                Name=Balance Due (LCY);
+                SourceExpr=CalcOverdueBalance;
+                CaptionClass=FORMAT(STRSUBSTNO(Text000,FORMAT(CurrentDate)));
+                OnDrillDown=VAR
+                              DtldCustLedgEntry@1000 : Record 379;
+                              CustLedgEntry@1001 : Record 21;
+                            BEGIN
+                              DtldCustLedgEntry.SETFILTER("Customer No.","No.");
+                              COPYFILTER("Global Dimension 1 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                              COPYFILTER("Global Dimension 2 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                              COPYFILTER("Currency Filter",DtldCustLedgEntry."Currency Code");
+                              CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
+                            END;
+                             }
+
+    { 14  ;2   ;Field     ;
+                CaptionML=[ENU=Invoiced Prepayment Amount ($);
+                           ESM=Importe anticipo facturado ($);
+                           FRC=Montant du paiement anticip‚ factur‚ ($);
+                           ENC=Invoiced Prepayment Amount ($)];
+                SourceExpr=GetInvoicedPrepmtAmountLCY }
+
+    { 1904305601;1;Group  ;
+                CaptionML=[ENU=Sales;
+                           ESM=Ventas;
+                           FRC=Ventes;
+                           ENC=Sales] }
+
+    { 1904230801;2;Group  ;
+                GroupType=FixedLayout }
+
+    { 1906874001;3;Group  ;
+                CaptionML=[ENU=This Period;
+                           ESM=Periodo actual;
+                           FRC=Cette p‚riode;
+                           ENC=This Period] }
+
+    { 20  ;4   ;Field     ;
+                SourceExpr=CustDateName[1] }
+
+    { 24  ;4   ;Field     ;
+                CaptionML=[ENU=Sales ($);
+                           ESM=Ventas ($);
+                           FRC=Ventes ($);
+                           ENC=Sales ($)];
+                SourceExpr=CustSalesLCY[1];
+                AutoFormatType=1 }
+
+    { 104 ;4   ;Field     ;
+                CaptionML=[ENU=Original Costs ($);
+                           ESM=Costos originales ($);
+                           FRC=Co–ts initiaux ($);
+                           ENC=Original Costs ($)];
+                SourceExpr=CustSalesLCY[1] - CustProfit[1];
+                AutoFormatType=1 }
+
+    { 29  ;4   ;Field     ;
+                CaptionML=[ENU=Original Profit ($);
+                           ESM=Bf§ original ($);
+                           FRC=Profit initial ($);
+                           ENC=Original Profit ($)];
+                SourceExpr=CustProfit[1];
+                AutoFormatType=1 }
+
+    { 34  ;4   ;Field     ;
+                CaptionML=[ENU=Original Profit %;
+                           ESM=% Bf§ original;
+                           FRC=% profit initial;
+                           ENC=Original Profit %];
+                DecimalPlaces=1:1;
+                SourceExpr=ProfitPct[1] }
+
+    { 89  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Costs ($);
+                           ESM=Costos actualizados ($);
+                           FRC=Co–ts ajust‚s ($);
+                           ENC=Adjusted Costs ($)];
+                SourceExpr=CustSalesLCY[1] - CustProfit[1] - AdjmtCostLCY[1];
+                AutoFormatType=1 }
+
+    { 97  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Profit ($);
+                           ESM=Beneficio actualizado ($);
+                           FRC=Profit ajust‚ ($);
+                           ENC=Adjusted Profit ($)];
+                SourceExpr=AdjCustProfit[1];
+                AutoFormatType=1 }
+
+    { 98  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Profit %;
+                           ESM=% beneficio ajustado;
+                           FRC=% profit ajust‚;
+                           ENC=Adjusted Profit %];
+                DecimalPlaces=1:1;
+                SourceExpr=AdjProfitPct[1] }
+
+    { 113 ;4   ;Field     ;
+                CaptionML=[ENU=Cost Adjmt. Amounts ($);
+                           ESM=Importes costo ajustado ($);
+                           FRC=Montants ajustement co–t ($);
+                           ENC=Cost Adjmt. Amounts ($)];
+                SourceExpr=-AdjmtCostLCY[1];
+                AutoFormatType=1;
+                OnDrillDown=BEGIN
+                              LookUpAdjmtValueEntries(CustDateFilter[1]);
+                            END;
+                             }
+
+    { 39  ;4   ;Field     ;
+                CaptionML=[ENU=Inv. Discounts ($);
+                           ESM=Dtos. factura ($);
+                           FRC=Escomptes facture ($);
+                           ENC=Inv. Discounts ($)];
+                SourceExpr=CustInvDiscAmountLCY[1];
+                AutoFormatType=1 }
+
+    { 75  ;4   ;Field     ;
+                CaptionML=[ENU=Inv. Amounts ($);
+                           ESM=Facturado ($);
+                           FRC=Montants de la facture ($);
+                           ENC=Inv. Amounts ($)];
+                SourceExpr=InvAmountsLCY[1];
+                AutoFormatType=1 }
+
+    { 18  ;4   ;Field     ;
+                CaptionML=[ENU=Reminder Amounts ($);
+                           ESM=Importe recordatorio ($);
+                           FRC=Montants rappel ($);
+                           ENC=Reminder Amounts ($)];
+                SourceExpr=CustReminderChargeAmtLCY[1];
+                AutoFormatType=1 }
+
+    { 49  ;4   ;Field     ;
+                CaptionML=[ENU=Fin. Charges ($);
+                           ESM=Intereses ($);
+                           FRC=Frais financiers ($);
+                           ENC=Fin. Charges ($)];
+                SourceExpr=CustFinChargeAmtLCY[1];
+                AutoFormatType=1 }
+
+    { 54  ;4   ;Field     ;
+                CaptionML=[ENU=Cr. Memo Amounts ($);
+                           ESM=Notas de Cr‚dito ($);
+                           FRC=Montants de notes de cr‚dit ($);
+                           ENC=Cr. Memo Amounts ($)];
+                SourceExpr=CustCrMemoAmountsLCY[1];
+                AutoFormatType=1 }
+
+    { 59  ;4   ;Field     ;
+                CaptionML=[ENU=Payments ($);
+                           ESM=Pagos ($);
+                           FRC=Paiements ($);
+                           ENC=Payments ($)];
+                SourceExpr=CustPaymentsLCY[1];
+                AutoFormatType=1 }
+
+    { 81  ;4   ;Field     ;
+                CaptionML=[ENU=Refunds ($);
+                           ESM=Reembolsos ($);
+                           FRC=Remboursements ($);
+                           ENC=Refunds ($)];
+                SourceExpr=CustRefundsLCY[1];
+                AutoFormatType=1 }
+
+    { 82  ;4   ;Field     ;
+                CaptionML=[ENU=Other Amounts ($);
+                           ESM=Otros importes ($);
+                           FRC=Autres montants ($);
+                           ENC=Other Amounts ($)];
+                SourceExpr=CustOtherAmountsLCY[1];
+                AutoFormatType=1 }
+
+    { 44  ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Discounts ($);
+                           ESM=Dto. P.P. ($);
+                           FRC=Escomptes de paiement ($);
+                           ENC=Pmt. Discounts ($)];
+                SourceExpr=CustPaymentDiscLCY[1];
+                AutoFormatType=1 }
+
+    { 6   ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Disc. Tol. ($);
+                           ESM=Tolerancia dto. P.P ($);
+                           FRC=Tol‚rance d'escompte de paiement $;
+                           ENC=Pmt. Disc. Tol. ($)];
+                SourceExpr=CustPaymentDiscTolLCY[1];
+                AutoFormatType=1 }
+
+    { 69  ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Tolerances ($);
+                           ESM=Tolerancia pagos ($);
+                           FRC=Tol‚rances de rŠglement $;
+                           ENC=Pmt. Tolerances ($)];
+                SourceExpr=CustPaymentTolLCY[1];
+                AutoFormatType=1 }
+
+    { 1901313401;3;Group  ;
+                CaptionML=[ENU=This Year;
+                           ESM=A¤o actual;
+                           FRC=Cette ann‚e;
+                           ENC=This Year] }
+
+    { 120 ;4   ;Field     ;
+                SourceExpr=Text001;
+                Visible=FALSE }
+
+    { 25  ;4   ;Field     ;
+                CaptionML=[ENU=Sales ($);
+                           ESM=Ventas ($);
+                           FRC=Ventes ($);
+                           ENC=Sales ($)];
+                SourceExpr=CustSalesLCY[2];
+                AutoFormatType=1 }
+
+    { 105 ;4   ;Field     ;
+                CaptionML=[ENU=Original Costs ($);
+                           ESM=Costos originales ($);
+                           FRC=Co–ts initiaux ($);
+                           ENC=Original Costs ($)];
+                SourceExpr=CustSalesLCY[2] - CustProfit[2];
+                AutoFormatType=1 }
+
+    { 30  ;4   ;Field     ;
+                CaptionML=[ENU=Original Profit ($);
+                           ESM=Bf§ original ($);
+                           FRC=Profit initial ($);
+                           ENC=Original Profit ($)];
+                SourceExpr=CustProfit[2];
+                AutoFormatType=1 }
+
+    { 35  ;4   ;Field     ;
+                CaptionML=[ENU=Original Profit %;
+                           ESM=% Bf§ original;
+                           FRC=% profit initial;
+                           ENC=Original Profit %];
+                DecimalPlaces=1:1;
+                SourceExpr=ProfitPct[2] }
+
+    { 91  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Costs ($);
+                           ESM=Costos actualizados ($);
+                           FRC=Co–ts ajust‚s ($);
+                           ENC=Adjusted Costs ($)];
+                SourceExpr=CustSalesLCY[2] - CustProfit[2] - AdjmtCostLCY[2];
+                AutoFormatType=1 }
+
+    { 96  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Profit ($);
+                           ESM=Beneficio actualizado ($);
+                           FRC=Profit ajust‚ ($);
+                           ENC=Adjusted Profit ($)];
+                SourceExpr=AdjCustProfit[2];
+                AutoFormatType=1 }
+
+    { 99  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Profit %;
+                           ESM=% beneficio ajustado;
+                           FRC=% profit ajust‚;
+                           ENC=Adjusted Profit %];
+                DecimalPlaces=1:1;
+                SourceExpr=AdjProfitPct[2] }
+
+    { 114 ;4   ;Field     ;
+                CaptionML=[ENU=Adjustment Costs ($);
+                           ESM=Costos ajustes ($);
+                           FRC=Co–ts d'ajustement ($);
+                           ENC=Adjustment Costs ($)];
+                SourceExpr=-AdjmtCostLCY[2];
+                AutoFormatType=1;
+                OnDrillDown=BEGIN
+                              LookUpAdjmtValueEntries(CustDateFilter[2]);
+                            END;
+                             }
+
+    { 40  ;4   ;Field     ;
+                CaptionML=[ENU=Inv. Discounts ($);
+                           ESM=Dtos. factura ($);
+                           FRC=Escomptes facture ($);
+                           ENC=Inv. Discounts ($)];
+                SourceExpr=CustInvDiscAmountLCY[2];
+                AutoFormatType=1 }
+
+    { 76  ;4   ;Field     ;
+                CaptionML=[ENU=Inv. Amounts ($);
+                           ESM=Facturado ($);
+                           FRC=Montants de la facture ($);
+                           ENC=Inv. Amounts ($)];
+                SourceExpr=InvAmountsLCY[2];
+                AutoFormatType=1 }
+
+    { 19  ;4   ;Field     ;
+                CaptionML=[ENU=Reminder Amounts ($);
+                           ESM=Importe recordatorio ($);
+                           FRC=Montants rappel ($);
+                           ENC=Reminder Amounts ($)];
+                SourceExpr=CustReminderChargeAmtLCY[2];
+                AutoFormatType=1 }
+
+    { 50  ;4   ;Field     ;
+                CaptionML=[ENU=Fin. Charges ($);
+                           ESM=Intereses ($);
+                           FRC=Frais financiers ($);
+                           ENC=Fin. Charges ($)];
+                SourceExpr=CustFinChargeAmtLCY[2];
+                AutoFormatType=1 }
+
+    { 55  ;4   ;Field     ;
+                CaptionML=[ENU=Cr. Memo Amounts ($);
+                           ESM=Notas de Cr‚dito ($);
+                           FRC=Montants de notes de cr‚dit ($);
+                           ENC=Cr. Memo Amounts ($)];
+                SourceExpr=CustCrMemoAmountsLCY[2];
+                AutoFormatType=1 }
+
+    { 60  ;4   ;Field     ;
+                CaptionML=[ENU=Payments ($);
+                           ESM=Pagos ($);
+                           FRC=Paiements ($);
+                           ENC=Payments ($)];
+                SourceExpr=CustPaymentsLCY[2];
+                AutoFormatType=1 }
+
+    { 83  ;4   ;Field     ;
+                CaptionML=[ENU=Refunds ($);
+                           ESM=Reembolsos ($);
+                           FRC=Remboursements ($);
+                           ENC=Refunds ($)];
+                SourceExpr=CustRefundsLCY[2];
+                AutoFormatType=1 }
+
+    { 84  ;4   ;Field     ;
+                CaptionML=[ENU=Other Amounts ($);
+                           ESM=Otros importes ($);
+                           FRC=Autres montants ($);
+                           ENC=Other Amounts ($)];
+                SourceExpr=CustOtherAmountsLCY[2];
+                AutoFormatType=1 }
+
+    { 45  ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Discounts ($);
+                           ESM=Dto. P.P. ($);
+                           FRC=Escomptes de paiement ($);
+                           ENC=Pmt. Discounts ($)];
+                SourceExpr=CustPaymentDiscLCY[2];
+                AutoFormatType=1 }
+
+    { 7   ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Disc. Tolerance ($);
+                           ESM=Tolerancia dto. P.P ($);
+                           FRC=Validation tol‚rance d'escompte de paiement $;
+                           ENC=Pmt. Disc. Tolerance ($)];
+                SourceExpr=CustPaymentDiscTolLCY[2];
+                AutoFormatType=1 }
+
+    { 70  ;4   ;Field     ;
+                CaptionML=[ENU=Payment Tolerances ($);
+                           ESM=Tolerancia pagos ($);
+                           FRC=Tol‚rance paiement ($);
+                           ENC=Payment Tolerances ($)];
+                SourceExpr=CustPaymentTolLCY[2];
+                AutoFormatType=1 }
+
+    { 1902759801;3;Group  ;
+                CaptionML=[ENU=Last Year;
+                           ESM=A¤o anterior;
+                           FRC=Ann‚e pr‚c‚dente;
+                           ENC=Last Year] }
+
+    { 122 ;4   ;Field     ;
+                SourceExpr=Text001;
+                Visible=FALSE }
+
+    { 26  ;4   ;Field     ;
+                CaptionML=[ENU=Sales ($);
+                           ESM=Ventas ($);
+                           FRC=Ventes ($);
+                           ENC=Sales ($)];
+                SourceExpr=CustSalesLCY[3];
+                AutoFormatType=1 }
+
+    { 106 ;4   ;Field     ;
+                CaptionML=[ENU=Original Costs ($);
+                           ESM=Costos originales ($);
+                           FRC=Co–ts initiaux ($);
+                           ENC=Original Costs ($)];
+                SourceExpr=CustSalesLCY[3] - CustProfit[3];
+                AutoFormatType=1 }
+
+    { 31  ;4   ;Field     ;
+                CaptionML=[ENU=Original Profit ($);
+                           ESM=Bf§ original ($);
+                           FRC=Profit initial ($);
+                           ENC=Original Profit ($)];
+                SourceExpr=CustProfit[3];
+                AutoFormatType=1 }
+
+    { 36  ;4   ;Field     ;
+                CaptionML=[ENU=Original Profit %;
+                           ESM=% Bf§ original;
+                           FRC=% profit initial;
+                           ENC=Original Profit %];
+                DecimalPlaces=1:1;
+                SourceExpr=ProfitPct[3] }
+
+    { 92  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Costs ($);
+                           ESM=Costos actualizados ($);
+                           FRC=Co–ts ajust‚s ($);
+                           ENC=Adjusted Costs ($)];
+                SourceExpr=CustSalesLCY[3] - CustProfit[3] - AdjmtCostLCY[3];
+                AutoFormatType=1 }
+
+    { 95  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Profit ($);
+                           ESM=Beneficio actualizado ($);
+                           FRC=Profit ajust‚ ($);
+                           ENC=Adjusted Profit ($)];
+                SourceExpr=AdjCustProfit[3];
+                AutoFormatType=1 }
+
+    { 100 ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Profit %;
+                           ESM=% beneficio ajustado;
+                           FRC=% profit ajust‚;
+                           ENC=Adjusted Profit %];
+                DecimalPlaces=1:1;
+                SourceExpr=AdjProfitPct[3] }
+
+    { 115 ;4   ;Field     ;
+                CaptionML=[ENU=Adjustment Costs ($);
+                           ESM=Costos ajustes ($);
+                           FRC=Co–ts d'ajustement ($);
+                           ENC=Adjustment Costs ($)];
+                SourceExpr=-AdjmtCostLCY[3];
+                AutoFormatType=1;
+                OnDrillDown=BEGIN
+                              LookUpAdjmtValueEntries(CustDateFilter[3]);
+                            END;
+                             }
+
+    { 41  ;4   ;Field     ;
+                CaptionML=[ENU=Inv. Discounts ($);
+                           ESM=Dtos. factura ($);
+                           FRC=Escomptes facture ($);
+                           ENC=Inv. Discounts ($)];
+                SourceExpr=CustInvDiscAmountLCY[3];
+                AutoFormatType=1 }
+
+    { 77  ;4   ;Field     ;
+                CaptionML=[ENU=Inv. Amounts ($);
+                           ESM=Facturado ($);
+                           FRC=Montants de la facture ($);
+                           ENC=Inv. Amounts ($)];
+                SourceExpr=InvAmountsLCY[3];
+                AutoFormatType=1 }
+
+    { 65  ;4   ;Field     ;
+                CaptionML=[ENU=Reminder Amounts ($);
+                           ESM=Importe recordatorio ($);
+                           FRC=Montants rappel ($);
+                           ENC=Reminder Amounts ($)];
+                SourceExpr=CustReminderChargeAmtLCY[3];
+                AutoFormatType=1 }
+
+    { 51  ;4   ;Field     ;
+                CaptionML=[ENU=Fin. Charges ($);
+                           ESM=Intereses ($);
+                           FRC=Frais financiers ($);
+                           ENC=Fin. Charges ($)];
+                SourceExpr=CustFinChargeAmtLCY[3];
+                AutoFormatType=1 }
+
+    { 56  ;4   ;Field     ;
+                CaptionML=[ENU=Cr. Memo Amounts ($);
+                           ESM=Notas de Cr‚dito ($);
+                           FRC=Montants de notes de cr‚dit ($);
+                           ENC=Cr. Memo Amounts ($)];
+                SourceExpr=CustCrMemoAmountsLCY[3];
+                AutoFormatType=1 }
+
+    { 61  ;4   ;Field     ;
+                CaptionML=[ENU=Payments ($);
+                           ESM=Pagos ($);
+                           FRC=Paiements ($);
+                           ENC=Payments ($)];
+                SourceExpr=CustPaymentsLCY[3];
+                AutoFormatType=1 }
+
+    { 85  ;4   ;Field     ;
+                CaptionML=[ENU=Refunds ($);
+                           ESM=Reembolsos ($);
+                           FRC=Remboursements ($);
+                           ENC=Refunds ($)];
+                SourceExpr=CustRefundsLCY[3];
+                AutoFormatType=1 }
+
+    { 86  ;4   ;Field     ;
+                CaptionML=[ENU=Other Amounts ($);
+                           ESM=Otros importes ($);
+                           FRC=Autres montants ($);
+                           ENC=Other Amounts ($)];
+                SourceExpr=CustOtherAmountsLCY[3];
+                AutoFormatType=1 }
+
+    { 46  ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Discounts ($);
+                           ESM=Dto. P.P. ($);
+                           FRC=Escomptes de paiement ($);
+                           ENC=Pmt. Discounts ($)];
+                SourceExpr=CustPaymentDiscLCY[3];
+                AutoFormatType=1 }
+
+    { 8   ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Disc. Tolerance ($);
+                           ESM=Tolerancia dto. P.P ($);
+                           FRC=Validation tol‚rance d'escompte de paiement $;
+                           ENC=Pmt. Disc. Tolerance ($)];
+                SourceExpr=CustPaymentDiscTolLCY[3];
+                AutoFormatType=1 }
+
+    { 72  ;4   ;Field     ;
+                CaptionML=[ENU=Payment Tolerances ($);
+                           ESM=Tolerancia pagos ($);
+                           FRC=Tol‚rance paiement ($);
+                           ENC=Payment Tolerances ($)];
+                SourceExpr=CustPaymentTolLCY[3];
+                AutoFormatType=1 }
+
+    { 1900206201;3;Group  ;
+                CaptionML=[ENU=To Date;
+                           ESM=Hasta fecha;
+                           FRC=Jusqu'au;
+                           ENC=To Date] }
+
+    { 123 ;4   ;Field     ;
+                SourceExpr=Text001;
+                Visible=FALSE }
+
+    { 27  ;4   ;Field     ;
+                CaptionML=[ENU=Sales ($);
+                           ESM=Ventas ($);
+                           FRC=Ventes ($);
+                           ENC=Sales ($)];
+                SourceExpr=CustSalesLCY[4];
+                AutoFormatType=1 }
+
+    { 107 ;4   ;Field     ;
+                CaptionML=[ENU=Original Costs ($);
+                           ESM=Costos originales ($);
+                           FRC=Co–ts initiaux ($);
+                           ENC=Original Costs ($)];
+                SourceExpr=CustSalesLCY[4] - CustProfit[4];
+                AutoFormatType=1 }
+
+    { 32  ;4   ;Field     ;
+                CaptionML=[ENU=Original Profit ($);
+                           ESM=Bf§ original ($);
+                           FRC=Profit initial ($);
+                           ENC=Original Profit ($)];
+                SourceExpr=CustProfit[4];
+                AutoFormatType=1 }
+
+    { 37  ;4   ;Field     ;
+                CaptionML=[ENU=Original Profit %;
+                           ESM=% Bf§ original;
+                           FRC=% profit initial;
+                           ENC=Original Profit %];
+                DecimalPlaces=1:1;
+                SourceExpr=ProfitPct[4] }
+
+    { 93  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Costs ($);
+                           ESM=Costos actualizados ($);
+                           FRC=Co–ts ajust‚s ($);
+                           ENC=Adjusted Costs ($)];
+                SourceExpr=CustSalesLCY[4] - CustProfit[4] - AdjmtCostLCY[4];
+                AutoFormatType=1 }
+
+    { 94  ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Profit ($);
+                           ESM=Beneficio actualizado ($);
+                           FRC=Profit ajust‚ ($);
+                           ENC=Adjusted Profit ($)];
+                SourceExpr=AdjCustProfit[4];
+                AutoFormatType=1 }
+
+    { 101 ;4   ;Field     ;
+                CaptionML=[ENU=Adjusted Profit %;
+                           ESM=% beneficio ajustado;
+                           FRC=% profit ajust‚;
+                           ENC=Adjusted Profit %];
+                DecimalPlaces=1:1;
+                SourceExpr=AdjProfitPct[4] }
+
+    { 116 ;4   ;Field     ;
+                CaptionML=[ENU=Adjustment Costs ($);
+                           ESM=Costos ajustes ($);
+                           FRC=Co–ts d'ajustement ($);
+                           ENC=Adjustment Costs ($)];
+                SourceExpr=-AdjmtCostLCY[4];
+                AutoFormatType=1;
+                OnDrillDown=BEGIN
+                              LookUpAdjmtValueEntries(CustDateFilter[4]);
+                            END;
+                             }
+
+    { 42  ;4   ;Field     ;
+                CaptionML=[ENU=Inv. Discounts ($);
+                           ESM=Dtos. factura ($);
+                           FRC=Escomptes facture ($);
+                           ENC=Inv. Discounts ($)];
+                SourceExpr=CustInvDiscAmountLCY[4];
+                AutoFormatType=1 }
+
+    { 78  ;4   ;Field     ;
+                CaptionML=[ENU=Inv. Amounts ($);
+                           ESM=Facturado ($);
+                           FRC=Montants de la facture ($);
+                           ENC=Inv. Amounts ($)];
+                SourceExpr=InvAmountsLCY[4];
+                AutoFormatType=1 }
+
+    { 66  ;4   ;Field     ;
+                CaptionML=[ENU=Reminder Amounts ($);
+                           ESM=Importe recordatorio ($);
+                           FRC=Montants rappel ($);
+                           ENC=Reminder Amounts ($)];
+                SourceExpr=CustReminderChargeAmtLCY[4];
+                AutoFormatType=1 }
+
+    { 52  ;4   ;Field     ;
+                CaptionML=[ENU=Fin. Charges ($);
+                           ESM=Intereses ($);
+                           FRC=Frais financiers ($);
+                           ENC=Fin. Charges ($)];
+                SourceExpr=CustFinChargeAmtLCY[4];
+                AutoFormatType=1 }
+
+    { 57  ;4   ;Field     ;
+                CaptionML=[ENU=Cr. Memo Amounts ($);
+                           ESM=Notas de Cr‚dito ($);
+                           FRC=Montants de notes de cr‚dit ($);
+                           ENC=Cr. Memo Amounts ($)];
+                SourceExpr=CustCrMemoAmountsLCY[4];
+                AutoFormatType=1 }
+
+    { 62  ;4   ;Field     ;
+                CaptionML=[ENU=Payments ($);
+                           ESM=Pagos ($);
+                           FRC=Paiements ($);
+                           ENC=Payments ($)];
+                SourceExpr=CustPaymentsLCY[4];
+                AutoFormatType=1 }
+
+    { 87  ;4   ;Field     ;
+                CaptionML=[ENU=Refunds ($);
+                           ESM=Reembolsos ($);
+                           FRC=Remboursements ($);
+                           ENC=Refunds ($)];
+                SourceExpr=CustRefundsLCY[4];
+                AutoFormatType=1 }
+
+    { 88  ;4   ;Field     ;
+                CaptionML=[ENU=Other Amounts ($);
+                           ESM=Otros importes ($);
+                           FRC=Autres montants ($);
+                           ENC=Other Amounts ($)];
+                SourceExpr=CustOtherAmountsLCY[4];
+                AutoFormatType=1 }
+
+    { 47  ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Discounts ($);
+                           ESM=Dto. P.P. ($);
+                           FRC=Escomptes de paiement ($);
+                           ENC=Pmt. Discounts ($)];
+                SourceExpr=CustPaymentDiscLCY[4];
+                AutoFormatType=1 }
+
+    { 9   ;4   ;Field     ;
+                CaptionML=[ENU=Pmt. Disc. Tolerance ($);
+                           ESM=Tolerancia dto. P.P ($);
+                           FRC=Validation tol‚rance d'escompte de paiement $;
+                           ENC=Pmt. Disc. Tolerance ($)];
+                SourceExpr=CustPaymentDiscTolLCY[4];
+                AutoFormatType=1 }
+
+    { 73  ;4   ;Field     ;
+                CaptionML=[ENU=Payment Tolerances ($);
+                           ESM=Tolerancia pagos ($);
+                           FRC=Tol‚rance paiement ($);
+                           ENC=Payment Tolerances ($)];
+                SourceExpr=CustPaymentTolLCY[4];
+                AutoFormatType=1 }
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=Overdue Amounts ($) as of %1;ESM=Importes vencidos ($) a %1;FRC=Montants en souffrance ($) en date %1;ENC=Overdue Amounts ($) as of %1';
+      DateFilterCalc@1001 : Codeunit 358;
+      CustDateFilter@1002 : ARRAY [4] OF Text[30];
+      CustDateName@1003 : ARRAY [4] OF Text[30];
+      CurrentDate@1005 : Date;
+      CustSalesLCY@1006 : ARRAY [4] OF Decimal;
+      AdjmtCostLCY@1022 : ARRAY [4] OF Decimal;
+      CustProfit@1007 : ARRAY [4] OF Decimal;
+      ProfitPct@1008 : ARRAY [4] OF Decimal;
+      AdjCustProfit@1024 : ARRAY [4] OF Decimal;
+      AdjProfitPct@1023 : ARRAY [4] OF Decimal;
+      CustInvDiscAmountLCY@1009 : ARRAY [4] OF Decimal;
+      CustPaymentDiscLCY@1010 : ARRAY [4] OF Decimal;
+      CustPaymentDiscTolLCY@1019 : ARRAY [4] OF Decimal;
+      CustPaymentTolLCY@1018 : ARRAY [4] OF Decimal;
+      CustReminderChargeAmtLCY@1011 : ARRAY [4] OF Decimal;
+      CustFinChargeAmtLCY@1012 : ARRAY [4] OF Decimal;
+      CustCrMemoAmountsLCY@1013 : ARRAY [4] OF Decimal;
+      CustPaymentsLCY@1014 : ARRAY [4] OF Decimal;
+      CustRefundsLCY@1020 : ARRAY [4] OF Decimal;
+      CustOtherAmountsLCY@1021 : ARRAY [4] OF Decimal;
+      i@1015 : Integer;
+      InvAmountsLCY@1016 : ARRAY [4] OF Decimal;
+      Text001@1025 : TextConst 'ENU=Placeholder;ESM=Marcador de posici¢n;FRC=ParamŠtre substituable;ENC=Placeholder';
+
+    BEGIN
+    END.
+  }
+}
+

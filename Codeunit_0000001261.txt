@@ -1,0 +1,58 @@
+OBJECT Codeunit 1261 Process XML Bank Rec. Lines
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    TableNo=274;
+    OnRun=VAR
+            PostingExch@1002 : Record 1220;
+            ProcessPostingExch@1001 : Codeunit 1201;
+            RecRef@1000 : RecordRef;
+          BEGIN
+            PostingExch.GET("Posting Exch. Entry No.");
+            RecRef.GETTABLE(Rec);
+            PreProcess(Rec);
+            ProcessPostingExch.ProcessColumnMapping(PostingExch,RecRef);
+            PostProcess(Rec)
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE PreProcess@1(BankAccReconciliationLine@1000 : Record 274);
+    VAR
+      PostingExch@1001 : Record 1220;
+      PrePostProcessXMLImport@1002 : Codeunit 1262;
+    BEGIN
+      PostingExch.GET(BankAccReconciliationLine."Posting Exch. Entry No.");
+      PrePostProcessXMLImport.PreProcessFile(PostingExch);
+      PrePostProcessXMLImport.PreProcessBankAccount(PostingExch,BankAccReconciliationLine."Bank Account No.");
+    END;
+
+    PROCEDURE PostProcess@2(BankAccReconciliationLine@1000 : Record 274);
+    VAR
+      PostingExch@1001 : Record 1220;
+      BankAccReconciliation@1002 : Record 273;
+      PrePostProcessXMLImport@1004 : Codeunit 1262;
+      RecRef@1003 : RecordRef;
+    BEGIN
+      PostingExch.GET(BankAccReconciliationLine."Posting Exch. Entry No.");
+      BankAccReconciliation.GET(BankAccReconciliationLine."Bank Account No.",BankAccReconciliationLine."Statement No.");
+
+      RecRef.GETTABLE(BankAccReconciliation);
+      PrePostProcessXMLImport.PostProcessStatementEndingBalance(PostingExch,RecRef,
+        BankAccReconciliation.FIELDNO("Statement Ending Balance"));
+      PrePostProcessXMLImport.PostProcessStatementDate(PostingExch,RecRef,BankAccReconciliation.FIELDNO("Statement Date"));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

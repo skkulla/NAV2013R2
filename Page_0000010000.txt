@@ -1,0 +1,238 @@
+OBJECT Page 10000 Import Budget Information
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/02/04;
+    Time=12:00:00 PM;
+    Version List=NAVUS3.01;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Import Budget Information;
+               ESM=Importar info. presupuesto;
+               FRC=Importer info. budget;
+               ENC=Import Budget Information];
+    PageType=Card;
+    OnInit=BEGIN
+             CurrPage.LOOKUPMODE := TRUE;
+             GlobDim2Enable := TRUE;
+             GlobDim1Enable := TRUE;
+           END;
+
+    OnOpenPage=BEGIN
+                 GLSetup.GET;
+                 IF GLSetup."Global Dimension 1 Code" = '' THEN BEGIN
+                   GlobDim1Enable := FALSE;
+                   GlobDim1Code := '';
+                 END;
+                 IF GLSetup."Global Dimension 2 Code" = '' THEN BEGIN
+                   GlobDim2Enable := FALSE;
+                   GlobDim2Code := '';
+                 END;
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 4   ;1   ;Field     ;
+                CaptionML=[ENU=Budget Name;
+                           ESM=Nombre ppto.;
+                           FRC=Nom du budget;
+                           ENC=Budget Name];
+                SourceExpr=BudgetName;
+                TableRelation="G/L Budget Name" }
+
+    { 6   ;1   ;Field     ;
+                CaptionML=[ENU=Budget Start Date;
+                           ESM=Fecha inicio ppto.;
+                           FRC=Date de d‚but de budget;
+                           ENC=Budget Start Date];
+                SourceExpr=StartDate }
+
+    { 8   ;1   ;Field     ;
+                CaptionML=[ENU=Number of Periods;
+                           ESM=N£mero de periodos;
+                           FRC=Nombre de p‚riodes;
+                           ENC=Number of Periods];
+                SourceExpr=NumPeriods;
+                MinValue=1;
+                MaxValue=12 }
+
+    { 22  ;1   ;Field     ;
+                CaptionML=[ENU=Business Unit Code;
+                           ESM=C¢d. empresa;
+                           FRC=Code d'unit‚ fonctionnelle;
+                           ENC=Business Unit Code];
+                SourceExpr=BusinessUnitCode;
+                TableRelation="Business Unit" }
+
+    { 10  ;1   ;Field     ;
+                Name=GlobDim1;
+                SourceExpr=GlobDim1Code;
+                CaptionClass='1,1,1';
+                Enabled=GlobDim1Enable;
+                OnValidate=BEGIN
+                             ValidateShortcutDimCode(1,GlobDim1Code);
+                           END;
+
+                OnLookup=BEGIN
+                           LookupShortcutDimCode(1,GlobDim1Code);
+                         END;
+                          }
+
+    { 12  ;1   ;Field     ;
+                Name=GlobDim2;
+                SourceExpr=GlobDim2Code;
+                CaptionClass='1,1,2';
+                Enabled=GlobDim2Enable;
+                OnValidate=BEGIN
+                             ValidateShortcutDimCode(2,GlobDim2Code);
+                           END;
+
+                OnLookup=BEGIN
+                           LookupShortcutDimCode(2,GlobDim2Code);
+                         END;
+                          }
+
+    { 14  ;1   ;Field     ;
+                CaptionML=[ENU=Description;
+                           ESM=Descripci¢n;
+                           FRC=Description;
+                           ENC=Description];
+                SourceExpr=Description }
+
+    { 16  ;1   ;Field     ;
+                OptionCaptionML=[ENU=Replace Current Budget,Add to Current Budget;
+                                 ESM=Reemplazar presupuesto actual,Agregar a presupuesto real;
+                                 FRC=Remplacer le budget actuel,Ajouter au budget actuel;
+                                 ENC=Replace Current Budget,Add to Current Budget];
+                SourceExpr=ReplaceOption }
+
+    { 21  ;1   ;Field     ;
+                CaptionClass=Text19033369;
+                MultiLine=Yes }
+
+    { 20  ;1   ;Field     ;
+                CaptionClass=Text19080001 }
+
+    { 19  ;1   ;Field     ;
+                CaptionClass=Text19015020 }
+
+  }
+  CODE
+  {
+    VAR
+      GLSetup@1008 : Record 98;
+      DimManagement@1009 : Codeunit 408;
+      BudgetName@1000 : Code[10];
+      StartDate@1001 : Date;
+      NumPeriods@1002 : Integer;
+      GlobDim1Code@1003 : Code[20];
+      GlobDim2Code@1004 : Code[20];
+      BusinessUnitCode@1005 : Code[20];
+      Description@1006 : Text[50];
+      ReplaceOption@1007 : 'Replace Current Budget,Add to Current Budget';
+      GlobDim1Enable@19066637 : Boolean INDATASET;
+      GlobDim2Enable@19019277 : Boolean INDATASET;
+      Text19015020@19003669 : TextConst 'ENU=*;ESM=*;FRC=*;ENC=*';
+      Text19080001@19069732 : TextConst 'ENU=*;ESM=*;FRC=*;ENC=*';
+      Text19033369@19051567 : TextConst 'ENU=Imported budget amount will be divided evenly among this number of Accounting Periods;ESM=El importe del presupuesto importado se dividir  equitativamente entre este n£mero de per¡odos contables;FRC=Le montant budget import‚ sera r‚parti ‚galement entre ce nombre de p‚riodes comptables;ENC=Imported budget amount will be divided evenly among this number of Accounting Periods';
+
+    PROCEDURE SetBudgetName@1(NewBudgetName@1000 : Code[10]);
+    BEGIN
+      BudgetName := NewBudgetName;
+    END;
+
+    PROCEDURE GetBudgetName@2() : Code[10];
+    BEGIN
+      EXIT(BudgetName);
+    END;
+
+    PROCEDURE SetStartDate@3(NewStartDate@1000 : Date);
+    BEGIN
+      StartDate := NewStartDate;
+    END;
+
+    PROCEDURE GetStartDate@4() : Date;
+    BEGIN
+      EXIT(StartDate);
+    END;
+
+    PROCEDURE SetNumPeriods@5(NewNumPeriods@1000 : Integer);
+    BEGIN
+      NumPeriods := NewNumPeriods;
+    END;
+
+    PROCEDURE GetNumPeriods@6() : Integer;
+    BEGIN
+      EXIT(NumPeriods);
+    END;
+
+    PROCEDURE SetGlobDim1Code@7(NewGlobDim1Code@1000 : Code[20]);
+    BEGIN
+      GlobDim1Code := NewGlobDim1Code;
+    END;
+
+    PROCEDURE GetGlobDim1Code@8() : Code[20];
+    BEGIN
+      EXIT(GlobDim1Code);
+    END;
+
+    PROCEDURE SetGlobDim2Code@9(NewGlobDim2Code@1000 : Code[20]);
+    BEGIN
+      GlobDim2Code := NewGlobDim2Code;
+    END;
+
+    PROCEDURE GetGlobDim2Code@10() : Code[20];
+    BEGIN
+      EXIT(GlobDim2Code);
+    END;
+
+    PROCEDURE SetBusinessUnitCode@13(NewBusinessUnitCode@1000 : Code[10]);
+    BEGIN
+      BusinessUnitCode := NewBusinessUnitCode;
+    END;
+
+    PROCEDURE GetBusinessUnitCode@14() : Code[10];
+    BEGIN
+      EXIT(BusinessUnitCode);
+    END;
+
+    PROCEDURE SetDescription@11(NewDescription@1000 : Text[50]);
+    BEGIN
+      Description := NewDescription;
+    END;
+
+    PROCEDURE GetDescription@12() : Text[50];
+    BEGIN
+      EXIT(Description);
+    END;
+
+    PROCEDURE SetReplaceOption@15(NewReplaceOption@1000 : 'Replace Current Budget,Add to Current Budget');
+    BEGIN
+      ReplaceOption := NewReplaceOption;
+    END;
+
+    PROCEDURE GetReplaceOption@16() : Integer;
+    BEGIN
+      EXIT(ReplaceOption);
+    END;
+
+    LOCAL PROCEDURE ValidateShortcutDimCode@17(FieldNo@1000 : Integer;VAR ShortcutDimCode@1001 : Code[20]);
+    BEGIN
+      DimManagement.ValidateDimValueCode(FieldNo,ShortcutDimCode);
+    END;
+
+    LOCAL PROCEDURE LookupShortcutDimCode@18(FieldNo@1000 : Integer;VAR ShortcutDimCode@1001 : Code[20]);
+    BEGIN
+      DimManagement.LookupDimValueCode(FieldNo,ShortcutDimCode);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

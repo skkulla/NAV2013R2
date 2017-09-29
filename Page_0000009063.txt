@@ -1,0 +1,129 @@
+OBJECT Page 9063 Purchase Agent Activities
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Activities;
+               ESM=Actividades;
+               FRC=Activit‚s;
+               ENC=Activities];
+    SourceTable=Table9055;
+    PageType=CardPart;
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+
+                 SetRespCenterFilter;
+                 SETFILTER("Date Filter",'>=%1',WORKDATE);
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 9   ;1   ;Group     ;
+                CaptionML=[ENU=Pre-arrival Follow-up on Purchase Orders;
+                           ESM=Seguimiento previo a llegada en pedidos compra;
+                           FRC=Suivi avant arriv‚e des bons de commande;
+                           ENC=Pre-arrival Follow-up on Purchase Orders];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 3       ;0   ;Action    ;
+                                  CaptionML=[ENU=New Purchase Quote;
+                                             ESM=Nueva cotizaci¢n compra;
+                                             FRC=Nouveau devis d'achat;
+                                             ENC=New Purchase Quote];
+                                  RunObject=Page 49;
+                                  RunPageMode=Create }
+                  { 8       ;0   ;Action    ;
+                                  CaptionML=[ENU=New Purchase Order;
+                                             ESM=Nuevo pedido de compra;
+                                             FRC=Nouveau bon de commande;
+                                             ENC=New Purchase Order];
+                                  RunObject=Page 50;
+                                  RunPageMode=Create }
+                  { 7       ;0   ;Action    ;
+                                  CaptionML=[ENU=Edit Purchase Journal;
+                                             ESM=Editar diario de compras;
+                                             FRC=Modifier le journal des achats;
+                                             ENC=Edit Purchase Journal];
+                                  RunObject=Page 254 }
+                }
+                 }
+
+    { 1   ;2   ;Field     ;
+                SourceExpr="To Send or Confirm";
+                DrillDownPageID=Purchase Order List }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Upcoming Orders";
+                DrillDownPageID=Purchase Order List }
+
+    { 10  ;1   ;Group     ;
+                CaptionML=[ENU=Post Arrival Follow-up;
+                           ESM=Seguim. posterior a llegada;
+                           FRC=Suivi d'arriv‚e … posteriori;
+                           ENC=Post Arrival Follow-up];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 16      ;0   ;Action    ;
+                                  CaptionML=[ENU=Navigate;
+                                             ESM=Navegar;
+                                             FRC=Naviguer;
+                                             ENC=Navigate];
+                                  RunObject=Page 344;
+                                  Image=Navigate }
+                  { 17      ;0   ;Action    ;
+                                  CaptionML=[ENU=New Purchase Return Order;
+                                             ESM=Nueva devoluci¢n compra;
+                                             FRC=Nouvelle commande de retour d'achat;
+                                             ENC=New Purchase Return Order];
+                                  RunObject=Page 6640;
+                                  RunPageMode=Create }
+                }
+                 }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Outstanding Purchase Orders";
+                DrillDownPageID=Purchase Order List }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Purchase Return Orders - All";
+                DrillDownPageID=Purchase Return Order List }
+
+    { 18  ;1   ;Group     ;
+                CaptionML=[ENU=Purchase Orders - Authorize for Payment;
+                           ESM=Pedidos compra - Autorizar para pago;
+                           FRC=Bons de commande - Autorisation de paiement;
+                           ENC=Purchase Orders - Authorize for Payment];
+                GroupType=CueGroup }
+
+    { 19  ;2   ;Field     ;
+                SourceExpr="Not Invoiced";
+                DrillDownPageID=Purchase Order List }
+
+    { 21  ;2   ;Field     ;
+                SourceExpr="Partially Invoiced";
+                DrillDownPageID=Purchase Order List }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

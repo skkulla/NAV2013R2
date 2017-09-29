@@ -1,0 +1,68 @@
+OBJECT Page 1214 Post Exch Mapping Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posting Exchange Mapping;
+               ESM=Mapeo de intercambio de registro;
+               FRC=Correspondance de l'‚change de report;
+               ENC=Posting Exchange Mapping];
+    SourceTable=Table1224;
+    DelayedInsert=Yes;
+    PageType=Document;
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=General;
+                GroupType=Group }
+
+    { 3   ;2   ;Field     ;
+                CaptionML=[ENU=Table ID;
+                           ESM=Id. tabla;
+                           FRC=Code table;
+                           ENC=Table ID];
+                SourceExpr="Table ID" }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Mapping Codeunit" }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Posting Exch. No. Field ID";
+                Visible=false }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Posting Exch. Line Field ID";
+                Visible=false }
+
+    { 10  ;1   ;Part      ;
+                CaptionML=[ENU=Field Mapping;
+                           ESM=Mapeo de campos;
+                           FRC=Correspondance de champ;
+                           ENC=Field Mapping];
+                SubPageLink=Posting Exch. Def Code=FIELD(Posting Exch. Def Code),
+                            Posting Exch. Line Def Code=FIELD(Posting Exch. Line Def Code),
+                            Table ID=FIELD(Table ID);
+                PagePartID=Page1217;
+                PartType=Page }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

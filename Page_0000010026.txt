@@ -1,0 +1,640 @@
+OBJECT Page 10026 Sales Order Shipment
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sales Order Shipment;
+               ESM=Env°o pedido venta;
+               FRC=Document de vente - Livraison;
+               ENC=Sales Order Shipment];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table36;
+    SourceTableView=WHERE(Document Type=FILTER(Order));
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    OnInit=BEGIN
+             "Tax Area CodeEditable" := TRUE;
+             "Package Tracking No.Editable" := TRUE;
+             "Shipment Method CodeEditable" := TRUE;
+             "Shipping Agent CodeEditable" := TRUE;
+             "Shipment DateEditable" := TRUE;
+             "Location CodeEditable" := TRUE;
+             "Ship-to CountyEditable" := TRUE;
+             "Ship-to CodeEditable" := TRUE;
+             "Ship-to Post CodeEditable" := TRUE;
+             "Ship-to ContactEditable" := TRUE;
+             "Ship-to CityEditable" := TRUE;
+             "Ship-to Address 2Editable" := TRUE;
+             "Ship-to AddressEditable" := TRUE;
+             "Ship-to NameEditable" := TRUE;
+             "Document DateEditable" := TRUE;
+             "Salesperson CodeEditable" := TRUE;
+             "Posting DateEditable" := TRUE;
+           END;
+
+    OnOpenPage=BEGIN
+                 IF UserMgt.GetSalesFilter <> '' THEN BEGIN
+                   FILTERGROUP(2);
+                   SETRANGE("Responsibility Center",UserMgt.GetSalesFilter);
+                   FILTERGROUP(0);
+                 END;
+
+                 SETRANGE("Date Filter",0D,WORKDATE - 1);
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       OnAfterGetCurrRecord;
+                     END;
+
+    OnNewRecord=BEGIN
+                  "Responsibility Center" := UserMgt.GetSalesFilter;
+                  OnAfterGetCurrRecord;
+                END;
+
+    OnDeleteRecord=BEGIN
+                     CurrPage.SAVERECORD;
+                     EXIT(ConfirmDeletion);
+                   END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 59      ;1   ;ActionGroup;
+                      CaptionML=[ENU=O&rder;
+                                 ESM=&Pedido;
+                                 FRC=C&ommande;
+                                 ENC=O&rder];
+                      Image=Order }
+      { 61      ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 SalesSetup.GET;
+                                 IF SalesSetup."Calc. Inv. Discount" THEN BEGIN
+                                   CurrPage.SalesLines.PAGE.CalcInvDisc;
+                                   COMMIT
+                                 END;
+                                 IF "Tax Area Code" = '' THEN
+                                   PAGE.RUNMODAL(PAGE::"Sales Order Statistics",Rec)
+                                 ELSE
+                                   PAGE.RUNMODAL(PAGE::"Sales Order Stats.",Rec)
+                               END;
+                                }
+      { 62      ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Card;
+                                 ESM=Ficha;
+                                 FRC=Fiche;
+                                 ENC=Card];
+                      RunObject=Page 21;
+                      RunPageLink=No.=FIELD(Sell-to Customer No.);
+                      Image=EditLines }
+      { 63      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 67;
+                      RunPageLink=Document Type=FIELD(Document Type),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 64      ;2   ;Action    ;
+                      CaptionML=[ENU=S&hipments;
+                                 ESM=E&nv°os;
+                                 FRC=L&ivraisons;
+                                 ENC=S&hipments];
+                      RunObject=Page 142;
+                      RunPageView=SORTING(Order No.);
+                      RunPageLink=Order No.=FIELD(No.);
+                      Image=Shipment }
+      { 65      ;2   ;Action    ;
+                      CaptionML=[ENU=Invoices;
+                                 ESM=Facturas;
+                                 FRC=Factures;
+                                 ENC=Invoices];
+                      RunObject=Page 143;
+                      RunPageView=SORTING(Order No.);
+                      RunPageLink=Order No.=FIELD(No.);
+                      Image=Invoice }
+      { 122     ;2   ;Action    ;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDocDim;
+                                 CurrPage.SAVERECORD;
+                               END;
+                                }
+      { 197     ;2   ;Action    ;
+                      CaptionML=[ENU=Order &Promising;
+                                 ESM=Comprom&iso entrega;
+                                 FRC=&Promesse de livraison;
+                                 ENC=Order &Promising];
+                      Image=OrderPromising;
+                      OnAction=VAR
+                                 OrderPromisingLine@1000 : TEMPORARY Record 99000880;
+                               BEGIN
+                                 OrderPromisingLine.SETRANGE("Source Type","Document Type");
+                                 OrderPromisingLine.SETRANGE("Source ID","No.");
+                                 PAGE.RUNMODAL(PAGE::"Order Promising Lines",OrderPromisingLine);
+                               END;
+                                }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1903171306;1 ;Action    ;
+                      CaptionML=[ENU=Sales Shipment per Package;
+                                 ESM=Remisi¢n ventas por paquete;
+                                 FRC=Livraison vente par colis;
+                                 ENC=Sales Shipment per Package];
+                      RunObject=Report 10080;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 66      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 134     ;2   ;Action    ;
+                      CaptionML=[ENU=Re&open;
+                                 ESM=&Volver a abrir;
+                                 FRC=RÇ&ouvrir;
+                                 ENC=Re&open];
+                      Image=ReOpen;
+                      OnAction=VAR
+                                 ReleaseSalesDoc@1001 : Codeunit 414;
+                               BEGIN
+                                 ReleaseSalesDoc.Reopen(Rec);
+                               END;
+                                }
+      { 73      ;1   ;ActionGroup;
+                      CaptionML=[ENU=P&osting;
+                                 ESM=&Registro;
+                                 FRC=Rep&ort;
+                                 ENC=P&osting];
+                      Image=Post }
+      { 74      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Test Report;
+                                 ESM=Test;
+                                 FRC=Tester le report;
+                                 ENC=Test Report];
+                      Image=TestReport;
+                      OnAction=BEGIN
+                                 ReportPrint.PrintSalesHeader(Rec);
+                               END;
+                                }
+      { 75      ;2   ;Action    ;
+                      ShortCutKey=F9;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=P&ost;
+                                 ESM=&Registrar;
+                                 FRC=Rep&orter;
+                                 ENC=P&ost];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Post;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ApprovalMgt@1020001 : Codeunit 439;
+                                 PurchaseHeader@1020002 : Record 38;
+                               BEGIN
+                                 IF ApprovalMgt.PrePostApprovalCheck(Rec,PurchaseHeader) THEN BEGIN
+                                   IF ApprovalMgt.TestSalesPrepayment(Rec) THEN
+                                     ERROR(STRSUBSTNO(Text001,"Document Type","No."));
+
+                                   IF ApprovalMgt.TestSalesPayment(Rec) THEN
+                                     ERROR(STRSUBSTNO(Text002,"Document Type","No."));
+
+                                   InsertFreightLine;
+                                   CODEUNIT.RUN(CODEUNIT::"Ship-Post (Yes/No)",Rec);
+                                   IF "Shipping No." = '-1' THEN
+                                     ERROR('');
+
+                                 END;
+                               END;
+                                }
+      { 76      ;2   ;Action    ;
+                      ShortCutKey=Shift+F9;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Post and &Print;
+                                 ESM=Registrar e &imprimir;
+                                 FRC=Reporter et im&primer;
+                                 ENC=Post and &Print];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostPrint;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ApprovalMgt@1020002 : Codeunit 439;
+                                 PurchaseHeader@1020001 : Record 38;
+                               BEGIN
+                                 IF ApprovalMgt.PrePostApprovalCheck(Rec,PurchaseHeader) THEN BEGIN
+                                   IF ApprovalMgt.TestSalesPrepayment(Rec) THEN
+                                     ERROR(STRSUBSTNO(Text001,"Document Type","No."));
+
+                                   IF ApprovalMgt.TestSalesPayment(Rec) THEN
+                                     ERROR(STRSUBSTNO(Text002,"Document Type","No."));
+
+                                   InsertFreightLine;
+                                   CODEUNIT.RUN(CODEUNIT::"Ship-Post + Print",Rec);
+                                   IF "Shipping No." = '-1' THEN
+                                     ERROR('');
+
+                                 END;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No.";
+                Editable=FALSE;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Sell-to Customer No.";
+                Editable=FALSE;
+                OnValidate=BEGIN
+                             SelltoCustomerNoOnAfterValidat;
+                           END;
+                            }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Sell-to Customer Name";
+                Editable=FALSE }
+
+    { 1020001;2;Field     ;
+                SourceExpr="Bill-to Customer No.";
+                Editable=FALSE }
+
+    { 1020005;2;Field     ;
+                SourceExpr="Bill-to Name";
+                Editable=FALSE }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Tax Liable";
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Posting Date";
+                Editable="Posting DateEditable" }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Order Date";
+                Editable="Order DateEditable" }
+
+    { 45  ;2   ;Field     ;
+                SourceExpr="Document Date";
+                Editable="Document DateEditable" }
+
+    { 135 ;2   ;Field     ;
+                SourceExpr="Requested Delivery Date" }
+
+    { 137 ;2   ;Field     ;
+                SourceExpr="Promised Delivery Date";
+                Editable=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Salesperson Code";
+                Editable="Salesperson CodeEditable" }
+
+    { 1020007;2;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code";
+                Editable=FALSE }
+
+    { 1020009;2;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code";
+                Editable=FALSE }
+
+    { 129 ;2   ;Field     ;
+                SourceExpr=Status;
+                Editable=FALSE }
+
+    { 1020011;2;Field     ;
+                SourceExpr="On Hold";
+                Editable=FALSE }
+
+    { 58  ;1   ;Part      ;
+                Name=SalesLines;
+                SubPageLink=Document No.=FIELD(No.);
+                PagePartID=Page10027 }
+
+    { 1906801201;1;Group  ;
+                CaptionML=[ENU=Shipping;
+                           ESM=Env°o;
+                           FRC=Livraison;
+                           ENC=Shipping] }
+
+    { 1020032;2;Field     ;
+                SourceExpr="Ship-to Code";
+                Editable="Ship-to CodeEditable" }
+
+    { 1020030;2;Field     ;
+                SourceExpr="Ship-to Name";
+                Editable="Ship-to NameEditable" }
+
+    { 1020028;2;Field     ;
+                SourceExpr="Ship-to Address";
+                Editable="Ship-to AddressEditable" }
+
+    { 1020026;2;Field     ;
+                SourceExpr="Ship-to Address 2";
+                Editable="Ship-to Address 2Editable" }
+
+    { 1020024;2;Field     ;
+                SourceExpr="Ship-to City";
+                Editable="Ship-to CityEditable" }
+
+    { 1020022;2;Field     ;
+                CaptionML=[ENU=Ship-to State / ZIP Code;
+                           ESM=Env°o a-Estado / C.P.;
+                           FRC=êtat-Province/code postal de livraison;
+                           ENC=Ship-to Prov./State / Post./ZIP Code];
+                SourceExpr="Ship-to County";
+                Editable="Ship-to CountyEditable" }
+
+    { 1020021;2;Field     ;
+                SourceExpr="Ship-to Post Code";
+                Editable="Ship-to Post CodeEditable" }
+
+    { 1020016;2;Field     ;
+                SourceExpr="Ship-to Contact";
+                Editable="Ship-to ContactEditable" }
+
+    { 1020015;2;Field     ;
+                SourceExpr="Ship-to UPS Zone" }
+
+    { 1020014;2;Field     ;
+                SourceExpr="Tax Area Code";
+                Editable="Tax Area CodeEditable" }
+
+    { 1020013;2;Field     ;
+                CaptionML=[ENU=Freight Amount;
+                           ESM=Importe flete;
+                           FRC=Montant du transport;
+                           ENC=Freight Amount];
+                SourceExpr=FreightAmount }
+
+    { 1020049;2;Field     ;
+                SourceExpr="Location Code";
+                Editable="Location CodeEditable" }
+
+    { 1020048;2;Field     ;
+                SourceExpr="Outbound Whse. Handling Time" }
+
+    { 1020047;2;Field     ;
+                SourceExpr="Shipment Method Code";
+                Editable="Shipment Method CodeEditable" }
+
+    { 1020046;2;Field     ;
+                SourceExpr="Shipping Agent Code";
+                Editable="Shipping Agent CodeEditable" }
+
+    { 1020045;2;Field     ;
+                SourceExpr="Shipping Agent Service Code" }
+
+    { 1020044;2;Field     ;
+                SourceExpr="Shipping Time" }
+
+    { 1020043;2;Field     ;
+                SourceExpr="Late Order Shipping" }
+
+    { 1020042;2;Field     ;
+                SourceExpr="Package Tracking No.";
+                Editable="Package Tracking No.Editable" }
+
+    { 1020050;2;Field     ;
+                SourceExpr="Shipment Date";
+                Editable="Shipment DateEditable" }
+
+    { 1020052;2;Field     ;
+                SourceExpr="Shipping Advice" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1903720907;1;Part   ;
+                SubPageLink=No.=FIELD(Sell-to Customer No.);
+                PagePartID=Page9080;
+                Visible=TRUE;
+                Editable=FALSE;
+                PartType=Page }
+
+    { 1902018507;1;Part   ;
+                SubPageLink=No.=FIELD(Bill-to Customer No.);
+                PagePartID=Page9082;
+                Visible=TRUE;
+                Editable=FALSE;
+                PartType=Page }
+
+    { 1900316107;1;Part   ;
+                SubPageLink=No.=FIELD(Sell-to Customer No.);
+                PagePartID=Page9084;
+                Visible=TRUE;
+                Editable=FALSE;
+                PartType=Page }
+
+    { 1906127307;1;Part   ;
+                SubPageLink=Document Type=FIELD(Document Type),
+                            Document No.=FIELD(Document No.),
+                            Line No.=FIELD(Line No.);
+                PagePartID=Page9087;
+                ProviderID=58;
+                Visible=TRUE;
+                Editable=FALSE;
+                PartType=Page }
+
+    { 1901314507;1;Part   ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page9089;
+                ProviderID=58;
+                Visible=TRUE;
+                Editable=FALSE;
+                PartType=Page }
+
+    { 1906354007;1;Part   ;
+                SubPageLink=Table ID=CONST(36),
+                            Document Type=FIELD(Document Type),
+                            Document No.=FIELD(No.),
+                            Status=CONST(Open);
+                PagePartID=Page9092;
+                Visible=TRUE;
+                Editable=FALSE;
+                PartType=Page }
+
+    { 1901796907;1;Part   ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page9109;
+                ProviderID=58;
+                Visible=FALSE;
+                Editable=FALSE;
+                PartType=Page }
+
+    { 1907234507;1;Part   ;
+                SubPageLink=No.=FIELD(Bill-to Customer No.);
+                PagePartID=Page9081;
+                Visible=FALSE;
+                Editable=FALSE;
+                PartType=Page }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                Editable=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=Unable to execute this function while in view only mode.;ESM=No es posible ejecutar esta funci¢n en el modo de solo lectura.;FRC=Impossible d''exÇcuter cette fonction dans le mode visualisation seulement.;ENC=Unable to execute this function while in view only mode.';
+      SalesLine@1020002 : Record 37;
+      ReportPrint@1002 : Codeunit 228;
+      SalesSetup@1004 : Record 311;
+      UserMgt@1006 : Codeunit 5700;
+      FreightAmount@1020000 : Decimal;
+      FreightLineExists@1020001 : Boolean;
+      tcFreightLineDescription@1020003 : TextConst 'ENU=Freight Amount;ESM=Importe flete;FRC=Montant du transport;ENC=Freight Amount';
+      Text001@1020004 : TextConst 'ENU=There are non posted Prepayment Amounts on %1 %2.;ESM=No hay cantidades anticipo registradas en %1 %2.;FRC=Il y a des montants de paiement anticipÇ non reportÇs sur %1 %2.;ENC=There are non posted Prepayment Amounts on %1 %2.';
+      Text002@1020005 : TextConst 'ENU=There are unpaid Prepayment Invoices related to %1 %2.;ESM=Existen facturas anticipo sin abonar relacionadas con %1 %2.;FRC=Il y a des factures pour paiement anticipÇ non payÇes associÇes Ö %1 %2.;ENC=There are unpaid Prepayment Invoices related to %1 %2.';
+      "Posting DateEditable"@19008133 : Boolean INDATASET;
+      "Order DateEditable"@19041498 : Boolean INDATASET;
+      "Salesperson CodeEditable"@19071610 : Boolean INDATASET;
+      "Document DateEditable"@19066404 : Boolean INDATASET;
+      "Ship-to NameEditable"@19016985 : Boolean INDATASET;
+      "Ship-to AddressEditable"@19079345 : Boolean INDATASET;
+      "Ship-to Address 2Editable"@19047538 : Boolean INDATASET;
+      "Ship-to CityEditable"@19063178 : Boolean INDATASET;
+      "Ship-to ContactEditable"@19023233 : Boolean INDATASET;
+      "Ship-to Post CodeEditable"@19021188 : Boolean INDATASET;
+      "Ship-to CodeEditable"@19068609 : Boolean INDATASET;
+      "Ship-to CountyEditable"@19069973 : Boolean INDATASET;
+      "Location CodeEditable"@19048234 : Boolean INDATASET;
+      "Shipment DateEditable"@19046400 : Boolean INDATASET;
+      "Shipping Agent CodeEditable"@19058680 : Boolean INDATASET;
+      "Shipment Method CodeEditable"@19044334 : Boolean INDATASET;
+      "Package Tracking No.Editable"@19044372 : Boolean INDATASET;
+      "Tax Area CodeEditable"@19010329 : Boolean INDATASET;
+
+    PROCEDURE UpdateAllowed@1() : Boolean;
+    BEGIN
+      IF CurrPage.EDITABLE = FALSE THEN
+        ERROR(Text000);
+      EXIT(TRUE);
+    END;
+
+    PROCEDURE OrderOnHold@1000(OnHold@1020000 : Boolean);
+    BEGIN
+      "Posting DateEditable" := NOT OnHold;
+      "Order DateEditable" := NOT OnHold;
+      "Salesperson CodeEditable" := NOT OnHold;
+      "Document DateEditable" := NOT OnHold;
+      "Ship-to NameEditable" := NOT OnHold;
+      "Ship-to AddressEditable" := NOT OnHold;
+      "Ship-to Address 2Editable" := NOT OnHold;
+      "Ship-to CityEditable" := NOT OnHold;
+      "Ship-to ContactEditable" := NOT OnHold;
+      "Ship-to Post CodeEditable" := NOT OnHold;
+      "Ship-to CodeEditable" := NOT OnHold;
+      "Ship-to CountyEditable" := NOT OnHold;
+      // CurrForm."Ship-to UPS Zone".EDITABLE := NOT OnHold;
+      "Location CodeEditable" := NOT OnHold;
+      "Shipment DateEditable" := NOT OnHold;
+      "Shipping Agent CodeEditable" := NOT OnHold;
+      "Shipment Method CodeEditable" := NOT OnHold;
+      "Package Tracking No.Editable" := NOT OnHold;
+      "Tax Area CodeEditable" := NOT OnHold;
+
+      CurrPage.SalesLines.PAGE.OrderOnHold(OnHold);
+    END;
+
+    PROCEDURE InsertFreightLine@1020000();
+    BEGIN
+      IF FreightAmount <= 0 THEN BEGIN
+        FreightAmount := 0;
+        EXIT;
+      END;
+
+      // If a freight amount is specified then the freight account must be filled in
+      SalesSetup.GET;
+      SalesSetup.TESTFIELD("G/L Freight Account No.");
+
+      // Fill in the Sales Line
+      SalesLine.SETRANGE("Document Type","Document Type");
+      SalesLine.SETRANGE("Document No.","No.");
+
+      // See if the Freight Line already exists
+      FreightLineExists := TRUE;
+      SalesLine.SETRANGE(Description,tcFreightLineDescription); // used a text constant
+      SalesLine.SETRANGE("Qty. to Ship",1);
+      IF NOT SalesLine.FINDFIRST THEN BEGIN
+        FreightLineExists := FALSE;
+        SalesLine.SETRANGE(Description);
+        SalesLine.SETRANGE("Qty. to Ship");
+        SalesLine.FINDLAST;
+        SalesLine."Line No." := SalesLine."Line No." + 10000;
+      END;
+      SalesLine.INIT;
+      SalesLine.VALIDATE(Type,SalesLine.Type::"G/L Account");
+      SalesLine.VALIDATE("No.",SalesSetup."G/L Freight Account No.");
+      SalesLine.VALIDATE(Description,tcFreightLineDescription); // used a text constant
+      SalesLine.VALIDATE(Quantity,1);
+      SalesLine.VALIDATE("Unit Price",FreightAmount);
+      IF FreightLineExists THEN
+        SalesLine.MODIFY
+      ELSE
+        SalesLine.INSERT;
+      FreightAmount := 0;
+    END;
+
+    LOCAL PROCEDURE SelltoCustomerNoOnAfterValidat@19034782();
+    BEGIN
+      CurrPage.UPDATE;
+    END;
+
+    LOCAL PROCEDURE OnAfterGetCurrRecord@19077479();
+    BEGIN
+      xRec := Rec;
+      SETRANGE("Date Filter",0D,WORKDATE - 1);
+
+      OrderOnHold("On Hold" <> '');
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

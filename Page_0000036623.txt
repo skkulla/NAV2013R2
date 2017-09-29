@@ -1,0 +1,123 @@
+OBJECT Page 36623 Credit Manager Activities
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Activities;
+               ESM=Actividades;
+               FRC=Activit‚s;
+               ENC=Activities];
+    SourceTable=Table36623;
+    PageType=CardPart;
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+
+                 SETRANGE("Overdue Date Filter",0D,WORKDATE - 1);
+                 SETRANGE("User Filter",USERID);
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 11  ;1   ;Group     ;
+                CaptionML=[ENU=My Approvals;
+                           ESM=Mis aprobaciones;
+                           FRC=Mes approbations;
+                           ENC=My Approvals];
+                GroupType=CueGroup }
+
+    { 1020004;2;Field     ;
+                CaptionML=[ENU=Sales Orders;
+                           ESM=Pedidos venta;
+                           FRC=Documents de vente;
+                           ENC=Sales Orders];
+                SourceExpr="Approvals - Sales Orders";
+                DrillDownPageID=Approval Entries }
+
+    { 1020006;2;Field     ;
+                CaptionML=[ENU=Sales Invoices;
+                           ESM=Facturas venta;
+                           FRC=Factures vente;
+                           ENC=Sales Invoices];
+                SourceExpr="Approvals - Sales Invoices";
+                DrillDownPageID=Approval Entries }
+
+    { 10  ;1   ;Group     ;
+                CaptionML=[ENU=Customers;
+                           ESM=Clientes;
+                           FRC=Clients;
+                           ENC=Customers];
+                GroupType=CueGroup }
+
+    { 1020002;2;Field     ;
+                CaptionML=[ENU=Overdue;
+                           ESM=Vencidos;
+                           FRC=En retard;
+                           ENC=Overdue];
+                SourceExpr="Customers - Overdue";
+                DrillDownPageID=Customer List - Collections }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Blocked;
+                           ESM=Bloqueado;
+                           FRC=Bloqu‚;
+                           ENC=Blocked];
+                SourceExpr="Customers - Blocked";
+                DrillDownPageID=Customer List - Collections }
+
+    { 1   ;2   ;Field     ;
+                SourceExpr="Overdue Sales Invoices";
+                DrillDownPageID=Customer Ledger Entries }
+
+    { 1400002;1;Group     ;
+                CaptionML=[ENU=Sales Orders;
+                           ESM=Pedidos venta;
+                           FRC=Documents de vente;
+                           ENC=Sales Orders];
+                GroupType=CueGroup }
+
+    { 1020000;2;Field     ;
+                CaptionML=[ENU=On Hold;
+                           ESM=Esperar;
+                           FRC=En attente;
+                           ENC=On Hold];
+                SourceExpr="Sales Orders On Hold";
+                DrillDownPageID=Customer Order Header Status }
+
+    { 14  ;2   ;Field     ;
+                CaptionML=[ENU=Pending Approval;
+                           ESM=Pendiente de aprobaci¢n;
+                           FRC=Approbation en attente;
+                           ENC=Pending Approval];
+                SourceExpr="SOs Pending Approval";
+                DrillDownPageID=Customer Order Header Status }
+
+    { 12  ;2   ;Field     ;
+                CaptionML=[ENU=Approved;
+                           ESM=Aprobado;
+                           FRC=Approuv‚;
+                           ENC=Approved];
+                SourceExpr="Approved Sales Orders";
+                DrillDownPageID=Customer Order Header Status }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,237 @@
+OBJECT Page 5 Currencies
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Currencies;
+               ESM=Divisas;
+               FRC=Devises;
+               ENC=Currencies];
+    SourceTable=Table4;
+    PageType=List;
+    CardPageID=Currency Card;
+    OnAfterGetRecord=VAR
+                       CurrencyExchangeRate@1000 : Record 330;
+                     BEGIN
+                       CurrencyFactor := CurrencyExchangeRate.GetCurrentCurrencyFactor(Code);
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 60      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 61      ;2   ;Action    ;
+                      CaptionML=[ENU=Change Payment &Tolerance;
+                                 ESM=Cambiar &tolerancia pagos;
+                                 FRC=Modifier la &tol‚rance de paiement;
+                                 ENC=Change Payment &Tolerance];
+                      Promoted=Yes;
+                      Image=ChangePaymentTolerance;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ChangePmtTol@1001 : Report 34;
+                               BEGIN
+                                 ChangePmtTol.SetCurrency(Rec);
+                                 ChangePmtTol.RUNMODAL;
+                               END;
+                                }
+      { 4       ;1   ;Action    ;
+                      CaptionML=[ENU=Exch. &Rates;
+                                 ESM=Tipo &cambio;
+                                 FRC=&Taux de change;
+                                 ENC=Exch. &Rates];
+                      RunObject=Page 483;
+                      RunPageLink=Currency Code=FIELD(Code);
+                      Promoted=Yes;
+                      Image=CurrencyExchangeRates;
+                      PromotedCategory=Process }
+      { 1904035104;1 ;Action    ;
+                      CaptionML=[ENU=Adjust Exchange Rate;
+                                 ESM=Ajustar tipo cambio;
+                                 FRC=Ajuster taux de change;
+                                 ENC=Adjust Exchange Rate];
+                      RunObject=Report 595;
+                      Promoted=Yes;
+                      Image=AdjustExchangeRates;
+                      PromotedCategory=Process }
+      { 1900169904;1 ;Action    ;
+                      CaptionML=[ENU=Exchange Rate Adjust. Register;
+                                 ESM=Registro ajuste tipo cambio;
+                                 FRC=Registre d'ajust. du taux de change;
+                                 ENC=Exchange Rate Adjust. Register];
+                      RunObject=Page 106;
+                      RunPageLink=Currency Code=FIELD(Code);
+                      Promoted=Yes;
+                      Image=ExchangeRateAdjustRegister;
+                      PromotedCategory=Process }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1901143306;1 ;Action    ;
+                      CaptionML=[ENU=Foreign Currency Balance;
+                                 ESM=Saldo divisas extranjeras;
+                                 FRC=Solde en devises;
+                                 ENC=Foreign Currency Balance];
+                      RunObject=Report 503;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 1480000;2;Field     ;
+                SourceExpr=Symbol }
+
+    { 44  ;2   ;Field     ;
+                SourceExpr="EMU Currency" }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Realized Gains Acc." }
+
+    { 21  ;2   ;Field     ;
+                SourceExpr="Realized Losses Acc." }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Unrealized Gains Acc." }
+
+    { 19  ;2   ;Field     ;
+                SourceExpr="Unrealized Losses Acc." }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Realized G/L Gains Account";
+                Visible=FALSE }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Realized G/L Losses Account";
+                Visible=FALSE }
+
+    { 46  ;2   ;Field     ;
+                SourceExpr="Residual Gains Account";
+                Visible=FALSE }
+
+    { 48  ;2   ;Field     ;
+                SourceExpr="Residual Losses Account";
+                Visible=FALSE }
+
+    { 25  ;2   ;Field     ;
+                SourceExpr="Amount Rounding Precision" }
+
+    { 36  ;2   ;Field     ;
+                SourceExpr="Amount Decimal Places" }
+
+    { 23  ;2   ;Field     ;
+                SourceExpr="Invoice Rounding Precision" }
+
+    { 27  ;2   ;Field     ;
+                SourceExpr="Invoice Rounding Type" }
+
+    { 31  ;2   ;Field     ;
+                SourceExpr="Unit-Amount Rounding Precision" }
+
+    { 38  ;2   ;Field     ;
+                SourceExpr="Unit-Amount Decimal Places" }
+
+    { 42  ;2   ;Field     ;
+                SourceExpr="Appln. Rounding Precision" }
+
+    { 50  ;2   ;Field     ;
+                SourceExpr="Conv. LCY Rndg. Debit Acc." }
+
+    { 52  ;2   ;Field     ;
+                SourceExpr="Conv. LCY Rndg. Credit Acc." }
+
+    { 54  ;2   ;Field     ;
+                SourceExpr="Max. VAT Difference Allowed";
+                Visible=FALSE }
+
+    { 56  ;2   ;Field     ;
+                SourceExpr="VAT Rounding Type";
+                Visible=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Last Date Adjusted" }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Last Date Modified" }
+
+    { 34  ;2   ;Field     ;
+                SourceExpr="Payment Tolerance %" }
+
+    { 58  ;2   ;Field     ;
+                SourceExpr="Max. Payment Tolerance Amount" }
+
+    { 62  ;2   ;Field     ;
+                CaptionML=[ENU=Currency Factor;
+                           ESM=Factor divisa;
+                           FRC=Facteur devise;
+                           ENC=Currency Factor];
+                DecimalPlaces=1:6;
+                SourceExpr=CurrencyFactor;
+                OnValidate=VAR
+                             CurrencyExchangeRate@1000 : Record 330;
+                           BEGIN
+                             CurrencyExchangeRate.SetCurrentCurrencyFactor(Code,CurrencyFactor);
+                           END;
+                            }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      CurrencyFactor@1000 : Decimal;
+
+    PROCEDURE GetSelectionFilter@2() : Text;
+    VAR
+      Currency@1001 : Record 4;
+      SelectionFilterManagement@1002 : Codeunit 46;
+    BEGIN
+      CurrPage.SETSELECTIONFILTER(Currency);
+      EXIT(SelectionFilterManagement.GetSelectionFilterForCurrency(Currency));
+    END;
+
+    PROCEDURE GetCurrency@1(VAR "Currency Code"@1000 : Code[10]);
+    BEGIN
+      "Currency Code" := Code;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,56 @@
+OBJECT Codeunit 10122 Bank Rec.-Post + Print
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/11/02;
+    Time=12:00:00 PM;
+    Version List=NAVNA4.00;
+  }
+  PROPERTIES
+  {
+    TableNo=10120;
+    OnRun=BEGIN
+            BankRecHeader.COPY(Rec);
+
+            IF NOT CONFIRM(Text000,FALSE) THEN
+              EXIT;
+
+            Code;
+            Rec := BankRecHeader;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      BankRecHeader@1003 : Record 10120;
+      PostedBankRecHeader@1020000 : Record 10123;
+      BankRecPost@1009 : Codeunit 10120;
+      Text000@1020001 : TextConst 'ENU=Do you want to post and print the Bank Reconcilation?;ESM=¨Desea registrar e imprimir la conciliaci¢n?;FRC=Voulez-vous reporter et imprimer le rapprochement bancaire?;ENC=Do you want to post and print the Bank Reconcilation?';
+
+    LOCAL PROCEDURE Code@2();
+    VAR
+      ReportSelection@1020000 : Record 77;
+    BEGIN
+      WITH BankRecHeader DO BEGIN
+        BankRecPost.RUN(BankRecHeader);
+
+        PostedBankRecHeader.SETRANGE("Bank Account No.","Bank Account No.");
+        PostedBankRecHeader.SETRANGE("Statement No.","Statement No.");
+        ReportSelection.SETRANGE(Usage,ReportSelection.Usage::"B.Stmt");
+        ReportSelection.SETFILTER("Report ID",'<>0');
+        ReportSelection.ASCENDING := FALSE;
+        ReportSelection.FIND('-');
+        REPEAT
+          REPORT.RUN(ReportSelection."Report ID",FALSE,FALSE,PostedBankRecHeader);
+        UNTIL ReportSelection.NEXT = 0;
+
+        COMMIT;
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

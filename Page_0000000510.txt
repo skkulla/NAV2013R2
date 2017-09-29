@@ -1,0 +1,602 @@
+OBJECT Page 510 Blanket Purchase Order Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Lines;
+               ESM=L°neas;
+               FRC=Lignes;
+               ENC=Lines];
+    MultipleNewLines=Yes;
+    LinksAllowed=No;
+    SourceTable=Table39;
+    DelayedInsert=Yes;
+    SourceTableView=WHERE(Document Type=FILTER(Blanket Order));
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    OnAfterGetRecord=BEGIN
+                       ShowShortcutDimCode(ShortcutDimCode);
+                     END;
+
+    OnNewRecord=BEGIN
+                  InitType;
+                  CLEAR(ShortcutDimCode);
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1906587504;1 ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 1901312904;2 ;Action    ;
+                      CaptionML=[ENU=E&xplode BOM;
+                                 ESM=D&esplegar L.M.;
+                                 FRC=ê&clater nomenclature;
+                                 ENC=E&xplode BOM];
+                      Image=ExplodeBOM;
+                      OnAction=BEGIN
+                                 ExplodeBOM;
+                               END;
+                                }
+      { 1901313304;2 ;Action    ;
+                      CaptionML=[ENU=Insert &Ext. Text;
+                                 ESM=Insertar t&extos adicionales;
+                                 FRC=InsÇrer te&xtes Çtendus;
+                                 ENC=Insert &Ext. Text];
+                      Image=Text;
+                      OnAction=BEGIN
+                                 InsertExtendedText(TRUE);
+                               END;
+                                }
+      { 1907935204;1 ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 ESM=&L°nea;
+                                 FRC=&Ligne;
+                                 ENC=&Line];
+                      Image=Line }
+      { 1901991404;2 ;ActionGroup;
+                      CaptionML=[ENU=Item Availability by;
+                                 ESM=Disponibilidad prod. por;
+                                 FRC=DisponibilitÇ d'article par;
+                                 ENC=Item Availability by];
+                      Image=ItemAvailability }
+      { 5       ;3   ;Action    ;
+                      CaptionML=[ENU=Event;
+                                 ESM=Evento;
+                                 FRC=êvÇnement;
+                                 ENC=Event];
+                      Image=Event;
+                      OnAction=BEGIN
+                                 ItemAvailFormsMgt.ShowItemAvailFromPurchLine(Rec,ItemAvailFormsMgt.ByEvent)
+                               END;
+                                }
+      { 1900205704;3 ;Action    ;
+                      CaptionML=[ENU=Period;
+                                 ESM=Periodo;
+                                 FRC=PÇriode;
+                                 ENC=Period];
+                      Image=Period;
+                      OnAction=BEGIN
+                                 ItemAvailFormsMgt.ShowItemAvailFromPurchLine(Rec,ItemAvailFormsMgt.ByPeriod)
+                               END;
+                                }
+      { 1901652104;3 ;Action    ;
+                      CaptionML=[ENU=Variant;
+                                 ESM=Variante;
+                                 FRC=Variante;
+                                 ENC=Variant];
+                      Image=ItemVariant;
+                      OnAction=BEGIN
+                                 ItemAvailFormsMgt.ShowItemAvailFromPurchLine(Rec,ItemAvailFormsMgt.ByVariant)
+                               END;
+                                }
+      { 1901313404;3 ;Action    ;
+                      CaptionML=[ENU=Location;
+                                 ESM=AlmacÇn;
+                                 FRC=Emplacement;
+                                 ENC=Location];
+                      Image=Warehouse;
+                      OnAction=BEGIN
+                                 ItemAvailFormsMgt.ShowItemAvailFromPurchLine(Rec,ItemAvailFormsMgt.ByLocation)
+                               END;
+                                }
+      { 3       ;3   ;Action    ;
+                      CaptionML=[ENU=BOM Level;
+                                 ESM=Nivel L.M.;
+                                 FRC=Niveau nomenclature;
+                                 ENC=BOM Level];
+                      Image=BOMLevel;
+                      OnAction=BEGIN
+                                 ItemAvailFormsMgt.ShowItemAvailFromPurchLine(Rec,ItemAvailFormsMgt.ByBOM)
+                               END;
+                                }
+      { 1903868004;2 ;ActionGroup;
+                      CaptionML=[ENU=Unposted Lines;
+                                 ESM=L°neas no registradas;
+                                 FRC=Lignes non reportÇes;
+                                 ENC=Unposted Lines];
+                      Image=Order }
+      { 1903100004;3 ;Action    ;
+                      CaptionML=[ENU=Orders;
+                                 ESM=Pedidos;
+                                 FRC=Commandes;
+                                 ENC=Orders];
+                      Image=Document;
+                      OnAction=BEGIN
+                                 ShowOrders;
+                               END;
+                                }
+      { 1900546404;3 ;Action    ;
+                      CaptionML=[ENU=Invoices;
+                                 ESM=Facturas;
+                                 FRC=Factures;
+                                 ENC=Invoices];
+                      Image=Invoice;
+                      OnAction=BEGIN
+                                 ShowInvoices;
+                               END;
+                                }
+      { 1903098504;3 ;Action    ;
+                      CaptionML=[ENU=Return Orders;
+                                 ESM=Devoluciones;
+                                 FRC=Retours;
+                                 ENC=Return Orders];
+                      Image=ReturnOrder;
+                      OnAction=BEGIN
+                                 ShowReturnOrders;
+                               END;
+                                }
+      { 1901992804;3 ;Action    ;
+                      CaptionML=[ENU=Credit Memos;
+                                 ESM=Notas de CrÇdito;
+                                 FRC=Notes de crÇdit;
+                                 ENC=Credit Memos];
+                      Image=CreditMemo;
+                      OnAction=BEGIN
+                                 ShowCreditMemos;
+                               END;
+                                }
+      { 1901314404;2 ;ActionGroup;
+                      CaptionML=[ENU=Posted Lines;
+                                 ESM=L°neas registradas;
+                                 FRC=Lignes reportÇes;
+                                 ENC=Posted Lines];
+                      Image=Post }
+      { 1900296804;3 ;Action    ;
+                      CaptionML=[ENU=Receipts;
+                                 ESM=Recepciones;
+                                 FRC=Reáus;
+                                 ENC=Receipts];
+                      Image=PostedReceipts;
+                      OnAction=BEGIN
+                                 ShowPostedReceipts;
+                               END;
+                                }
+      { 1904522204;3 ;Action    ;
+                      CaptionML=[ENU=Invoices;
+                                 ESM=Facturas;
+                                 FRC=Factures;
+                                 ENC=Invoices];
+                      Image=Invoice;
+                      OnAction=BEGIN
+                                 ShowPostedInvoices;
+                               END;
+                                }
+      { 1903926304;3 ;Action    ;
+                      CaptionML=[ENU=Return Receipts;
+                                 ESM=Recep. devoluci¢n;
+                                 FRC=RÇceptions retour;
+                                 ENC=Return Receipts];
+                      Image=ReturnReceipt;
+                      OnAction=BEGIN
+                                 ShowPostedReturnReceipts;
+                               END;
+                                }
+      { 1902056104;3 ;Action    ;
+                      CaptionML=[ENU=Credit Memos;
+                                 ESM=Notas de CrÇdito;
+                                 FRC=Notes de crÇdit;
+                                 ENC=Credit Memos];
+                      Image=CreditMemo;
+                      OnAction=BEGIN
+                                 ShowPostedCreditMemos;
+                               END;
+                                }
+      { 1906874004;2 ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+      { 1900978604;2 ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=Co&mentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      Image=ViewComments;
+                      OnAction=BEGIN
+                                 ShowLineComments;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Type;
+                OnValidate=BEGIN
+                             NoOnAfterValidate;
+                           END;
+                            }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="No.";
+                OnValidate=BEGIN
+                             ShowShortcutDimCode(ShortcutDimCode);
+                             NoOnAfterValidate;
+                           END;
+                            }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Cross-Reference No.";
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             CrossReferenceNoOnAfterValidat;
+                           END;
+
+                OnLookup=BEGIN
+                           CrossReferenceNoLookUp;
+                           InsertExtendedText(FALSE);
+                         END;
+                          }
+
+    { 36  ;2   ;Field     ;
+                SourceExpr="Variant Code";
+                Visible=FALSE }
+
+    { 1030000;2;Field     ;
+                SourceExpr="GST/HST" }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="VAT Prod. Posting Group";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 74  ;2   ;Field     ;
+                SourceExpr="Location Code" }
+
+    { 8   ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr=Quantity }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Unit of Measure Code" }
+
+    { 40  ;2   ;Field     ;
+                SourceExpr="Unit of Measure";
+                Visible=FALSE }
+
+    { 12  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Direct Unit Cost" }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Indirect Cost %";
+                Visible=FALSE }
+
+    { 68  ;2   ;Field     ;
+                SourceExpr="Unit Cost (LCY)";
+                Visible=FALSE }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Unit Price (LCY)";
+                Visible=FALSE }
+
+    { 1480000;2;Field     ;
+                SourceExpr="Tax Liable";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1480004;2;Field     ;
+                SourceExpr="Tax Area Code";
+                Visible=FALSE }
+
+    { 1400000;2;Field     ;
+                SourceExpr="Provincial Tax Area Code";
+                Visible=FALSE }
+
+    { 1480002;2;Field     ;
+                SourceExpr="Tax Group Code" }
+
+    { 1480006;2;Field     ;
+                SourceExpr="Use Tax";
+                Visible=FALSE }
+
+    { 32  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Line Amount" }
+
+    { 16  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Line Discount %" }
+
+    { 60  ;2   ;Field     ;
+                SourceExpr="Line Discount Amount";
+                Visible=FALSE }
+
+    { 58  ;2   ;Field     ;
+                SourceExpr="Allow Invoice Disc.";
+                Visible=FALSE }
+
+    { 18  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Qty. to Receive" }
+
+    { 20  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Quantity Received" }
+
+    { 24  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Quantity Invoiced" }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Expected Receipt Date";
+                Visible=FALSE }
+
+    { 78  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code";
+                Visible=FALSE }
+
+    { 76  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code";
+                Visible=FALSE }
+
+    { 300 ;2   ;Field     ;
+                SourceExpr=ShortcutDimCode[3];
+                CaptionClass='1,2,3';
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             ValidateShortcutDimCode(3,ShortcutDimCode[3]);
+                           END;
+
+                OnLookup=BEGIN
+                           LookupShortcutDimCode(3,ShortcutDimCode[3]);
+                         END;
+                          }
+
+    { 302 ;2   ;Field     ;
+                SourceExpr=ShortcutDimCode[4];
+                CaptionClass='1,2,4';
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             ValidateShortcutDimCode(4,ShortcutDimCode[4]);
+                           END;
+
+                OnLookup=BEGIN
+                           LookupShortcutDimCode(4,ShortcutDimCode[4]);
+                         END;
+                          }
+
+    { 304 ;2   ;Field     ;
+                SourceExpr=ShortcutDimCode[5];
+                CaptionClass='1,2,5';
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             ValidateShortcutDimCode(5,ShortcutDimCode[5]);
+                           END;
+
+                OnLookup=BEGIN
+                           LookupShortcutDimCode(5,ShortcutDimCode[5]);
+                         END;
+                          }
+
+    { 306 ;2   ;Field     ;
+                SourceExpr=ShortcutDimCode[6];
+                CaptionClass='1,2,6';
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             ValidateShortcutDimCode(6,ShortcutDimCode[6]);
+                           END;
+
+                OnLookup=BEGIN
+                           LookupShortcutDimCode(6,ShortcutDimCode[6]);
+                         END;
+                          }
+
+    { 308 ;2   ;Field     ;
+                SourceExpr=ShortcutDimCode[7];
+                CaptionClass='1,2,7';
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             ValidateShortcutDimCode(7,ShortcutDimCode[7]);
+                           END;
+
+                OnLookup=BEGIN
+                           LookupShortcutDimCode(7,ShortcutDimCode[7]);
+                         END;
+                          }
+
+    { 310 ;2   ;Field     ;
+                SourceExpr=ShortcutDimCode[8];
+                CaptionClass='1,2,8';
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             ValidateShortcutDimCode(8,ShortcutDimCode[8]);
+                           END;
+
+                OnLookup=BEGIN
+                           LookupShortcutDimCode(8,ShortcutDimCode[8]);
+                         END;
+                          }
+
+  }
+  CODE
+  {
+    VAR
+      TransferExtendedText@1002 : Codeunit 378;
+      ItemAvailFormsMgt@1004 : Codeunit 353;
+      ShortcutDimCode@1003 : ARRAY [8] OF Code[20];
+      PurchLine@1000 : Record 39;
+      CurrentPurchLine@1001 : Record 39;
+
+    PROCEDURE ApproveCalcInvDisc@7();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Purch.-Disc. (Yes/No)",Rec);
+    END;
+
+    PROCEDURE CalcInvDisc@1();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Purch.-Calc.Discount",Rec);
+    END;
+
+    PROCEDURE ExplodeBOM@3();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Purch.-Explode BOM",Rec);
+    END;
+
+    PROCEDURE InsertExtendedText@6(Unconditionally@1000 : Boolean);
+    BEGIN
+      IF TransferExtendedText.PurchCheckIfAnyExtText(Rec,Unconditionally) THEN BEGIN
+        CurrPage.SAVERECORD;
+        TransferExtendedText.InsertPurchExtText(Rec);
+      END;
+      IF TransferExtendedText.MakeUpdate THEN
+        UpdateForm(TRUE);
+    END;
+
+    PROCEDURE UpdateForm@12(SetSaveRecord@1000 : Boolean);
+    BEGIN
+      CurrPage.UPDATE(SetSaveRecord);
+    END;
+
+    PROCEDURE ShowOrders@2();
+    BEGIN
+      CurrentPurchLine := Rec;
+      PurchLine.RESET;
+      PurchLine.SETCURRENTKEY("Document Type","Blanket Order No.","Blanket Order Line No.");
+      PurchLine.SETRANGE("Document Type",PurchLine."Document Type"::Order);
+      PurchLine.SETRANGE("Blanket Order No.",CurrentPurchLine."Document No.");
+      PurchLine.SETRANGE("Blanket Order Line No.",CurrentPurchLine."Line No.");
+      PAGE.RUNMODAL(PAGE::"Purchase Lines",PurchLine);
+    END;
+
+    PROCEDURE ShowInvoices@4();
+    BEGIN
+      CurrentPurchLine := Rec;
+      PurchLine.RESET;
+      PurchLine.SETCURRENTKEY("Document Type","Blanket Order No.","Blanket Order Line No.");
+      PurchLine.SETRANGE("Document Type",PurchLine."Document Type"::Invoice);
+      PurchLine.SETRANGE("Blanket Order No.",CurrentPurchLine."Document No.");
+      PurchLine.SETRANGE("Blanket Order Line No.",CurrentPurchLine."Line No.");
+      PAGE.RUNMODAL(PAGE::"Purchase Lines",PurchLine);
+    END;
+
+    PROCEDURE ShowReturnOrders@9();
+    BEGIN
+      CurrentPurchLine := Rec;
+      PurchLine.RESET;
+      PurchLine.SETCURRENTKEY("Document Type","Blanket Order No.","Blanket Order Line No.");
+      PurchLine.SETRANGE("Document Type",PurchLine."Document Type"::"Return Order");
+      PurchLine.SETRANGE("Blanket Order No.",CurrentPurchLine."Document No.");
+      PurchLine.SETRANGE("Blanket Order Line No.",CurrentPurchLine."Line No.");
+      PAGE.RUNMODAL(PAGE::"Purchase Lines",PurchLine);
+    END;
+
+    PROCEDURE ShowCreditMemos@10();
+    BEGIN
+      CurrentPurchLine := Rec;
+      PurchLine.RESET;
+      PurchLine.SETCURRENTKEY("Document Type","Blanket Order No.","Blanket Order Line No.");
+      PurchLine.SETRANGE("Document Type",PurchLine."Document Type"::"Credit Memo");
+      PurchLine.SETRANGE("Blanket Order No.",CurrentPurchLine."Document No.");
+      PurchLine.SETRANGE("Blanket Order Line No.",CurrentPurchLine."Line No.");
+      PAGE.RUNMODAL(PAGE::"Purchase Lines",PurchLine);
+    END;
+
+    PROCEDURE ShowPostedReceipts@17();
+    VAR
+      PurchRcptLine@1000 : Record 121;
+    BEGIN
+      CurrentPurchLine := Rec;
+      PurchRcptLine.RESET;
+      PurchRcptLine.SETCURRENTKEY("Blanket Order No.","Blanket Order Line No.");
+      PurchRcptLine.SETRANGE("Blanket Order No.",CurrentPurchLine."Document No.");
+      PurchRcptLine.SETRANGE("Blanket Order Line No.",CurrentPurchLine."Line No.");
+      PAGE.RUNMODAL(PAGE::"Posted Purchase Receipt Lines",PurchRcptLine);
+    END;
+
+    PROCEDURE ShowPostedInvoices@14();
+    VAR
+      PurchInvLine@1000 : Record 123;
+    BEGIN
+      CurrentPurchLine := Rec;
+      PurchInvLine.RESET;
+      PurchInvLine.SETCURRENTKEY("Blanket Order No.","Blanket Order Line No.");
+      PurchInvLine.SETRANGE("Blanket Order No.",CurrentPurchLine."Document No.");
+      PurchInvLine.SETRANGE("Blanket Order Line No.",CurrentPurchLine."Line No.");
+      PAGE.RUNMODAL(PAGE::"Posted Purchase Invoice Lines",PurchInvLine);
+    END;
+
+    PROCEDURE ShowPostedReturnReceipts@13();
+    VAR
+      ReturnShptLine@1000 : Record 6651;
+    BEGIN
+      CurrentPurchLine := Rec;
+      ReturnShptLine.RESET;
+      ReturnShptLine.SETCURRENTKEY("Blanket Order No.","Blanket Order Line No.");
+      ReturnShptLine.SETRANGE("Blanket Order No.",CurrentPurchLine."Document No.");
+      ReturnShptLine.SETRANGE("Blanket Order Line No.",CurrentPurchLine."Line No.");
+      PAGE.RUNMODAL(PAGE::"Posted Return Shipment Lines",ReturnShptLine);
+    END;
+
+    PROCEDURE ShowPostedCreditMemos@11();
+    VAR
+      PurchCrMemoLine@1000 : Record 125;
+    BEGIN
+      CurrentPurchLine := Rec;
+      PurchCrMemoLine.RESET;
+      PurchCrMemoLine.SETCURRENTKEY("Blanket Order No.","Blanket Order Line No.");
+      PurchCrMemoLine.SETRANGE("Blanket Order No.",CurrentPurchLine."Document No.");
+      PurchCrMemoLine.SETRANGE("Blanket Order Line No.",CurrentPurchLine."Line No.");
+      PAGE.RUNMODAL(PAGE::"Posted Purchase Cr. Memo Lines",PurchCrMemoLine);
+    END;
+
+    LOCAL PROCEDURE NoOnAfterValidate@19066594();
+    BEGIN
+      InsertExtendedText(FALSE);
+    END;
+
+    LOCAL PROCEDURE CrossReferenceNoOnAfterValidat@19048248();
+    BEGIN
+      InsertExtendedText(FALSE);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,106 @@
+OBJECT Page 1217 Post Exch Field Mapping Part
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posting Exchange Field Mapping;
+               ESM=Mapeo de campos de intercambio de registro;
+               FRC=Correspondance de champ d'‚change de report;
+               ENC=Posting Exchange Field Mapping];
+    SourceTable=Table1225;
+    DelayedInsert=Yes;
+    PageType=ListPart;
+    OnAfterGetRecord=BEGIN
+                       ColumnCaptionText := GetColumnCaption;
+                       FieldCaptionText := GetFieldCaption;
+                     END;
+
+    OnNewRecord=BEGIN
+                  ColumnCaptionText := '';
+                  FieldCaptionText := '';
+                END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Column No.";
+                OnValidate=BEGIN
+                             ColumnCaptionText := GetColumnCaption;
+                           END;
+                            }
+
+    { 9   ;2   ;Field     ;
+                CaptionML=[ENU=Column Caption;
+                           ESM=Leyenda columna;
+                           FRC=Titre colonne;
+                           ENC=Column Caption];
+                SourceExpr=ColumnCaptionText;
+                Editable=false }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Field ID";
+                OnValidate=BEGIN
+                             FieldCaptionText := GetFieldCaption;
+                           END;
+
+                OnLookup=VAR
+                           Field@1001 : Record 2000000041;
+                           TableFilter@1003 : Record 9805;
+                           FieldsLookup@1000 : Page 9806;
+                         BEGIN
+                           Field.SETRANGE(TableNo,"Table ID");
+                           FieldsLookup.SETTABLEVIEW(Field);
+                           FieldsLookup.LOOKUPMODE(TRUE);
+
+                           IF FieldsLookup.RUNMODAL = ACTION::LookupOK THEN BEGIN
+                             FieldsLookup.GETRECORD(Field);
+                             IF Field."No." = "Field ID" THEN
+                               EXIT;
+                             TableFilter.CheckDuplicateField(Field);
+                             FillSourceRecord(Field);
+                             FieldCaptionText := GetFieldCaption;
+                             CurrPage.UPDATE(TRUE);
+                           END;
+                         END;
+                          }
+
+    { 3   ;2   ;Field     ;
+                CaptionML=[ENU=Field Caption;
+                           ESM=T¡tulo campo;
+                           FRC=Libell‚ champ;
+                           ENC=Field Caption];
+                SourceExpr=FieldCaptionText;
+                Editable=false }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr=Optional }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Multiplier;
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      ColumnCaptionText@1000 : Text INDATASET;
+      FieldCaptionText@1001 : Text INDATASET;
+
+    BEGIN
+    END.
+  }
+}
+

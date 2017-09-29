@@ -1,0 +1,667 @@
+OBJECT Page 9000 Whse. WMS Role Center
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               ESM=µrea de tareas;
+               FRC=Tableau de bord;
+               ENC=Role Centre];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 5       ;1   ;Action    ;
+                      CaptionML=[ENU=&Picking List;
+                                 ESM=Lista &picking;
+                                 FRC=&Bordereau de prÇlävement;
+                                 ENC=&Picking List];
+                      RunObject=Report 5752;
+                      Image=Report }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=P&ut-away List;
+                                 ESM=Lista &ubicac.;
+                                 FRC=Liste d'art&icles Ö classer;
+                                 ENC=P&ut-away List];
+                      RunObject=Report 5751;
+                      Image=Report }
+      { 7       ;1   ;Action    ;
+                      CaptionML=[ENU=M&ovement List;
+                                 ESM=Lista m&ovimiento;
+                                 FRC=Liste de m&ouvements;
+                                 ENC=M&ovement List];
+                      RunObject=Report 7301;
+                      Image=Report }
+      { 49      ;1   ;Separator  }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=Whse. &Shipment Status;
+                                 ESM=E&stado env°o alm.;
+                                 FRC=êtat des livraison&s d'entrepìt;
+                                 ENC=Whse. &Shipment Status];
+                      RunObject=Report 7313;
+                      Image=Report }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Warehouse &Bin List;
+                                 ESM=Lista u&bicaci¢n almacÇn;
+                                 FRC=Liste des &zones de stockage;
+                                 ENC=Warehouse &Bin List];
+                      RunObject=Report 7319;
+                      Image=Report }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Whse. &Adjustment Bin;
+                                 ESM=Ubic. &ajuste alm.;
+                                 FRC=Zone d'&ajustement d'entrepìt;
+                                 ENC=Whse. &Adjustment Bin];
+                      RunObject=Report 7320;
+                      Image=Report }
+      { 51      ;1   ;Separator  }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Whse. Phys. Inventory &List;
+                                 ESM=&Lista invent. f°s. alm.;
+                                 FRC=&Liste de l'inventaire physique de l'entrepìt;
+                                 ENC=Whse. Phys. Inventory &List];
+                      RunObject=Report 7307;
+                      Image=Report }
+      { 16      ;1   ;Action    ;
+                      CaptionML=[ENU=P&hys. Inventory List;
+                                 ESM=Lista in&ventario f°sico;
+                                 FRC=Liste de l'inventaire p&hysique;
+                                 ENC=P&hys. Inventory List];
+                      RunObject=Report 722;
+                      Image=Report }
+      { 54      ;1   ;Separator  }
+      { 50      ;1   ;Action    ;
+                      CaptionML=[ENU=&Customer - Labels;
+                                 ESM=&Cliente - Etiquetas;
+                                 FRC=&Client - êtiquettes;
+                                 ENC=&Customer - Labels];
+                      RunObject=Report 110;
+                      Image=Report }
+      { 1020000 ;1   ;Action    ;
+                      CaptionML=[ENU=Shipping Labels;
+                                 ESM=Etiq. de env°o;
+                                 FRC=êtiquettes de livraison;
+                                 ENC=Shipping Labels];
+                      RunObject=Report 10078;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Warehouse Shipments;
+                                 ESM=Env°os almacÇn;
+                                 FRC=Livraisons entrepìt;
+                                 ENC=Warehouse Shipments];
+                      RunObject=Page 7339 }
+      { 22      ;1   ;Action    ;
+                      CaptionML=[ENU=Released;
+                                 ESM=Lanzados;
+                                 FRC=RelÉchÇ;
+                                 ENC=Released];
+                      RunObject=Page 7339;
+                      RunPageView=SORTING(No.)
+                                  WHERE(Status=FILTER(Released)) }
+      { 23      ;1   ;Action    ;
+                      CaptionML=[ENU=Partially Picked;
+                                 ESM=Picking parcial;
+                                 FRC=Partiellement prÇlevÇ;
+                                 ENC=Partially Picked];
+                      RunObject=Page 7339;
+                      RunPageView=WHERE(Document Status=FILTER(Partially Picked)) }
+      { 24      ;1   ;Action    ;
+                      CaptionML=[ENU=Completely Picked;
+                                 ESM=Picking completo;
+                                 FRC=Entiärement prÇlÇvÇ;
+                                 ENC=Completely Picked];
+                      RunObject=Page 7339;
+                      RunPageView=WHERE(Document Status=FILTER(Completely Picked)) }
+      { 25      ;1   ;Action    ;
+                      CaptionML=[ENU=Partially Shipped;
+                                 ESM=Enviados parcialmente;
+                                 FRC=Partiellement livrÇ;
+                                 ENC=Partially Shipped];
+                      RunObject=Page 7339;
+                      RunPageView=WHERE(Document Status=FILTER(Partially Shipped)) }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=Warehouse Receipts;
+                                 ESM=Recepciones almacÇn;
+                                 FRC=RÇceptions de l'entrepìt;
+                                 ENC=Warehouse Receipts];
+                      RunObject=Page 7332 }
+      { 77      ;1   ;Action    ;
+                      CaptionML=[ENU=Partially Received;
+                                 ESM=Recibidas parcialmente;
+                                 FRC=Partiellement reáu;
+                                 ENC=Partially Received];
+                      RunObject=Page 7332;
+                      RunPageView=WHERE(Document Status=FILTER(Partially Received)) }
+      { 47      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Orders;
+                                 ESM=Pedidos venta;
+                                 FRC=Documents de vente;
+                                 ENC=Sales Orders];
+                      RunObject=Page 9305;
+                      Image=Order }
+      { 79      ;1   ;Action    ;
+                      CaptionML=[ENU=Released;
+                                 ESM=Lanzados;
+                                 FRC=RelÉchÇ;
+                                 ENC=Released];
+                      RunObject=Page 9305;
+                      RunPageView=WHERE(Status=FILTER(Released)) }
+      { 81      ;1   ;Action    ;
+                      CaptionML=[ENU=Partially Shipped;
+                                 ESM=Enviados parcialmente;
+                                 FRC=Partiellement livrÇ;
+                                 ENC=Partially Shipped];
+                      RunObject=Page 9305;
+                      RunPageView=WHERE(Status=FILTER(Released),
+                                        Completely Shipped=FILTER(No)) }
+      { 82      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Return Orders;
+                                 ESM=Devoluciones compra;
+                                 FRC=Retours achat;
+                                 ENC=Purchase Return Orders];
+                      RunObject=Page 9311 }
+      { 83      ;1   ;Action    ;
+                      CaptionML=[ENU=Transfer Orders;
+                                 ESM=Peds. transfer.;
+                                 FRC=Ordres de transfert;
+                                 ENC=Transfer Orders];
+                      RunObject=Page 5742;
+                      Image=Document }
+      { 31      ;1   ;Action    ;
+                      CaptionML=[ENU=Released Production Orders;
+                                 ESM=‡rdenes producci¢n lanzadas;
+                                 FRC=Ordres de fabrication lancÇs;
+                                 ENC=Released Production Orders];
+                      RunObject=Page 9326 }
+      { 55      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Orders;
+                                 ESM=Pedidos compra;
+                                 FRC=Bons de commande;
+                                 ENC=Purchase Orders];
+                      RunObject=Page 9307 }
+      { 33      ;1   ;Action    ;
+                      CaptionML=[ENU=Released;
+                                 ESM=Lanzados;
+                                 FRC=RelÉchÇ;
+                                 ENC=Released];
+                      RunObject=Page 9307;
+                      RunPageView=WHERE(Status=FILTER(Released)) }
+      { 34      ;1   ;Action    ;
+                      CaptionML=[ENU=Partially Received;
+                                 ESM=Recibidos parcialmente;
+                                 FRC=Partiellement reáu;
+                                 ENC=Partially Received];
+                      RunObject=Page 9307;
+                      RunPageView=WHERE(Status=FILTER(Released),
+                                        Completely Received=FILTER(No)) }
+      { 27      ;1   ;Action    ;
+                      CaptionML=[ENU=Assembly Orders;
+                                 ESM=Pedidos de ensamblado;
+                                 FRC=Ordres d'assemblage;
+                                 ENC=Assembly Orders];
+                      RunObject=Page 902 }
+      { 35      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Return Orders;
+                                 ESM=Devoluciones venta;
+                                 FRC=Retours vente;
+                                 ENC=Sales Return Orders];
+                      RunObject=Page 9304;
+                      Image=ReturnOrder }
+      { 56      ;1   ;Action    ;
+                      CaptionML=[ENU=Picks;
+                                 ESM=Picking;
+                                 FRC=PrÇlävements;
+                                 ENC=Picks];
+                      RunObject=Page 9313 }
+      { 87      ;1   ;Action    ;
+                      CaptionML=[ENU=Unassigned;
+                                 ESM=No asignados;
+                                 FRC=Non attribuÇ;
+                                 ENC=Unassigned];
+                      RunObject=Page 9313;
+                      RunPageView=WHERE(Assigned User ID=FILTER('')) }
+      { 58      ;1   ;Action    ;
+                      CaptionML=[ENU=Put-away;
+                                 ESM=Ubicaci¢n;
+                                 FRC=Rangement;
+                                 ENC=Put-away];
+                      RunObject=Page 9312 }
+      { 90      ;1   ;Action    ;
+                      CaptionML=[ENU=Unassigned;
+                                 ESM=No asignada;
+                                 FRC=Non attribuÇ;
+                                 ENC=Unassigned];
+                      RunObject=Page 9312;
+                      RunPageView=WHERE(Assigned User ID=FILTER('')) }
+      { 59      ;1   ;Action    ;
+                      CaptionML=[ENU=Movements;
+                                 ESM=Movimientos;
+                                 FRC=Mouvements;
+                                 ENC=Movements];
+                      RunObject=Page 9314 }
+      { 93      ;1   ;Action    ;
+                      CaptionML=[ENU=Unassigned;
+                                 ESM=No asignados;
+                                 FRC=Non attribuÇ;
+                                 ENC=Unassigned];
+                      RunObject=Page 9314;
+                      RunPageView=WHERE(Assigned User ID=FILTER('')) }
+      { 60      ;1   ;Action    ;
+                      CaptionML=[ENU=Movement Worksheets;
+                                 ESM=Hojas trabajo movimiento;
+                                 FRC=Feuilles de mouvement;
+                                 ENC=Movement Worksheets];
+                      RunObject=Page 7346;
+                      RunPageView=WHERE(Template Type=CONST(Movement)) }
+      { 94      ;1   ;Action    ;
+                      CaptionML=[ENU=Bin Contents;
+                                 ESM=Contenidos ubicaci¢n;
+                                 FRC=Contenu de la zone;
+                                 ENC=Bin Contents];
+                      RunObject=Page 7305;
+                      Image=BinContent }
+      { 61      ;1   ;Action    ;
+                      CaptionML=[ENU=Whse. Item Journals;
+                                 ESM=Diarios producto almacÇn;
+                                 FRC=Journaux d'article d'entrepìt;
+                                 ENC=Whse. Item Journals];
+                      RunObject=Page 7329;
+                      RunPageView=WHERE(Template Type=CONST(Item)) }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 62      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Reference Data;
+                                 ESM=Datos referencia;
+                                 FRC=DonnÇes de rÇfÇrence;
+                                 ENC=Reference Data];
+                      Image=ReferenceData }
+      { 117     ;2   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 ESM=Productos;
+                                 FRC=Articles;
+                                 ENC=Items];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 118     ;2   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 ESM=Clientes;
+                                 FRC=Clients;
+                                 ENC=Customers];
+                      RunObject=Page 22;
+                      Image=Customer }
+      { 119     ;2   ;Action    ;
+                      CaptionML=[ENU=Vendors;
+                                 ESM=Proveedores;
+                                 FRC=Fournisseurs;
+                                 ENC=Vendors];
+                      RunObject=Page 27;
+                      Image=Vendor }
+      { 120     ;2   ;Action    ;
+                      CaptionML=[ENU=Locations;
+                                 ESM=Almacenes;
+                                 FRC=Emplacements;
+                                 ENC=Locations];
+                      RunObject=Page 15;
+                      Image=Warehouse }
+      { 121     ;2   ;Action    ;
+                      CaptionML=[ENU=Shipping Agent;
+                                 ESM=Transportista;
+                                 FRC=Agent de livraison;
+                                 ENC=Shipping Agent];
+                      RunObject=Page 428 }
+      { 122     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Journals;
+                                 ESM=Diarios;
+                                 FRC=Journaux;
+                                 ENC=Journals];
+                      Image=Journals }
+      { 12      ;2   ;Action    ;
+                      CaptionML=[ENU=Whse. Item Journals;
+                                 ESM=Diarios producto almacÇn;
+                                 FRC=Journaux d'article d'entrepìt;
+                                 ENC=Whse. Item Journals];
+                      RunObject=Page 7329;
+                      RunPageView=WHERE(Template Type=CONST(Item)) }
+      { 17      ;2   ;Action    ;
+                      CaptionML=[ENU=Whse. Reclass. Journals;
+                                 ESM=Diarios reclasificaci¢n alm.;
+                                 FRC=Journaux de reclassements d'entrepìt;
+                                 ENC=Whse. Reclass. Journals];
+                      RunObject=Page 7329;
+                      RunPageView=WHERE(Template Type=CONST(Reclassification)) }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Whse. Phys. Invt. Journals;
+                                 ESM=Diarios inv. f°sico almacÇn;
+                                 FRC=Journaux d'inventaire d'entrepìt;
+                                 ENC=Whse. Phys. Invt. Journals];
+                      RunObject=Page 7329;
+                      RunPageView=WHERE(Template Type=CONST(Physical Inventory)) }
+      { 19      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Journals;
+                                 ESM=Diarios de productos;
+                                 FRC=Journaux d'articles;
+                                 ENC=Item Journals];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Item),
+                                        Recurring=CONST(No)) }
+      { 123     ;2   ;Action    ;
+                      CaptionML=[ENU=Item Reclass. Journals;
+                                 ESM=Diarios reclasif. producto;
+                                 FRC=Journaux de reclassements d'articles;
+                                 ENC=Item Reclass. Journals];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Transfer),
+                                        Recurring=CONST(No)) }
+      { 126     ;2   ;Action    ;
+                      CaptionML=[ENU=Phys. Inventory Journals;
+                                 ESM=Diarios de inventario;
+                                 FRC=Journaux de dÇcompte d'inventaire;
+                                 ENC=Phys. Inventory Journals];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Phys. Inventory),
+                                        Recurring=CONST(No)) }
+      { 129     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Worksheet;
+                                 ESM=Hoja trabajo;
+                                 FRC=Feuille activitÇ;
+                                 ENC=Worksheet];
+                      Image=Worksheets }
+      { 130     ;2   ;Action    ;
+                      CaptionML=[ENU=Put-away Worksheets;
+                                 ESM=Hojas trab. ubicaci¢n;
+                                 FRC=Feuilles de rangement;
+                                 ENC=Put-away Worksheets];
+                      RunObject=Page 7346;
+                      RunPageView=WHERE(Template Type=CONST(Put-away)) }
+      { 131     ;2   ;Action    ;
+                      CaptionML=[ENU=Pick Worksheets;
+                                 ESM=Hojas trabajo picking;
+                                 FRC=Feuilles de prÇlävement;
+                                 ENC=Pick Worksheets];
+                      RunObject=Page 7346;
+                      RunPageView=WHERE(Template Type=CONST(Pick)) }
+      { 132     ;2   ;Action    ;
+                      CaptionML=[ENU=Movement Worksheets;
+                                 ESM=Hojas trabajo movimiento;
+                                 FRC=Feuilles de mouvement;
+                                 ENC=Movement Worksheets];
+                      RunObject=Page 7346;
+                      RunPageView=WHERE(Template Type=CONST(Movement)) }
+      { 134     ;2   ;Action    ;
+                      CaptionML=[ENU=Internal Put-aways;
+                                 ESM=Ubicaciones internas;
+                                 FRC=Rangements internes;
+                                 ENC=Internal Put-aways];
+                      RunObject=Page 7356 }
+      { 135     ;2   ;Action    ;
+                      CaptionML=[ENU=Internal Picks;
+                                 ESM=Picking internos;
+                                 FRC=PrÇlävements internes;
+                                 ENC=Internal Picks];
+                      RunObject=Page 7359 }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posted Documents;
+                                 ESM=Documentos hist¢ricos;
+                                 FRC=Documents reportÇs;
+                                 ENC=Posted Documents];
+                      Image=FiledPosted }
+      { 3       ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Whse Shipments;
+                                 ESM=Hist¢rico env°os almacÇn;
+                                 FRC=Livraisons d'entrepìt reportÇes;
+                                 ENC=Posted Whse Shipments];
+                      RunObject=Page 7340 }
+      { 136     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Shipment;
+                                 ESM=Hist¢rico remisiones venta;
+                                 FRC=Livraison vente reportÇe;
+                                 ENC=Posted Sales Shipment];
+                      RunObject=Page 142 }
+      { 137     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Transfer Shipments;
+                                 ESM=Hist¢rico env°os transferencia;
+                                 FRC=Livraisons de transfert reportÇes;
+                                 ENC=Posted Transfer Shipments];
+                      RunObject=Page 5752 }
+      { 138     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Return Shipments;
+                                 ESM=Hist¢rico env°os devoluci¢n;
+                                 FRC=Livraisons de retour reportÇes;
+                                 ENC=Posted Return Shipments];
+                      RunObject=Page 6652 }
+      { 10      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Whse Receipts;
+                                 ESM=Hist¢rico recep. almacÇn;
+                                 FRC=RÇceptions d'entrepìt reportÇes;
+                                 ENC=Posted Whse Receipts];
+                      RunObject=Page 7333 }
+      { 139     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Receipts;
+                                 ESM=Hist¢ricos recepciones de compra;
+                                 FRC=Factures d'achat reportÇes;
+                                 ENC=Posted Purchase Receipts];
+                      RunObject=Page 145 }
+      { 140     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Transfer Receipts;
+                                 ESM=Hist. recepciones transferencia;
+                                 FRC=RÇceptions de transfert reportÇes;
+                                 ENC=Posted Transfer Receipts];
+                      RunObject=Page 5753 }
+      { 141     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Return Receipts;
+                                 ESM=Hist¢ricos recep. devoluci¢n;
+                                 FRC=RÇceptions de retour reportÇes;
+                                 ENC=Posted Return Receipts];
+                      RunObject=Page 6662;
+                      Image=PostedReturnReceipt }
+      { 32      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Assembly Orders;
+                                 ESM=Pedidos de ensamblado registrados;
+                                 FRC=Ordres d'assemblage reportÇs;
+                                 ENC=Posted Assembly Orders];
+                      RunObject=Page 922 }
+      { 57      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Registered Documents;
+                                 ESM=Documentos registrados;
+                                 FRC=Documents enregistrÇs;
+                                 ENC=Registered Documents];
+                      Image=RegisteredDocs }
+      { 43      ;2   ;Action    ;
+                      CaptionML=[ENU=Registered Picks;
+                                 ESM=Picking registrados;
+                                 FRC=PrÇlävements enregistrÇs;
+                                 ENC=Registered Picks];
+                      RunObject=Page 9344;
+                      Image=RegisteredDocs }
+      { 44      ;2   ;Action    ;
+                      CaptionML=[ENU=Registered Put-aways;
+                                 ESM=Ubicaciones registradas;
+                                 FRC=Rangements enregistrÇs;
+                                 ENC=Registered Put-aways];
+                      RunObject=Page 9343;
+                      Image=RegisteredDocs }
+      { 45      ;2   ;Action    ;
+                      CaptionML=[ENU=Registered Movements;
+                                 ESM=Movimientos registrados;
+                                 FRC=Mouvements enregistrÇs;
+                                 ENC=Registered Movements];
+                      RunObject=Page 9345;
+                      Image=RegisteredDocs }
+      { 26      ;0   ;ActionContainer;
+                      ActionContainerType=NewDocumentItems }
+      { 21      ;1   ;Action    ;
+                      CaptionML=[ENU=Whse. &Shipment;
+                                 ESM=E&nv°o almacÇn;
+                                 FRC=&Livraison magasin;
+                                 ENC=Whse. &Shipment];
+                      RunObject=Page 7335;
+                      Promoted=No;
+                      Image=Shipment;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=T&ransfer Order;
+                                 ESM=&Ped. transfer.;
+                                 FRC=O&rdre de transfert;
+                                 ENC=T&ransfer Order];
+                      RunObject=Page 5740;
+                      Promoted=No;
+                      Image=Document;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=&Purchase Order;
+                                 ESM=&Pedido compra;
+                                 FRC=&Bon de commande;
+                                 ENC=&Purchase Order];
+                      RunObject=Page 50;
+                      Promoted=No;
+                      Image=Document;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 1       ;1   ;Action    ;
+                      CaptionML=[ENU=&Whse. Receipt;
+                                 ESM=Rece&pci¢n almacÇn;
+                                 FRC=&RÇception en magasin;
+                                 ENC=&Whse. Receipt];
+                      RunObject=Page 5768;
+                      Promoted=No;
+                      Image=Receipt;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 52      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 ESM=Tareas;
+                                 FRC=TÉches;
+                                 ENC=Tasks];
+                      IsHeader=Yes }
+      { 28      ;1   ;Action    ;
+                      CaptionML=[ENU=P&ut-away Worksheet;
+                                 ESM=Hoja trabajo &ubicaci¢n;
+                                 FRC=Fe&uille rangement;
+                                 ENC=P&ut-away Worksheet];
+                      RunObject=Page 7352;
+                      Image=PutAwayWorksheet }
+      { 29      ;1   ;Action    ;
+                      CaptionML=[ENU=Pi&ck Worksheet;
+                                 ESM=Preparar ho&j. trab. pedido;
+                                 FRC=Feuille prÇlä&vement;
+                                 ENC=Pi&ck Worksheet];
+                      RunObject=Page 7345;
+                      Image=PickWorksheet }
+      { 30      ;1   ;Action    ;
+                      CaptionML=[ENU=M&ovement Worksheet;
+                                 ESM=Hoja trabajo mo&vimiento;
+                                 FRC=Feuille m&ouvement;
+                                 ENC=M&ovement Worksheet];
+                      RunObject=Page 7351;
+                      Image=MovementWorksheet }
+      { 38      ;1   ;Separator  }
+      { 36      ;1   ;Action    ;
+                      CaptionML=[ENU=W&hse. Item Journal;
+                                 ESM=&Diario producto almacÇn;
+                                 FRC=&Journal article entrepìt;
+                                 ENC=W&hse. Item Journal];
+                      RunObject=Page 7324;
+                      Image=BinJournal }
+      { 46      ;1   ;Action    ;
+                      CaptionML=[ENU=Whse. Phys. &Invt. Journal;
+                                 ESM=Diario inv. &f°s. almacÇn;
+                                 FRC=Journal d'inventaire d'entre&pìt;
+                                 ENC=Whse. &Phys. Invt. Journal];
+                      RunObject=Page 7326;
+                      Image=InventoryJournal }
+      { 53      ;1   ;Separator ;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      IsHeader=Yes }
+      { 84      ;1   ;Action    ;
+                      CaptionML=[ENU=Item &Tracing;
+                                 ESM=Segu&imiento productos;
+                                 FRC=RepÇrage d'ar&ticle;
+                                 ENC=Item &Tracing];
+                      RunObject=Page 6520;
+                      Image=ItemTracing }
+      { 1020004 ;1   ;Separator ;
+                      CaptionML=[ENU=Customer;
+                                 ESM=Cliente;
+                                 FRC=Client;
+                                 ENC=Customer];
+                      IsHeader=Yes }
+      { 1020005 ;1   ;Action    ;
+                      CaptionML=[ENU=Credit Management;
+                                 ESM=Gesti¢n crÇdito;
+                                 FRC=Gestion de crÇdit;
+                                 ENC=Credit Management];
+                      RunObject=Page 36630 }
+      { 1020006 ;1   ;Action    ;
+                      CaptionML=[ENU=Order Status;
+                                 ESM=Estado pedido;
+                                 FRC=êtat commande;
+                                 ENC=Order Status];
+                      RunObject=Page 36631 }
+      { 1480000 ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Order Shipping;
+                                 ESM=Env°o pedido ventas;
+                                 FRC=Livraison de document de vente;
+                                 ENC=Sales Order Shipping];
+                      RunObject=Page 36626 }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1903327208;2;Part   ;
+                PagePartID=Page9053;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 4   ;2   ;Part      ;
+                PagePartID=Page760;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 37  ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                PartType=Page }
+
+    { 1903012608;2;Part   ;
+                PagePartID=Page9175;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1901377608;2;Part   ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

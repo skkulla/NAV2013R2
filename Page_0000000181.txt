@@ -1,0 +1,108 @@
+OBJECT Page 181 License Agreement Accept
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=License Agreement Accept;
+               ESM=Aceptaci¢n contrato licencia;
+               FRC=Acceptation du contrat de licence;
+               ENC=License Agreement Accept];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table140;
+    PageType=Card;
+    OnOpenPage=BEGIN
+                 GET;
+                 OrgAccepted := Accepted;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=&Accept;
+                                 ESM=&Aceptar;
+                                 FRC=&Accepter;
+                                 ENC=&Accept];
+                      Promoted=Yes;
+                      Image=Approve;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 VALIDATE(Accepted,TRUE);
+                                 CurrPage.UPDATE;
+                                 // CurrForm.CLOSE;
+                               END;
+                                }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Read the End User License Agreement;
+                                 ESM=Lea el contrato de licencia para el usuario final;
+                                 FRC=Lire le contrat de licence d'utilisation;
+                                 ENC=Read the End User License Agreement];
+                      Promoted=Yes;
+                      Image=Agreement;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 ShowEULA;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                CaptionClass=FORMAT("Message for Accepting User");
+                Editable=FALSE;
+                MultiLine=Yes }
+
+    { 3   ;2   ;Field     ;
+                CaptionClass=Text19050732 }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Accepted;
+                OnValidate=BEGIN
+                             IF OrgAccepted AND NOT Accepted THEN
+                               ERROR(Text001);
+                           END;
+                            }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Accepted By";
+                Editable=FALSE }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Accepted On";
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Effective Date";
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      OrgAccepted@1000 : Boolean;
+      Text001@1001 : TextConst 'ENU=You can not revoke the End User License Agreement accept. The accept can only be revoked by changing the Go Live Date field in the Go Live Information Setup Card.;ESM=No puede revocar la aceptaci¢n del contrato de licencia para el usuario final. La aceptaci¢n s¢lo se puede revocar si cambia el campo Fecha publicaci¢n en la Ficha config. info. publicaci¢n.;FRC=Vous ne pouvez pas r‚voquer l''acceptation du contrat de licence d''utilisation, sauf en modifiant le champ Date d''entr‚e en service dans la fiche de configuration des donn‚es d''entr‚e en service.;ENC=You can not revoke the End User License Agreement accept. The accept can only be revoked by changing the Go Live Date field in the Go Live Information Setup Card.';
+      Text19050732@19045109 : TextConst 'ENU=Do you accept the license terms?;ESM=¨Acepta los t‚rminos de licencia?;FRC=Acceptez-vous les termes du contrat de licence?;ENC=Do you accept the license terms?';
+
+    BEGIN
+    END.
+  }
+}
+

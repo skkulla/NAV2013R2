@@ -1,0 +1,93 @@
+OBJECT Page 982 Payment Registration Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Registration Setup;
+               ESM=Configuraci¢n de registro de pago;
+               FRC=Configuration de l'enregistrement de paiement;
+               ENC=Payment Registration Setup];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table980;
+    DataCaptionExpr=PageCaption;
+    PageType=StandardDialog;
+    OnOpenPage=BEGIN
+                 IF NOT GET(USERID) THEN BEGIN
+                   IF GET THEN;
+
+                   "User ID" := USERID;
+                   INSERT;
+                 END;
+
+                 PageCaption := '';
+               END;
+
+    OnQueryClosePage=BEGIN
+                       IF CloseAction = ACTION::LookupOK THEN
+                         EXIT(ValidateMandatoryFields(TRUE));
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;    ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General];
+                GroupType=Group }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Journal Template Name" }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Journal Batch Name" }
+
+    { 5   ;2   ;Field     ;
+                CaptionML=[ENU=Balancing Account Type;
+                           ESM=Tipo de contrapartida;
+                           FRC=Type compte contrepartie;
+                           ENC=Balancing Account Type];
+                SourceExpr="Bal. Account Type" }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Balancing Account;
+                           ESM=Saldo;
+                           FRC=Compte ‚quilibr‚;
+                           ENC=Balancing Account];
+                SourceExpr="Bal. Account No." }
+
+    { 7   ;2   ;Field     ;
+                CaptionML=[ENU=Use this Account as Default;
+                           ESM=Usar esta cuenta como predeterminada;
+                           FRC=Utiliser ce compte par d‚faut;
+                           ENC=Use this Account as Default];
+                SourceExpr="Use this Account as Def." }
+
+    { 8   ;2   ;Field     ;
+                CaptionML=[ENU=Automatically Fill Date Received;
+                           ESM=Rellenar fecha de recepci¢n autom ticamente;
+                           FRC=Renseigner automatiquement la date de r‚ception;
+                           ENC=Automatically Fill Date Received];
+                SourceExpr="Auto Fill Date Received" }
+
+  }
+  CODE
+  {
+    VAR
+      PageCaption@1000 : Text[10];
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,165 @@
+OBJECT Page 908 Assembly Availability
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Assembly Availability;
+               ESM=Disponibilidad de ensamblado;
+               FRC=Disponibilit‚ assemblage;
+               ENC=Assembly Availability];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    ModifyAllowed=No;
+    SourceTable=Table900;
+    PageType=ConfirmationDialog;
+    SourceTableTemporary=Yes;
+    InstructionalTextML=[ENU=The quantity on inventory is not sufficient to cover the net change in inventory. Are you sure that you want to record the quantity?;
+                         ESM=Las cantidad en inventario disponible no es suficiente para la cantidad solicitada. ¨Est  seguro de que desea registrar la cantidad?;
+                         FRC=La quantit‚ disponible en inventaire n'est pas suffisante pour couvrir votre demande. Òtes-vous s–r de vouloir enregistrer la quantit‚ÿ?;
+                         ENC=The quantity on inventory is not sufficient to cover the net change in inventory. Are you sure that you want to record the quantity?];
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Details;
+                CaptionML=[ENU=Details;
+                           ESM=Detalles;
+                           FRC=D‚tails;
+                           ENC=Details] }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Item No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 5   ;2   ;Field     ;
+                Name=Current Quantity;
+                CaptionML=[ENU=Current Quantity;
+                           ESM=Cantidad l¡n. actual;
+                           FRC=Quantit‚ courante;
+                           ENC=Current Quantity];
+                SourceExpr="Remaining Quantity" }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Reserved Quantity" }
+
+    { 8   ;2   ;Field     ;
+                Name=AbleToAssemble;
+                CaptionML=[ENU=Able to Assemble;
+                           ESM=Capaz de ensamblar;
+                           FRC=Possible … assembler;
+                           ENC=Able to Assemble];
+                DecimalPlaces=0:5;
+                SourceExpr=QtyAvailToMake;
+                Style=Unfavorable;
+                StyleExpr=QtyAvailTooLow }
+
+    { 6   ;2   ;Field     ;
+                Name=EarliestAvailableDate;
+                CaptionML=[ENU=Earliest Available Date;
+                           ESM=Primera fecha posible;
+                           FRC=Date disponibilit‚ au plus t“t;
+                           ENC=Earliest Available Date];
+                SourceExpr=EarliestAvailableDate }
+
+    { 9   ;2   ;Field     ;
+                Name=Inventory;
+                CaptionML=[ENU=Inventory;
+                           ESM=Inventario;
+                           FRC=Inventaire;
+                           ENC=Inventory];
+                DecimalPlaces=0:5;
+                SourceExpr=Inventory;
+                OnDrillDown=VAR
+                              Item@1002 : Record 27;
+                              ItemAvailFormsMgt@1000 : Codeunit 353;
+                            BEGIN
+                              Item.GET("Item No.");
+                              SetItemFilter(Item);
+                              ItemAvailFormsMgt.ShowItemLedgerEntries(Item,FALSE);
+                            END;
+                             }
+
+    { 10  ;2   ;Field     ;
+                Name=GrossRequirement;
+                CaptionML=[ENU=Gross Requirement;
+                           ESM=Necesidades brutas;
+                           FRC=Exigence brute;
+                           ENC=Gross Requirement];
+                DecimalPlaces=0:5;
+                SourceExpr=GrossRequirement }
+
+    { 11  ;2   ;Field     ;
+                Name=ScheduledReceipts;
+                CaptionML=[ENU=Scheduled Receipts;
+                           ESM=Recep. previstas;
+                           FRC=R‚ceptions programm‚es;
+                           ENC=Scheduled Receipts];
+                DecimalPlaces=0:5;
+                SourceExpr=ScheduledReceipts }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Variant Code" }
+
+    { 15  ;2   ;Field     ;
+                SourceExpr="Location Code" }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Unit of Measure Code" }
+
+    { 7   ;2   ;Part      ;
+                Name=AssemblyLineAvail;
+                SubPageLink=Document Type=FIELD(Document Type),
+                            Document No.=FIELD(No.);
+                PagePartID=Page909;
+                PartType=Page }
+
+  }
+  CODE
+  {
+    VAR
+      Inventory@1009 : Decimal;
+      GrossRequirement@1008 : Decimal;
+      ScheduledReceipts@1007 : Decimal;
+      EarliestAvailableDate@1003 : Date;
+      QtyAvailToMake@1011 : Decimal;
+      QtyAvailTooLow@1001 : Boolean;
+
+    PROCEDURE SetData@1(VAR TempAssemblyHeader2@1000 : TEMPORARY Record 900;VAR TempAssemblyLine2@1001 : TEMPORARY Record 901);
+    VAR
+      TempAssemblyLine@1002 : TEMPORARY Record 901;
+    BEGIN
+      COPY(TempAssemblyHeader2,TRUE);
+      TempAssemblyLine.COPY(TempAssemblyLine2,TRUE);
+      CurrPage.AssemblyLineAvail.PAGE.SetHeader(TempAssemblyHeader2);
+      CurrPage.AssemblyLineAvail.PAGE.SetLinesRecord(TempAssemblyLine);
+    END;
+
+    PROCEDURE SetHeaderInventoryData@3(Inventory2@1004 : Decimal;GrossRequirement2@1003 : Decimal;ScheduledReceipts2@1002 : Decimal;EarliestAvailableDate2@1001 : Date;QtyAvailToMake2@1000 : Decimal;QtyAvailTooLow2@1005 : Boolean);
+    BEGIN
+      Inventory := Inventory2;
+      GrossRequirement := GrossRequirement2;
+      ScheduledReceipts := ScheduledReceipts2;
+      EarliestAvailableDate := EarliestAvailableDate2;
+      QtyAvailToMake := QtyAvailToMake2;
+      QtyAvailTooLow := QtyAvailTooLow2;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

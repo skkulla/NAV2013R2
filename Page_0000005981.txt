@@ -1,0 +1,432 @@
+OBJECT Page 5981 Service Item List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=03/13/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36281;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Service Item List;
+               ESM=Lista producto servicio;
+               FRC=Liste des articles de service;
+               ENC=Service Item List];
+    SourceTable=Table5940;
+    PageType=List;
+    CardPageID=Service Item Card;
+    RefreshOnActivate=Yes;
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 25      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Service Item;
+                                 ESM=&Producto servicio;
+                                 FRC=Article de &service;
+                                 ENC=&Service Item];
+                      Image=ServiceItem }
+      { 31      ;2   ;Action    ;
+                      CaptionML=[ENU=Com&ponent List;
+                                 ESM=Lista com&ponente;
+                                 FRC=L&iste des composants;
+                                 ENC=Com&ponent List];
+                      RunObject=Page 5986;
+                      RunPageView=SORTING(Active,Parent Service Item No.,Line No.);
+                      RunPageLink=Active=CONST(Yes),
+                                  Parent Service Item No.=FIELD(No.);
+                      Image=Components }
+      { 27      ;2   ;Separator  }
+      { 19      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions }
+      { 15      ;3   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=&Dimensions-Single;
+                                 ESM=Dimensiones-&Individual;
+                                 FRC=&Dimensions - Simples;
+                                 ENC=&Dimensions-Single];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(5940),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 18      ;3   ;Action    ;
+                      CaptionML=[ENU=Dimensions-&Multiple;
+                                 ESM=Dimensiones-&M£ltiple;
+                                 FRC=Dimensions - &Multiples;
+                                 ENC=Dimensions-&Multiple];
+                      Image=DimensionSets;
+                      OnAction=VAR
+                                 ServiceItem@1001 : Record 5940;
+                                 DefaultDimMultiple@1000 : Page 542;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(ServiceItem);
+                                 DefaultDimMultiple.SetMultiServiceItem(ServiceItem);
+                                 DefaultDimMultiple.RUNMODAL;
+                               END;
+                                }
+      { 58      ;2   ;Separator ;
+                      CaptionML=[ENU="";
+                                 ESM="";
+                                 FRC="";
+                                 ENC=""] }
+      { 11      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      Image=Statistics }
+      { 59      ;3   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      RunObject=Page 5982;
+                      RunPageLink=No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process }
+      { 60      ;3   ;Action    ;
+                      CaptionML=[ENU=Tr&endscape;
+                                 ESM=A&n†lisis;
+                                 FRC=Tr&endscape;
+                                 ENC=Tr&endscape];
+                      RunObject=Page 5983;
+                      RunPageLink=No.=FIELD(No.);
+                      Image=Trendscape }
+      { 61      ;2   ;Separator ;
+                      CaptionML=[ENU="";
+                                 ESM="";
+                                 FRC="";
+                                 ENC=""] }
+      { 7       ;2   ;ActionGroup;
+                      CaptionML=[ENU=Troubleshooting;
+                                 ESM=Soluci¢n de problemas;
+                                 FRC=DÇpannage;
+                                 ENC=Troubleshooting];
+                      Image=Troubleshoot }
+      { 44      ;3   ;Action    ;
+                      CaptionML=[ENU=Troubleshooting Setup;
+                                 ESM=Config. detecci¢n errores;
+                                 FRC=Configuration dÇpannage;
+                                 ENC=Troubleshooting Setup];
+                      RunObject=Page 5993;
+                      RunPageLink=Type=CONST(Service Item),
+                                  No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Troubleshoot;
+                      PromotedCategory=Process }
+      { 3       ;3   ;Action    ;
+                      CaptionML=[ENU=Troubleshooting;
+                                 ESM=Soluci¢n de problemas;
+                                 FRC=DÇpannage;
+                                 ENC=Troubleshooting];
+                      Image=Troubleshoot;
+                      OnAction=VAR
+                                 TroubleshootingHeader@1000 : Record 5943;
+                               BEGIN
+                                 TroubleshootingHeader.ShowForServItem(Rec);
+                               END;
+                                }
+      { 54      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Skills;
+                                 ESM=Cualificaciones recurso;
+                                 FRC=CompÇtences de la ressource;
+                                 ENC=Resource Skills];
+                      RunObject=Page 6019;
+                      RunPageLink=Type=CONST(Service Item),
+                                  No.=FIELD(No.);
+                      Image=ResourceSkills }
+      { 55      ;2   ;Action    ;
+                      CaptionML=[ENU=S&killed Resources;
+                                 ESM=&Recursos calificados;
+                                 FRC=Ressources c&ompÇtentes;
+                                 ENC=S&killed Resources];
+                      Image=ResourceSkills;
+                      OnAction=BEGIN
+                                 CLEAR(SkilledResourceList);
+                                 SkilledResourceList.Initialize(ResourceSkill.Type::"Service Item","No.",Description);
+                                 SkilledResourceList.RUNMODAL;
+                               END;
+                                }
+      { 56      ;2   ;Separator ;
+                      CaptionML=[ENU="";
+                                 ESM="";
+                                 FRC="";
+                                 ENC=""] }
+      { 57      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 5911;
+                      RunPageLink=Table Name=CONST(Service Item),
+                                  Table Subtype=CONST(0),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 10      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Documents;
+                                 ESM=Documentos;
+                                 FRC=Documents;
+                                 ENC=Documents];
+                      Image=Documents }
+      { 63      ;2   ;ActionGroup;
+                      CaptionML=[ENU=S&ervice Orders;
+                                 ESM=P&edidos servicio;
+                                 FRC=Commandes de s&ervice;
+                                 ENC=S&ervice Orders];
+                      Image=Order }
+      { 64      ;3   ;Action    ;
+                      CaptionML=[ENU=&Item Lines;
+                                 ESM=L°ns. &prod.;
+                                 FRC=Lignes &articles;
+                                 ENC=&Item Lines];
+                      RunObject=Page 5903;
+                      RunPageView=SORTING(Service Item No.);
+                      RunPageLink=Service Item No.=FIELD(No.);
+                      Image=ItemLines }
+      { 65      ;3   ;Action    ;
+                      CaptionML=[ENU=&Service Lines;
+                                 ESM=L°neas &servicio;
+                                 FRC=Lignes de &service;
+                                 ENC=&Service Lines];
+                      RunObject=Page 5904;
+                      RunPageView=SORTING(Service Item No.);
+                      RunPageLink=Service Item No.=FIELD(No.);
+                      Image=ServiceLines }
+      { 66      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Service Shi&pments;
+                                 ESM=&Entregas de Servicio;
+                                 FRC=Li&vraisons de services;
+                                 ENC=Service Shi&pments];
+                      Image=Shipment }
+      { 67      ;3   ;Action    ;
+                      CaptionML=[ENU=&Item Lines;
+                                 ESM=L°ns. &prod.;
+                                 FRC=Lignes &articles;
+                                 ENC=&Item Lines];
+                      RunObject=Page 5950;
+                      RunPageView=SORTING(Service Item No.);
+                      RunPageLink=Service Item No.=FIELD(No.);
+                      Image=ItemLines }
+      { 68      ;3   ;Action    ;
+                      CaptionML=[ENU=&Service Lines;
+                                 ESM=L°neas &servicio;
+                                 FRC=Lignes de &service;
+                                 ENC=&Service Lines];
+                      RunObject=Page 5949;
+                      RunPageView=SORTING(Service Item No.);
+                      RunPageLink=Service Item No.=FIELD(No.);
+                      Image=ServiceLines }
+      { 9       ;2   ;Action    ;
+                      CaptionML=[ENU=Ser&vice Contracts;
+                                 ESM=Con&tratos de Servicio;
+                                 FRC=Contrats de ser&vices;
+                                 ENC=Ser&vice Contracts];
+                      RunObject=Page 6075;
+                      RunPageView=SORTING(Service Item No.,Contract Status);
+                      RunPageLink=Service Item No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=ServiceAgreement;
+                      PromotedCategory=Process }
+      { 13      ;1   ;ActionGroup;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      Image=History }
+      { 62      ;2   ;Action    ;
+                      CaptionML=[ENU=Service Item Lo&g;
+                                 ESM=Lo&g prod. servicio;
+                                 FRC=&Journal article de service;
+                                 ENC=Service Item Lo&g];
+                      RunObject=Page 5989;
+                      RunPageLink=Service Item No.=FIELD(No.);
+                      Image=Log }
+      { 28      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Service Ledger E&ntries;
+                                 ESM=Movs. &servicio;
+                                 FRC=êcritures se&rvice;
+                                 ENC=Service Ledger E&ntries];
+                      RunObject=Page 5912;
+                      RunPageView=SORTING(Service Item No. (Serviced),Entry Type,Moved from Prepaid Acc.,Type,Posting Date);
+                      RunPageLink=Service Item No. (Serviced)=FIELD(No.),
+                                  Service Order No.=FIELD(Service Order Filter),
+                                  Service Contract No.=FIELD(Contract Filter),
+                                  Posting Date=FIELD(Date Filter);
+                      Image=ServiceLedger }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=&Warranty Ledger Entries;
+                                 ESM=Movs. &garant°a;
+                                 FRC=êcritures &garantie;
+                                 ENC=&Warranty Ledger Entries];
+                      RunObject=Page 5913;
+                      RunPageView=SORTING(Service Item No. (Serviced),Posting Date,Document No.);
+                      RunPageLink=Service Item No. (Serviced)=FIELD(No.);
+                      Image=WarrantyLedger }
+      { 30      ;2   ;Separator ;
+                      CaptionML=[ENU="";
+                                 ESM="";
+                                 FRC="";
+                                 ENC=""] }
+      { 1900000005;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 5       ;1   ;ActionGroup;
+                      CaptionML=[ENU=New;
+                                 ESM=Nuevo;
+                                 FRC=Nouveau;
+                                 ENC=New] }
+      { 1900294905;2 ;Action    ;
+                      CaptionML=[ENU=New Item;
+                                 ESM=Nuevo producto;
+                                 FRC=Nouvel article;
+                                 ENC=New Item];
+                      RunObject=Page 30;
+                      Promoted=Yes;
+                      Image=NewItem;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1904837406;1 ;Action    ;
+                      CaptionML=[ENU=Service Item;
+                                 ESM=Producto servicio;
+                                 FRC=Article de service;
+                                 ENC=Service Item];
+                      RunObject=Report 5935;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1905919306;1 ;Action    ;
+                      CaptionML=[ENU=Service Item Label;
+                                 ESM=Etiqueta producto servicio;
+                                 FRC=êtiquette article de service;
+                                 ENC=Service Item Label];
+                      RunObject=Report 5901;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907713806;1 ;Action    ;
+                      CaptionML=[ENU=Service Item Resource usage;
+                                 ESM=Consumo recurso productos servicio;
+                                 FRC=Utilisation des ressources article de service;
+                                 ENC=Service Item Resource usage];
+                      RunObject=Report 5939;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1901646906;1 ;Action    ;
+                      CaptionML=[ENU=Service Item Out of Warranty;
+                                 ESM=Producto de servicio fuera de garant°a;
+                                 FRC=Article de service hors garantie;
+                                 ENC=Service Item Out of Warranty];
+                      RunObject=Report 5937;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                Editable=FALSE;
+                GroupType=Repeater }
+
+    { 39  ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Item No." }
+
+    { 41  ;2   ;Field     ;
+                SourceExpr="Item Description" }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Serial No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Customer No." }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Ship-to Code" }
+
+    { 49  ;2   ;Field     ;
+                SourceExpr="Warranty Starting Date (Parts)" }
+
+    { 51  ;2   ;Field     ;
+                SourceExpr="Warranty Ending Date (Parts)" }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Warranty Starting Date (Labor)" }
+
+    { 47  ;2   ;Field     ;
+                SourceExpr="Warranty Ending Date (Labor)" }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Search Description" }
+
+    { 1102601000;2;Field  ;
+                SourceExpr=Status;
+                Visible=FALSE }
+
+    { 1102601002;2;Field  ;
+                SourceExpr=Priority;
+                Visible=FALSE }
+
+    { 1102601004;2;Field  ;
+                SourceExpr="Last Service Date";
+                Visible=FALSE }
+
+    { 1102601006;2;Field  ;
+                SourceExpr="Service Contracts";
+                Visible=FALSE }
+
+    { 1102601008;2;Field  ;
+                SourceExpr="Vendor No.";
+                Visible=FALSE }
+
+    { 1102601010;2;Field  ;
+                SourceExpr="Vendor Name";
+                Visible=FALSE }
+
+    { 1102601012;2;Field  ;
+                SourceExpr="Installation Date";
+                Visible=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      ResourceSkill@1001 : Record 5956;
+      SkilledResourceList@1003 : Page 6023;
+
+    BEGIN
+    END.
+  }
+}
+

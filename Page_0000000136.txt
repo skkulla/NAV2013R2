@@ -1,0 +1,352 @@
+OBJECT Page 136 Posted Purchase Receipt
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posted Purchase Receipt;
+               ESM=Hist¢rico recepciones compra;
+               FRC=RÇception achat reportÇe;
+               ENC=Posted Purchase Receipt];
+    InsertAllowed=No;
+    SourceTable=Table120;
+    PageType=Document;
+    OnOpenPage=BEGIN
+                 SetSecurityFilterOnRespCenter;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 45      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Receipt;
+                                 ESM=R&ecepci¢n;
+                                 FRC=&Reáu;
+                                 ENC=&Receipt];
+                      Image=Receipt }
+      { 8       ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      RunObject=Page 399;
+                      RunPageLink=No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process }
+      { 72      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 66;
+                      RunPageLink=Document Type=CONST(Receipt),
+                                  No.=FIELD(No.),
+                                  Document Line No.=CONST(0);
+                      Image=ViewComments }
+      { 77      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+      { 99      ;2   ;Action    ;
+                      CaptionML=[ENU=Approvals;
+                                 ESM=Aprobaciones;
+                                 FRC=Approbations;
+                                 ENC=Approvals];
+                      Image=Approvals;
+                      OnAction=VAR
+                                 PostedApprovalEntries@1000 : Page 659;
+                               BEGIN
+                                 PostedApprovalEntries.Setfilters(DATABASE::"Purch. Rcpt. Header","No.");
+                                 PostedApprovalEntries.RUN;
+                               END;
+                                }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 47      ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=&Imprimir;
+                                 FRC=&Imprimer;
+                                 ENC=&Print];
+                      Promoted=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 CurrPage.SETSELECTIONFILTER(PurchRcptHeader);
+                                 PurchRcptHeader.PrintRecords(TRUE);
+                               END;
+                                }
+      { 48      ;1   ;Action    ;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      Promoted=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Buy-from Vendor No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 102 ;2   ;Field     ;
+                SourceExpr="Buy-from Contact No.";
+                Editable=FALSE }
+
+    { 50  ;2   ;Field     ;
+                SourceExpr="Buy-from Vendor Name";
+                Editable=FALSE }
+
+    { 52  ;2   ;Field     ;
+                SourceExpr="Buy-from Address";
+                Editable=FALSE }
+
+    { 54  ;2   ;Field     ;
+                SourceExpr="Buy-from Address 2";
+                Editable=FALSE }
+
+    { 56  ;2   ;Field     ;
+                SourceExpr="Buy-from City";
+                Editable=FALSE }
+
+    { 1480001;2;Field     ;
+                CaptionML=[ENU=Buy-from State/ZIP Code;
+                           ESM=Compra a Estado/C.P.;
+                           FRC=CP/Ville fournisseur;
+                           ENC=Buy-from Province/State/Postal/ZIP Code];
+                SourceExpr="Buy-from County";
+                Editable=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Buy-from Post Code";
+                Editable=FALSE }
+
+    { 58  ;2   ;Field     ;
+                SourceExpr="Buy-from Contact";
+                Editable=FALSE }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="No. Printed";
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Posting Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 27  ;2   ;Field     ;
+                SourceExpr="Document Date";
+                Editable=FALSE }
+
+    { 82  ;2   ;Field     ;
+                SourceExpr="Requested Receipt Date" }
+
+    { 84  ;2   ;Field     ;
+                SourceExpr="Promised Receipt Date" }
+
+    { 107 ;2   ;Field     ;
+                SourceExpr="Quote No." }
+
+    { 73  ;2   ;Field     ;
+                SourceExpr="Order No.";
+                Editable=FALSE }
+
+    { 97  ;2   ;Field     ;
+                SourceExpr="Vendor Order No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Vendor Shipment No.";
+                Editable=FALSE }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Order Address Code";
+                Editable=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Purchaser Code";
+                Editable=FALSE }
+
+    { 80  ;2   ;Field     ;
+                SourceExpr="Responsibility Center";
+                Editable=FALSE }
+
+    { 44  ;1   ;Part      ;
+                Name=PurchReceiptLines;
+                SubPageLink=Document No.=FIELD(No.);
+                PagePartID=Page137 }
+
+    { 1905885101;1;Group  ;
+                CaptionML=[ENU=Invoicing;
+                           ESM=Facturaci¢n;
+                           FRC=Facturation;
+                           ENC=Invoicing] }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Pay-to Vendor No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 104 ;2   ;Field     ;
+                SourceExpr="Pay-to Contact no.";
+                Editable=FALSE }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Pay-to Name";
+                Editable=FALSE }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Pay-to Address";
+                Editable=FALSE }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr="Pay-to Address 2";
+                Editable=FALSE }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Pay-to City";
+                Editable=FALSE }
+
+    { 1480004;2;Field     ;
+                CaptionML=[ENU=State/ZIP Code;
+                           ESM=Pago a Estado / C.P.;
+                           FRC=êtat-Province/code postal (crÇancier);
+                           ENC=Province/State/Postal/ZIP Code];
+                SourceExpr="Pay-to County";
+                Editable=FALSE }
+
+    { 67  ;2   ;Field     ;
+                SourceExpr="Pay-to Post Code";
+                Editable=FALSE }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Pay-to Contact";
+                Editable=FALSE }
+
+    { 61  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code";
+                Editable=FALSE }
+
+    { 63  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code";
+                Editable=FALSE }
+
+    { 1906801201;1;Group  ;
+                CaptionML=[ENU=Shipping;
+                           ESM=Env°o;
+                           FRC=Livraison;
+                           ENC=Shipping] }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Ship-to Name";
+                Editable=FALSE }
+
+    { 32  ;2   ;Field     ;
+                SourceExpr="Ship-to Address";
+                Editable=FALSE }
+
+    { 34  ;2   ;Field     ;
+                SourceExpr="Ship-to Address 2";
+                Editable=FALSE }
+
+    { 36  ;2   ;Field     ;
+                SourceExpr="Ship-to City";
+                Editable=FALSE }
+
+    { 1480007;2;Field     ;
+                CaptionML=[ENU=Ship-to State/ZIP Code;
+                           ESM=Env°o a Estado / C.P.;
+                           FRC=êtat-Province/code postal de livraison;
+                           ENC=Ship-to Province/State/Postal/ZIP Code];
+                SourceExpr="Ship-to County";
+                Editable=FALSE }
+
+    { 69  ;2   ;Field     ;
+                SourceExpr="Ship-to Post Code";
+                Editable=FALSE }
+
+    { 38  ;2   ;Field     ;
+                SourceExpr="Ship-to Contact";
+                Editable=FALSE }
+
+    { 65  ;2   ;Field     ;
+                SourceExpr="Location Code";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 88  ;2   ;Field     ;
+                SourceExpr="Inbound Whse. Handling Time" }
+
+    { 40  ;2   ;Field     ;
+                SourceExpr="Shipment Method Code";
+                Editable=FALSE }
+
+    { 90  ;2   ;Field     ;
+                SourceExpr="Lead Time Calculation" }
+
+    { 42  ;2   ;Field     ;
+                SourceExpr="Expected Receipt Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      PurchRcptHeader@1000 : Record 120;
+
+    BEGIN
+    END.
+  }
+}
+

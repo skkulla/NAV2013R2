@@ -1,0 +1,55 @@
+OBJECT Codeunit 1209 Export Payment File (Yes/No)
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    TableNo=81;
+    OnRun=VAR
+            BankAcc@1001 : Record 270;
+          BEGIN
+            IF NOT FINDSET THEN
+              ERROR(NothingToExportErr);
+            SETRANGE("Journal Template Name","Journal Template Name");
+            SETRANGE("Journal Batch Name","Journal Batch Name");
+            CheckJnlBatch(Rec);
+            CheckJnlLine(Rec);
+            CheckDocNoOnLines;
+            IF IsExportedToPaymentFile THEN
+              IF NOT CONFIRM(ExportAgainQst) THEN
+                EXIT;
+            BankAcc.GET("Bal. Account No.");
+            CODEUNIT.RUN(BankAcc.GetPaymentExportCodeunitID,Rec);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      ExportAgainQst@1000 : TextConst 'ENU=One or more of the selected lines have already been exported. Do you want to export again?;ESM=Una o m s de las l¡neas seleccionadas ya se han exportado. ¨Desea repetir la exportaci¢n?;FRC=Une ou plusieurs des lignes s‚lectionn‚es ont d‚j… ‚t‚ export‚es. Souhaitez-vous les exporter … nouveauÿ?;ENC=One or more of the selected lines have already been exported. Do you want to export again?';
+      NothingToExportErr@1002 : TextConst 'ENU=Nothing to export.;ESM=Nada para exportar.;FRC=Il n''y a rien … exporter.;ENC=Nothing to export.';
+
+    LOCAL PROCEDURE CheckJnlBatch@100(VAR GenJnlLine@1001 : Record 81);
+    VAR
+      GenJnlBatch@1000 : Record 232;
+    BEGIN
+      GenJnlBatch.GET(GenJnlLine."Journal Template Name",GenJnlLine."Journal Batch Name");
+      GenJnlBatch.TESTFIELD("Allow Payment Export",TRUE);
+      GenJnlBatch.TESTFIELD("Bal. Account Type",GenJnlBatch."Bal. Account Type"::"Bank Account");
+    END;
+
+    LOCAL PROCEDURE CheckJnlLine@1(VAR GenJnlLine@1000 : Record 81);
+    BEGIN
+      GenJnlLine.TESTFIELD("Bal. Account Type",GenJnlLine."Bal. Account Type"::"Bank Account");
+      GenJnlLine.TESTFIELD("Bal. Account No.");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

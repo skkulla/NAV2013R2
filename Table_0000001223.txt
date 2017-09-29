@@ -1,0 +1,363 @@
+OBJECT Table 1223 Posting Exch. Column Def
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    OnInsert=BEGIN
+               ValidateRec;
+             END;
+
+    OnModify=BEGIN
+               ValidateRec;
+             END;
+
+    OnDelete=VAR
+               PostingExchFieldMapping@1000 : Record 1225;
+               PostingExchColumnDef@1001 : Record 1223;
+             BEGIN
+               PostingExchFieldMapping.SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+               PostingExchFieldMapping.SETRANGE("Posting Exch. Line Def Code","Posting Exch. Line Def Code");
+               PostingExchFieldMapping.SETRANGE("Column No.","Column No.");
+               IF NOT PostingExchFieldMapping.ISEMPTY THEN
+                 IF CONFIRM(STRSUBSTNO(DeleteFieldMappingQst,PostingExchColumnDef.TABLECAPTION,PostingExchFieldMapping.TABLECAPTION)) THEN
+                   PostingExchFieldMapping.DELETEALL
+                 ELSE
+                   ERROR('')
+             END;
+
+    CaptionML=[ENU=Posting Exch. Column Def;
+               ESM=Def. columna intercambio registro;
+               FRC=D‚f. colonne ‚chge report;
+               ENC=Posting Exch. Column Def];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Posting Exch. Def Code;Code20      ;TableRelation="Posting Exch. Def";
+                                                   CaptionML=[ENU=Posting Exch. Def Code;
+                                                              ESM=C¢digo def. intercambio registro;
+                                                              FRC=Code appellation ‚chge report;
+                                                              ENC=Posting Exch. Def Code] }
+    { 2   ;   ;Column No.          ;Integer       ;CaptionML=[ENU=Column No.;
+                                                              ESM=N§ columna;
+                                                              FRC=Nø de colonne;
+                                                              ENC=Column No.];
+                                                   MinValue=1 }
+    { 3   ;   ;Name                ;Text250       ;CaptionML=[ENU=Name;
+                                                              ESM=Nombre;
+                                                              FRC=Nom;
+                                                              ENC=Name] }
+    { 4   ;   ;Show                ;Boolean       ;CaptionML=[ENU=Show;
+                                                              ESM=Mostrar;
+                                                              FRC=Afficher;
+                                                              ENC=Show] }
+    { 5   ;   ;Data Type           ;Option        ;CaptionML=[ENU=Data Type;
+                                                              ESM=Tipo de datos;
+                                                              FRC=Type de donn‚es;
+                                                              ENC=Data Type];
+                                                   OptionCaptionML=[ENU=Text,Date,Decimal;
+                                                                    ESM=Texto,Fecha,Decimal;
+                                                                    FRC=Texte,Date,D‚cimale;
+                                                                    ENC=Text,Date,Decimal];
+                                                   OptionString=Text,Date,Decimal }
+    { 6   ;   ;Data Format         ;Text100       ;CaptionML=[ENU=Data Format;
+                                                              ESM=Formato de datos;
+                                                              FRC=Format donn‚es;
+                                                              ENC=Data Format] }
+    { 7   ;   ;Data Formatting Culture;Text10     ;CaptionML=[ENU=Data Formatting Culture;
+                                                              ESM=Referencia cultural de formato de datos;
+                                                              FRC=Culture mise en forme donn‚es;
+                                                              ENC=Data Formatting Culture] }
+    { 8   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              ESM=Descripci¢n;
+                                                              FRC=Description;
+                                                              ENC=Description] }
+    { 9   ;   ;Multiplier          ;Decimal       ;CaptionML=[ENU=Multiplier;
+                                                              ESM=Multiplier;
+                                                              FRC=Multiplier;
+                                                              ENC=Multiplier];
+                                                   Description=Obsolete }
+    { 10  ;   ;Posting Exch. Line Def Code;Code20 ;TableRelation="Posting Exch. Line Def".Code WHERE (Posting Exch. Def Code=FIELD(Posting Exch. Def Code));
+                                                   CaptionML=[ENU=Posting Exch. Line Def Code;
+                                                              ESM=C¢digo def. l¡nea intercambio registro;
+                                                              FRC=Code appellation ligne ‚chge report;
+                                                              ENC=Posting Exch. Line Def Code] }
+    { 11  ;   ;Length              ;Integer       ;CaptionML=[ENU=Length;
+                                                              ESM=Longitud;
+                                                              FRC=Longueur;
+                                                              ENC=Length] }
+    { 12  ;   ;Constant            ;Text30        ;CaptionML=[ENU=Constant;
+                                                              ESM=Constante;
+                                                              FRC=Fixe;
+                                                              ENC=Constant] }
+    { 13  ;   ;Path                ;Text250       ;CaptionML=[ENU=Path;
+                                                              ESM=Ruta acceso;
+                                                              FRC=Chemin;
+                                                              ENC=Path] }
+    { 14  ;   ;Negative-Sign Identifier;Text30    ;CaptionML=[ENU=Negative-Sign Identifier;
+                                                              ESM=Identificador de signo de negativo;
+                                                              FRC=Identificateur de signe n‚gatif;
+                                                              ENC=Negative-Sign Identifier] }
+  }
+  KEYS
+  {
+    {    ;Posting Exch. Def Code,Posting Exch. Line Def Code,Column No.;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      PayrollImpPostingDateNameTxt@1017 : TextConst 'ENU=Posting Date Placeholder;ESM=Marcador de fecha de registro;FRC=ParamŠtre substituable Date de report;ENC=Posting Date Placeholder';
+      PayrollImpPostingDateDescTxt@1016 : TextConst 'ENU=Adjust Column No., Data Format and Data Formatting;ESM=Ajustar n§ columna, formato datos y formateo datos;FRC=Ajuster nø col., frmt donn‚es & mise en f. donn‚es;ENC=Adjust Column No., Data Format and Data Formatting';
+      PayrollImpAccountNoNameTxt@1015 : TextConst 'ENU="Account No. Placeholder ";ESM="Marcador de n§ cuenta ";FRC="ParamŠtre substituable Nø de compte ";ENC="Account No. Placeholder "';
+      PayrollImpAccountNoDescTxt@1014 : TextConst 'ENU=Adjust Column No.;ESM=Ajustar n§ columna;FRC=Ajuster le nø de colonne;ENC=Adjust Column No.';
+      PayrollImpAmountNameTxt@1013 : TextConst 'ENU=Amount Placeholder;ESM=Marcador importe;FRC=ParamŠtre substituable Montant;ENC=Amount Placeholder';
+      PayrollImpAmountDescTxt@1012 : TextConst 'ENU=Adjust Column No. and Data Formatting Culture;ESM=Ajustar n§ columna y ref. cultural formato datos;FRC=Ajuster nø colonne & culture mise en forme donn‚es;ENC=Adjust Column No. and Data Formatting Culture';
+      PayrollImpDescriptionNameTxt@1011 : TextConst 'ENU=Description Placeholder;ESM=Marcador de descripci¢n;FRC=ParamŠtre substituable Description;ENC=Description Placeholder';
+      PayrollImpDescriptionDescTxt@1010 : TextConst 'ENU=Adjust Column No.;ESM=Ajustar n§ columna;FRC=Ajuster le nø de colonne;ENC=Adjust Column No.';
+      BankImpDateNameTxt@1009 : TextConst 'ENU=Post./Trans. Date Placeholder;ESM=Marcador fecha registro/transacci¢n;FRC=ParamŠtre substituable Date de report/trans.;ENC=Post./Trans. Date Placeholder';
+      BankImpDateDescTxt@1008 : TextConst 'ENU=Adjust Column No., Data Format and Data Formatting;ESM=Ajustar n§ columna, formato datos y formateo datos;FRC=Ajuster nø col., frmt donn‚es & mise en f. donn‚es;ENC=Adjust Column No., Data Format and Data Formatting';
+      BankImpValueDateNameTxt@1007 : TextConst 'ENU="Value Date Placeholder (T274) ";ESM="Marcador fecha valor (T274) ";FRC="ParamŠtre substituable Date valeur (T274) ";ENC="Value Date Placeholder (T274) "';
+      BankImpValueDateDescTxt@1006 : TextConst 'ENU=Adjust Column No., Data Format and Data Formatting;ESM=Ajustar n§ columna, formato datos y formateo datos;FRC=Ajuster nø col., frmt donn‚es & mise en f. donn‚es;ENC=Adjust Column No., Data Format and Data Formatting';
+      BankImpAmountNameTxt@1005 : TextConst 'ENU=(Statement) Amount Placeholder;ESM=(Estado de cuenta) Marcador importe;FRC=ParamŠtre substituable Montant (relev‚);ENC=(Statement) Amount Placeholder';
+      BankImpAmountDescTxt@1004 : TextConst 'ENU=Adjust Column No. and Data Formatting Culture;ESM=Ajustar n§ columna y ref. cultural formato datos;FRC=Ajuster nø colonne & culture mise en forme donn‚es;ENC=Adjust Column No. and Data Formatting Culture';
+      BankImpDescriptionNameTxt@1003 : TextConst 'ENU=Description Placeholder;ESM=Marcador de descripci¢n;FRC=ParamŠtre substituable Description;ENC=Description Placeholder';
+      BankImpDescriptionDescTxt@1002 : TextConst 'ENU=Adjust Column No.;ESM=Ajustar n§ columna;FRC=Ajuster le nø de colonne;ENC=Adjust Column No.';
+      PaymentExportNoTemplateColumnsMsg@1018 : TextConst 'ENU=There are no template columns for Payment Export definitions.;ESM=No hay columnas de plantilla para definiciones de exportaci¢n de pagos.;FRC=Il n''existe pas de modŠle de colonnes pour les d‚finitions Exportation de paiement.;ENC=There are no template columns for Payment Export definitions.';
+      OtherTypeNoTemplateColumnsMsg@1000 : TextConst 'ENU=There are no template columns for %1 definitions.;ESM=No hay columnas de plantilla para definiciones de %1.;FRC=Il n''existe pas de modŠle de colonnes pour les d‚finitions %1.;ENC=There are no template columns for %1 definitions.';
+      DeleteExistingQst@1019 : TextConst 'ENU=If you insert default definitions, existing lines will be deleted. Do you want to proceed?;ESM=Si inserta definiciones predeterminadas, se eliminar n las l¡neas existentes. ¨Desea continuar?;FRC=Si vous ins‚rez des d‚finitions par d‚faut, les lignes existantes vont ˆtre supprim‚es. Voulez-vous continuer?;ENC=If you insert default definitions, existing lines will be deleted. Do you want to proceed?';
+      DeleteFieldMappingQst@1001 : TextConst 'ENU=The %1 that you are about to delete is used for one or more %2, which will also be deleted. \\Do you want to continue?;ESM=El %1 que est  por eliminar se usa para una o m s %2, que tambi‚n se eliminar n. \\¨Desea continuar?;FRC=Le %1 que vous ˆtes sur le point de supprimer est utilis‚ pour un ou plusieurs %2, qui seront ‚galement supprim‚s. \\Voulez-vous continuer?;ENC=The %1 that you are about to delete is used for one or more %2, which will also be deleted. \\Do you want to continue?';
+
+    PROCEDURE InsertRec@7(PostExchDefCode@1000 : Code[20];PostExchLineDefCode@1007 : Code[20];ColumnNo@1001 : Integer;Name@1002 : Text[250];Show@1003 : Boolean;DataType@1004 : Option;DataTypeFormatting@1005 : Text[50];DataFormattingCulture@1006 : Text[10]);
+    BEGIN
+      INIT;
+      VALIDATE("Posting Exch. Def Code",PostExchDefCode);
+      VALIDATE("Posting Exch. Line Def Code",PostExchLineDefCode);
+      VALIDATE("Column No.",ColumnNo);
+      VALIDATE(Name,Name);
+      VALIDATE(Show,Show);
+      VALIDATE("Data Type",DataType);
+      VALIDATE("Data Format",DataTypeFormatting);
+      VALIDATE("Data Formatting Culture",DataFormattingCulture);
+      INSERT;
+    END;
+
+    PROCEDURE InsertRecForExport@2(PostExchDefCode@1000 : Code[20];PostExchLineDefCode@1002 : Code[20];ColumnNo@1001 : Integer;Name@1003 : Text[250];DataType@1005 : Option;DataFormat@1006 : Text[100];Length@1009 : Integer;Constant@1004 : Text[30]);
+    BEGIN
+      INIT;
+      VALIDATE("Posting Exch. Def Code",PostExchDefCode);
+      VALIDATE("Posting Exch. Line Def Code",PostExchLineDefCode);
+      VALIDATE("Column No.",ColumnNo);
+      VALIDATE(Name,Name);
+      VALIDATE("Data Type",DataType);
+      VALIDATE("Data Format",DataFormat);
+      VALIDATE(Length,Length);
+      VALIDATE(Constant,Constant);
+      INSERT;
+    END;
+
+    PROCEDURE InsertRecForImport@3(PostExchDefCode@1020 : Code[20];PostExchLineDefCode@1019 : Code[20];ColumnNo@1018 : Integer;Name@1017 : Text[250];Description@1016 : Text[50];Show@1015 : Boolean;DataType@1014 : Option;DataFormat@1013 : Text[100];DataFormattingCulture@1012 : Text[10]);
+    BEGIN
+      INIT;
+      VALIDATE("Posting Exch. Def Code",PostExchDefCode);
+      VALIDATE("Posting Exch. Line Def Code",PostExchLineDefCode);
+      VALIDATE("Column No.",ColumnNo);
+      VALIDATE(Name,Name);
+      VALIDATE(Description,Description);
+      VALIDATE(Show,Show);
+      VALIDATE("Data Type",DataType);
+      VALIDATE("Data Format",DataFormat);
+      VALIDATE("Data Formatting Culture",DataFormattingCulture);
+      INSERT;
+    END;
+
+    PROCEDURE ValidateRec@1();
+    VAR
+      PostExchDef@1000 : Record 1222;
+    BEGIN
+      TESTFIELD("Posting Exch. Def Code");
+      TESTFIELD("Column No.");
+
+      PostExchDef.GET("Posting Exch. Def Code");
+
+      IF PostExchDef."File Type" = PostExchDef."File Type"::"Fixed Text" THEN
+        TESTFIELD(Length);
+
+      IF ("Data Type" <> "Data Type"::Text) AND (NOT IsXMLImport) THEN
+        IF PostExchDef.Type = PostExchDef.Type::"Payment Export" THEN
+          TESTFIELD("Data Format")
+        ELSE BEGIN
+          TESTFIELD("Data Formatting Culture");
+          IF "Data Type" = "Data Type"::Date THEN
+            TESTFIELD("Data Format");
+        END;
+    END;
+
+    PROCEDURE CreateColumnDefinitions@6(PostingExchDefCode@1001 : Code[20];PostingExchLineDefCode@1002 : Code[20];DoCreateColumnsCheck@1004 : Boolean;CreateDefaultFieldMappingQst@1006 : Text) : Boolean;
+    VAR
+      PostingExchDef@1000 : Record 1222;
+      PostingExchColumnDef@1003 : Record 1223;
+      CheckColumnsMessage@1005 : Text;
+    BEGIN
+      PostingExchColumnDef.SETRANGE("Posting Exch. Def Code",PostingExchDefCode);
+      PostingExchColumnDef.SETRANGE("Posting Exch. Line Def Code",PostingExchLineDefCode);
+
+      PostingExchDef.GET(PostingExchDefCode);
+      IF DoCreateColumnsCheck AND NOT PostingExchDef.CheckCreateTemplateColumns(CheckColumnsMessage) THEN BEGIN
+        IF CheckColumnsMessage <> '' THEN
+          MESSAGE(CheckColumnsMessage);
+        EXIT(FALSE);
+      END;
+
+      IF CONFIRM(STRSUBSTNO(CreateDefaultFieldMappingQst,PostingExchLineDefCode),TRUE) THEN BEGIN
+        PostingExchColumnDef."Posting Exch. Def Code" := PostingExchDefCode;
+        PostingExchColumnDef."Posting Exch. Line Def Code" := PostingExchLineDefCode;
+
+        IF NOT PostingExchColumnDef.ISEMPTY THEN
+          IF CONFIRM(DeleteExistingQst,FALSE) THEN
+            PostingExchColumnDef.DELETEALL(TRUE)
+          ELSE
+            EXIT(FALSE);
+
+        CASE PostingExchDef.Type OF
+          PostingExchDef.Type::"Payroll Import":
+            CreatePayrollTemplateLines(PostingExchDefCode,PostingExchLineDefCode);
+          PostingExchDef.Type::"Bank Statement Import":
+            CreateBankStatementImportTemplateLines(PostingExchDefCode,PostingExchLineDefCode);
+        END;
+      END;
+
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE CreatePayrollTemplateLines@5(PostingExchDefCode@1009 : Code[20];PostingExchLineDefCode@1010 : Code[20]);
+    VAR
+      PostingExchColumnDef@1000 : Record 1223;
+    BEGIN
+      SetCommonColumnDefValues(PostingExchDefCode,
+        PostingExchLineDefCode,1,PayrollImpPostingDateNameTxt,
+        PayrollImpPostingDateDescTxt,PostingExchColumnDef."Data Type"::Date,'MMddyyyy','en-US');
+
+      SetCommonColumnDefValues(PostingExchDefCode,
+        PostingExchLineDefCode,2,PayrollImpAccountNoNameTxt,
+        PayrollImpAccountNoDescTxt,PostingExchColumnDef."Data Type"::Text,'','');
+
+      SetCommonColumnDefValues(PostingExchDefCode,
+        PostingExchLineDefCode,3,PayrollImpAmountNameTxt,
+        PayrollImpAmountDescTxt,PostingExchColumnDef."Data Type"::Decimal,'','en-US');
+
+      SetCommonColumnDefValues(PostingExchDefCode,
+        PostingExchLineDefCode,4,PayrollImpDescriptionNameTxt,
+        PayrollImpDescriptionDescTxt,PostingExchColumnDef."Data Type"::Text,'','');
+    END;
+
+    LOCAL PROCEDURE CreateBankStatementImportTemplateLines@4(PostingExchDefCode@1010 : Code[20];PostingExchLineDefCode@1009 : Code[20]);
+    VAR
+      PostingExchColumnDef@1000 : Record 1223;
+    BEGIN
+      SetCommonColumnDefValues(PostingExchDefCode,
+        PostingExchLineDefCode,1,BankImpDateNameTxt,
+        BankImpDateDescTxt,PostingExchColumnDef."Data Type"::Date,'MMddyyyy','en-US');
+
+      SetCommonColumnDefValues(PostingExchDefCode,
+        PostingExchLineDefCode,2,BankImpDescriptionNameTxt,
+        BankImpDescriptionDescTxt,PostingExchColumnDef."Data Type"::Text,'','');
+
+      SetCommonColumnDefValues(PostingExchDefCode,
+        PostingExchLineDefCode,3,BankImpAmountNameTxt,
+        BankImpAmountDescTxt,PostingExchColumnDef."Data Type"::Decimal,'','en-US');
+
+      SetCommonColumnDefValues(PostingExchDefCode,
+        PostingExchLineDefCode,4,BankImpValueDateNameTxt,
+        BankImpValueDateDescTxt,PostingExchColumnDef."Data Type"::Date,'MMddyyyy','en-US');
+    END;
+
+    LOCAL PROCEDURE SetCommonColumnDefValues@32(DefCode@1000 : Code[20];LineDefCode@1001 : Code[20];ColumnNo@1004 : Integer;Name@1002 : Text[100];Description@1003 : Text[50];DataType@1006 : Option;DataFormat@1008 : Text[100];DataFormattingCulture@1009 : Text[10]);
+    VAR
+      PostingExchColumnDef@1007 : Record 1223;
+    BEGIN
+      PostingExchColumnDef.INIT;
+      PostingExchColumnDef."Posting Exch. Def Code" := DefCode;
+      PostingExchColumnDef."Posting Exch. Line Def Code" := LineDefCode;
+      PostingExchColumnDef."Column No." := ColumnNo;
+      PostingExchColumnDef.Name := Name;
+      PostingExchColumnDef.Description := Description;
+      PostingExchColumnDef."Data Type" := DataType;
+      PostingExchColumnDef."Data Format" := DataFormat;
+      PostingExchColumnDef."Data Formatting Culture" := DataFormattingCulture;
+      PostingExchColumnDef.INSERT;
+    END;
+
+    PROCEDURE SetXMLDataFormattingValues@21(SimpleDataType@1000 : Text);
+    VAR
+      PostExchColDef@1001 : Record 1223;
+    BEGIN
+      CASE DELCHR(LOWERCASE(SimpleDataType)) OF
+        'decimal':
+          "Data Type" := PostExchColDef."Data Type"::Decimal;
+        'date','datetime':
+          "Data Type" := PostExchColDef."Data Type"::Date;
+        ELSE
+          "Data Type" := PostExchColDef."Data Type"::Text;
+      END;
+      MODIFY;
+    END;
+
+    PROCEDURE GetColumnNoFromPath@9(ParameterPath@1000 : Text) : Integer;
+    BEGIN
+      SETFILTER(Path,ParameterPath);
+      FINDFIRST;
+      EXIT("Column No.");
+    END;
+
+    LOCAL PROCEDURE IsXMLImport@8() : Boolean;
+    VAR
+      PostingExchDef@1000 : Record 1222;
+    BEGIN
+      PostingExchDef.GET("Posting Exch. Def Code");
+      EXIT((PostingExchDef."File Type" = PostingExchDef."File Type"::Xml) AND
+        (PostingExchDef.Type <> PostingExchDef.Type::"Payment Export"));
+    END;
+
+    PROCEDURE IsTemplateCreationSupported@12(PostingExchDefCode@1001 : Code[20]) : Boolean;
+    VAR
+      PostingExchDef@1000 : Record 1222;
+    BEGIN
+      PostingExchDef.GET(PostingExchDefCode);
+      CASE PostingExchDef.Type OF
+        PostingExchDef.Type::"Payroll Import",
+        PostingExchDef.Type::"Bank Statement Import":
+          EXIT(TRUE);
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    PROCEDURE GetTemplateCreationMessage@10(PostingExchDefCode@1001 : Code[20]) : Text;
+    VAR
+      PostingExchDef@1000 : Record 1222;
+    BEGIN
+      PostingExchDef.GET(PostingExchDefCode);
+      CASE PostingExchDef.Type OF
+        PostingExchDef.Type::"Payroll Import",
+        PostingExchDef.Type::"Bank Statement Import":
+          EXIT('');
+        PostingExchDef.Type::"Payment Export":
+          EXIT(PaymentExportNoTemplateColumnsMsg);
+        ELSE
+          EXIT(STRSUBSTNO(OtherTypeNoTemplateColumnsMsg,PostingExchDef.Type));
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

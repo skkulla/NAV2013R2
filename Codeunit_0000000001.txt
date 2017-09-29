@@ -1,0 +1,236 @@
+OBJECT Codeunit 1 ApplicationManagement
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36366;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      DebuggerManagement@1017 : Codeunit 9500;
+      LogInManagement@1027 : Codeunit 40;
+      TextManagement@1003 : Codeunit 41;
+      CaptionManagement@1000 : Codeunit 42;
+      LanguageManagement@1002 : Codeunit 43;
+      NASManagement@1001 : Codeunit 44;
+      AutoFormatManagement@1012 : Codeunit 45;
+
+    PROCEDURE CompanyOpen@30();
+    BEGIN
+      LogInManagement.CompanyOpen;
+    END;
+
+    PROCEDURE GetSystemIndicator@51(VAR Text@1000 : Text[250];VAR Style@1001 : 'Standard,Accent1,Accent2,Accent3,Accent4,Accent5,Accent6,Accent7,Accent8,Accent9');
+    VAR
+      CompanyInformation@1002 : Record 79;
+    BEGIN
+      IF CompanyInformation.GET THEN
+        CompanyInformation.GetSystemIndicator(Text,Style);
+    END;
+
+    PROCEDURE CompanyClose@31();
+    BEGIN
+      LogInManagement.CompanyClose;
+    END;
+
+    PROCEDURE FindPrinter@11(ReportID@1000 : Integer) : Text[250];
+    VAR
+      PrinterSelection@1001 : Record 78;
+    BEGIN
+      CLEAR(PrinterSelection);
+
+      IF NOT PrinterSelection.GET(USERID,ReportID) THEN
+        IF NOT PrinterSelection.GET('',ReportID) THEN
+          IF NOT PrinterSelection.GET(USERID,0) THEN
+            IF PrinterSelection.GET('',0) THEN;
+
+      EXIT(PrinterSelection."Printer Name");
+    END;
+
+    PROCEDURE ApplicationVersion@2() : Text[80];
+    BEGIN
+      EXIT('US Dynamics NAV 7.1');
+    END;
+
+    PROCEDURE ApplicationBuild@3() : Text[80];
+    BEGIN
+      EXIT('36366');
+    END;
+
+    PROCEDURE ApplicationLanguage@4() : Integer;
+    BEGIN
+      EXIT(1033);
+    END;
+
+    PROCEDURE DefaultRoleCenter@50() : Integer;
+    VAR
+      ConfPersMgt@1000 : Codeunit 9170;
+    BEGIN
+      EXIT(ConfPersMgt.DefaultRoleCenterID);
+    END;
+
+    PROCEDURE MakeDateTimeText@114(VAR DateTimeText@1000 : Text[250]) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeDateTimeText(DateTimeText));
+    END;
+
+    PROCEDURE GetSeparateDateTime@10011(DateTimeText@1000 : Text[250];VAR Date@1005 : Date;VAR Time@1006 : Time) : Boolean;
+    BEGIN
+      EXIT(TextManagement.GetSeparateDateTime(DateTimeText,Date,Time));
+    END;
+
+    PROCEDURE MakeDateText@105(VAR DateText@1000 : Text[250]) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeDateText(DateText));
+    END;
+
+    PROCEDURE MakeTimeText@106(VAR TimeText@1000 : Text[250]) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeTimeText(TimeText));
+    END;
+
+    PROCEDURE MakeText@107(VAR Text@1000 : Text[250]) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeText(Text));
+    END;
+
+    PROCEDURE MakeDateTimeFilter@214(VAR DateTimeFilterText@1000 : Text[250]) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeDateTimeFilter(DateTimeFilterText));
+    END;
+
+    PROCEDURE MakeDateFilter@205(VAR DateFilterText@1000 : Text[1024]) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeDateFilter(DateFilterText));
+    END;
+
+    PROCEDURE MakeTextFilter@207(VAR TextFilterText@1000 : Text) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeTextFilter(TextFilterText));
+    END;
+
+    PROCEDURE MakeCodeFilter@209(VAR TextFilterText@1000 : Text) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeTextFilter(TextFilterText));
+    END;
+
+    PROCEDURE MakeTimeFilter@206(VAR TimeFilterText@1000 : Text[250]) : Integer;
+    BEGIN
+      EXIT(TextManagement.MakeTimeFilter(TimeFilterText));
+    END;
+
+    PROCEDURE AutoFormatTranslate@12(AutoFormatType@1000 : Integer;AutoFormatExpr@1001 : Text[80]) : Text[80];
+    BEGIN
+      EXIT(AutoFormatManagement.AutoFormatTranslate(AutoFormatType,AutoFormatExpr));
+    END;
+
+    PROCEDURE ReadRounding@14() : Decimal;
+    BEGIN
+      EXIT(AutoFormatManagement.ReadRounding);
+    END;
+
+    PROCEDURE CaptionClassTranslate@15(Language@1000 : Integer;CaptionExpr@1001 : Text[1024]) : Text[1024];
+    BEGIN
+      EXIT(CaptionManagement.CaptionClassTranslate(Language,CaptionExpr));
+    END;
+
+    PROCEDURE SetGlobalLanguage@5();
+    BEGIN
+      LanguageManagement.SetGlobalLanguage;
+    END;
+
+    PROCEDURE ValidateApplicationlLanguage@1102601001(LanguageID@1037 : Integer);
+    BEGIN
+      LanguageManagement.ValidateApplicationLanguage(LanguageID);
+    END;
+
+    PROCEDURE LookupApplicationlLanguage@1102601005(VAR LanguageID@1040 : Integer);
+    BEGIN
+      LanguageManagement.LookupApplicationLanguage(LanguageID);
+    END;
+
+    PROCEDURE NASHandler@99(NASID@1000 : Text[260]);
+    BEGIN
+      NASManagement.NASHandler(NASID);
+    END;
+
+    PROCEDURE GetDatabaseTableTriggerSetup@25(TableId@1000 : Integer;VAR OnDatabaseInsert@1001 : Boolean;VAR OnDatabaseModify@1002 : Boolean;VAR OnDatabaseDelete@1003 : Boolean;VAR OnDatabaseRename@1004 : Boolean);
+    VAR
+      IntegrationManagement@1005 : Codeunit 5150;
+      ChangeLogMgt@1006 : Codeunit 423;
+    BEGIN
+      ChangeLogMgt.GetDatabaseTableTriggerSetup(TableId,OnDatabaseInsert,OnDatabaseModify,OnDatabaseDelete,OnDatabaseRename);
+
+      IntegrationManagement.GetDatabaseTableTriggerSetup(TableId,OnDatabaseInsert,OnDatabaseModify,OnDatabaseDelete,OnDatabaseRename);
+    END;
+
+    PROCEDURE OnDatabaseInsert@26(RecRef@1000 : RecordRef);
+    VAR
+      IntegrationManagement@1001 : Codeunit 5150;
+      ChangeLogMgt@1002 : Codeunit 423;
+    BEGIN
+      ChangeLogMgt.LogInsertion(RecRef);
+
+      IntegrationManagement.OnDatabaseInsert(RecRef);
+    END;
+
+    PROCEDURE OnDatabaseModify@27(RecRef@1000 : RecordRef);
+    VAR
+      IntegrationManagement@1001 : Codeunit 5150;
+      ChangeLogMgt@1002 : Codeunit 423;
+    BEGIN
+      ChangeLogMgt.LogModification(RecRef);
+
+      IntegrationManagement.OnDatabaseModify(RecRef);
+    END;
+
+    PROCEDURE OnDatabaseDelete@28(RecRef@1000 : RecordRef);
+    VAR
+      IntegrationManagement@1001 : Codeunit 5150;
+      ChangeLogMgt@1002 : Codeunit 423;
+    BEGIN
+      ChangeLogMgt.LogDeletion(RecRef);
+
+      IntegrationManagement.OnDatabaseDelete(RecRef);
+    END;
+
+    PROCEDURE OnDatabaseRename@29(RecRef@1000 : RecordRef;xRecRef@1001 : RecordRef);
+    VAR
+      IntegrationManagement@1002 : Codeunit 5150;
+      ChangeLogMgt@1003 : Codeunit 423;
+    BEGIN
+      ChangeLogMgt.LogRename(RecRef,xRecRef);
+
+      IntegrationManagement.OnDatabaseRename(RecRef,xRecRef);
+    END;
+
+    PROCEDURE OnDebuggerBreak@55(ErrorMessage@1000 : Text);
+    BEGIN
+      DebuggerManagement.ProcessDebuggerBreak(ErrorMessage);
+    END;
+
+    PROCEDURE LaunchDebugger@60();
+    BEGIN
+      PAGE.RUN(PAGE::"Session List");
+    END;
+
+    PROCEDURE CustomizeChart@70(VAR TempChart@1000 : TEMPORARY Record 2000000078) : Boolean;
+    VAR
+      GenericChartMgt@1001 : Codeunit 9180;
+    BEGIN
+      EXIT(GenericChartMgt.ChartCustomization(TempChart));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,668 @@
+OBJECT Page 1330 Mini Vendor Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Vendor Card;
+               ESM=Ficha proveedor;
+               FRC=Fiche fournisseur;
+               ENC=Vendor Card];
+    SourceTable=Table23;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,New Document,Vendor,History,Prices and Discounts;
+                                ESM=Nuevo,Proceso,Informe,Nuevo documento,Proveedor,Historial,Precios y descuentos;
+                                FRC=Nouveau,Traitement,Rapport,Nouveau document,Fournisseur,Historique,Prix et escomptes;
+                                ENC=New,Process,Report,New Document,Vendor,History,Prices and Discounts];
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 5       ;1   ;ActionGroup;
+                      Name=NewDocument;
+                      CaptionML=[ENU=New Document;
+                                 ESM=Nuevo documento;
+                                 FRC=Nouveau document;
+                                 ENC=New Document] }
+      { 14      ;2   ;Action    ;
+                      Name=Page Mini Purchase Invoice;
+                      CaptionML=[ENU=Purchase Invoice;
+                                 ESM=Factura compra;
+                                 FRC=Facture achat;
+                                 ENC=Purchase Invoice];
+                      ToolTipML=[ENU=Create a purchase invoice for the vendor.;
+                                 ESM=Cree una factura de compra para el proveedor.;
+                                 FRC=CrÇez une facture achat pour le fournisseur.;
+                                 ENC=Create a purchase invoice for the vendor.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Invoice;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewInvoice;
+                               END;
+                                }
+      { 11      ;2   ;Action    ;
+                      Name=Page Mini Purchase Credit Memo;
+                      CaptionML=[ENU=Purchase Credit Memo;
+                                 ESM=Nota crÇdito compra;
+                                 FRC=Note de crÇdit d'achat;
+                                 ENC=Purchase Credit Memo];
+                      ToolTipML=[ENU=Create a purchase credit memo for the vendor.;
+                                 ESM=Cree una nota de crÇdito de compra para el proveedor.;
+                                 FRC=CrÇez une note de crÇdit d'achat pour le fournisseur.;
+                                 ENC=Create a purchase credit memo for the vendor.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CreditMemo;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewCreditMemo;
+                               END;
+                                }
+      { 64      ;1   ;ActionGroup;
+                      Name=Vendor;
+                      CaptionML=[ENU=Vendor;
+                                 ESM=Proveedor;
+                                 FRC=Fournisseur;
+                                 ENC=Vendor];
+                      Image=Vendor }
+      { 39      ;2   ;Action    ;
+                      Name=RecurringPurchaseLines;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Recurring Purchase Lines;
+                                 ESM=Recurring Purchase Lines;
+                                 FRC=Recurring Purchase Lines;
+                                 ENC=Recurring Purchase Lines];
+                      ToolTipML=[ENU=Set up recurring purchase lines for the vendor, such as a monthly replenishment order, that can quickly be inserted on a purchase document for the vendor.;
+                                 ESM=Set up recurring purchase lines for the vendor, such as a monthly replenishment order, that can quickly be inserted on a purchase document for the vendor.;
+                                 FRC=Set up recurring purchase lines for the vendor, such as a monthly replenishment order, that can quickly be inserted on a purchase document for the vendor.;
+                                 ENC=Set up recurring purchase lines for the vendor, such as a monthly replenishment order, that can quickly be inserted on a purchase document for the vendor.];
+                      RunObject=Page 1364;
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=VendorCode;
+                      PromotedCategory=Category5 }
+      { 184     ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      ToolTipML=[ENU=Set up default dimensions for the vendor, such as an area or vendor group code. You can assign dimension codes to transactions to distribute costs and analyze historical information.;
+                                 ESM=Configure las dimensiones predeterminadas del proveedor, como un †rea o un c¢digo de grupo de proveedor. Puede asignar c¢digos de dimensi¢n a transacciones para distribuir los costos y analizar la informaci¢n hist¢rica.;
+                                 FRC=Configurez les dimensions par dÇfaut pour le fournisseur, comme un code de groupe de fournisseurs ou de zone. Vous pouvez affecter des codes de dimension aux transactions dans le but de rÇpartir les coñts et d'analyser les informations d'historique.;
+                                 ENC=Set up default dimensions for the vendor, such as an area or vendor group code. You can assign dimension codes to transactions to distribute costs and analyse historical information.];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(23),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 87      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 ESM=Bancos;
+                                 FRC=Comptes bancaires;
+                                 ENC=Bank Accounts];
+                      ToolTipML=[ENU=Set up information about the vendor's bank account.;
+                                 ESM=Configure la informaci¢n sobre la cuenta bancaria del proveedor.;
+                                 FRC=ParamÇtrez les informations concernant le compte bancaire du fournisseur.;
+                                 ENC=Set up information about the vendor's bank account.];
+                      RunObject=Page 426;
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      Image=BankAccount }
+      { 54      ;2   ;Action    ;
+                      CaptionML=[ENU=Order &Addresses;
+                                 ESM=D&irecciones pedido;
+                                 FRC=&Adresses de commande;
+                                 ENC=Order &Addresses];
+                      ToolTipML=[ENU=Set up one or more alternate addresses from where you can buy items from the vendor. You can then enter an alternate address on purchase documents for the vendor.;
+                                 ESM=Configure una o m†s direcciones alternativas desde las que pueda comprar productos del proveedor. Posteriormente, podr† introducir una direcci¢n alternativa en los documentos de compra del proveedor.;
+                                 FRC=ParamÇtrez une ou plusieurs adresses secondaires Ö partir desquelles vous pouvez acheter des articles au fournisseur. Vous pouvez ensuite entrer une autre adresse sur les documents achat pour le fournisseur.;
+                                 ENC=Set up one or more alternate addresses from where you can buy items from the vendor. You can then enter an alternate address on purchase documents for the vendor.];
+                      RunObject=Page 369;
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      Image=Addresses }
+      { 84      ;2   ;Action    ;
+                      CaptionML=[ENU=Cross References;
+                                 ESM=Referencias cruzadas;
+                                 FRC=RÇfÇrences externes;
+                                 ENC=Cross References];
+                      ToolTipML=[ENU=Set up the vendor's own identification of items that you buy from the vendor. Cross-references to the vendor's item number means that their item number is automatically shown on purchase documents instead of the number that you use.;
+                                 ESM=Configure la identificaci¢n de los productos que compra al proveedor propia del proveedor en cuesti¢n. Las referencias cruzadas con el n£mero de producto del proveedor significan que su n£mero de producto se muestra autom†ticamente en los documentos de compra, en lugar del n£mero que usa usted.;
+                                 FRC=ParamÇtrez l'identification par le fournisseur des articles que vous lui achetez. Les rÇfÇrences croisÇes au numÇro d'article du fournisseur impliquent que le numÇro d'article est automatiquement affichÇ sur les documents achat au lieu du numÇro que vous utilisez.;
+                                 ENC=Set up the vendor's own identification of items that you buy from the vendor. Cross-references to the vendor's item number means that their item number is automatically shown on purchase documents instead of the number that you use.];
+                      RunObject=Page 5723;
+                      RunPageView=SORTING(Cross-Reference Type,Cross-Reference Type No.);
+                      RunPageLink=Cross-Reference Type=CONST(Vendor),
+                                  Cross-Reference Type No.=FIELD(No.);
+                      Image=Change }
+      { 102     ;2   ;Action    ;
+                      CaptionML=[ENU=Online Map;
+                                 ESM=Online Map;
+                                 FRC=Online Map;
+                                 ENC=Online Map];
+                      ToolTipML=[ENU=View the vendor's address on your preferred map website.;
+                                 ESM=Vea la direcci¢n del proveedor en su sitio web de mapas favorito.;
+                                 FRC=Affichez l'adresse du fournisseur sur votre site Web de mappage par dÇfaut.;
+                                 ENC=View the vendor's address on your preferred map website.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Map;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 DisplayMap;
+                               END;
+                                }
+      { 21      ;1   ;ActionGroup;
+                      Name=History;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      Image=History }
+      { 7       ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=Mo&vimientos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      ToolTipML=[ENU=View the history of transactions for the vendor.;
+                                 ESM=Vea el historial de transacciones del proveedor.;
+                                 FRC=Affichez l'historique des transactions pour le fournisseur.;
+                                 ENC=View the history of transactions for the vendor.];
+                      RunObject=Page 29;
+                      RunPageView=SORTING(Vendor No.);
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      Promoted=No;
+                      Image=VendorLedger;
+                      PromotedCategory=Process }
+      { 71      ;1   ;ActionGroup;
+                      Name=PricesAndDiscounts;
+                      CaptionML=[ENU=Prices and Discounts;
+                                 ESM=Precios y descuentos;
+                                 FRC=Prix et escomptes;
+                                 ENC=Prices and Discounts];
+                      Image=Purchasing }
+      { 73      ;2   ;Action    ;
+                      CaptionML=[ENU=Invoice &Discounts;
+                                 ESM=Dto. &factura;
+                                 FRC=&Escomptes facture;
+                                 ENC=Invoice &Discounts];
+                      ToolTipML=[ENU=Set up different discounts that the vendor grants you. An invoice discount is automatically granted when the total on a purchase invoice exceeds a certain amount.;
+                                 ESM=Configure los distintos descuentos que le concede el proveedor. Un descuento en factura se concede autom†ticamente cuando el total de una factura de compra supera un importe determinado.;
+                                 FRC=Configurez des escomptes diffÇrents que le fournisseur vous octroie. Un escompte de facture est automatiquement accordÇ lorsque le total sur une facture d'achat dÇpasse un certain montant.;
+                                 ENC=Set up different discounts that the vendor grants you. An invoice discount is automatically granted when the total on a purchase invoice exceeds a certain amount.];
+                      RunObject=Page 28;
+                      RunPageLink=Code=FIELD(Invoice Disc. Code);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CalculateInvoiceDiscount;
+                      PromotedCategory=Category7 }
+      { 72      ;2   ;Action    ;
+                      CaptionML=[ENU=Prices;
+                                 ESM=Precios;
+                                 FRC=Prix;
+                                 ENC=Prices];
+                      ToolTipML=[ENU=Set up different prices for items that you buy from the vendor. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.;
+                                 ESM=Configure precios distintos para los productos que compra al proveedor. Un precio de producto se concede autom†ticamente en las l°neas de factura cuando se cumplen los criterios especificados, como el proveedor, la cantidad o la fecha final.;
+                                 FRC=ParamÇtrez des prix diffÇrents pour les articles que vous achetez au fournisseur. Un prix article est automatiquement affectÇ sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le fournisseur, la quantitÇ ou la date de fin.;
+                                 ENC=Set up different prices for items that you buy from the vendor. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.];
+                      RunObject=Page 7012;
+                      RunPageView=SORTING(Vendor No.);
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Price;
+                      PromotedCategory=Category7 }
+      { 116     ;2   ;Action    ;
+                      CaptionML=[ENU=Line Discounts;
+                                 ESM=Descuentos l°nea;
+                                 FRC=Ligne Escomptes;
+                                 ENC=Line Discounts];
+                      ToolTipML=[ENU=Set up different discounts for items that you buy from the vendor. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.;
+                                 ESM=Configure descuentos distintos para los productos que compra al proveedor. Un descuento de producto se concede autom†ticamente en las l°neas de factura cuando se cumplen los criterios especificados, como el proveedor, la cantidad o la fecha final.;
+                                 FRC=Configurez des escomptes diffÇrents pour les articles que vous achetez au fournisseur. Un escompte article est automatiquement affectÇ sur les lignes de facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le fournisseur, la quantitÇ ou la date de fin.;
+                                 ENC=Set up different discounts for items that you buy from the vendor. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.];
+                      RunObject=Page 7014;
+                      RunPageView=SORTING(Vendor No.);
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=LineDiscount;
+                      PromotedCategory=Category7 }
+      { 37      ;1   ;ActionGroup;
+                      Name=DataTemplate;
+                      CaptionML=[ENU=Data Template;
+                                 ESM=Plantilla datos;
+                                 FRC=Modäle donnÇes;
+                                 ENC=Data Template] }
+      { 35      ;2   ;Action    ;
+                      Name=SaveAsTemplate;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Save as Template;
+                                 ESM=Guardar como Plantilla;
+                                 FRC=Sauvegarder comme modäle;
+                                 ENC=Save as Template];
+                      ToolTipML=[ENU=Save the vendor card as a template that can be reused to create new vendor cards. Vendor templates contain preset information to help you fill fields on vendor cards.;
+                                 ESM=Guardar la ficha de proveedor como plantilla que se podr† usar para crear nuevas fichas de proveedor. Las plantillas de proveedor contienen informaci¢n predefinida para ayudarle a completar los cambios de las fichas de proveedor.;
+                                 FRC=Enregistrez la fiche fournisseur comme modäle que vous pourrez rÇutiliser pour crÇer de nouvelles fiches fournisseur. Les modäles fournisseur contiennent des informations prÇdÇfinies pour vous aider Ö complÇter les fiches fournisseur.;
+                                 ENC=Save the vendor card as a template that can be reused to create new vendor cards. Vendor templates contain preset information to help you fill fields on vendor cards.];
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=New;
+                      OnAction=VAR
+                                 TempMiniVendorTemplate@1000 : TEMPORARY Record 1303;
+                               BEGIN
+                                 TempMiniVendorTemplate.SaveAsTemplate(Rec);
+                               END;
+                                }
+      { 19      ;2   ;Action    ;
+                      Name=Templates;
+                      CaptionML=[ENU=Templates;
+                                 ESM=Plantillas;
+                                 FRC=Modäles;
+                                 ENC=Templates];
+                      ToolTipML=[ENU=View or edit vendor templates.;
+                                 ESM=Vea o edite las plantillas de proveedor.;
+                                 FRC=Affichez ou modifiez des modäles fournisseur.;
+                                 ENC=View or edit vendor templates.];
+                      RunObject=Page 1340;
+                      RunPageView=WHERE(Table ID=CONST(23));
+                      PromotedIsBig=Yes;
+                      Image=Template }
+      { 1900000006;1 ;ActionGroup;
+                      Name=ReportsVendor;
+                      CaptionML=[ENU=Reports;
+                                 ESM=Informes;
+                                 FRC=Rapports;
+                                 ENC=Reports];
+                      ActionContainerType=Reports }
+      { 43      ;2   ;ActionGroup;
+                      Name=Reports;
+                      CaptionML=[ENU=Reports;
+                                 ESM=Informes;
+                                 FRC=Rapports;
+                                 ENC=Reports];
+                      Image=Report }
+      { 1905916106;3 ;Action    ;
+                      CaptionML=[ENU=Vendor - Summary Aging;
+                                 ESM=Proveedor - Pagos por periodos;
+                                 FRC=Fournisseur - Chronologie sommaire;
+                                 ENC=Vendor - Summary Aging];
+                      ToolTipML=[ENU=View, print, or save a summary of the payables owed to each vendor, divided into three time periods.;
+                                 ESM=Vea, imprima o guarde un resumen de los documentos a pagar debidos a cada proveedor, divididos en tres periodos de tiempo.;
+                                 FRC=Affichez, imprimez ou enregistrez un rÇsumÇ des soldes dus Ö chaque fournisseur, divisÇ en troisˇpÇriodes.;
+                                 ENC=View, print, or save a summary of the payables owed to each vendor, divided into three time periods.];
+                      RunObject=Report 305;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904504206;3 ;Action    ;
+                      CaptionML=[ENU=Vendor - Balance to Date;
+                                 ESM=Proveedor - Saldo por fechas;
+                                 FRC=Fournisseur - Solde Ö ce jour;
+                                 ENC=Vendor - Balance to Date];
+                      ToolTipML=[ENU=View, print, or save a list with your payment history to vendors up until a specified date. You can use the report to extract your total payment liabilities at the close of an accounting period or fiscal year.;
+                                 ESM=Vea, imprima o guarde una lista con su historial de pagos a proveedores hasta una fecha especificada. Puede usar el informe para extraer las obligaciones de pago totales al cierre de un periodo contable o ejercicio.;
+                                 FRC=Affichez, imprimez ou enregistrez une liste reprenant votre historique de paiement aux fournisseurs jusqu'Ö une certaine date. Vous pouvez utiliser le rapport pour extraire votre passif total Ö la fermeture d'une pÇriode comptable ou d'un exercice financier.;
+                                 ENC=View, print, or save a list with your payment history to vendors up until a specified date. You can use the report to extract your total payment liabilities at the close of an accounting period or fiscal year.];
+                      RunObject=Report 321;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                Name=Vendor;
+                CaptionML=[ENU=Vendor;
+                           ESM=Proveedor;
+                           FRC=Fournisseur;
+                           ENC=Vendor];
+                GroupType=Group }
+
+    { 3   ;2   ;Group     ;
+                GroupType=Group }
+
+    { 2   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the vendor. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.;
+                           ESM=Especifica el n£mero del proveedor. El campo se rellena autom†ticamente a partir de un n£mero de serie definido o el n£mero se especifica manualmente porque se ha habilitado la entrada manual de n£meros en la configuraci¢n de n£mero de serie.;
+                           FRC=Indique le numÇro du fournisseur. Le champ est renseignÇ soit automatiquement Ö partir d'une souche de numÇros dÇfinie, soit vous entrez manuellement le numÇro car vous avez activÇ la saisie manuelle de numÇro dans le paramÇtrage de la souche de numÇros.;
+                           ENC=Specifies the number of the vendor. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.];
+                SourceExpr="No.";
+                Importance=Promoted;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's name. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el nombre del proveedor. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le nom du fournisseur. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the vendor's name. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Name;
+                Importance=Promoted }
+
+    { 24  ;3   ;Field     ;
+                ToolTipML=[ENU=Prevents specific transactions from being processed for a customer by selecting an appropriate blocking level.;
+                           ESM=Impide que se procesen transacciones determinadas de un cliente si selecciona un nivel de bloqueo adecuado.;
+                           FRC=Empàche le traitement de transactions spÇcifiques d'un client en sÇlectionnant un niveau de blocage appropriÇ.;
+                           ENC=Prevents specific transactions from being processed for a customer by selecting an appropriate blocking level.];
+                SourceExpr=Blocked }
+
+    { 26  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies when the vendor card was last modified.;
+                           ESM=Especifica cu†ndo se modific¢ la ficha de proveedor por £ltima vez.;
+                           FRC=Indique la date Ö laquelle la fiche fournisseur a ÇtÇ modifiÇe pour la derniäre fois.;
+                           ENC=Specifies when the vendor card was last modified.];
+                SourceExpr="Last Date Modified" }
+
+    { 17  ;2   ;Group     ;
+                GroupType=Group }
+
+    { 18  ;3   ;Field     ;
+                ToolTipML=[ENU=Shows the vendor's current balance in LCY.;
+                           ESM=Muestra el saldo actual del proveedor en $.;
+                           FRC=Affiche le solde actuel du fournisseur en devise sociÇtÇ.;
+                           ENC=Shows the vendor's current balance in $.];
+                SourceExpr="Balance (LCY)" }
+
+    { 28  ;3   ;Field     ;
+                ToolTipML=[ENU=Shows the balance due to this vendor in LCY.;
+                           ESM=Muestra el saldo pendiente con el proveedor en $.;
+                           FRC=Indique le solde dñ Ö ce fournisseur en devise sociÇtÇ.;
+                           ENC=Shows the balance due to this vendor in $.];
+                SourceExpr="Balance Due (LCY)" }
+
+    { 9   ;1   ;Group     ;
+                Name=AdressContactTab;
+                CaptionML=[ENU=Address & Contact;
+                           ESM=Direcci¢n y contacto;
+                           FRC=Adresse et contact;
+                           ENC=Address & Contact];
+                GroupType=Group }
+
+    { 10  ;2   ;Group     ;
+                Name=AddressDetails;
+                CaptionML=[ENU=Address;
+                           ESM=Direcci¢n;
+                           FRC=Adresse;
+                           ENC=Address];
+                GroupType=Group }
+
+    { 6   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's address. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica la direcci¢n del proveedor. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie l'adresse du fournisseur. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the vendor's address. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Address }
+
+    { 8   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies another line of the vendor's address, if necessary. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica otra l°nea de la direcci¢n del proveedor en caso de ser necesario. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie un complÇment Ö l'adresse du fournisseur, s'il y a lieu. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies another line of the vendor's address, if necessary. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr="Address 2" }
+
+    { 79  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's post code.;
+                           ESM=Especifica el c¢digo postal del proveedor.;
+                           FRC=SpÇcifie le code postal du fournisseur.;
+                           ENC=Specifies the vendor's postal/ZIP code.];
+                SourceExpr="Post Code";
+                Importance=Promoted }
+
+    { 15  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's city.;
+                           ESM=Especifica el Municipio/Ciudad del proveedor.;
+                           FRC=SpÇcifie la ville du fournisseur.;
+                           ENC=Specifies the vendor's city.];
+                SourceExpr=City }
+
+    { 81  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the country/region code for this vendor.;
+                           ESM=Especifica el c¢digo de pa°s/regi¢n de este proveedor.;
+                           FRC=SpÇcifie le code pays/rÇgion de ce fournisseur.;
+                           ENC=Specifies the country/region code for this vendor.];
+                SourceExpr="Country/Region Code" }
+
+    { 13  ;2   ;Group     ;
+                Name=ContactDetails;
+                CaptionML=[ENU=Contact;
+                           ESM=Contacto;
+                           FRC=Contact;
+                           ENC=Contact];
+                GroupType=Group }
+
+    { 12  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's telephone number. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el n£mero de telÇfono del proveedor. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le numÇro de tÇlÇphone du fournisseur. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the vendor's telephone number. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr="Phone No." }
+
+    { 22  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's e-mail address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           ESM=Especifica la direcci¢n de correo electr¢nico del proveedor. Puede introducir un m†ximo de 80 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie l'adresse e-mail du fournisseur. Vous pouvez entrer au maximum 80ˇcaractäres, des chiffres ou des lettres.;
+                           ENC=Specifies the vendor's e-mail address. You can enter a maximum of 80 characters, both numbers and letters.];
+                SourceExpr="E-Mail" }
+
+    { 23  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's home page address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           ESM=Especifica la direcci¢n de la p†gina Web del proveedor. Puede introducir un m†ximo de 80 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie l'adresse de la page d'accueil du fournisseur. Vous pouvez entrer au maximum 80ˇcaractäres, des chiffres ou des lettres.;
+                           ENC=Specifies the vendor's home page address. You can enter a maximum of 80 characters, both numbers and letters.];
+                SourceExpr="Home Page" }
+
+    { 25  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the person you regularly contact when you do business with this vendor. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el nombre de la persona con la que contacta normalmente cuando trata con este proveedor. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le nom de la personne que vous contactez rÇguliärement lorsque vous traitez avec ce fournisseur. Vous pouvez saisir au maximum 30ˇcaractäres, des chiffres ou des lettres.;
+                           ENC=Specifies the name of the person you regularly contact when you do business with this vendor. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Contact;
+                Importance=Promoted }
+
+    { 47  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your account number with the vendor, if you have one. You can enter a maximum of 20 characters, both numbers and letters. This field is only informational.;
+                           ESM=Especifica el n£mero de la cuenta que mantiene con el proveedor, si corresponde. Puede introducir un m†ximo de 20 caracteres, tanto n£meros como letras. Este campo es £nicamente informativo.;
+                           FRC=SpÇcifie votre numÇro de compte avec le fournisseur, si vous en avez un. Vous pouvez entrer un maximum de 20ˇcaractäres alphanumÇriques. Ce champ est fourni uniquement Ö titre indicatif.;
+                           ENC=Specifies your account number with the vendor, if you have one. You can enter a maximum of 20 characters, both numbers and letters. This field is only informational.];
+                SourceExpr="Our Account No." }
+
+    { 1905885101;1;Group  ;
+                Name=InvoicingTab;
+                CaptionML=[ENU=Invoicing;
+                           ESM=Facturaci¢n;
+                           FRC=Facturation;
+                           ENC=Invoicing];
+                GroupType=Group }
+
+    { 16  ;2   ;Group     ;
+                Name=PostingDetails;
+                CaptionML=[ENU=Posting Details;
+                           ESM=Detalles del registro;
+                           FRC=DÇtails du report;
+                           ENC=Posting Details];
+                GroupType=Group }
+
+    { 30  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of a different vendor whom you pay for products delivered by the vendor on the vendor card.;
+                           ESM=Especifica el n£mero de otro proveedor al que pague los productos entregados por el proveedor en la ficha de proveedor.;
+                           FRC=SpÇcifie le numÇro d'un autre fournisseur Ö qui vous payez des biens vendus par le fournisseur sur la fiche fournisseur.;
+                           ENC=Specifies the number of a different vendor whom you pay for products delivered by the vendor on the vendor card.];
+                SourceExpr="Pay-to Vendor No." }
+
+    { 60  ;3   ;Field     ;
+                ToolTipML=[ENU=Specify the vendor's trade type to link transactions made for this vendor with the appropriate general ledger account according to the general posting setup.;
+                           ESM=Especifique el tipo de comercio del proveedor para vincular las transacciones realizadas para este proveedor a la cuenta contable correspondiente seg£n la configuraci¢n de registro general.;
+                           FRC=SpÇcifiez le type commercial du fournisseur pour lier les transactions effectuÇes pour ce fournisseur au compte gÇnÇral appropriÇ en fonction des paramätres de validation gÇnÇraux.;
+                           ENC=Specify the vendor's trade type to link transactions made for this vendor with the appropriate general ledger account according to the general posting setup.];
+                SourceExpr="Gen. Bus. Posting Group";
+                Importance=Promoted }
+
+    { 90  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's VAT specification to link transactions made for this vendor with the appropriate general ledger account according to the VAT posting setup.;
+                           ESM=Especifica la especificaci¢n de IVA del proveedor para vincular las transacciones realizadas para este proveedor a la cuenta contable correspondiente seg£n la configuraci¢n de registro de IVA.;
+                           FRC=SpÇcifie le dÇtail TVA du fournisseur pour lier les transactions effectuÇes pour ce fournisseur au compte gÇnÇral appropriÇ en fonction des paramätres de validation TVA.;
+                           ENC=Specifies the vendor's tax specification to link transactions made for this vendor with the appropriate general ledger account according to the tax posting setup.];
+                SourceExpr="VAT Bus. Posting Group" }
+
+    { 32  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's market type to link business transactions made for the vendor with the appropriate account in the general ledger.;
+                           ESM=Especifica el tipo del mercado del proveedor para vincular las transacciones de negocio realizadas para el proveedor con la cuenta correspondiente en la contabilidad.;
+                           FRC=SpÇcifie le type du marchÇ du fournisseur pour lier les transactions commerciales effectuÇes pour le fournisseur avec le compte appropriÇ dans la comptabilitÇ.;
+                           ENC=Specifies the vendor's market type to link business transactions made for the vendor with the appropriate account in the general ledger.];
+                SourceExpr="Vendor Posting Group";
+                Importance=Promoted }
+
+    { 34  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's invoice discount code. When you set up a new vendor card, the number you have entered in the No. field is automatically inserted.;
+                           ESM=Especifica el c¢digo de descuento en factura del proveedor. Al configurar una ficha de proveedor nueva, el n£mero que ha introducido en el campo Nß se inserta autom†ticamente.;
+                           FRC=Indique le code remise facture du fournisseur. Lorsque vous crÇez une nouvelle fiche fournisseur, le numÇro que vous avez saisi dans le champ N¯ est automatiquement insÇrÇ.;
+                           ENC=Specifies the vendor's invoice discount code. When you set up a new vendor card, the number you have entered in the No. field is automatically inserted.];
+                NotBlank=Yes;
+                SourceExpr="Invoice Disc. Code" }
+
+    { 94  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Direct Unit Cost and Line Amount fields on the purchase lines and in purchase reports should be shown with or without VAT.;
+                           ESM=Especifica si los campos Costo unit. directo y Importe l°nea de las l°neas de compra y en los informes de compra se deben mostrar con o sin IVA.;
+                           FRC=SpÇcifie si les champs Coñt unitaire direct et Montant ligne des lignes achat et des Çtats achat sont affichÇs avec ou sans la TVA.;
+                           ENC=Specifies if the Direct Unit Cost and Line Amount fields on the purchase lines and in purchase reports should be shown with or without tax.];
+                SourceExpr="Prices Including VAT" }
+
+    { 27  ;2   ;Group     ;
+                Name=ForeignTrade;
+                CaptionML=[ENU=Foreign Trade;
+                           ESM=Comercio exterior;
+                           FRC=Commerce Çtranger;
+                           ENC=Foreign Trade];
+                GroupType=Group }
+
+    { 33  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a default currency code for the vendor.;
+                           ESM=Especifica un c¢digo de divisa predeterminado para el proveedor.;
+                           FRC=SpÇcifie un code devise par dÇfaut pour le fournisseur.;
+                           ENC=Specifies a default currency code for the vendor.];
+                SourceExpr="Currency Code";
+                Importance=Promoted }
+
+    { 31  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the language on printouts for this vendor.;
+                           ESM=Especifica el idioma en las copias impresas para este proveedor.;
+                           FRC=Indique la langue des documents imprimÇs pour ce fournisseur.;
+                           ENC=Specifies the language on printouts for this vendor.];
+                SourceExpr="Language Code" }
+
+    { 29  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's VAT registration number. You can enter a maximum of 20 characters, both numbers and letters.;
+                           ESM=Especifica el n£mero RFC del proveedor. Puede introducir un m†ximo de 20 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le numÇro de groupe compta. produit TVA du fournisseur. Vous pouvez entrer un maximum de 20ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the vendor's GST/HST registration number. You can enter a maximum of 20 characters, both numbers and letters.];
+                SourceExpr="VAT Registration No." }
+
+    { 1901677601;1;Group  ;
+                Name=PaymentsTab;
+                CaptionML=[ENU=Payments;
+                           ESM=Pagos;
+                           FRC=Paiements;
+                           ENC=Payments];
+                GroupType=Group }
+
+    { 36  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how to apply payments to entries for this vendor. Select Manual to manually specify the document that a payment applies to. This is the default method. Select Apply to Oldest to automatically apply payments to the oldest open vendor ledger entry.;
+                           ESM=Especifica c¢mo liquidar pagos en los movimientos para este proveedor. Seleccione Manual para especificar manualmente el documento al que se aplica un pago. êste es el mÇtodo predeterminado. Seleccione Liq. por antigÅedad para aplicar autom†ticamente los pagos al movimiento de proveedor pendiente m†s antiguo.;
+                           FRC=SpÇcifie la maniäre de lettrer les paiements aux Çcritures pour ce fournisseur. SÇlectionnez Manuel pour spÇcifier manuellement le document auquel un paiement s'applique. Il s'agit de la mÇthode par dÇfaut. SÇlectionnez Au plus ancien pour lettrer automatiquement les paiements Ö l'Çcriture comptable fournisseur ouverte la plus ancienne.;
+                           ENC=Specifies how to apply payments to entries for this vendor. Select Manual to manually specify the document that a payment applies to. This is the default method. Select Apply to Oldest to automatically apply payments to the oldest open vendor ledger entry.];
+                SourceExpr="Application Method" }
+
+    { 38  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a code that indicates the payment terms that the vendor usually requires. The payment terms code you define in this field is inserted on purchase invoices for the vendor.;
+                           ESM=Especifica un c¢digo que indica los tÇrminos de pago que suele requerir el proveedor. El c¢digo de tÇrminos de pago que define en este campo se inserta en las facturas de compra para el proveedor.;
+                           FRC=Indique un code qui indique les conditions de paiement que le fournisseur exige habituellement. Le code condition de paiement que vous dÇfinissez dans ce champ est insÇrÇ sur les factures achat pour le fournisseur.;
+                           ENC=Specifies a code that indicates the payment terms that the vendor usually requires. The payment terms code you define in this field is inserted on purchase invoices for the vendor.];
+                SourceExpr="Payment Terms Code";
+                Importance=Promoted }
+
+    { 40  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how the vendor requires you to submit payment, such as bank transfer or check. The payment method code that you select in this field is inserted on purchase invoices for the vendor.;
+                           ESM=Especifica la manera en que el proveedor requiere que env°e el pago, como transferencia bancaria o cheque. El c¢digo de forma de pago que ha seleccionado en este campo se inserta en las facturas de compra para el proveedor.;
+                           FRC=SpÇcifie le mode de paiement exigÇ par le fournisseur, tel que transfert bancaire ou chäque. Le code mode de räglement que vous sÇlectionnez dans ce champ est insÇrÇ sur les factures achat pour le fournisseur.;
+                           ENC=Specifies how the vendor requires you to submit payment, such as bank transfer or cheque. The payment method code that you select in this field is inserted on purchase invoices for the vendor.];
+                SourceExpr="Payment Method Code";
+                Importance=Promoted }
+
+    { 42  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the importance of the vendor when suggesting payments using the Suggest Vendor Payments function. Leave the field blank to not use payment priority.;
+                           ESM=Especifica la importancia del proveedor al sugerir pagos con la funci¢n Proponer pagos a proveedores. Deje en blanco el campo para no usar la prioridad del pago.;
+                           FRC=SpÇcifie l'importance du fournisseur lors de la proposition de paiements Ö l'aide de la fonction Proposer paiements fournisseur. Laissez ce champ vide pour ne pas utiliser la prioritÇ de paiement.;
+                           ENC=Specifies the importance of the vendor when suggesting payments using the Suggest Vendor Payments function. Leave the field blank to not use payment priority.];
+                SourceExpr=Priority }
+
+    { 119 ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the vendor allows payment tolerance. You only fill this field if you know the vendor's payment reminder policy.;
+                           ESM=Especifica si al proveedor permite una tolerancia de pago. Rellene este campo solo si conoce la directiva del recordatorio de pago del proveedor.;
+                           FRC=SpÇcifie si le fournisseur a droit Ö un Çcart de räglement. Vous ne renseignez ce champ que si vous connaissez la politique de relance de paiement du fournisseur.;
+                           ENC=Specifies if the vendor allows payment tolerance. You only fill this field if you know the vendor's payment reminder policy.];
+                SourceExpr="Block Payment Tolerance";
+                OnValidate=BEGIN
+                             IF "Block Payment Tolerance" THEN BEGIN
+                               IF CONFIRM(RemovePaymentToleranceQst,FALSE) THEN
+                                 PaymentToleranceMgt.DelTolVendLedgEntry(Rec);
+                             END ELSE BEGIN
+                               IF CONFIRM(AllowPaymentToleranceQst,FALSE) THEN
+                                 PaymentToleranceMgt.CalcTolVendLedgEntry(Rec);
+                             END;
+                           END;
+                            }
+
+    { 20  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor bank account that will be used by default on payment journal lines for export to a payment bank file.;
+                           ESM=Especifica la cuenta de banco de proveedor que se usar† de forma predeterminada en l°neas de diario de pagos para exportar a un archivo de banco del pago.;
+                           FRC=SpÇcifie le compte bancaire fournisseur utilisÇ par dÇfaut sur les lignes feuille paiement pour l'exportation vers un fichier de la banque de paiement.;
+                           ENC=Specifies the vendor bank account that will be used by default on payment journal lines for export to a payment bank file.];
+                SourceExpr="Preferred Bank Account" }
+
+    { 44  ;1   ;Field     ;
+                Name=PageReady;
+                ControlAddIn=[Microsoft.Dynamics.Nav.Client.PageReady;PublicKeyToken=31bf3856ad364e35] }
+
+  }
+  CODE
+  {
+    VAR
+      PaymentToleranceMgt@1002 : Codeunit 426;
+      AllowPaymentToleranceQst@1005 : TextConst 'ENU=Do you want to allow payment tolerance for entries that are currently open?;ESM=®Desea permitir la tolerancia de pago para movimientos pendientes?;FRC=Souhaitez-vous autoriser les Çcarts de räglement pour les Çcritures actuellement ouvertes ?;ENC=Do you want to allow payment tolerance for entries that are currently open?';
+      RemovePaymentToleranceQst@1004 : TextConst 'ENU=Do you want to remove payment tolerance from entries that are currently open?;ESM=®Confirma que desea eliminar la tolerancia pago de los movimientos actualmente pendientes?;FRC=Souhaitez-vous supprimer les Çcarts de räglement pour les Çcritures actuellement ouvertes ?;ENC=Do you want to remove payment tolerance from entries that are currently open?';
+
+    EVENT PageReady@-44::AddInReady@0();
+    VAR
+      MiniVendorTemplate@1000 : Record 1303;
+      NewVendorCode@1001 : Code[20];
+    BEGIN
+      IF "No." = '' THEN BEGIN
+        NewVendorCode := MiniVendorTemplate.NewVendorFromTemplate;
+        IF NewVendorCode <> '' THEN BEGIN
+          GET(NewVendorCode);
+          CurrPage.UPDATE;
+        END;
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,85 @@
+OBJECT Page 67 Sales Comment Sheet
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/05/08;
+    Time=12:00:00 PM;
+    Version List=NAVW16.00,NAVNA4.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Comment Sheet;
+               ESM=Hoja comentarios;
+               FRC=Feuille de commentaires;
+               ENC=Comment Sheet];
+    MultipleNewLines=Yes;
+    LinksAllowed=No;
+    SourceTable=Table44;
+    DelayedInsert=Yes;
+    DataCaptionFields=Document Type,No.;
+    PageType=List;
+    AutoSplitKey=Yes;
+    OnNewRecord=BEGIN
+                  SetUpNewLine;
+                END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Date }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Comment }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Code;
+                Visible=FALSE }
+
+    { 1020004;2;Field     ;
+                SourceExpr="Print On Quote";
+                Visible=FALSE }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Print On Pick Ticket";
+                Visible=FALSE }
+
+    { 1020008;2;Field     ;
+                SourceExpr="Print On Order Confirmation";
+                Visible=FALSE }
+
+    { 1020010;2;Field     ;
+                SourceExpr="Print On Shipment";
+                Visible=FALSE }
+
+    { 1020012;2;Field     ;
+                SourceExpr="Print On Invoice";
+                Visible=FALSE }
+
+    { 1020014;2;Field     ;
+                SourceExpr="Print On Credit Memo";
+                Visible=FALSE }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Print On Return Authorization";
+                Visible=FALSE }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Print On Return Receipt";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

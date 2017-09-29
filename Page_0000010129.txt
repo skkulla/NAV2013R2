@@ -1,0 +1,70 @@
+OBJECT Page 10129 Posted Bank Rec. List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Bank Rec. List;
+               ESM=Lista concil. registrada;
+               FRC=Liste rapprochement bancaire report‚;
+               ENC=Posted Bank Rec. List];
+    SourceTable=Table10123;
+    PageType=List;
+    CardPageID=Posted Bank Rec.Worksheet;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1907013006;1 ;Action    ;
+                      CaptionML=[ENU=Bank Reconciliation;
+                                 ESM=Conciliaci¢n;
+                                 FRC=Rapprochement bancaire;
+                                 ENC=Bank Reconciliation];
+                      RunObject=Report 10408;
+                      Promoted=No;
+                      Image=Worksheet;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Bank Account No." }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Statement No." }
+
+    { 1020004;2;Field     ;
+                SourceExpr="Statement Date" }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Statement Balance" }
+
+    { 1020008;2;Field     ;
+                SourceExpr="Date Created";
+                Visible=FALSE }
+
+    { 1020010;2;Field     ;
+                SourceExpr="Time Created";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

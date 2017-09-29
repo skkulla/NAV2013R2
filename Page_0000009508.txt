@@ -1,0 +1,94 @@
+OBJECT Page 9508 Debugger Variable List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Debugger Variable List;
+               ESM=Lista de variables de depurador;
+               FRC=Liste des variables du d‚bogueur;
+               ENC=Debugger Variable List];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    ModifyAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table2000000102;
+    PageType=List;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Watch;
+                                ESM=Nuevo,Proceso,Informe,Inspecci¢n;
+                                FRC=Nouveau,Traitement,Rapport,Espion;
+                                ENC=New,Process,Report,Watch];
+    ActionList=ACTIONS
+    {
+      { 6       ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 9       ;1   ;Separator  }
+      { 7       ;1   ;Action    ;
+                      Name=Add Watch;
+                      ShortCutKey=Ctrl+Insert;
+                      CaptionML=[ENU=Add Watch;
+                                 ESM=Agregar inspecci¢n;
+                                 FRC=Ajouter un espion;
+                                 ENC=Add Watch];
+                      ToolTipML=[ENU=Add the selected variable to the watch list.;
+                                 ESM=Agrega la variable seleccionada a la lista de observaci¢n.;
+                                 FRC=Ajoutez la variable s‚lectionn‚e … la liste des espions.;
+                                 ENC=Add the selected variable to the watch list.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=AddWatch;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 DebuggerManagement@1002 : Codeunit 9500;
+                               BEGIN
+                                 DebuggerManagement.AddWatch(Path,FALSE);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                IndentationColumnName=Indentation;
+                ShowAsTree=Yes;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                CaptionML=[ENU=Name;
+                           ESM=Nombre;
+                           FRC=Nom;
+                           ENC=Name];
+                SourceExpr=Name }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Value;
+                           ESM=Valor;
+                           FRC=Valeur;
+                           ENC=Value];
+                SourceExpr=Value }
+
+    { 5   ;2   ;Field     ;
+                CaptionML=[ENU=Type;
+                           ESM=Tipo;
+                           FRC=Type;
+                           ENC=Type];
+                SourceExpr=Type }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

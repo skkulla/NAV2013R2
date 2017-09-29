@@ -1,0 +1,185 @@
+OBJECT Page 1210 Post Exch Def Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36366;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posting Exchange Definition;
+               ESM=Definici¢n de intercambio de registro;
+               FRC=DÇfinition de l'Çchange de report;
+               ENC=Posting Exchange Definition];
+    SourceTable=Table1222;
+    PageType=Card;
+    PromotedActionCategoriesML=[ENU=Import/Export,Process,Report;
+                                ESM=Importar/exportar,Procesar,Informe;
+                                FRC=Importation/Exportation,Traitement,Rapport;
+                                ENC=Import/Export,Process,Report];
+    OnOpenPage=BEGIN
+                 IsNonXMLFileType := CheckEnableDisableIsNonXMLFileType;
+                 IsImportType := CheckEnableDisableIsImportType;
+                 IsDelimitedFileType := CheckEnableDisableDelimitedFileType;
+               END;
+
+    OnInsertRecord=VAR
+                     PostingExchLineDef@1000 : Record 1227;
+                   BEGIN
+                     IF NOT PostingExchLineDef.GET(Code) THEN BEGIN
+                       PostingExchLineDef."Posting Exch. Def Code" := Code;
+                       PostingExchLineDef.Code := DefaultTxt;
+                       PostingExchLineDef.Name := DefaultTxt;
+                       PostingExchLineDef.INSERT;
+                     END;
+                   END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           CheckLineDefCount;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 17      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Import Data Exchange Setup;
+                                 ESM=Configuraci¢n intercambio de datos de importaci¢n;
+                                 FRC=Importer la configuration d'Çchange de donnÇes;
+                                 ENC=Import Data Exchange Setup];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Import;
+                      OnAction=BEGIN
+                                 XMLPORT.RUN(XMLPORT::"Imp / Exp Data Exch Def & Map",FALSE,TRUE);
+                               END;
+                                }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Export Data Exchange Setup;
+                                 ESM=Configuraci¢n intercambio de datos de exportaci¢n;
+                                 FRC=Exporter la configuration d'Çchange de donnÇes;
+                                 ENC=Export Data Exchange Setup];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Export;
+                      OnAction=VAR
+                                 PostingExchDef@1000 : Record 1222;
+                               BEGIN
+                                 PostingExchDef.SETFILTER(Code,Code);
+                                 XMLPORT.RUN(XMLPORT::"Imp / Exp Data Exch Def & Map",FALSE,FALSE,PostingExchDef);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=General;
+                GroupType=Group }
+
+    { 19  ;2   ;Group     ;
+                GroupType=Group }
+
+    { 3   ;3   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;3   ;Field     ;
+                SourceExpr=Name }
+
+    { 16  ;3   ;Field     ;
+                SourceExpr="File Type";
+                OnValidate=BEGIN
+                             IsNonXMLFileType := CheckEnableDisableIsNonXMLFileType;
+                             IsDelimitedFileType := CheckEnableDisableDelimitedFileType;
+                             IsImportType := CheckEnableDisableIsImportType;
+                             CurrPage.UPDATE;
+                           END;
+                            }
+
+    { 5   ;3   ;Field     ;
+                SourceExpr=Type;
+                OnValidate=BEGIN
+                             IsImportType := CheckEnableDisableIsImportType;
+                             CurrPage.UPDATE;
+                           END;
+                            }
+
+    { 6   ;3   ;Field     ;
+                SourceExpr="Processing XMLport" }
+
+    { 21  ;3   ;Field     ;
+                SourceExpr="Importing Codeunit" }
+
+    { 22  ;3   ;Field     ;
+                SourceExpr="Processing Codeunit" }
+
+    { 18  ;2   ;Group     ;
+                CaptionML=[ENU=File Type: Variable/Fixed;
+                           ESM=Tipo de archivo: variable/fijo;
+                           FRC=Type de fichier: Variable/Fixe;
+                           ENC=File Type: Variable/Fixed];
+                Enabled=IsNonXMLFileType;
+                GroupType=Group }
+
+    { 11  ;3   ;Field     ;
+                SourceExpr="File Encoding" }
+
+    { 10  ;3   ;Field     ;
+                SourceExpr="Column Separator";
+                Enabled=IsDelimitedFileType }
+
+    { 20  ;2   ;Group     ;
+                CaptionML=[ENU=Type: Import;
+                           ESM=Tipo: importaci¢n;
+                           FRC=Type: Importation;
+                           ENC=Type: Import];
+                Enabled=IsImportType;
+                GroupType=Group }
+
+    { 7   ;3   ;Field     ;
+                SourceExpr="Header Lines" }
+
+    { 8   ;3   ;Field     ;
+                SourceExpr="Header Tag" }
+
+    { 9   ;3   ;Field     ;
+                SourceExpr="Footer Tag" }
+
+    { 14  ;1   ;Part      ;
+                CaptionML=[ENU=Posting Line Definitions;
+                           ESM=Definiciones de l°nea de registro;
+                           FRC=DÇfinitions de la ligne de report;
+                           ENC=Posting Line Definitions];
+                SubPageLink=Posting Exch. Def Code=FIELD(Code);
+                PagePartID=Page1215;
+                PartType=Page }
+
+    { 12  ;1   ;Part      ;
+                CaptionML=[ENU=Posting Column Definitions;
+                           ESM=Definiciones de columna de registro;
+                           FRC=DÇfinitions de la colonne de report;
+                           ENC=Posting Column Definitions];
+                SubPageLink=Posting Exch. Line Def Code=FIELD(Code),
+                            Posting Exch. Def Code=FIELD(Posting Exch. Def Code);
+                PagePartID=Page1216;
+                ProviderID=14;
+                PartType=Page }
+
+  }
+  CODE
+  {
+    VAR
+      IsNonXMLFileType@1005 : Boolean;
+      IsImportType@1006 : Boolean;
+      IsDelimitedFileType@1007 : Boolean;
+      DefaultTxt@1000 : TextConst '@@@=Transate;ENU=DEFAULT;ESM=PREDET;FRC=DêFAUT;ENC=DEFAULT';
+
+    BEGIN
+    END.
+  }
+}
+

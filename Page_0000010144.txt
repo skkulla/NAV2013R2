@@ -1,0 +1,150 @@
+OBJECT Page 10144 Posted Deposit Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Deposit Subform;
+               ESM=Subform. dep¢sito reg.;
+               FRC=Sous-formulaire dÇpìts reportÇs;
+               ENC=Posted Deposit Subform];
+    SourceTable=Table10144;
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1907935204;1 ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 ESM=&L°nea;
+                                 FRC=&Ligne;
+                                 ENC=&Line];
+                      Image=Line }
+      { 1900295204;2 ;Action    ;
+                      Name=AccountCard;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Account &Card;
+                                 ESM=&Ficha;
+                                 FRC=Fiche &comptable;
+                                 ENC=Account &Card];
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10143. Unsupported part was commented. Please check it.
+                                 {CurrPage.Subform.PAGE.}
+                                 _ShowAccountCard;
+                               END;
+                                }
+      { 1902937104;2 ;Action    ;
+                      Name=AccountLedgerEntries;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Account Ledger E&ntries;
+                                 ESM=Movimie&ntos;
+                                 FRC=êcritures de compt&e;
+                                 ENC=Account Ledger E&ntries];
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10143. Unsupported part was commented. Please check it.
+                                 {CurrPage.Subform.PAGE.}
+                                 _ShowAccountLedgerEntries;
+                               END;
+                                }
+      { 1907070804;2 ;Action    ;
+                      Name=Dimensions;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10143. Unsupported part was commented. Please check it.
+                                 {CurrPage.Subform.PAGE.}
+                                 _ShowDimensions;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Account Type" }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Account No." }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Document Date" }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Document Type" }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Document No." }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr=Amount }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code";
+                Visible=FALSE }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code";
+                Visible=FALSE }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Entry No.";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+
+    PROCEDURE _ShowDimensions@19020529();
+    BEGIN
+      ShowDimensions;
+    END;
+
+    PROCEDURE ShowDimensions@8();
+    BEGIN
+      ShowDimensions;
+    END;
+
+    PROCEDURE _ShowAccountCard@19065341();
+    BEGIN
+      ShowAccountCard;
+    END;
+
+    PROCEDURE ShowAccountCard@1020001();
+    BEGIN
+      ShowAccountCard;
+    END;
+
+    PROCEDURE _ShowAccountLedgerEntries@19027132();
+    BEGIN
+      ShowAccountLedgerEntries;
+    END;
+
+    PROCEDURE ShowAccountLedgerEntries@1020002();
+    BEGIN
+      ShowAccountLedgerEntries;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

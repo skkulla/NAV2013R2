@@ -1,0 +1,97 @@
+OBJECT Page 1314 Mini Std Customer Sales Codes
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Recurring Customer Sales Lines;
+               ESM=Recurring Customer Sales Lines;
+               FRC=Recurring Customer Sales Lines;
+               ENC=Recurring Customer Sales Lines];
+    SourceTable=Table172;
+    DataCaptionFields=Customer No.;
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 11      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Sales;
+                                 ESM=&Ventas;
+                                 FRC=&Ventes;
+                                 ENC=&Sales];
+                      Image=Sales }
+      { 13      ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Card;
+                                 ESM=Ficha;
+                                 FRC=Fiche;
+                                 ENC=Card];
+                      RunObject=Page 1311;
+                      RunPageLink=Code=FIELD(Code);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=EditLines;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer number of the customer to which the standard sales code is assigned.;
+                           ESM=Especifica el n£mero del cliente al que est  asignado el c¢digo de ventas est ndar.;
+                           FRC=Indique le num‚ro du client auquel le code vente standard est affect‚.;
+                           ENC=Specifies the customer number of the customer to which the standard sales code is assigned.];
+                SourceExpr="Customer No.";
+                Visible=FALSE }
+
+    { 4   ;2   ;Field     ;
+                Lookup=Yes;
+                ToolTipML=[ENU=Specifies a standard sales code from the Standard Sales Code table.;
+                           ESM=Especifica un c¢digo de ventas est ndar de la tabla respectiva.;
+                           FRC=Indique un code vente standard provenant de la table Code vente standard.;
+                           ENC=Specifies a standard sales code from the Standard Sales Code table.];
+                SourceExpr=Code;
+                LookupPageID=Mini Standard Sales Code Card;
+                DrillDownPageID=Mini Standard Sales Code Card;
+                OnLookup=VAR
+                           StdSalesCode@1000 : Record 170;
+                         BEGIN
+                           IF Code <> '' THEN
+                             StdSalesCode.GET(Code);
+
+                           IF PAGE.RUNMODAL(PAGE::"Mini Standard Sales Codes",StdSalesCode) = ACTION::LookupOK THEN BEGIN
+                             VALIDATE(Code,StdSalesCode.Code);
+                             Text := Code;
+                           END;
+
+                           EXIT(TRUE);
+                         END;
+                          }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a description of the standard sales code. When you fill in the Code field, the program automatically copies the description from the Standard Sales Code table.;
+                           ESM=Especifica una descripci¢n del c¢digo de ventas est ndar. Cuando se rellena el campo C¢digo, el sistema copia autom ticamente la descripci¢n de la tabla C¢digo ventas est ndar.;
+                           FRC=Sp‚cifie la d‚signation du code vente standard. Lorsque vous renseignez le champ Code, le programme copie automatiquement la d‚signation … partir de la table Code vente standard.;
+                           ENC=Specifies a description of the standard sales code. When you fill in the Code field, the program automatically copies the description from the Standard Sales Code table.];
+                SourceExpr=Description }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

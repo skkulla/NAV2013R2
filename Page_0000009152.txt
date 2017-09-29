@@ -1,0 +1,112 @@
+OBJECT Page 9152 My Items
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36040;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=My Items;
+               ESM=Mis art¡culos;
+               FRC=Mes articles;
+               ENC=My Items];
+    SourceTable=Table9152;
+    PageType=ListPart;
+    OnOpenPage=BEGIN
+                 SETRANGE("User ID",USERID);
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       GetItem;
+                     END;
+
+    OnNewRecord=BEGIN
+                  CLEAR(Item);
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 11      ;1   ;Action    ;
+                      ShortCutKey=Return;
+                      CaptionML=[ENU=Open;
+                                 ESM=Abrir;
+                                 FRC=Ouvert;
+                                 ENC=Open];
+                      Image=ViewDetails;
+                      RunPageMode=View;
+                      OnAction=BEGIN
+                                 OpenItemCard;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Item No.";
+                OnValidate=BEGIN
+                             GetItem;
+                           END;
+                            }
+
+    { 9   ;2   ;Field     ;
+                CaptionML=[ENU=Description;
+                           ESM=Descripci¢n;
+                           FRC=Description;
+                           ENC=Description];
+                SourceExpr=Item.Description;
+                Editable=FALSE }
+
+    { 2   ;2   ;Field     ;
+                CaptionML=[ENU=Unit Price;
+                           ESM=Precio unitario;
+                           FRC=Prix unitaire;
+                           ENC=Unit Price];
+                SourceExpr=Item."Unit Price";
+                Editable=FALSE }
+
+    { 13  ;2   ;Field     ;
+                Name=Inventory;
+                CaptionML=[ENU=Inventory;
+                           ESM=Inventario;
+                           FRC=Inventaire;
+                           ENC=Inventory];
+                SourceExpr=Item.Inventory;
+                Visible=FALSE;
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      Item@1000 : Record 27;
+
+    PROCEDURE GetItem@1();
+    BEGIN
+      CLEAR(Item);
+
+      IF Item.GET("Item No.") THEN
+        Item.CALCFIELDS(Inventory);
+    END;
+
+    PROCEDURE OpenItemCard@2();
+    BEGIN
+      IF Item.GET("Item No.") THEN
+        PAGE.RUN(PAGE::"Item Card",Item);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

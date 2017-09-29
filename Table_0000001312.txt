@@ -1,0 +1,45 @@
+OBJECT Table 1312 Mini Trial Balance Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Mini Trial Balance Setup;
+               ESM=Configuraci¢n mini Balance comprobaci¢n;
+               FRC=Configuration balance de v‚rification mini;
+               ENC=Mini Trial Balance Setup];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              ESM=Clave primaria;
+                                                              FRC=Cl‚ primaire;
+                                                              ENC=Primary Key] }
+    { 2   ;   ;AccountScheduleName ;Code10        ;CaptionML=[ENU=AccountScheduleName;
+                                                              ESM=NombreEsquemaCuenta;
+                                                              FRC=AccountScheduleName;
+                                                              ENC=AccountScheduleName] }
+    { 3   ;   ;ColumnLayoutName    ;Code10        ;CaptionML=[ENU=ColumnLayoutName;
+                                                              ESM=NombrePlantillaColumna;
+                                                              FRC=ColumnLayoutName;
+                                                              ENC=ColumnLayoutName] }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,390 @@
+OBJECT Page 1331 Mini Vendor List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Vendor List;
+               ESM=Lista de proveedores;
+               FRC=Liste des fournisseurs;
+               ENC=Vendor List];
+    SourceTable=Table23;
+    PageType=List;
+    CardPageID=Mini Vendor Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,New Document,Vendor,History,Prices and Discounts;
+                                ESM=Nuevo,Proceso,Informe,Nuevo documento,Proveedor,Historial,Precios y descuentos;
+                                FRC=Nouveau,Traitement,Rapport,Nouveau document,Fournisseur,Historique,Prix et escomptes;
+                                ENC=New,Process,Report,New Document,Vendor,History,Prices and Discounts];
+    ActionList=ACTIONS
+    {
+      { 17      ;0   ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 29      ;1   ;ActionGroup;
+                      Name=New;
+                      CaptionML=[ENU=New;
+                                 ESM=Nuevo;
+                                 FRC=Nouveau;
+                                 ENC=New];
+                      Image=Action }
+      { 12      ;2   ;Action    ;
+                      Name=NewVendor;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=New;
+                                 ESM=Nuevo;
+                                 FRC=Nouveau;
+                                 ENC=New];
+                      ToolTipML=[ENU=Create a new vendor card. If one vendor template exists, the new card will be based on that template by default. If more than one template exists, select a relevant template for the type of vendor you are creating. Vendor templates contain preset information to help you fill fields on vendor cards.;
+                                 ESM=Crear una nueva ficha de proveedor. Si existe una plantilla de proveedor, la nueva ficha se basar† en ella de manera predeterminada. Si existe m†s de una plantilla, seleccione una plantilla relevante para el tipo de proveedor que estÇ creando. Las plantillas de proveedor contienen informaci¢n predefinida para ayudarle a completar los cambios de las fichas de proveedor.;
+                                 FRC=CrÇez une fiche fournisseur. S'il existe un modäle fournisseur, la nouvelle fiche sera basÇe sur ce modäle par dÇfaut. S'il existe plusieurs modäles, sÇlectionnez-en un adaptÇ au type de fournisseur que vous crÇez. Les modäles fournisseur contiennent des informations prÇdÇfinies pour vous aider Ö complÇter les fiches fournisseur.;
+                                 ENC=Create a new vendor card. If one vendor template exists, the new card will be based on that template by default. If more than one template exists, select a relevant template for the type of vendor you are creating. Vendor templates contain preset information to help you fill fields on vendor cards.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=NewDocument;
+                      PromotedCategory=New;
+                      OnAction=VAR
+                                 MiniVendorTemplate@1005 : Record 1303;
+                               BEGIN
+                                 MiniVendorTemplate.OpenVendorCardWithNewVendorFromTemplate;
+                               END;
+                                }
+      { 13      ;1   ;ActionGroup;
+                      Name=NewDocument;
+                      CaptionML=[ENU=New Document;
+                                 ESM=Nuevo documento;
+                                 FRC=Nouveau document;
+                                 ENC=New Document] }
+      { 1906384905;2 ;Action    ;
+                      Name=NewPurchaseInvoice;
+                      CaptionML=[ENU=Purchase Invoice;
+                                 ESM=Factura compra;
+                                 FRC=Facture achat;
+                                 ENC=Purchase Invoice];
+                      ToolTipML=[ENU=Create a purchase invoice for the selected vendor.;
+                                 ESM=Cree una factura de compra para el proveedor seleccionado.;
+                                 FRC=CrÇez une facture achat pour le fournisseur sÇlectionnÇ.;
+                                 ENC=Create a purchase invoice for the selected vendor.];
+                      Promoted=Yes;
+                      Image=Invoice;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewInvoice;
+                               END;
+                                }
+      { 1902583505;2 ;Action    ;
+                      Name=NewPurchaseCreditMemo;
+                      CaptionML=[ENU=Purchase Credit Memo;
+                                 ESM=Nota crÇdito compra;
+                                 FRC=Note de crÇdit d'achat;
+                                 ENC=Purchase Credit Memo];
+                      ToolTipML=[ENU=Create a purchase credit memo for the selected vendor.;
+                                 ESM=Cree una nota de crÇdito de compra para el proveedor seleccionado.;
+                                 FRC=CrÇez une note de crÇdit d'achat pour le fournisseur sÇlectionnÇ.;
+                                 ENC=Create a purchase credit memo for the selected vendor.];
+                      Promoted=Yes;
+                      Image=CreditMemo;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewCreditMemo;
+                               END;
+                                }
+      { 9       ;1   ;ActionGroup;
+                      Name=History;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      Image=History }
+      { 22      ;2   ;Action    ;
+                      Name=<Page Vendor Ledger Entries>;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=Mo&vimientos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      ToolTipML=[ENU=View the history of transactions for the selected vendor.;
+                                 ESM=Ver el historial de transacciones del proveedor seleccionado.;
+                                 FRC=Affichez l'historique des transactions pour le fournisseur sÇlectionnÇ.;
+                                 ENC=View the history of transactions for the selected vendor.];
+                      RunObject=Page 29;
+                      RunPageView=SORTING(Vendor No.);
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=VendorLedger;
+                      PromotedCategory=Category6 }
+      { 18      ;1   ;ActionGroup;
+                      Name=PricesAndDiscounts;
+                      CaptionML=[ENU=Prices and Discounts;
+                                 ESM=Precios y descuentos;
+                                 FRC=Prix et escomptes;
+                                 ENC=Prices and Discounts] }
+      { 25      ;2   ;Action    ;
+                      Name=<Page Vendor Invoice Discounts>;
+                      CaptionML=[ENU=Invoice &Discounts;
+                                 ESM=Dto. &factura;
+                                 FRC=&Escomptes facture;
+                                 ENC=Invoice &Discounts];
+                      ToolTipML=[ENU=Set up different discounts that the selected vendor grants you. An invoice discount is automatically granted when the total on a purchase invoice exceeds a certain amount.;
+                                 ESM=Configure los distintos descuentos que le concede el proveedor seleccionado. Un descuento en factura se concede autom†ticamente cuando el total de una factura de compra supera un importe determinado.;
+                                 FRC=Configurez des escomptes diffÇrents que le fournisseur sÇlectionnÇ vous octroie. Un escompte facture est automatiquement accordÇ lorsque le total sur une facture d'achat dÇpasse un certain montant.;
+                                 ENC=Set up different discounts that the selected vendor grants you. An invoice discount is automatically granted when the total on a purchase invoice exceeds a certain amount.];
+                      RunObject=Page 28;
+                      RunPageLink=Code=FIELD(Invoice Disc. Code);
+                      PromotedIsBig=Yes;
+                      Image=CalculateInvoiceDiscount;
+                      PromotedCategory=Category7 }
+      { 26      ;2   ;Action    ;
+                      Name=<Page Purchase Prices>;
+                      CaptionML=[ENU=Prices;
+                                 ESM=Precios;
+                                 FRC=Prix;
+                                 ENC=Prices];
+                      ToolTipML=[ENU=Set up different prices for items that you buy from the selected vendor. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.;
+                                 ESM=Configure precios distintos para los productos que compra al proveedor seleccionado. Un precio de producto se concede autom†ticamente en las l°neas de factura cuando se cumplen los criterios especificados, como el proveedor, la cantidad o la fecha final.;
+                                 FRC=ParamÇtrez des prix diffÇrents pour les articles que vous achetez au fournisseur sÇlectionnÇ. Un prix article est automatiquement affectÇ sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le fournisseur, la quantitÇ ou la date de fin.;
+                                 ENC=Set up different prices for items that you buy from the selected vendor. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.];
+                      RunObject=Page 7012;
+                      RunPageView=SORTING(Vendor No.);
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Price;
+                      PromotedCategory=Category7 }
+      { 71      ;2   ;Action    ;
+                      Name=<Page Purchase Line Discounts>;
+                      CaptionML=[ENU=Line Discounts;
+                                 ESM=Descuentos l°nea;
+                                 FRC=Ligne Escomptes;
+                                 ENC=Line Discounts];
+                      ToolTipML=[ENU=Set up different discounts for items that you buy from the selected vendor. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.;
+                                 ESM=Configure descuentos distintos para los productos que compra al proveedor seleccionado. Un descuento de producto se concede autom†ticamente en las l°neas de factura cuando se cumplen los criterios especificados, como el proveedor, la cantidad o la fecha final.;
+                                 FRC=Configurez des escomptes diffÇrents pour les articles que vous achetez au fournisseur sÇlectionnÇ. Un escompte article est automatiquement affectÇ sur les lignes de facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le fournisseur, la quantitÇ ou la date de fin.;
+                                 ENC=Set up different discounts for items that you buy from the selected vendor. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.];
+                      RunObject=Page 7014;
+                      RunPageView=SORTING(Vendor No.);
+                      RunPageLink=Vendor No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=LineDiscount;
+                      PromotedCategory=Category7 }
+      { 1900000006;1 ;ActionGroup;
+                      Name=ReportsVendor;
+                      CaptionML=[ENU=Reports;
+                                 ESM=Informes;
+                                 FRC=Rapports;
+                                 ENC=Reports];
+                      ActionContainerType=Reports }
+      { 44      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Purchase Reports;
+                                 ESM=Informes de compras;
+                                 FRC=Rapports des achats;
+                                 ENC=Purchase Reports];
+                      Image=Report }
+      { 31      ;3   ;Action    ;
+                      CaptionML=[ENU=Vendor - Top 10 List;
+                                 ESM=Proveedor - Listado 10 mejores;
+                                 FRC=Fournisseur - Liste des 10 meilleurs;
+                                 ENC=Vendor - Top 10 List];
+                      ToolTipML=[ENU=View, print, or save a list of the vendors from whom you purchase the most or to whom you owe the most.;
+                                 ESM=Vea, imprima o guarde una lista de los proveedores a quienes m†s compra o debe.;
+                                 FRC=Affichez, imprimez ou enregistrez une liste des fournisseurs Ö qui vous achetez le plus et ceux Ö qui vous devez le plus d'argent.;
+                                 ENC=View, print, or save a list of the vendors from whom you purchase the most or to whom you owe the most.];
+                      RunObject=Report 311;
+                      Image=Report }
+      { 32      ;3   ;Action    ;
+                      CaptionML=[ENU=Purchase Statistics;
+                                 ESM=Estad°sticas compras;
+                                 FRC=Statistiques achat;
+                                 ENC=Purchase Statistics];
+                      ToolTipML=[ENU=View, print, or save an overview of amounts for purchases, invoice discount and payment discount in $ for each vendor, for example, to analyze item purchases for an individual customer and trends for item purchases.;
+                                 ESM=Vea, imprima o guarde un resumen de los importes de las compras, descuento en factura y descuento por pronto pago en $ para cada proveedor, por ejemplo, para analizar compras de productos de un cliente individual y las tendencias de compras de productos.;
+                                 FRC=Affichez, imprimez ou enregistrez un aperáu des montants pour les achats, les escomptes facture et les escomptes de paiement en $ pour chaque fournisseur, par exemple, pour analyser les achats d'article par un client spÇcifique et les tendances d'achats d'article.;
+                                 ENC=View, print, or save an overview of amounts for purchases, invoice discount and payment discount in $ for each vendor, for example, to analyse item purchases for an individual customer and trends for item purchases.];
+                      RunObject=Report 312;
+                      Image=Report }
+      { 33      ;3   ;Action    ;
+                      CaptionML=[ENU=Vendor - Purchase List;
+                                 ESM=Proveedor - Lista compras;
+                                 FRC=Fournisseur - Liste d'achats;
+                                 ENC=Vendor - Purchase List];
+                      ToolTipML=[ENU=View, print, or save a list of your purchases in a period, for example, to report purchase activity to customs and tax authorities.;
+                                 ESM=Vea, imprima o guarde una lista de sus compras de periodo, por ejemplo, para informar de la actividad de compras a las autoridades fiscales y aduaneras.;
+                                 FRC=Affichez, imprimez ou enregistrez une liste de vos achats au cours d'une pÇriode, par exemple, pour signaler une activitÇ achat aux autoritÇs douaniäres et fiscales.;
+                                 ENC=View, print, or save a list of your purchases in a period, for example, to report purchase activity to customs and tax authorities.];
+                      RunObject=Report 309;
+                      Image=Report }
+      { 36      ;3   ;Action    ;
+                      CaptionML=[ENU=Vendor Item Catalog;
+                                 ESM=Lista productos proveedores;
+                                 FRC=Fourn. : Catalogue articles;
+                                 ENC=Vendor Item Catalogue];
+                      ToolTipML=[ENU=View a list of the items that you can buy from the vendor.;
+                                 ESM=Vea una lista de los productos que puede comprar al proveedor.;
+                                 FRC=Affichez la liste des articles que vous pouvez acheter aupräs du fournisseur.;
+                                 ENC=View a list of the items that you can buy from the vendor.];
+                      RunObject=Report 320;
+                      Image=Report }
+      { 37      ;3   ;Action    ;
+                      CaptionML=[ENU=Vendor/Item Purchases;
+                                 ESM=Compras prov./producto;
+                                 FRC=Achats d'articles par fourn.;
+                                 ENC=Vendor/Item Purchases];
+                      ToolTipML=[ENU=View all the items you have purchased from the vendor over time.;
+                                 ESM=Vea todos los productos comprados al proveedor a lo largo del tiempo.;
+                                 FRC=Affichez tous les articles que vous avez achetÇs aupräs du fournisseur au fil des annÇes.;
+                                 ENC=View all the items you have purchased from the vendor over time.];
+                      RunObject=Report 313;
+                      Image=Report }
+      { 45      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Finance Reports;
+                                 ESM=Informes financieros;
+                                 FRC=Rapports financiers;
+                                 ENC=Finance Reports];
+                      Image=Report }
+      { 38      ;3   ;Action    ;
+                      CaptionML=[ENU=Vendor - Balance to Date;
+                                 ESM=Proveedor - Saldo por fechas;
+                                 FRC=Fournisseur - Solde Ö ce jour;
+                                 ENC=Vendor - Balance to Date];
+                      ToolTipML=[ENU=View, print, or save a list with your payment history to vendors up until a specified date. You can use the report to extract your total payment liabilities at the close of an accounting period or fiscal year.;
+                                 ESM=Vea, imprima o guarde una lista con su historial de pagos a proveedores hasta una fecha especificada. Puede usar el informe para extraer las obligaciones de pago totales al cierre de un periodo contable o ejercicio.;
+                                 FRC=Affichez, imprimez ou enregistrez une liste reprenant votre historique de paiement aux fournisseurs jusqu'Ö une certaine date. Vous pouvez utiliser le rapport pour extraire votre passif total Ö la fermeture d'une pÇriode comptable ou d'un exercice financier.;
+                                 ENC=View, print, or save a list with your payment history to vendors up until a specified date. You can use the report to extract your total payment liabilities at the close of an accounting period or fiscal year.];
+                      RunObject=Report 321;
+                      Image=Report }
+      { 39      ;3   ;Action    ;
+                      CaptionML=[ENU=Vendor - Trial Balance;
+                                 ESM=Proveedor - Balance sumas y saldos;
+                                 FRC=Fournisseur - Balance de vÇrification;
+                                 ENC=Vendor - Trial Balance];
+                      ToolTipML=[ENU=View, print, or save the beginning and ending balance for vendors with entries within a specified period.;
+                                 ESM=Vea, imprima o guarde el saldo inicial y final para los proveedores con movimientos dentro de un periodo especificado.;
+                                 FRC=Affichez, imprimez ou enregistrez le solde d'ouverture et final pour les fournisseurs prÇsentant des Çcritures au cours d'une pÇriode spÇcifiÇe.;
+                                 ENC=View, print, or save the beginning and ending balance for vendors with entries within a specified period.];
+                      RunObject=Report 329;
+                      Image=Report }
+      { 40      ;3   ;Action    ;
+                      CaptionML=[ENU=Vendor - Detail Trial Balance;
+                                 ESM=Proveedor - Balance de comprobaci¢n detallado;
+                                 FRC=Fournisseur - Balance de vÇrification dÇtaillÇe;
+                                 ENC=Vendor - Detail Trial Balance];
+                      ToolTipML=[ENU=View, print, or save the balance for vendors with balances on a specified date, for example, at the close of an accounting period or for an audit.;
+                                 ESM=Vea, imprima o guarde el saldo de los proveedores con saldos en una fecha determinada como, por ejemplo, al cierre de un periodo contable o para una auditor°a.;
+                                 FRC=Affichez, imprimez ou enregistrez le solde des fournisseurs prÇsentant des soldes Ö une date donnÇe, par exemple, Ö la fermeture d'une pÇriode comptable ou pour un audit.;
+                                 ENC=View, print, or save the balance for vendors with balances on a specified date, for example, at the close of an accounting period or for an audit.];
+                      RunObject=Report 304;
+                      Image=Report }
+      { 41      ;3   ;Action    ;
+                      CaptionML=[ENU=Vendor - Summary Aging;
+                                 ESM=Proveedor - Pagos por periodos;
+                                 FRC=Fournisseur - Chronologie sommaire;
+                                 ENC=Vendor - Summary Aging];
+                      ToolTipML=[ENU=View, print, or save a summary of the payables owed to each vendor, divided into three time periods.;
+                                 ESM=Vea, imprima o guarde un resumen de los documentos a pagar debidos a cada proveedor, divididos en tres periodos de tiempo.;
+                                 FRC=Affichez, imprimez ou enregistrez un rÇsumÇ des soldes dus Ö chaque fournisseur, divisÇ en troisˇpÇriodes.;
+                                 ENC=View, print, or save a summary of the payables owed to each vendor, divided into three time periods.];
+                      RunObject=Report 305;
+                      Image=Report }
+      { 42      ;3   ;Action    ;
+                      CaptionML=[ENU=Aged Accounts Payable;
+                                 ESM=AntigÅedad pagos;
+                                 FRC=Comptes fournisseurs classÇs chronologiquement;
+                                 ENC=Aged Accounts Payable];
+                      ToolTipML=[ENU=View, print, or save an overview of when your payables to vendors are due or overdue, divided into four periods.;
+                                 ESM=Vea, imprima o guarde una visi¢n general del vencimiento de los pagos o de los pagos vencidos a los proveedores, dividida en cuatro periodos.;
+                                 FRC=Affichez, imprimez ou enregistrez un aperáu des dates d'ÇchÇance des soldes dus aux fournisseurs, divisÇ en quatreˇpÇriodes.;
+                                 ENC=View, print, or save an overview of when your payables to vendors are due or overdue, divided into four periods.];
+                      RunObject=Report 322;
+                      Image=Report }
+      { 43      ;3   ;Action    ;
+                      CaptionML=[ENU=Payments on Hold;
+                                 ESM=Pagos retenidos;
+                                 FRC=Paiements en attente;
+                                 ENC=Payments on Hold];
+                      ToolTipML=[ENU=View purchase invoices with outsdanding payments to the vendor.;
+                                 ESM=Vea las facturas de compra con pagos pendientes al proveedor.;
+                                 FRC=Visualisez les factures achat dont les räglements sont en suspens pour le fournisseur.;
+                                 ENC=View purchase invoices with outsdanding payments to the vendor.];
+                      RunObject=Report 319;
+                      Image=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the vendor. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.;
+                           ESM=Especifica el n£mero del proveedor. El campo se rellena autom†ticamente a partir de un n£mero de serie definido o el n£mero se especifica manualmente porque se ha habilitado la entrada manual de n£meros en la configuraci¢n de n£mero de serie.;
+                           FRC=Indique le numÇro du fournisseur. Le champ est renseignÇ soit automatiquement Ö partir d'une souche de numÇros dÇfinie, soit vous entrez manuellement le numÇro car vous avez activÇ la saisie manuelle de numÇro dans le paramÇtrage de la souche de numÇros.;
+                           ENC=Specifies the number of the vendor. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.];
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's name. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el nombre del proveedor. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le nom du fournisseur. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the vendor's name. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Name }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's telephone number. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el n£mero de telÇfono del proveedor. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le numÇro de tÇlÇphone du fournisseur. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies the vendor's telephone number. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr="Phone No." }
+
+    { 34  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the person you regularly contact when you do business with this vendor. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica el nombre de la persona con la que contacta normalmente cuando trata con este proveedor. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=SpÇcifie le nom de la personne que vous contactez rÇguliärement lorsque vous traitez avec ce fournisseur. Vous pouvez saisir au maximum 30ˇcaractäres, des chiffres ou des lettres.;
+                           ENC=Specifies the name of the person you regularly contact when you do business with this vendor. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Contact }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Shows the vendor's current balance in LCY.;
+                           ESM=Muestra el saldo actual del proveedor en $.;
+                           FRC=Affiche le solde actuel du fournisseur en devise sociÇtÇ.;
+                           ENC=Shows the vendor's current balance in $.];
+                SourceExpr="Balance (LCY)" }
+
+    { 10  ;2   ;Field     ;
+                ToolTipML=[ENU=Shows the balance due to this vendor in LCY.;
+                           ESM=Muestra el saldo pendiente con el proveedor en $.;
+                           FRC=Indique le solde dñ Ö ce fournisseur en devise sociÇtÇ.;
+                           ENC=Shows the balance due to this vendor in $.];
+                SourceExpr="Balance Due (LCY)" }
+
+    { 21  ;0   ;Container ;
+                ContainerType=FactBoxArea }
+
+    { 23  ;1   ;Part      ;
+                CaptionML=[ENU=Purchase History;
+                           ESM=Historial de compras;
+                           FRC=Historique achats;
+                           ENC=Purchase History];
+                SubPageLink=No.=FIELD(No.),
+                            Currency Filter=FIELD(Currency Filter),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                PagePartID=Page1332;
+                PartType=Page }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

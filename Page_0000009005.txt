@@ -1,0 +1,286 @@
+OBJECT Page 9005 Sales Manager Role Center
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701,NAVNA7.10.00.35701;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               ESM=µrea de tareas;
+               FRC=Tableau de bord;
+               ENC=Role Centre];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer - &Order Summary;
+                                 ESM=Cliente - &Total pedidos;
+                                 FRC=Client - S&ommaire de commande;
+                                 ENC=Customer - &Order Summary];
+                      RunObject=Report 107;
+                      Image=Report }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Top 10 List;
+                                 ESM=Los 10 mejores clientes;
+                                 FRC=Client - Liste des 10 meilleurs;
+                                 ENC=Customer Top 10 List];
+                      RunObject=Report 10062 }
+      { 17      ;1   ;Separator  }
+      { 18      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Sales Statistics;
+                                 ESM=Estad. ventas cliente;
+                                 FRC=Statistiques de ventes du client;
+                                 ENC=Customer Sales Statistics];
+                      RunObject=Report 10047 }
+      { 19      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer/Item Statistics;
+                                 ESM=Estad. cliente/producto;
+                                 FRC=Statistiques client/article;
+                                 ENC=Customer/Item Statistics];
+                      RunObject=Report 10048 }
+      { 38      ;1   ;Action    ;
+                      CaptionML=[ENU=Cust./Item Stat. by Salespers.;
+                                 ESM=Estad. cliente/prod. por vendedor;
+                                 FRC=Statistiques articles/client par reprÇsentant;
+                                 ENC=Cust./Item Stat. by Salespers.];
+                      RunObject=Report 10049;
+                      Image=Report }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=Salesperson Commissions;
+                                 ESM=Vendedor: comisiones;
+                                 FRC=Commissions des reprÇsentants;
+                                 ENC=Salesperson Commissions];
+                      RunObject=Report 10059 }
+      { 22      ;1   ;Separator  }
+      { 24      ;1   ;Action    ;
+                      CaptionML=[ENU=Campaign - &Details;
+                                 ESM=Campa§a - &Detalles;
+                                 FRC=Promotion - &Informations;
+                                 ENC=Campaign - &Details];
+                      RunObject=Report 5060;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Analysis Reports;
+                                 ESM=Informes de an†lisis de ventas;
+                                 FRC=Rapports d'analyse des ventes;
+                                 ENC=Sales Analysis Reports];
+                      RunObject=Page 9376 }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Analysis by Dimensions;
+                                 ESM=An†lisis de ventas por dimensiones;
+                                 FRC=Analyse des ventes par dimensions;
+                                 ENC=Sales Analysis by Dimensions];
+                      RunObject=Page 9371 }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Budgets;
+                                 ESM=Presupuestos ventas;
+                                 FRC=Budgets de ventes;
+                                 ENC=Sales Budgets];
+                      RunObject=Page 9374 }
+      { 5       ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Quotes;
+                                 ESM=Cotizaciones venta;
+                                 FRC=Devis;
+                                 ENC=Sales Quotes];
+                      RunObject=Page 9300;
+                      Image=Quote }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Orders;
+                                 ESM=Pedidos venta;
+                                 FRC=Documents de vente;
+                                 ENC=Sales Orders];
+                      RunObject=Page 9305;
+                      Image=Order }
+      { 7       ;1   ;Action    ;
+                      ShortCutKey=Return;
+                      CaptionML=[ENU=Open;
+                                 ESM=Pendientes;
+                                 FRC=Ouvert;
+                                 ENC=Open];
+                      RunObject=Page 9305;
+                      RunPageView=WHERE(Status=FILTER(Open));
+                      Image=Edit }
+      { 35      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Invoices;
+                                 ESM=Facturas venta;
+                                 FRC=Factures vente;
+                                 ENC=Sales Invoices];
+                      RunObject=Page 9301;
+                      Image=Invoice }
+      { 16      ;1   ;Action    ;
+                      ShortCutKey=Return;
+                      CaptionML=[ENU=Open;
+                                 ESM=Pendientes;
+                                 FRC=Ouvert;
+                                 ENC=Open];
+                      RunObject=Page 9301;
+                      RunPageView=WHERE(Status=FILTER(Open));
+                      Image=Edit }
+      { 23      ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 ESM=Productos;
+                                 FRC=Articles;
+                                 ENC=Items];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 25      ;1   ;Action    ;
+                      CaptionML=[ENU=Contacts;
+                                 ESM=Contactos;
+                                 FRC=Contacts;
+                                 ENC=Contacts];
+                      RunObject=Page 5052;
+                      Image=CustomerContact }
+      { 26      ;1   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 ESM=Clientes;
+                                 FRC=Clients;
+                                 ENC=Customers];
+                      RunObject=Page 22;
+                      Image=Customer }
+      { 27      ;1   ;Action    ;
+                      CaptionML=[ENU=Campaigns;
+                                 ESM=Campa§as;
+                                 FRC=Promotions;
+                                 ENC=Campaigns];
+                      RunObject=Page 5087;
+                      Image=Campaign }
+      { 28      ;1   ;Action    ;
+                      CaptionML=[ENU=Segments;
+                                 ESM=Segmentos;
+                                 FRC=Segments;
+                                 ENC=Segments];
+                      RunObject=Page 5093;
+                      Image=Segment }
+      { 29      ;1   ;Action    ;
+                      CaptionML=[ENU=To-dos;
+                                 ESM=Tareas;
+                                 FRC=TÉches;
+                                 ENC=To-dos];
+                      RunObject=Page 5096;
+                      Image=TaskList }
+      { 30      ;1   ;Action    ;
+                      CaptionML=[ENU=Teams;
+                                 ESM=Equipos;
+                                 FRC=êquipes;
+                                 ENC=Teams];
+                      RunObject=Page 5105;
+                      Image=TeamSales }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Administration Sales/Purchase;
+                                 ESM=Administraci¢n ventas/compras;
+                                 FRC=Vente/Achat - Administration;
+                                 ENC=Administration Sales/Purchase];
+                      Image=AdministrationSalesPurchases }
+      { 40      ;2   ;Action    ;
+                      CaptionML=[ENU=Salespeople/Purchasers;
+                                 ESM=Vendedores/Compradores;
+                                 FRC=ReprÇsentants/acheteurs;
+                                 ENC=Salespeople/Purchasers];
+                      RunObject=Page 14 }
+      { 32      ;2   ;Action    ;
+                      CaptionML=[ENU=Cust. Invoice Discounts;
+                                 ESM=Dtos. factura clientes;
+                                 FRC=Escomptes facture client;
+                                 ENC=Cust. Invoice Discounts];
+                      RunObject=Page 23 }
+      { 33      ;2   ;Action    ;
+                      CaptionML=[ENU=Vend. Invoice Discounts;
+                                 ESM=Dtos. factura proveedores;
+                                 FRC=Escomptes facture fournisseur;
+                                 ENC=Vend. Invoice Discounts];
+                      RunObject=Page 28 }
+      { 34      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Disc. Groups;
+                                 ESM=Grupos dto. producto;
+                                 FRC=Groupes rem. article;
+                                 ENC=Item Disc. Groups];
+                      RunObject=Page 513 }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 48      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 ESM=Tareas;
+                                 FRC=TÉches;
+                                 ENC=Tasks];
+                      IsHeader=Yes }
+      { 37      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Price &Worksheet;
+                                 ESM=H&oja precios venta;
+                                 FRC=Feuille de prix de &vente;
+                                 ENC=Sales Price &Worksheet];
+                      RunObject=Page 7023;
+                      Image=PriceWorksheet }
+      { 2       ;1   ;Separator  }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Sales &Prices;
+                                 ESM=P&recios de venta;
+                                 FRC=&Prix de vente;
+                                 ENC=Sales &Prices];
+                      RunObject=Page 7002;
+                      Image=SalesPrices }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Line &Discounts;
+                                 ESM=Descuentos &l°nea de ventas;
+                                 FRC=Esco&mptes de ligne de vente;
+                                 ENC=Sales Line &Discounts];
+                      RunObject=Page 7004;
+                      Image=SalesLineDisc }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 21  ;2   ;Part      ;
+                PagePartID=Page9175;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 11  ;2   ;Part      ;
+                PagePartID=Page770;
+                PartType=Page }
+
+    { 4   ;2   ;Part      ;
+                PagePartID=Page760;
+                PartType=Page }
+
+    { 1   ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                PartType=Page }
+
+    { 1902476008;2;Part   ;
+                PagePartID=Page9151;
+                Visible=false;
+                PartType=Page }
+
+    { 31  ;2   ;Part      ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

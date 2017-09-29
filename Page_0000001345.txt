@@ -1,0 +1,300 @@
+OBJECT Page 1345 Mini Sales Price and Line Disc
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sales Prices and Sales Line Discounts;
+               ESM=Precios venta y descuentos l¡nea ventas;
+               FRC=Prix de vente et escomptes de ligne de vente;
+               ENC=Sales Prices and Sales Line Discounts];
+    SourceTable=Table1304;
+    PageType=ListPart;
+    SourceTableTemporary=Yes;
+    OnNewRecord=BEGIN
+                  IF ("Loaded Customer No." = GetLoadedCustNo) AND ("Loaded Item No." = GetLoadedItemNo) THEN
+                    EXIT;
+
+                  "Loaded Item No." := GetLoadedItemNo;
+                  "Loaded Customer No." := GetLoadedCustNo;
+                  "Loaded Price Group" := GetLoadedPriceGroup;
+                  "Loaded Disc. Group" := GetLoadedDiscGroup;
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 20      ;0   ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 14      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Filtering;
+                                 ESM=Filtrado;
+                                 FRC=Filtrage;
+                                 ENC=Filtering] }
+      { 17      ;1   ;Action    ;
+                      CaptionML=[ENU=Show Current Only;
+                                 ESM=Mostrar solo actuales;
+                                 FRC=Afficher en cours uniquement;
+                                 ENC=Show Current Only];
+                      ToolTipML=[ENU=Show only valid price and discount agreements that have ending dates later than today's date.;
+                                 ESM=Muestre solo los acuerdos de precios y descuentos v lidos con fechas finales posteriores a la fecha actual.;
+                                 FRC=Affichez uniquement les ententes valides concernant les prix et les remises dont les dates de fin sont post‚rieures … la date du jour.;
+                                 ENC=Show only valid price and discount agreements that have ending dates later than today's date.];
+                      Image=ActivateDiscounts;
+                      OnAction=BEGIN
+                                 FilterToActualRecords
+                               END;
+                                }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Show All;
+                                 ESM=Mostrar todos;
+                                 FRC=Afficher tout;
+                                 ENC=Show All];
+                      ToolTipML=[ENU=Show all price and discount agreements, even those with ending dates earlier than today's date.;
+                                 ESM=Muestre todos los acuerdos de precios y descuentos, incluso aquellos con fechas finales anteriores a la fecha actual.;
+                                 FRC=Affichez toutes les ententes concernant les prix et les remises, mˆme celles dont les dates de fin sont ant‚rieures … la date du jour.;
+                                 ENC=Show all price and discount agreements, even those with ending dates earlier than today's date.];
+                      Image=DeactivateDiscounts;
+                      OnAction=BEGIN
+                                 RESET;
+                               END;
+                                }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Refresh Data;
+                                 ESM=Actualizar datos;
+                                 FRC=Actualiser les donn‚es;
+                                 ENC=Refresh Data];
+                      Image=RefreshLines;
+                      OnAction=VAR
+                                 Customer@1001 : Record 18;
+                                 Item@1000 : Record 27;
+                               BEGIN
+                                 IF GetLoadedItemNo <> '' THEN
+                                   IF Item.GET(GetLoadedItemNo) THEN BEGIN
+                                     LoadDataForItem(Item);
+                                     EXIT;
+                                   END;
+                                 IF Customer.GET(GetLoadedCustNo) THEN
+                                   LoadDataForCustomer(Customer)
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 26  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the line is for a sales price or a sales line discount.;
+                           ESM=Especifica si la l¡nea es para un precio de venta o un descuento de l¡nea de venta.;
+                           FRC=Indique si la ligne est pour un prix vente ou une remise ligne vente.;
+                           ENC=Specifies if the line is for a sales price or a sales line discount.];
+                SourceExpr="Line Type" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the sales type of the price or discount. The sales type defines whether the sales price or discount is for an individual customer, a customer discount group, or for all customers.;
+                           ESM=Especifica el tipo de venta del precio o descuento. El tipo de venta define si el precio de venta o descuento es para un cliente individual, para un grupo de descuentos de cliente o para todos los clientes.;
+                           FRC=Sp‚cifie le type vente du prix ou de la remise. Le type vente indique si le prix de vente ou la remise concerne un client particulier, un groupe remises client, ou tous les clients.;
+                           ENC=Specifies the sales type of the price or discount. The sales type defines whether the sales price or discount is for an individual customer, a customer discount group, or for all customers.];
+                SourceExpr="Sales Type" }
+
+    { 24  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the sales code of the price or discount. The sales code depends on the value in the Sales Type field. The code can represent an individual customer, a customer discount group, or for all customers.;
+                           ESM=Especifica el c¢digo de venta del precio o descuento. El c¢digo de venta depende del valor del campo Tipo venta. El c¢digo puede representar un cliente individual, a un grupo de descuento de cliente o a todos los clientes.;
+                           FRC=Sp‚cifie le code vente du prix ou de la remise. Le code vente d‚pend de la valeur du champ Type de vente. Le code peut repr‚senter un client, un groupe remises client ou tous les clients.;
+                           ENC=Specifies the sales code of the price or discount. The sales code depends on the value in the Sales Type field. The code can represent an individual customer, a customer discount group, or for all customers.];
+                SourceExpr="Sales Code";
+                Visible=SalesCodeIsVisible;
+                Enabled=SalesCodeIsVisible }
+
+    { 23  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the discount is valid for an item or for an item discount group.;
+                           ESM=Especifica si el descuento es v lido para un producto o para un grupo de descuento de producto.;
+                           FRC=Sp‚cifie si la remise est valable pour un article ou un groupe remises article.;
+                           ENC=Specifies if the discount is valid for an item or for an item discount group.];
+                SourceExpr=Type }
+
+    { 22  ;2   ;Field     ;
+                ToolTipML=[ENU=This object supports the Microsoft Dynamics NAV infrastructure and is intended only for internal use.;
+                           ESM=Este objeto admite la infraestructura de Microsoft Dynamics NAV y est  pensado £nicamente para su uso interno.;
+                           FRC=Cet objet prend en charge l'infrastructure Microsoft Dynamics NAV et est destin‚ … un usage interne.;
+                           ENC=This object supports the Microsoft Dynamics NAV infrastructure and is intended only for internal use.];
+                SourceExpr=Code;
+                Visible=CodeIsVisible;
+                Enabled=CodeIsVisible }
+
+    { 18  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit of measure that must be used on the sales document line to warrant the sales price or discount.;
+                           ESM=Especifica la unidad de medida que se debe usar en la l¡nea de documento de venta para autorizar el descuento o el precio de venta.;
+                           FRC=Sp‚cifie l'unit‚ … utiliser pour la ligne document vente pour garantir le prix ou la remise.;
+                           ENC=Specifies the unit of measure that must be used on the sales document line to warrant the sales price or discount.];
+                SourceExpr="Unit of Measure Code" }
+
+    { 21  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the quantity that must be entered on the sales document to warrant the sales price or discount.;
+                           ESM=Especifica la cantidad que se debe especificar en el documento de venta para autorizar el descuento o el precio de venta.;
+                           FRC=Sp‚cifie la quantit‚ … entrer sur le document vente pour garantir le prix ou la remise.;
+                           ENC=Specifies the quantity that must be entered on the sales document to warrant the sales price or discount.];
+                SourceExpr="Minimum Quantity" }
+
+    { 16  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the discount percent that is granted if the criteria are met.;
+                           ESM=Especifica el porcentaje de descuento concedido si se cumplen los criterios.;
+                           FRC=Sp‚cifie le pourcentage de remise accord‚ si les critŠres sont respect‚s.;
+                           ENC=Specifies the discount percent that is granted if the criteria are met.];
+                SourceExpr="Line Discount %";
+                Enabled="Line Type" = 1 }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit price that is granted on sales documents if the criteria, such as sales code, currency code, and date, are met.;
+                           ESM=Especifica el precio unitario que se concede en los documentos de venta si se cumplen los criterios, como el c¢digo de venta, el c¢digo de divisa y la fecha.;
+                           FRC=Indique le prix unitaire qui est attribu‚ sur les documents vente si les critŠres, tels que le code vente, le code devise et la date sont r‚unis.;
+                           ENC=Specifies the unit price that is granted on sales documents if the criteria, such as sales code, currency code, and date, are met.];
+                SourceExpr="Unit Price";
+                Enabled="Line Type" = 2 }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date from which the sales line discount is valid. To specify that a discount should be valid during a specific period, such as during a sales campaign, enter a value in the Ending Date field as well. If you leave the Starting Date field blank, the sales line discount will be valid as soon as you implement it and will remain in effect until the ending date or until you delete the line.;
+                           ESM=Especifica la fecha desde la que es v lido el descuento de l¡nea de venta. Para especificar que un descuento debe ser v lido durante un periodo espec¡fico, por ejemplo, durante una campa¤a de ventas, introduzca tambi‚n un valor en el campo Fecha final. Si deja en blanco el campo Fecha inicial, el descuento de l¡nea de venta entrar  en vigor en cuanto lo implemente y seguir  vigente hasta la fecha final o hasta que elimine la l¡nea.;
+                           FRC=Sp‚cifie la date limite … partir de laquelle la remise ligne vente est valable. Pour d‚finir une p‚riode de validit‚ pour une remise (pendant une campagne de vente, par exemple), entrez ‚galement une valeur dans le champ Date fin. Si vous laissez le champ Date d‚but blanc, la remise ligne vente entre en vigueur dŠs que vous l'appliquez et reste valable jusqu'… la date de fin ou jusqu'… ce que vous supprimiez cette ligne.;
+                           ENC=Specifies the date from which the sales line discount is valid. To specify that a discount should be valid during a specific period, such as during a sales campaign, enter a value in the Ending Date field as well. If you leave the Starting Date field blank, the sales line discount will be valid as soon as you implement it and will remain in effect until the ending date or until you delete the line.];
+                SourceExpr="Starting Date" }
+
+    { 11  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date to which the sales line discount is valid. To specify that a discount should be valid during a specific period, such as during a sales campaign, enter a value in the Starting Date field as well. If you leave the Ending Date field blank, the sales line discount will be valid until you delete the line, or until the starting data of another sales line discount.;
+                           ESM=Especifica la fecha hasta la que es v lido el descuento de l¡nea de venta. Para especificar que un descuento debe ser v lido durante un periodo espec¡fico, por ejemplo, durante una campa¤a de ventas, introduzca tambi‚n un valor en el campo Fecha inicial. Si deja en blanco el campo Fecha final, el descuento de l¡nea de venta ser  v lido hasta que elimine la l¡nea o hasta que se inicien los datos de otro descuento de l¡nea de venta.;
+                           FRC=Sp‚cifie la date limite … laquelle la remise ligne vente est valable. Pour d‚finir une p‚riode de validit‚ pour une remise (pendant une campagne de vente, par exemple), entrez ‚galement une valeur dans le champ Date d‚but. Si vous laissez le champ Date fin vide, la remise ligne vente entre en vigueur jusqu'… ce que vous supprimiez la ligne, ou jusqu'… la date de d‚but d'une autre remise ligne vente.;
+                           ENC=Specifies the date to which the sales line discount is valid. To specify that a discount should be valid during a specific period, such as during a sales campaign, enter a value in the Starting Date field as well. If you leave the Ending Date field blank, the sales line discount will be valid until you delete the line, or until the starting data of another sales line discount.];
+                SourceExpr="Ending Date" }
+
+    { 9   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the currency that must be used on the sales document line to warrant the sales price or discount.;
+                           ESM=Especifica la divisa que se debe usar en la l¡nea de documento de venta para autorizar el descuento o el precio de venta.;
+                           FRC=Sp‚cifie la devise … utiliser pour la ligne document vente pour garantir le prix ou la remise.;
+                           ENC=Specifies the currency that must be used on the sales document line to warrant the sales price or discount.];
+                SourceExpr="Currency Code";
+                Visible=FALSE }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the price that is granted includes VAT.;
+                           ESM=Especifica si el precio concedido incluye IVA.;
+                           FRC=Indique si le prix qui est octroy‚ inclut la TVA.;
+                           ENC=Specifies if the price that is granted includes tax.];
+                SourceExpr="Price Includes VAT";
+                Visible=FALSE }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if an invoice discount will be calculated when the sales price is offered.;
+                           ESM=Indica si se calcula un descuento en factura cuando se ofrece el precio de venta.;
+                           FRC=Sp‚cifie si une remise facture sera calcul‚e pour l'offre de prix vente.;
+                           ENC=Specifies if an invoice discount will be calculated when the sales price is offered.];
+                SourceExpr="Allow Invoice Disc.";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the VAT business posting group for customers who you want to apply the sales price to. This price includes VAT.;
+                           ESM=Especifica el grupo registro de IVA de negocio para los clientes a los que desea aplicar el precio de venta. Este precio incluye IVA.;
+                           FRC=Indique un groupe comptabilisation TVA pour les clients auxquels vous souhaitez appliquer le prix de vente. Ce prix inclut la TVA.;
+                           ENC=Specifies the tax business posting group for customers who you want to apply the sales price to. This price includes tax.];
+                SourceExpr="VAT Bus. Posting Gr. (Price)";
+                Visible=FALSE }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the variant that must be used on the sales document line to warrant the sales price or discount.;
+                           ESM=Especifica la variante que se debe usar en la l¡nea de documento de venta para autorizar el descuento o el precio de venta.;
+                           FRC=Sp‚cifie la variante … utiliser pour la ligne document vente pour garantir le prix ou la remise.;
+                           ENC=Specifies the variant that must be used on the sales document line to warrant the sales price or discount.];
+                SourceExpr="Variant Code";
+                Visible=FALSE }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=This object supports the Microsoft Dynamics NAV infrastructure and is intended only for internal use.;
+                           ESM=Este objeto admite la infraestructura de Microsoft Dynamics NAV y est  pensado £nicamente para su uso interno.;
+                           FRC=Cet objet prend en charge l'infrastructure Microsoft Dynamics NAV et est destin‚ … un usage interne.;
+                           ENC=This object supports the Microsoft Dynamics NAV infrastructure and is intended only for internal use.];
+                SourceExpr="Allow Line Disc.";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      loadedItemNo@1001 : Code[20];
+      loadedCustNo@1003 : Code[20];
+      loadedPriceGroup@1002 : Code[20];
+      loadedDiscGroup@1000 : Code[20];
+      CodeIsVisible@1004 : Boolean;
+      SalesCodeIsVisible@1005 : Boolean;
+
+    PROCEDURE InitPage@4(ForItem@1001 : Boolean);
+    BEGIN
+      IF ForItem THEN BEGIN
+        CodeIsVisible := FALSE;
+        SalesCodeIsVisible := TRUE;
+      END ELSE BEGIN
+        CodeIsVisible := TRUE;
+        SalesCodeIsVisible := FALSE;
+      END;
+    END;
+
+    PROCEDURE LoadItem@1(Item@1000 : Record 27);
+    BEGIN
+      CLEAR(Rec);
+      loadedItemNo := Item."No.";
+      loadedDiscGroup := Item."Item Disc. Group";
+      loadedPriceGroup := '';
+
+      LoadDataForItem(Item);
+    END;
+
+    PROCEDURE LoadCustomer@3(Customer@1000 : Record 18);
+    BEGIN
+      CLEAR(Rec);
+      loadedCustNo := Customer."No.";
+      loadedPriceGroup := Customer."Customer Price Group";
+      loadedDiscGroup := Customer."Customer Disc. Group";
+
+      LoadDataForCustomer(Customer);
+    END;
+
+    PROCEDURE GetLoadedItemNo@2() : Code[20];
+    BEGIN
+      EXIT(loadedItemNo)
+    END;
+
+    PROCEDURE GetLoadedCustNo@9() : Code[20];
+    BEGIN
+      EXIT(loadedCustNo)
+    END;
+
+    LOCAL PROCEDURE GetLoadedDiscGroup@8() : Code[20];
+    BEGIN
+      EXIT(loadedDiscGroup)
+    END;
+
+    LOCAL PROCEDURE GetLoadedPriceGroup@5() : Code[20];
+    BEGIN
+      EXIT(loadedPriceGroup)
+    END;
+
+    PROCEDURE RunUpdatePriceIncludesVatAndPrices@6(IncludesVat@1000 : Boolean);
+    VAR
+      Item@1001 : Record 27;
+    BEGIN
+      Item.GET(loadedItemNo);
+      UpdatePriceIncludesVatAndPrices(Item,IncludesVat);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

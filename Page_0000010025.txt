@@ -1,0 +1,216 @@
+OBJECT Page 10025 Customer Order Status
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Customer Order Status;
+               ESM=Estado pedido cliente;
+               FRC=êtat de commande client;
+               ENC=Customer Order Status];
+    SourceTable=Table18;
+    PageType=Document;
+    OnOpenPage=BEGIN
+                 CurrPage.CommentSubform.PAGE.NotOnCreditManagementForm;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 15      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Customer;
+                                 ESM=&Cliente;
+                                 FRC=&Client;
+                                 ENC=&Customer];
+                      Image=Customer }
+      { 27      ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Card;
+                                 ESM=Ficha;
+                                 FRC=Fiche;
+                                 ENC=Card];
+                      RunObject=Page 21;
+                      RunPageLink=No.=FIELD(No.);
+                      Image=EditLines }
+      { 17      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=Movimie&ntos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      RunObject=Page 25;
+                      RunPageView=SORTING(Customer No.,Posting Date);
+                      RunPageLink=Customer No.=FIELD(No.) }
+      { 1020000 ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(18),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 ESM=Bancos;
+                                 FRC=Comptes bancaires;
+                                 ENC=Bank Accounts];
+                      RunObject=Page 424;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=BankAccount }
+      { 19      ;2   ;Action    ;
+                      CaptionML=[ENU=Ship-&to Addresses;
+                                 ESM=Di&recci¢n env°o;
+                                 FRC=&Adresses de livraison;
+                                 ENC=Ship-&to Addresses];
+                      RunObject=Page 301;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=ShipAddress }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=C&ontact;
+                                 ESM=&Contacto;
+                                 FRC=C&ontact;
+                                 ENC=C&ontact];
+                      RunPageView=SORTING(Field5008);
+                      RunPageLink=Field5008=FIELD(No.);
+                      Image=ContactPerson;
+                      OnAction=BEGIN
+                                 ShowContact;
+                               END;
+                                }
+      { 21      ;2   ;Separator  }
+      { 22      ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      RunObject=Page 151;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process }
+      { 23      ;2   ;Action    ;
+                      CaptionML=[ENU=Statistics by C&urrencies;
+                                 ESM=Estad°sticas por di&visas;
+                                 FRC=Statistiques par d&evises;
+                                 ENC=Statistics by C&urrencies];
+                      RunObject=Page 486;
+                      RunPageLink=Customer Filter=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Date Filter=FIELD(Date Filter);
+                      Image=Currencies }
+      { 24      ;2   ;Action    ;
+                      CaptionML=[ENU=Entry Statistics;
+                                 ESM=Estad°sticas documentos;
+                                 FRC=Statistiques Çcritures;
+                                 ENC=Entry Statistics];
+                      RunObject=Page 302;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                      Image=EntryStatistics }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=S&ales;
+                                 ESM=Ve&ntas;
+                                 FRC=V&entes;
+                                 ENC=S&ales];
+                      RunObject=Page 155;
+                      RunPageLink=No.=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                      Image=Sales }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Lines;
+                           ESM=L°neas;
+                           FRC=Lignes;
+                           ENC=Lines] }
+
+    { 2   ;2   ;Field     ;
+                CaptionML=[ENU=Customer No.;
+                           ESM=Nß cliente;
+                           FRC=N¯ de client;
+                           ENC=Customer No.];
+                SourceExpr="No.";
+                Editable=FALSE }
+
+    { 8   ;2   ;Part      ;
+                SubPageLink=Sell-to Customer No.=FIELD(No.);
+                PagePartID=Page10010 }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name;
+                Editable=FALSE }
+
+    { 1905001101;1;Group  ;
+                CaptionML=[ENU=Orders;
+                           ESM=Pedidos;
+                           FRC=Commandes;
+                           ENC=Orders] }
+
+    { 11  ;2   ;Field     ;
+                Name=No.2;
+                CaptionML=[ENU=Customer No.;
+                           ESM=Nß cliente;
+                           FRC=N¯ de client;
+                           ENC=Customer No.];
+                SourceExpr="No.";
+                Editable=FALSE }
+
+    { 7   ;2   ;Part      ;
+                SubPageLink=Sell-to Customer No.=FIELD(No.);
+                PagePartID=Page10009 }
+
+    { 9   ;2   ;Field     ;
+                Name=Name2;
+                SourceExpr=Name;
+                Editable=FALSE }
+
+    { 1907935701;1;Group  ;
+                CaptionML=[ENU=Credit;
+                           ESM=Haber;
+                           FRC=CrÇdit;
+                           ENC=Credit] }
+
+    { 13  ;2   ;Part      ;
+                Name=CreditSubform;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page10007 }
+
+    { 26  ;2   ;Field     ;
+                CaptionClass=Text19061440 }
+
+    { 14  ;2   ;Part      ;
+                Name=CommentSubform;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page10008 }
+
+  }
+  CODE
+  {
+    VAR
+      Text19061440@19023415 : TextConst 'ENU=Customer Comments;ESM=Comentarios cliente;FRC=Commentaires client;ENC=Customer Comments';
+
+    BEGIN
+    END.
+  }
+}
+

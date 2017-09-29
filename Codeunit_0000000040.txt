@@ -1,0 +1,189 @@
+OBJECT Codeunit 40 LogInManagement
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Permissions=TableData 17=r,
+                TableData 51=rimd;
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1002 : TextConst '@@@="{Locked} ";ENU=CRONUS;ESM=CRONUS;FRC=CRONUS;ENC=CRONUS';
+      Text019@1001 : TextConst 'ENU=End User License Agreement has not been accepted.;ESM=No se ha aceptado el contrato de licencia para el usuario final.;FRC=Le contrat de licence utilisateur final n''a pas ‚t‚ accept‚.;ENC=End User License Agreement has not been accepted.';
+      Text020@1000 : TextConst 'ENU=The Go Live date is %1.;ESM=La fecha de publicaci¢n es %1.;FRC=La date de mise en service est le %1.;ENC=The Go Live date is %1.';
+      Text021@1010 : TextConst 'ENU=This is the demonstration company %1\\You can try out program features on the data in the demonstration company before you use the features with your real data.\The work date has been set to %2.;ESM=Esta es la empresa de demostraci¢n %1\\Puede probar caracter¡sticas del programa en los datos de la empresa de demostraci¢n antes de usar las caracter¡sticas con los datos reales.\La fecha de trabajo se estableci¢ en %2.;FRC=Il s''agit de la compagnie de d‚monstration %1\\Vous pouvez tester les fonctions du programme sur les donn‚es de la compagnie de d‚monstration avant de les utiliser sur vos donn‚es.\La date de travail a ‚t‚ d‚finie au %2.;ENC=This is the demonstration company %1\\You can try out program features on the data in the demonstration company before you use the features with your real data.\The work date has been set to %2.';
+      Text022@1007 : TextConst 'ENU=You must change password before you can continue.;ESM=Debe cambiar la contrase¤a antes de poder continuar.;FRC=Vous devez changer de mot de passe pour pouvoir continuer.;ENC=You must change password before you can continue.';
+      GLSetup@1011 : Record 98;
+      User@1003 : Record 2000000120 SECURITYFILTERING(Filtered);
+      LogInWorkDate@1006 : Date;
+      LogInDate@1005 : Date;
+      LogInTime@1004 : Time;
+      GLSetupRead@1012 : Boolean;
+
+    PROCEDURE CompanyOpen@1();
+    BEGIN
+      IF GUIALLOWED THEN
+        LogInStart;
+    END;
+
+    PROCEDURE CompanyClose@2();
+    BEGIN
+      IF GUIALLOWED THEN
+        LogInEnd;
+    END;
+
+    LOCAL PROCEDURE LogInStart@3();
+    VAR
+      GLSetup@1000 : Record 98;
+      GLEntry@1001 : Record 17;
+      Profile@1006 : Record 2000000072;
+      Language@1005 : Record 2000000045;
+      LicenseAgreement@1008 : Record 140;
+      ApplicationManagement@1009 : Codeunit 1;
+      CompanyInitialize@1003 : Codeunit 2;
+      ConfPersonalizationMgt@1004 : Codeunit 9170;
+      IdentityManagement@1002 : Codeunit 9801;
+      OK@1007 : Boolean;
+    BEGIN
+      IF (STRPOS(COMPANYNAME,Text000) < 1) AND LicenseAgreement.GET THEN
+        IF (TODAY >= LicenseAgreement."Effective Date") AND NOT LicenseAgreement.Accepted THEN BEGIN
+          PAGE.RUNMODAL(PAGE::"License Agreement Accept");
+          LicenseAgreement.GET;
+          IF NOT LicenseAgreement.Accepted THEN
+            MESSAGE(Text019);
+        END ELSE
+          IF TODAY < LicenseAgreement."Effective Date" THEN
+            MESSAGE(Text020,LicenseAgreement."Effective Date");
+
+      Language.SETRANGE("Localization Exist",TRUE);
+      Language.SETRANGE("Globally Enabled",TRUE);
+      Language."Language ID" := GLOBALLANGUAGE;
+      IF NOT Language.FIND THEN BEGIN
+        Language."Language ID" := WINDOWSLANGUAGE;
+        IF NOT Language.FIND THEN
+          Language."Language ID" := ApplicationManagement.ApplicationLanguage;
+      END;
+      GLOBALLANGUAGE := Language."Language ID";
+
+      // Check if the logged in user must change login before allowing access.
+      IF 0 <> User.COUNT THEN BEGIN
+        IF IdentityManagement.IsUserNamePasswordAuthentication THEN BEGIN
+          User.SETRANGE("User Security ID",USERSECURITYID);
+          User.FINDFIRST;
+          IF User."Change Password" THEN
+            PAGE.RUNMODAL(PAGE::"Change Password");
+
+          SELECTLATESTVERSION;
+          User.FINDFIRST;
+          IF User."Change Password" THEN
+            ERROR(Text022);
+        END;
+        User.SETRANGE("User Security ID");
+      END;
+
+      IF NOT GLSetup.GET THEN BEGIN
+        CompanyInitialize.RUN;
+        COMMIT;
+        CLEAR(CompanyInitialize);
+      END;
+
+      IF Profile.ISEMPTY THEN BEGIN
+        ConfPersonalizationMgt.RUN;
+        COMMIT;
+        CLEAR(ConfPersonalizationMgt);
+      END;
+
+      LogInDate := TODAY;
+      LogInTime := TIME;
+      LogInWorkDate := 0D;
+      IF STRPOS(COMPANYNAME,Text000) = 1 THEN
+        IF GLEntry.READPERMISSION THEN BEGIN
+          GLEntry.SETCURRENTKEY("G/L Account No.","Posting Date");
+          OK := TRUE;
+          REPEAT
+            GLEntry.SETFILTER("G/L Account No.",'>%1',GLEntry."G/L Account No.");
+            GLEntry.SETFILTER("Posting Date",'>%1',GLEntry."Posting Date");
+            IF GLEntry.FINDFIRST THEN BEGIN
+              GLEntry.SETRANGE("G/L Account No.",GLEntry."G/L Account No.");
+              GLEntry.SETRANGE("Posting Date");
+              GLEntry.FINDLAST;
+            END ELSE
+              OK := FALSE
+          UNTIL NOT OK;
+          IF NOT (GLEntry."Posting Date" IN [0D,WORKDATE]) THEN BEGIN
+            IF CURRENTEXECUTIONMODE <> EXECUTIONMODE::Debug THEN
+              MESSAGE(
+                Text021,
+                COMPANYNAME,NORMALDATE(GLEntry."Posting Date"));
+            LogInWorkDate := WORKDATE;
+            WORKDATE := NORMALDATE(GLEntry."Posting Date");
+          END;
+        END;
+    END;
+
+    LOCAL PROCEDURE LogInEnd@4();
+    VAR
+      UserSetup@1000 : Record 91;
+      UserTimeRegister@1001 : Record 51;
+      LogOutDate@1002 : Date;
+      LogOutTime@1003 : Time;
+      Minutes@1004 : Integer;
+      UserSetupFound@1005 : Boolean;
+      RegisterTime@1006 : Boolean;
+    BEGIN
+      IF LogInWorkDate <> 0D THEN
+        IF LogInWorkDate = LogInDate THEN
+          WORKDATE := TODAY
+        ELSE
+          WORKDATE := LogInWorkDate;
+
+      IF USERID <> '' THEN BEGIN
+        IF UserSetup.GET(USERID) THEN BEGIN
+          UserSetupFound := TRUE;
+          RegisterTime := UserSetup."Register Time";
+        END;
+        IF NOT UserSetupFound THEN
+          IF GetGLSetup THEN
+            RegisterTime := GLSetup."Register Time";
+        IF RegisterTime THEN BEGIN
+          LogOutDate := TODAY;
+          LogOutTime := TIME;
+          IF (LogOutDate > LogInDate) OR (LogOutDate = LogInDate) AND (LogOutTime > LogInTime) THEN
+            Minutes := ROUND((1440 * (LogOutDate - LogInDate)) + ((LogOutTime - LogInTime) / 60000),1);
+          IF Minutes = 0 THEN
+            Minutes := 1;
+          UserTimeRegister.INIT;
+          UserTimeRegister."User ID" := USERID;
+          UserTimeRegister.Date := LogInDate;
+          IF UserTimeRegister.FIND THEN BEGIN
+            UserTimeRegister.Minutes := UserTimeRegister.Minutes + Minutes;
+            UserTimeRegister.MODIFY;
+          END ELSE BEGIN
+            UserTimeRegister.Minutes := Minutes;
+            UserTimeRegister.INSERT;
+          END;
+        END;
+      END;
+    END;
+
+    LOCAL PROCEDURE GetGLSetup@5() : Boolean;
+    BEGIN
+      IF NOT GLSetupRead THEN
+        GLSetupRead := GLSetup.GET;
+      EXIT(GLSetupRead);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

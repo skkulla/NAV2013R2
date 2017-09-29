@@ -1,0 +1,195 @@
+OBJECT Report 188 Create Reminders
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Create Reminders;
+               ESM=Crear recordatorios;
+               FRC=Cr‚er rappels;
+               ENC=Create Reminders];
+    ProcessingOnly=Yes;
+    OnInitReport=BEGIN
+                   OverdueEntriesOnly := TRUE;
+                 END;
+
+    OnPreReport=BEGIN
+                  CustLedgEntry.COPY(CustLedgEntry2);
+                END;
+
+  }
+  DATASET
+  {
+    { 6836;    ;DataItem;                    ;
+               DataItemTable=Table18;
+               DataItemTableView=SORTING(No.);
+               OnPreDataItem=VAR
+                               SalesSetup@1000 : Record 311;
+                             BEGIN
+                               IF ReminderHeaderReq."Document Date" = 0D THEN
+                                 ERROR(Text000,ReminderHeaderReq.FIELDCAPTION("Document Date"));
+                               FILTERGROUP := 2;
+                               SETFILTER("Reminder Terms Code",'<>%1','');
+                               FILTERGROUP := 0;
+                               NoOfRecords := COUNT;
+                               SalesSetup.GET;
+                               SalesSetup.TESTFIELD("Reminder Nos.");
+                               IF NoOfRecords = 1 THEN
+                                 Window.OPEN(Text001)
+                               ELSE BEGIN
+                                 Window.OPEN(Text002);
+                                 OldTime := TIME;
+                               END;
+                               ReminderHeaderReq."Use Header Level" := "Use Header Level";
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  RecordNo := RecordNo + 1;
+                                  CLEAR(MakeReminder);
+                                  MakeReminder.Set(Customer,CustLedgEntry,ReminderHeaderReq,OverdueEntriesOnly,IncludeEntriesOnHold);
+                                  IF NoOfRecords = 1 THEN BEGIN
+                                    MakeReminder.Code;
+                                    MARK := FALSE;
+                                  END ELSE BEGIN
+                                    NewTime := TIME;
+                                    IF (NewTime - OldTime > 100) OR (NewTime < OldTime) THEN BEGIN
+                                      NewProgress := ROUND(RecordNo / NoOfRecords * 100,1);
+                                      IF NewProgress <> OldProgress THEN BEGIN
+                                        Window.UPDATE(1,NewProgress * 100);
+                                        OldProgress := NewProgress;
+                                      END;
+                                      OldTime := TIME;
+                                    END;
+                                    MARK := NOT MakeReminder.Code;
+                                  END;
+                                END;
+
+               OnPostDataItem=BEGIN
+                                Window.CLOSE;
+                                MARKEDONLY := TRUE;
+                                COMMIT;
+                                IF FIND('-') THEN
+                                  IF CONFIRM(Text003,TRUE) THEN
+                                    PAGE.RUNMODAL(0,Customer);
+                              END;
+
+               ReqFilterFields=No. }
+
+    { 9065;    ;DataItem;CustLedgEntry2      ;
+               DataItemTable=Table21;
+               DataItemTableView=SORTING(Customer No.);
+               OnPreDataItem=BEGIN
+                               CurrReport.BREAK;
+                             END;
+
+               ReqFilterFields=Document Type }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+      SaveValues=Yes;
+      OnOpenPage=BEGIN
+                   IF ReminderHeaderReq."Document Date" = 0D THEN BEGIN
+                     ReminderHeaderReq."Document Date" := WORKDATE;
+                     ReminderHeaderReq."Posting Date" := WORKDATE;
+                   END;
+                 END;
+
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             ESM=Opciones;
+                             FRC=Options;
+                             ENC=Options] }
+
+      { 3   ;2   ;Field     ;
+                  CaptionML=[ENU=Posting Date;
+                             ESM=Fecha registro;
+                             FRC=Date de report;
+                             ENC=Posting Date];
+                  SourceExpr=ReminderHeaderReq."Posting Date" }
+
+      { 1   ;2   ;Field     ;
+                  Name=DocumentDate;
+                  CaptionML=[ENU=Document Date;
+                             ESM=Fecha emisi¢n documento;
+                             FRC=Date document;
+                             ENC=Document Date];
+                  SourceExpr=ReminderHeaderReq."Document Date" }
+
+      { 5   ;2   ;Field     ;
+                  CaptionML=[ENU=Only Entries with Overdue Amounts;
+                             ESM=S¢lo movs. con importes vencidos;
+                             FRC=Seules les ‚critures avec des montants en souffrance;
+                             ENC=Only Entries with Overdue Amounts];
+                  SourceExpr=OverdueEntriesOnly;
+                  MultiLine=Yes }
+
+      { 1102601001;2;Field  ;
+                  CaptionML=[ENU=Include Entries On Hold;
+                             ESM=Incluir movimientos en espera;
+                             FRC=Inclure les ‚critures en attente;
+                             ENC=Include Entries On Hold];
+                  SourceExpr=IncludeEntriesOnHold }
+
+      { 7   ;2   ;Field     ;
+                  CaptionML=[ENU=Use Header Level;
+                             ESM=Usar nivel recordatorio;
+                             FRC=Utiliser le niveau d'en-tˆte;
+                             ENC=Use Header Level];
+                  SourceExpr="Use Header Level" }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=%1 must be specified.;ESM=Se debe indicar %1.;FRC=%1 doit ˆtre sp‚cifi‚.;ENC=%1 must be specified.';
+      Text001@1001 : TextConst 'ENU=Making reminders...;ESM=Realizando recordatorios...;FRC=Cr‚ation rappels...;ENC=Making reminders...';
+      Text002@1002 : TextConst 'ENU=Making reminders @1@@@@@@@@@@@@@;ESM=Realizando recordatorios @1@@@@@@@@@@@@@;FRC=Produire les rappels @1@@@@@@@@@@@@@;ENC=Making reminders @1@@@@@@@@@@@@@';
+      Text003@1003 : TextConst 'ENU=It was not possible to create reminders for some of the selected customers.\Do you want to see these customers?;ESM=No se han podido crear recordatorios para algunos de los clientes seleccionados.\¨Desea ver estos clientes?;FRC=Il n''a pas ‚t‚ possible de cr‚er des rappels pour certains clients s‚lectionn‚s.\Voulez-vous visualiser ces clientsÿ?;ENC=It was not possible to create reminders for some of the selected customers.\Do you want to see these customers?';
+      CustLedgEntry@1005 : Record 21;
+      ReminderHeaderReq@1006 : Record 295;
+      MakeReminder@1007 : Codeunit 392;
+      Window@1008 : Dialog;
+      NoOfRecords@1009 : Integer;
+      RecordNo@1010 : Integer;
+      NewProgress@1011 : Integer;
+      OldProgress@1012 : Integer;
+      NewTime@1013 : Time;
+      OldTime@1014 : Time;
+      OverdueEntriesOnly@1015 : Boolean;
+      "Use Header Level"@1016 : Boolean;
+      IncludeEntriesOnHold@1102601000 : Boolean;
+
+    PROCEDURE InitializeRequest@1(DocumentDate@1000 : Date;PostingDate@1001 : Date;OverdueEntries@1002 : Boolean;UseHeaderLevel@1003 : Boolean;IncludeEntries@1004 : Boolean);
+    BEGIN
+      ReminderHeaderReq."Document Date" := DocumentDate;
+      ReminderHeaderReq."Posting Date" := PostingDate;
+      OverdueEntriesOnly := OverdueEntries;
+      "Use Header Level" := UseHeaderLevel;
+      IncludeEntriesOnHold := IncludeEntries;
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

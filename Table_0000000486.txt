@@ -1,0 +1,92 @@
+OBJECT Table 486 Business Chart Map
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Business Chart Map;
+               ESM=Mapa del gr fico empresarial;
+               FRC=Carte avec graphique entreprise;
+               ENC=Business Chart Map];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Index               ;Integer       ;CaptionML=[ENU=Index;
+                                                              ESM=Öndice;
+                                                              FRC=Index;
+                                                              ENC=Index] }
+    { 2   ;   ;ValueString         ;Text30        ;CaptionML=[ENU=ValueString;
+                                                              ESM=Cadena valor;
+                                                              FRC=ValueString;
+                                                              ENC=ValueString] }
+    { 3   ;   ;Name                ;Text249       ;CaptionML=[ENU=Name;
+                                                              ESM=Nombre;
+                                                              FRC=Nom;
+                                                              ENC=Name] }
+  }
+  KEYS
+  {
+    {    ;Index                                   ;Clustered=Yes }
+    {    ;ValueString                              }
+    {    ;Name                                     }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE Add@1(MapName@1000 : Text[249];Value@1002 : Variant);
+    BEGIN
+      RESET;
+      IF FINDLAST THEN
+        Index += 1
+      ELSE
+        Index := 0;
+      Name := COPYSTR(MapName,1,MAXSTRLEN(Name));
+      ValueString := COPYSTR(FORMAT(Value,0,9),1,MAXSTRLEN(ValueString));
+      INSERT;
+    END;
+
+    PROCEDURE GetIndex@2(MapName@1000 : Text[249]) : Integer;
+    BEGIN
+      RESET;
+      SETRANGE(Name,MapName);
+      IF FINDFIRST THEN
+        EXIT(Index);
+      EXIT(-1);
+    END;
+
+    PROCEDURE GetValueString@3(Idx@1000 : Integer) : Text;
+    BEGIN
+      IF GET(Idx) THEN
+        EXIT(ValueString);
+    END;
+
+    PROCEDURE GetValueAsDate@5() : Date;
+    VAR
+      DateTime@1001 : DateTime;
+      Date@1000 : Date;
+    BEGIN
+      IF EVALUATE(Date,ValueString,9) THEN
+        EXIT(Date);
+      IF EVALUATE(DateTime,ValueString,9) THEN
+        EXIT(DT2DATE(DateTime));
+      EXIT(0D);
+    END;
+
+    PROCEDURE GetName@4(Idx@1000 : Integer) : Text;
+    BEGIN
+      IF GET(Idx) THEN
+        EXIT(Name);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

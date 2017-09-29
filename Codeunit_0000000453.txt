@@ -1,0 +1,43 @@
+OBJECT Codeunit 453 Job Queue - Enqueue
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    TableNo=472;
+    OnRun=BEGIN
+            RemoveFailedJobs(Rec);
+            Status := Status::"On Hold";
+            INSERT(TRUE);
+            IF "Run in User Session" THEN
+              STARTSESSION("User Session ID",CODEUNIT::"Job Queue User Session",COMPANYNAME,Rec);
+            Status := Status::Ready;
+            MODIFY;
+            COMMIT;
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE RemoveFailedJobs@1(VAR JobQueueEntry@1000 : Record 472);
+    VAR
+      JobQueueEntry2@1001 : Record 472;
+    BEGIN
+      JobQueueEntry2.SETRANGE("Object Type to Run",JobQueueEntry."Object Type to Run");
+      JobQueueEntry2.SETRANGE("Object ID to Run",JobQueueEntry."Object ID to Run");
+      JobQueueEntry2.SETRANGE("Record ID to Process",JobQueueEntry."Record ID to Process");
+      JobQueueEntry2.SETRANGE(Status,JobQueueEntry2.Status::Error);
+      IF NOT JobQueueEntry2.ISEMPTY THEN
+        JobQueueEntry2.DELETEALL;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

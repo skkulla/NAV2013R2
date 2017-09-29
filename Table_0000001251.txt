@@ -1,0 +1,164 @@
+OBJECT Table 1251 Account Mapping
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    OnInsert=BEGIN
+               TESTFIELD("Mapping Text");
+             END;
+
+    CaptionML=[ENU=Account Mapping;
+               ESM=Asignaci¢n de cuenta;
+               FRC=Correspondance compte;
+               ENC=Account Mapping];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              ESM=N§ l¡nea;
+                                                              FRC=Nø ligne;
+                                                              ENC=Line No.] }
+    { 2   ;   ;Mapping Text        ;Text50        ;OnValidate=BEGIN
+                                                                "Mapping Text" := COPYSTR(RecordMatchMgt.Trim("Mapping Text"),1,50);
+                                                              END;
+
+                                                   CaptionML=[ENU=Mapping Text;
+                                                              ESM=Asignando texto;
+                                                              FRC=Correspondance texte;
+                                                              ENC=Mapping Text];
+                                                   NotBlank=Yes }
+    { 3   ;   ;Debit Acc. No.      ;Code20        ;TableRelation="G/L Account";
+                                                   CaptionML=[ENU=Debit Acc. No.;
+                                                              ESM=N.§ cta. d‚bito;
+                                                              FRC=Nø cpte d‚bit;
+                                                              ENC=Debit Acc. No.] }
+    { 4   ;   ;Credit Acc. No.     ;Code20        ;TableRelation="G/L Account";
+                                                   CaptionML=[ENU=Credit Acc. No.;
+                                                              ESM=N.§ cta. cr‚dito;
+                                                              FRC=Nø cpte cr‚dit;
+                                                              ENC=Credit Acc. No.] }
+    { 5   ;   ;Bal. Source Type    ;Option        ;OnValidate=BEGIN
+                                                                VALIDATE("Bal. Source No.",'');
+                                                              END;
+
+                                                   CaptionML=[ENU=Bal. Source Type;
+                                                              ESM=Tipo origen contr.;
+                                                              FRC=Type origine solde;
+                                                              ENC=Bal. Source Type];
+                                                   OptionCaptionML=[ENU=G/L Account,Customer,Vendor;
+                                                                    ESM=Cuenta,Cliente,Proveedor;
+                                                                    FRC=Compte du grand livre,Client,Fournisseur;
+                                                                    ENC=G/L Account,Customer,Vendor];
+                                                   OptionString=G/L Account,Customer,Vendor }
+    { 6   ;   ;Bal. Source No.     ;Code20        ;TableRelation=IF (Bal. Source Type=CONST(Customer)) Customer
+                                                                 ELSE IF (Bal. Source Type=CONST(Vendor)) Vendor;
+                                                   CaptionML=[ENU=Bal. Source No.;
+                                                              ESM=N.§ origen contr.;
+                                                              FRC=Nø origine solde;
+                                                              ENC=Bal. Source No.] }
+  }
+  KEYS
+  {
+    {    ;Line No.                                ;Clustered=Yes }
+    {    ;Mapping Text                             }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      RecordMatchMgt@1000 : Codeunit 1251;
+
+    PROCEDURE InsertRec@1(GenJnlLine@1000 : Record 81);
+    VAR
+      AccountMapping@1001 : Record 1251;
+      LastLineNo@1002 : Integer;
+    BEGIN
+      AccountMapping.SETFILTER("Mapping Text",'%1','@' + RecordMatchMgt.Trim(GenJnlLine.Description));
+      IF AccountMapping.FINDFIRST THEN
+        COPY(AccountMapping)
+      ELSE BEGIN
+        AccountMapping.RESET;
+        IF AccountMapping.FINDLAST THEN
+          LastLineNo := AccountMapping."Line No.";
+
+        INIT;
+        "Line No." := LastLineNo + 10000;
+        VALIDATE("Mapping Text",GenJnlLine.Description);
+        SetBalSourceType(GenJnlLine);
+        IF "Bal. Source Type" <> "Bal. Source Type"::"G/L Account" THEN
+          "Bal. Source No." := GenJnlLine."Account No."
+        ELSE BEGIN
+          "Debit Acc. No." := GenJnlLine."Account No.";
+          "Credit Acc. No." := GenJnlLine."Account No.";
+        END;
+
+        IF "Mapping Text" <> '' THEN
+          INSERT;
+      END;
+
+      PAGE.RUN(PAGE::"Account Mapping",Rec);
+    END;
+
+    PROCEDURE GetAccountNo@2(Amount@1000 : Decimal) : Code[20];
+    BEGIN
+      IF Amount >= 0 THEN
+        EXIT("Debit Acc. No.");
+
+      EXIT("Credit Acc. No.");
+    END;
+
+    PROCEDURE GetPaymentDocType@5(VAR PaymentDocType@1002 : Option;ActualSourceType@1005 : Option;Amount@1000 : Decimal);
+    VAR
+      GenJournalLine@1004 : Record 81;
+      ExpectedSourceType@1001 : Option;
+    BEGIN
+      IF Amount >= 0 THEN
+        ExpectedSourceType := "Bal. Source Type"::Vendor
+      ELSE
+        ExpectedSourceType := "Bal. Source Type"::Customer;
+
+      IF ExpectedSourceType = ActualSourceType THEN
+        PaymentDocType := GenJournalLine."Document Type"::Payment
+      ELSE
+        PaymentDocType := GenJournalLine."Document Type"::Refund;
+    END;
+
+    PROCEDURE GetDocTypeForPmt@4(VAR DocType@1000 : Option;PaymentDocType@1002 : Option);
+    VAR
+      GenJournalLine@1004 : Record 81;
+    BEGIN
+      CASE PaymentDocType OF
+        GenJournalLine."Document Type"::Payment:
+          DocType := GenJournalLine."Document Type"::Invoice;
+        GenJournalLine."Document Type"::Refund:
+          DocType := GenJournalLine."Document Type"::"Credit Memo";
+      END;
+    END;
+
+    LOCAL PROCEDURE SetBalSourceType@3(GenJournalLine@1000 : Record 81);
+    BEGIN
+      CASE GenJournalLine."Account Type" OF
+        GenJournalLine."Account Type"::Customer:
+          "Bal. Source Type" := "Bal. Source Type"::Customer;
+        GenJournalLine."Account Type"::Vendor:
+          "Bal. Source Type" := "Bal. Source Type"::Vendor;
+      END;
+    END;
+
+    PROCEDURE IsBalSourceNoEnabled@6() : Boolean;
+    BEGIN
+      EXIT("Bal. Source Type" <> "Bal. Source Type"::"G/L Account");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

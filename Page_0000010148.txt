@@ -1,0 +1,121 @@
+OBJECT Page 10148 Posted Deposit Lines
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Deposit Lines;
+               ESM=L°neas dep¢sitos reg.;
+               FRC=Lignes dÇpìt reportÇs;
+               ENC=Posted Deposit Lines];
+    SourceTable=Table10144;
+    PageType=ListPart;
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1020002 ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 ESM=&L°nea;
+                                 FRC=&Ligne;
+                                 ENC=&Line];
+                      Image=Line }
+      { 1020003 ;2   ;Action    ;
+                      CaptionML=[ENU=Show Document;
+                                 ESM=Mostrar documento;
+                                 FRC=Afficher le document;
+                                 ENC=Show Document];
+                      RunObject=Page 10147;
+                      RunPageLink=No.=FIELD(Deposit No.);
+                      Image=View }
+      { 1020005 ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Account &Card;
+                                 ESM=&Ficha;
+                                 FRC=Fiche &comptable;
+                                 ENC=Account &Card];
+                      OnAction=BEGIN
+                                 ShowAccountCard;
+                               END;
+                                }
+      { 1020008 ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Account Ledger E&ntries;
+                                 ESM=Movimie&ntos;
+                                 FRC=êcritures de compt&e;
+                                 ENC=Account Ledger E&ntries];
+                      OnAction=BEGIN
+                                 ShowAccountLedgerEntries;
+                               END;
+                                }
+      { 1020004 ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Deposit No." }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Account Type" }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Account No." }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Document Date" }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Document Type" }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Document No." }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr=Amount }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code";
+                Visible=FALSE }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code";
+                Visible=FALSE }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Entry No.";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,326 @@
+OBJECT Page 371 Bank Account List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Bank Account List;
+               ESM=Lista de bancos;
+               FRC=Liste comptes bancaires;
+               ENC=Bank Account List];
+    SourceTable=Table270;
+    PageType=List;
+    CardPageID=Bank Account Card;
+    OnAfterGetRecord=BEGIN
+                       CALCFIELDS("Check Report Name");
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 15      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Bank Acc.;
+                                 ESM=&Banco;
+                                 FRC=Cpt &banque;
+                                 ENC=&Bank Acc.];
+                      Image=Bank }
+      { 17      ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      RunObject=Page 375;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 124;
+                      RunPageLink=Table Name=CONST(Bank Account),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 22      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions }
+      { 84      ;3   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions-Single;
+                                 ESM=Dimensiones-Individual;
+                                 FRC=Dimensions - Simples;
+                                 ENC=Dimensions-Single];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(270),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 21      ;3   ;Action    ;
+                      CaptionML=[ENU=Dimensions-&Multiple;
+                                 ESM=Dimensiones-&M£ltiple;
+                                 FRC=Dimensions - &Multiples;
+                                 ENC=Dimensions-&Multiple];
+                      Image=DimensionSets;
+                      OnAction=VAR
+                                 BankAcc@1001 : Record 270;
+                                 DefaultDimMultiple@1002 : Page 542;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(BankAcc);
+                                 DefaultDimMultiple.SetMultiBankAcc(BankAcc);
+                                 DefaultDimMultiple.RUNMODAL;
+                               END;
+                                }
+      { 6       ;2   ;Action    ;
+                      CaptionML=[ENU=Balance;
+                                 ESM=Saldo;
+                                 FRC=Solde;
+                                 ENC=Balance];
+                      RunObject=Page 377;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                      Promoted=Yes;
+                      Image=Balance;
+                      PromotedCategory=Process }
+      { 1020000 ;2   ;Action    ;
+                      CaptionML=[ENU=St&atements;
+                                 ESM=Estados de c&uenta;
+                                 FRC=Rele&vÇs;
+                                 ENC=St&atements];
+                      RunObject=Page 10129;
+                      RunPageLink=Bank Account No.=FIELD(No.);
+                      Image=Report }
+      { 1020001 ;2   ;Action    ;
+                      CaptionML=[ENU=Deposits;
+                                 ESM=Dep¢sitos;
+                                 FRC=DÇpìts;
+                                 ENC=Deposits];
+                      RunObject=Page 10147;
+                      RunPageView=SORTING(Bank Account No.);
+                      RunPageLink=Bank Account No.=FIELD(No.);
+                      Image=DepositSlip }
+      { 19      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=&Movimientos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      RunObject=Page 372;
+                      RunPageView=SORTING(Bank Account No.);
+                      RunPageLink=Bank Account No.=FIELD(No.);
+                      Promoted=No;
+                      Image=BankAccountLedger;
+                      PromotedCategory=Process }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=Chec&k Ledger Entries;
+                                 ESM=Movs. c&heques;
+                                 FRC=êcritures du &grand livre de contrìle;
+                                 ENC=Che&que Ledger Entries];
+                      RunObject=Page 374;
+                      RunPageView=SORTING(Bank Account No.);
+                      RunPageLink=Bank Account No.=FIELD(No.);
+                      Image=CheckLedger }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=C&ontact;
+                                 ESM=&Contacto;
+                                 FRC=&Contact;
+                                 ENC=C&ontact];
+                      Image=ContactPerson;
+                      OnAction=BEGIN
+                                 ShowContact;
+                               END;
+                                }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1900670506;1 ;Action    ;
+                      CaptionML=[ENU=Detail Trial Balance;
+                                 ESM=Detalles del balance de comprobaci¢n;
+                                 FRC=Balance de vÇrification dÇtaillÇe;
+                                 ENC=Detail Trial Balance];
+                      RunObject=Report 1404;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904208406;1 ;Action    ;
+                      CaptionML=[ENU=Check Details;
+                                 ESM=Desglose cheques;
+                                 FRC=VÇrifier les dÇtails;
+                                 ENC=Cheque Details];
+                      RunObject=Report 1406;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902174606;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance by Period;
+                                 ESM=Bal. sumas y saldos/periodo;
+                                 FRC=Balance de vÇrification par pÇriode;
+                                 ENC=Trial Balance by Period];
+                      RunObject=Report 10026;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904082706;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance;
+                                 ESM=Balance comprobaci¢n;
+                                 FRC=Balance de vÇrification;
+                                 ENC=Trial Balance];
+                      RunObject=Report 10022;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1905098306;1 ;Action    ;
+                      CaptionML=[ENU=Projected Cash Receipts;
+                                 ESM=Cobros proyectados;
+                                 FRC=Encaissements prÇvus;
+                                 ENC=Projected Cash Receipts];
+                      RunObject=Report 10057;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1906213906;1 ;Action    ;
+                      CaptionML=[ENU=Cash Requirem. by Due Date;
+                                 ESM=Req. efectivo por fecha venc.;
+                                 FRC=Besoin d'encaisse par date d'ÇchÇance;
+                                 ENC=Cash Requirem. by Due Date];
+                      RunObject=Report 10088;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907127306;1 ;Action    ;
+                      CaptionML=[ENU=Projected Cash Payments;
+                                 ESM=Pagos al contado pronost.;
+                                 FRC=Paiements encaisse prÇvus;
+                                 ENC=Projected Cash Payments];
+                      RunObject=Report 10098;
+                      Promoted=No;
+                      Image=PaymentForecast;
+                      PromotedCategory=Report }
+      { 1907493906;1 ;Action    ;
+                      CaptionML=[ENU=Bank Account - Reconcile;
+                                 ESM=Banco - Control;
+                                 FRC=Compte bancaire - Rapprochement;
+                                 ENC=Bank Account - Reconcile];
+                      RunObject=Report 10409;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Bank Account Statements;
+                                 ESM=Estados de cuenta banco;
+                                 FRC=RelevÇs bancaires;
+                                 ENC=Bank Account Statements];
+                      ToolTipML=[ENU=View, print, or save statements for selected bank accounts. For each bank transaction, the report shows a description, an applied amount, a statement amount, and other information.;
+                                 ESM=Vea, imprima o guarde estados de cuenta para bancos seleccionados. Para cada transacci¢n bancaria, el informe muestra una descripci¢n, un importe liquidado, un importe de estado de cuenta y otra informaci¢n.;
+                                 FRC=Affichez, imprimez ou enregistrez les relevÇs des comptes bancaires sÇlectionnÇs. Pour chaque transaction bancaire, le rapport affiche une description, un montant affectÇ, un montant de relevÇ et d'autres informations.;
+                                 ENC=View, print, or save statements for selected bank accounts. For each bank transaction, the report shows a description, an applied amount, a statement amount, and other information.];
+                      RunObject=Report 1407;
+                      Image=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 87  ;2   ;Field     ;
+                SourceExpr="Post Code";
+                Visible=FALSE }
+
+    { 89  ;2   ;Field     ;
+                SourceExpr="Country/Region Code";
+                Visible=FALSE }
+
+    { 91  ;2   ;Field     ;
+                SourceExpr="Phone No." }
+
+    { 93  ;2   ;Field     ;
+                SourceExpr="Fax No.";
+                Visible=FALSE }
+
+    { 23  ;2   ;Field     ;
+                SourceExpr=Contact }
+
+    { 105 ;2   ;Field     ;
+                SourceExpr="Bank Account No.";
+                Visible=FALSE }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="SWIFT Code";
+                Visible=FALSE }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr=IBAN;
+                Visible=FALSE }
+
+    { 95  ;2   ;Field     ;
+                SourceExpr="Our Contact Code";
+                Visible=FALSE }
+
+    { 97  ;2   ;Field     ;
+                SourceExpr="Bank Acc. Posting Group";
+                Visible=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Currency Code";
+                Visible=FALSE }
+
+    { 103 ;2   ;Field     ;
+                SourceExpr="Language Code";
+                Visible=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Search Name" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1905532107;1;Part   ;
+                SubPageLink=Table ID=CONST(270),
+                            No.=FIELD(No.);
+                PagePartID=Page9083;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

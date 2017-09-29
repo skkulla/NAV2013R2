@@ -1,0 +1,87 @@
+OBJECT Table 1221 Posting Exch. Field
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posting Exch. Field;
+               ESM=Campo intercambio registro;
+               FRC=Champ ‚chge report;
+               ENC=Posting Exch. Field];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Posting Exch. No.   ;Integer       ;TableRelation="Posting Exch.";
+                                                   CaptionML=[ENU=Posting Exch. No.;
+                                                              ESM=N.§ intercambio registro;
+                                                              FRC=Nø ‚chge report;
+                                                              ENC=Posting Exch. No.] }
+    { 2   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              ESM=N§ l¡nea;
+                                                              FRC=Nø ligne;
+                                                              ENC=Line No.] }
+    { 3   ;   ;Column No.          ;Integer       ;CaptionML=[ENU=Column No.;
+                                                              ESM=N§ columna;
+                                                              FRC=Nø de colonne;
+                                                              ENC=Column No.] }
+    { 4   ;   ;Value               ;Text250       ;CaptionML=[ENU=Value;
+                                                              ESM=Valor;
+                                                              FRC=Valeur;
+                                                              ENC=Value] }
+    { 5   ;   ;Node Id             ;Text250       ;CaptionML=[ENU=Node Id;
+                                                              ESM=Id. nodo;
+                                                              FRC=ID de noeud;
+                                                              ENC=Node Id] }
+  }
+  KEYS
+  {
+    {    ;Posting Exch. No.,Line No.,Column No.,Node Id;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE InsertRec@2(PostExchNo@1000 : Integer;LineNo@1001 : Integer;ColumnNo@1002 : Integer;Value@1003 : Text[250]);
+    BEGIN
+      INIT;
+      VALIDATE("Posting Exch. No.",PostExchNo);
+      VALIDATE("Line No.",LineNo);
+      VALIDATE("Column No.",ColumnNo);
+      VALIDATE(Value,Value);
+      INSERT;
+    END;
+
+    PROCEDURE InsertRecXMLField@1(PostExchNo@1000 : Integer;LineNo@1001 : Integer;ColumnNo@1002 : Integer;NodeId@1004 : Text[250];Value@1003 : Text[250]);
+    BEGIN
+      INIT;
+      VALIDATE("Posting Exch. No.",PostExchNo);
+      VALIDATE("Line No.",LineNo);
+      VALIDATE("Column No.",ColumnNo);
+      VALIDATE("Node Id",NodeId);
+      VALIDATE(Value,Value);
+      INSERT;
+    END;
+
+    PROCEDURE GetFieldName@1060() : Text;
+    VAR
+      PostExchColumnDef@1060 : Record 1223;
+      PostExch@1061 : Record 1220;
+    BEGIN
+      PostExch.GET("Posting Exch. No.");
+      IF PostExchColumnDef.GET(PostExch."Posting Exch. Def Code",PostExch."Posting Exch. Line Def Code","Column No.") THEN
+        EXIT(PostExchColumnDef.Name);
+      EXIT('');
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

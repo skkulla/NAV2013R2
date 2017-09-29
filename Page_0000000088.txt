@@ -1,0 +1,754 @@
+OBJECT Page 88 Job Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Job Card;
+               ESM=Ficha proyecto;
+               FRC=Fiche projet;
+               ENC=Job Card];
+    SourceTable=Table167;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Prices;
+                                ESM=Nuevo,Proceso,Informe,Precios;
+                                FRC=Nouveau,Traitement,Rapport,Prix;
+                                ENC=New,Process,Report,Prices];
+    OnInit=BEGIN
+             CurrencyCodeEditable := TRUE;
+             InvoiceCurrencyCodeEditable := TRUE;
+           END;
+
+    OnAfterGetRecord=BEGIN
+                       CurrencyCheck;
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 58      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Job;
+                                 ESM=Pro&yecto;
+                                 FRC=&Projet;
+                                 ENC=&Job];
+                      Image=Job }
+      { 87      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+T;
+                      CaptionML=[ENU=Job &Task Lines;
+                                 ESM=L°neas &tarea proyecto;
+                                 FRC=Lignes de &tÉche de projet;
+                                 ENC=Job &Task Lines];
+                      RunObject=Page 1002;
+                      RunPageLink=Job No.=FIELD(No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=TaskList;
+                      PromotedCategory=Process }
+      { 88      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+P;
+                      CaptionML=[ENU=Job &Planning Lines;
+                                 ESM=L°neas &planificaci¢n proyecto;
+                                 FRC=Lignes de &planification de projet;
+                                 ENC=Job &Planning Lines];
+                      Image=JobLines;
+                      OnAction=VAR
+                                 JobPlanningLine@1001 : Record 1003;
+                                 JobPlanningLines@1000 : Page 1007;
+                               BEGIN
+                                 TESTFIELD("No.");
+                                 JobPlanningLine.SETRANGE("Job No.","No.");
+                                 JobPlanningLines.SetJobNoVisible(FALSE);
+                                 JobPlanningLines.SETTABLEVIEW(JobPlanningLine);
+                                 JobPlanningLines.EDITABLE := FALSE;
+                                 JobPlanningLines.RUN;
+                               END;
+                                }
+      { 84      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=&Dimensions;
+                                 ESM=&Dimensiones;
+                                 FRC=&Dimensions;
+                                 ENC=&Dimensions];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(167),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 61      ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=&Statistics;
+                                 ESM=&Estad°sticas;
+                                 FRC=&Statistiques;
+                                 ENC=&Statistics];
+                      RunObject=Page 1025;
+                      RunPageLink=No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process }
+      { 64      ;2   ;Separator  }
+      { 62      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 124;
+                      RunPageLink=Table Name=CONST(Job),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 66      ;2   ;Action    ;
+                      CaptionML=[ENU=&Online Map;
+                                 ESM=&Online Map;
+                                 FRC=&Online Map;
+                                 ENC=&Online Map];
+                      Image=Map;
+                      OnAction=BEGIN
+                                 DisplayMap;
+                               END;
+                                }
+      { 81      ;1   ;ActionGroup;
+                      CaptionML=[ENU=W&IP;
+                                 ESM=&WIP;
+                                 FRC=T&EC;
+                                 ENC=W&IP];
+                      Image=WIP }
+      { 85      ;2   ;Action    ;
+                      CaptionML=[ENU=&WIP Entries;
+                                 ESM=Movimientos &WIP;
+                                 FRC=êcritures TEC;
+                                 ENC=&WIP Entries];
+                      RunObject=Page 1008;
+                      RunPageView=SORTING(Job No.,Job Posting Group,WIP Posting Date);
+                      RunPageLink=Job No.=FIELD(No.);
+                      Image=WIPEntries }
+      { 86      ;2   ;Action    ;
+                      CaptionML=[ENU=WIP &G/L Entries;
+                                 ESM=Movs. c&ontabilidad WIP;
+                                 FRC=êcritures &GL TEC;
+                                 ENC=WIP &G/L Entries];
+                      RunObject=Page 1009;
+                      RunPageView=SORTING(Job No.);
+                      RunPageLink=Job No.=FIELD(No.);
+                      Image=WIPLedger }
+      { 54      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Prices;
+                                 ESM=&Precios;
+                                 FRC=&Prix;
+                                 ENC=&Prices];
+                      Image=Price }
+      { 93      ;2   ;Action    ;
+                      CaptionML=[ENU=&Resource;
+                                 ESM=&Recurso;
+                                 FRC=&Ressource;
+                                 ENC=&Resource];
+                      RunObject=Page 1011;
+                      RunPageLink=Job No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Resource;
+                      PromotedCategory=Category4 }
+      { 94      ;2   ;Action    ;
+                      CaptionML=[ENU=&Item;
+                                 ESM=&Producto;
+                                 FRC=Arti&cle;
+                                 ENC=&Item];
+                      RunObject=Page 1012;
+                      RunPageLink=Job No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Item;
+                      PromotedCategory=Category4 }
+      { 95      ;2   ;Action    ;
+                      CaptionML=[ENU=&G/L Account;
+                                 ESM=Cue&nta;
+                                 FRC=Compte du &grand livre;
+                                 ENC=&G/L Account];
+                      RunObject=Page 1013;
+                      RunPageLink=Job No.=FIELD(No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=JobPrice;
+                      PromotedCategory=Category4 }
+      { 53      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Plan&ning;
+                                 ESM=Pla&nific.;
+                                 FRC=Pla&nification;
+                                 ENC=Plan&ning];
+                      Image=Planning }
+      { 65      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource &Allocated per Job;
+                                 ESM=&Asign. recursos por proyecto;
+                                 FRC=&Ressource assignÇe par travail;
+                                 ENC=Resource &Allocated per Job];
+                      RunObject=Page 221;
+                      Image=ViewJob }
+      { 69      ;2   ;Action    ;
+                      CaptionML=[ENU=Res. &Gr. All&ocated per Job;
+                                 ESM=&Asign. fams. recursos proyecto;
+                                 FRC=&Gpe ress. affectÇes par pr&ojet;
+                                 ENC=Res. &Gr. All&ocated per Job];
+                      RunObject=Page 228;
+                      Image=ResourceGroup }
+      { 40      ;1   ;ActionGroup;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      Image=History }
+      { 60      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=&Movimientos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      RunObject=Page 92;
+                      RunPageView=SORTING(Job No.,Job Task No.,Entry Type,Posting Date);
+                      RunPageLink=Job No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=JobLedger;
+                      PromotedCategory=Process }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 33      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Copy;
+                                 ESM=&Copiar;
+                                 FRC=Co&pier;
+                                 ENC=&Copy];
+                      ActionContainerType=NewDocumentItems;
+                      Image=Copy }
+      { 31      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Copy Job Tasks &from...;
+                                 ESM=Copiar tareas de proyecto &desde...;
+                                 FRC=Copier tÉche projet Ö &partir de...;
+                                 ENC=Copy Job Tasks &from...];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CopyToTask;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 CopyJobTasks@1000 : Page 1041;
+                               BEGIN
+                                 CopyJobTasks.SetToJob(Rec);
+                                 CopyJobTasks.RUNMODAL;
+                               END;
+                                }
+      { 27      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Copy Job Tasks &to...;
+                                 ESM=Copiar tareas de proyecto &hasta...;
+                                 FRC=Copier tÉche projet &vers...;
+                                 ENC=Copy Job Tasks &to...];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CopyFromTask;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 CopyJobTasks@1000 : Page 1041;
+                               BEGIN
+                                 CopyJobTasks.SetFromJob(Rec);
+                                 CopyJobTasks.RUNMODAL;
+                               END;
+                                }
+      { 26      ;1   ;ActionGroup;
+                      CaptionML=[ENU=W&IP;
+                                 ESM=W&IP;
+                                 FRC=T&EC;
+                                 ENC=W&IP];
+                      Image=WIP }
+      { 25      ;2   ;Action    ;
+                      Name=<Action82>;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Calculate WIP;
+                                 ESM=Calc&ular WIP;
+                                 FRC=&Calculer TEC;
+                                 ENC=&Calculate WIP];
+                      Image=CalculateWIP;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 Job@1002 : Record 167;
+                               BEGIN
+                                 TESTFIELD("No.");
+                                 Job.COPY(Rec);
+                                 Job.SETRANGE("No.","No.");
+                                 REPORT.RUNMODAL(REPORT::"Job Calculate WIP",TRUE,FALSE,Job);
+                               END;
+                                }
+      { 24      ;2   ;Action    ;
+                      Name=<Action83>;
+                      ShortCutKey=F9;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Post WIP to G/L;
+                                 ESM=&Registrar WIP en C/G;
+                                 FRC=&Reporter TEC au GL;
+                                 ENC=&Post WIP to G/L];
+                      Image=PostOrder;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 Job@1001 : Record 167;
+                               BEGIN
+                                 TESTFIELD("No.");
+                                 Job.COPY(Rec);
+                                 Job.SETRANGE("No.","No.");
+                                 REPORT.RUNMODAL(REPORT::"Job Post WIP to G/L",TRUE,FALSE,Job);
+                               END;
+                                }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1902563906;1 ;Action    ;
+                      CaptionML=[ENU=Job Cost Budget;
+                                 ESM=Ppto. costo proyecto;
+                                 FRC=Budget coñt de projet;
+                                 ENC=Job Cost Budget];
+                      RunObject=Report 10215;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1901542506;1 ;Action    ;
+                      CaptionML=[ENU=Job Analysis;
+                                 ESM=An†lisis proyecto;
+                                 FRC=Analyse de projet;
+                                 ENC=Job Analysis];
+                      RunObject=Report 1008;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902943106;1 ;Action    ;
+                      CaptionML=[ENU=Job - Planning Lines;
+                                 ESM=Proyecto - L°neas planificaci¢n;
+                                 FRC=Projet - Lignes de planification;
+                                 ENC=Job - Planning Lines];
+                      RunObject=Report 1006;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907524606;1 ;Action    ;
+                      CaptionML=[ENU=Job Cost Transaction Detail;
+                                 ESM=Movimientos costo proyecto;
+                                 FRC=DÇtails transact. coñts projet;
+                                 ENC=Job Cost Transaction Detail];
+                      RunObject=Report 10220;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900273706;1 ;Action    ;
+                      CaptionML=[ENU=Job Actual to Budget (Cost);
+                                 ESM=Resultado vs. ppto. proyecto (costo);
+                                 FRC=Projet actuel Ö budgÇter (Coñt);
+                                 ENC=Job Actual to Budget (Cost)];
+                      RunObject=Report 10210;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1905412406;1 ;Action    ;
+                      CaptionML=[ENU=Job Actual to Budget (Price);
+                                 ESM=Resultado vs. ppto. proyecto (precio);
+                                 FRC=Projet actuel Ö budgÇter (Prix);
+                                 ENC=Job Actual to Budget (Price)];
+                      RunObject=Report 10211;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1903311606;1 ;Action    ;
+                      CaptionML=[ENU=Open Purchase Invoices by Job;
+                                 ESM=Abrir facturas compra por proy.;
+                                 FRC=Factures d'achat ouvertes par projet;
+                                 ENC=Open Purchase Invoices by Job];
+                      RunObject=Report 10092;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904393606;1 ;Action    ;
+                      CaptionML=[ENU=Open Sales Invoices by Job;
+                                 ESM=Abrir fact. vta. por proy.;
+                                 FRC=Factures de vente ouvertes par projet;
+                                 ENC=Open Sales Invoices by Job];
+                      RunObject=Report 10054;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902386606;1 ;Action    ;
+                      CaptionML=[ENU=Job Cost Suggested Billing;
+                                 ESM=Fact. prop. de costo proy.;
+                                 FRC=Factur. sugg. par coñts projet;
+                                 ENC=Job Cost Suggested Billing];
+                      RunObject=Report 10219;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No.";
+                Importance=Promoted;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description;
+                Importance=Promoted }
+
+    { 32  ;2   ;Field     ;
+                SourceExpr="Bill-to Customer No.";
+                Importance=Promoted;
+                OnValidate=BEGIN
+                             BilltoCustomerNoOnAfterValidat;
+                           END;
+                            }
+
+    { 96  ;2   ;Field     ;
+                SourceExpr="Bill-to Contact No." }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Bill-to Name";
+                Importance=Promoted }
+
+    { 45  ;2   ;Field     ;
+                SourceExpr="Bill-to Address" }
+
+    { 47  ;2   ;Field     ;
+                SourceExpr="Bill-to Address 2" }
+
+    { 49  ;2   ;Field     ;
+                SourceExpr="Bill-to City" }
+
+    { 1480001;2;Field     ;
+                CaptionML=[ENU=State / ZIP Code;
+                           ESM=Fact. a-Estado / C.P.;
+                           FRC=êtat-Province/code postal de facturation;
+                           ENC=Province/State / Postal/ZIP Code];
+                SourceExpr="Bill-to County" }
+
+    { 55  ;2   ;Field     ;
+                SourceExpr="Bill-to Post Code" }
+
+    { 43  ;2   ;Field     ;
+                SourceExpr="Bill-to Country/Region Code" }
+
+    { 51  ;2   ;Field     ;
+                SourceExpr="Bill-to Contact" }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Search Description" }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Person Responsible";
+                Importance=Promoted }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr=Blocked }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Last Date Modified" }
+
+    { 1904784501;1;Group  ;
+                CaptionML=[ENU=Posting;
+                           ESM=Registro;
+                           FRC=Report;
+                           ENC=Posting] }
+
+    { 34  ;2   ;Field     ;
+                SourceExpr=Status;
+                Importance=Promoted }
+
+    { 38  ;2   ;Field     ;
+                SourceExpr="Job Posting Group";
+                Importance=Promoted }
+
+    { 106 ;2   ;Field     ;
+                SourceExpr="WIP Method" }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="WIP Posting Method" }
+
+    { 89  ;2   ;Field     ;
+                SourceExpr="Allow Schedule/Contract Lines" }
+
+    { 70  ;2   ;Field     ;
+                SourceExpr="Apply Usage Link" }
+
+    { 39  ;2   ;Field     ;
+                Name=% of Overdue Planning Lines;
+                CaptionML=[ENU=% of Overdue Planning Lines;
+                           ESM=% de l°neas de planificaci¢n vencidas;
+                           FRC=% de lignes planification Çchues;
+                           ENC=% of Overdue Planning Lines];
+                SourceExpr=PercentOverdue;
+                Importance=Additional;
+                Editable=FALSE }
+
+    { 36  ;2   ;Field     ;
+                Name=% Completed;
+                CaptionML=[ENU=% Completed;
+                           ESM=% Completado;
+                           FRC=% rÇalisÇ;
+                           ENC=% Completed];
+                SourceExpr=PercentCompleted;
+                Importance=Additional;
+                Editable=FALSE }
+
+    { 35  ;2   ;Field     ;
+                Name=% Invoiced;
+                CaptionML=[ENU=% Invoiced;
+                           ESM=% Facturado;
+                           FRC=% facturÇ;
+                           ENC=% Invoiced];
+                SourceExpr=PercentInvoiced;
+                Importance=Additional;
+                Editable=FALSE }
+
+    { 1905744101;1;Group  ;
+                CaptionML=[ENU=Duration;
+                           ESM=Duraci¢n;
+                           FRC=DurÇe;
+                           ENC=Duration] }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Starting Date";
+                Importance=Promoted }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Ending Date";
+                Importance=Promoted }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Creation Date" }
+
+    { 1907468901;1;Group  ;
+                CaptionML=[ENU=Foreign Trade;
+                           ESM=Comercio exterior;
+                           FRC=Commerce Çtranger;
+                           ENC=Foreign Trade] }
+
+    { 98  ;2   ;Field     ;
+                SourceExpr="Currency Code";
+                Importance=Promoted;
+                Editable=CurrencyCodeEditable;
+                OnValidate=BEGIN
+                             CurrencyCheck;
+                           END;
+                            }
+
+    { 100 ;2   ;Field     ;
+                SourceExpr="Invoice Currency Code";
+                Editable=InvoiceCurrencyCodeEditable;
+                OnValidate=BEGIN
+                             CurrencyCheck;
+                           END;
+                            }
+
+    { 102 ;2   ;Field     ;
+                SourceExpr="Exch. Calculation (Cost)" }
+
+    { 104 ;2   ;Field     ;
+                SourceExpr="Exch. Calculation (Price)" }
+
+    { 1905734501;1;Group  ;
+                CaptionML=[ENU=WIP and Recognition;
+                           ESM=Trabajo en curso y reconocimiento;
+                           FRC=TEC et Reconnaissance;
+                           ENC=WIP and Recognition] }
+
+    { 7   ;2   ;Group     ;
+                CaptionML=[ENU=To Post;
+                           ESM=Para registrar;
+                           FRC=∑ reporter;
+                           ENC=To Post];
+                GroupType=Group }
+
+    { 108 ;3   ;Field     ;
+                SourceExpr="WIP Posting Date" }
+
+    { 37  ;3   ;Field     ;
+                SourceExpr="Total WIP Sales Amount" }
+
+    { 17  ;3   ;Field     ;
+                SourceExpr="Applied Sales G/L Amount";
+                Visible=FALSE }
+
+    { 110 ;3   ;Field     ;
+                SourceExpr="Total WIP Cost Amount" }
+
+    { 19  ;3   ;Field     ;
+                SourceExpr="Applied Costs G/L Amount";
+                Visible=FALSE }
+
+    { 16  ;3   ;Field     ;
+                SourceExpr="Recog. Sales Amount" }
+
+    { 18  ;3   ;Field     ;
+                SourceExpr="Recog. Costs Amount" }
+
+    { 71  ;3   ;Field     ;
+                Name=Recog. Profit Amount;
+                CaptionML=[ENU=Recog. Profit Amount;
+                           ESM=Importe de beneficio reconoc.;
+                           FRC=Montant profit rÇcep.;
+                           ENC=Recog. Profit Amount];
+                SourceExpr=CalcRecognizedProfitAmount }
+
+    { 74  ;3   ;Field     ;
+                Name=Recog. Profit %;
+                CaptionML=[ENU=Recog. Profit %;
+                           ESM=% de beneficio reconoc.;
+                           FRC=% profit sur vente rÇception;
+                           ENC=Recog. Profit %];
+                SourceExpr=CalcRecognizedProfitPercentage }
+
+    { 15  ;3   ;Field     ;
+                Name=Acc. WIP Costs Amount;
+                CaptionML=[ENU=Acc. WIP Costs Amount;
+                           ESM=Importe costos WIP acumulados;
+                           FRC=Montant coñts TEC comptabilitÇ;
+                           ENC=Acc. WIP Costs Amount];
+                SourceExpr=CalcAccWIPCostsAmount;
+                Visible=FALSE }
+
+    { 13  ;3   ;Field     ;
+                Name=Acc. WIP Sales Amount;
+                CaptionML=[ENU=Acc. WIP Sales Amount;
+                           ESM=Importe ventas WIP acumuladas;
+                           FRC=Montant vente TEC Ö payer;
+                           ENC=Acc. WIP Sales Amount];
+                SourceExpr=CalcAccWIPSalesAmount;
+                Visible=FALSE }
+
+    { 11  ;3   ;Field     ;
+                SourceExpr="Calc. Recog. Sales Amount";
+                Visible=FALSE }
+
+    { 9   ;3   ;Field     ;
+                SourceExpr="Calc. Recog. Costs Amount";
+                Visible=FALSE }
+
+    { 5   ;2   ;Group     ;
+                CaptionML=[ENU=Posted;
+                           ESM=Registrado;
+                           FRC=ReportÇ;
+                           ENC=Posted];
+                GroupType=Group }
+
+    { 116 ;3   ;Field     ;
+                SourceExpr="WIP G/L Posting Date" }
+
+    { 41  ;3   ;Field     ;
+                SourceExpr="Total WIP Sales G/L Amount" }
+
+    { 118 ;3   ;Field     ;
+                SourceExpr="Total WIP Cost G/L Amount" }
+
+    { 28  ;3   ;Field     ;
+                SourceExpr="Recog. Sales G/L Amount" }
+
+    { 29  ;3   ;Field     ;
+                SourceExpr="Recog. Costs G/L Amount" }
+
+    { 76  ;3   ;Field     ;
+                Name=Recog. Profit G/L Amount;
+                CaptionML=[ENU=Recog. Profit G/L Amount;
+                           ESM=Importe C/G de beneficio reconoc.;
+                           FRC=Montant GL profit rÇcep.;
+                           ENC=Recog. Profit G/L Amount];
+                SourceExpr=CalcRecognizedProfitGLAmount }
+
+    { 78  ;3   ;Field     ;
+                Name=Recog. Profit G/L %;
+                CaptionML=[ENU=Recog. Profit G/L %;
+                           ESM=% contable de beneficio reconoc.;
+                           FRC=% rÇception profit cpte GL;
+                           ENC=Recog. Profit G/L %];
+                SourceExpr=CalcRecognProfitGLPercentage }
+
+    { 21  ;3   ;Field     ;
+                SourceExpr="Calc. Recog. Sales G/L Amount";
+                Visible=FALSE }
+
+    { 23  ;3   ;Field     ;
+                SourceExpr="Calc. Recog. Costs G/L Amount";
+                Visible=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1902018507;1;Part   ;
+                SubPageLink=No.=FIELD(Bill-to Customer No.);
+                PagePartID=Page9082;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1902136407;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Resource Filter=FIELD(Resource Filter),
+                            Posting Date Filter=FIELD(Posting Date Filter),
+                            Resource Gr. Filter=FIELD(Resource Gr. Filter),
+                            Planning Date Filter=FIELD(Planning Date Filter);
+                PagePartID=Page9098;
+                Visible=TRUE;
+                PartType=Page }
+
+    { 1905650007;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Resource Filter=FIELD(Resource Filter),
+                            Posting Date Filter=FIELD(Posting Date Filter),
+                            Resource Gr. Filter=FIELD(Resource Gr. Filter),
+                            Planning Date Filter=FIELD(Planning Date Filter);
+                PagePartID=Page9099;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      InvoiceCurrencyCodeEditable@19003397 : Boolean INDATASET;
+      CurrencyCodeEditable@19053147 : Boolean INDATASET;
+
+    PROCEDURE CurrencyCheck@3();
+    BEGIN
+      IF "Currency Code" <> ''THEN
+        InvoiceCurrencyCodeEditable := FALSE
+      ELSE
+        InvoiceCurrencyCodeEditable := TRUE;
+
+      IF "Invoice Currency Code" <> ''THEN
+        CurrencyCodeEditable := FALSE
+      ELSE
+        CurrencyCodeEditable := TRUE;
+    END;
+
+    LOCAL PROCEDURE BilltoCustomerNoOnAfterValidat@19044114();
+    BEGIN
+      CurrPage.UPDATE;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,148 @@
+OBJECT Page 9036 Bookkeeper Activities
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Activities;
+               ESM=Actividades;
+               FRC=Activit‚s;
+               ENC=Activities];
+    SourceTable=Table9054;
+    PageType=CardPart;
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+
+                 SETFILTER("Due Date Filter",'<=%1',WORKDATE);
+                 SETFILTER("Overdue Date Filter",'<%1',WORKDATE);
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 7   ;1   ;Group     ;
+                CaptionML=[ENU=Payables;
+                           ESM=Pagos;
+                           FRC=Comptes … payer;
+                           ENC=Payables];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 11      ;0   ;Action    ;
+                                  CaptionML=[ENU=Edit Payment Journal;
+                                             ESM=Editar diario de pagos;
+                                             FRC=Modifier le journal des paiements;
+                                             ENC=Edit Payment Journal];
+                                  RunObject=Page 256 }
+                  { 12      ;0   ;Action    ;
+                                  CaptionML=[ENU=New Purchase Credit Memo;
+                                             ESM=Nueva nota cr‚dito compra;
+                                             FRC=Nouvelle note de cr‚dit d'achat;
+                                             ENC=New Purchase Credit Memo];
+                                  RunObject=Page 52;
+                                  RunPageMode=Create }
+                }
+                 }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Purchase Invoices Due Today";
+                DrillDownPageID=Vendor Ledger Entries }
+
+    { 1   ;2   ;Field     ;
+                SourceExpr="Vendors - Payment on Hold";
+                DrillDownPageID=Vendor List }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Approved Purchase Orders";
+                DrillDownPageID=Purchase Order List }
+
+    { 8   ;1   ;Group     ;
+                CaptionML=[ENU=Receivables;
+                           ESM=Cobros;
+                           FRC=Comptes … recevoir;
+                           ENC=Receivables];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 20      ;0   ;Action    ;
+                                  CaptionML=[ENU=Edit Cash Receipt Journal;
+                                             ESM=Editar diario de recibos de efectivo;
+                                             FRC=Modifier le journal des encaissements;
+                                             ENC=Edit Cash Receipt Journal];
+                                  RunObject=Page 255 }
+                  { 21      ;0   ;Action    ;
+                                  CaptionML=[ENU=New Sales Credit Memo;
+                                             ESM=Nueva nota cr‚dito venta;
+                                             FRC=Nouvelle note de cr‚dit de vente;
+                                             ENC=New Sales Credit Memo];
+                                  RunObject=Page 44;
+                                  RunPageMode=Create }
+                }
+                 }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="SOs Pending Approval";
+                DrillDownPageID=Sales Order List }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Overdue Sales Documents";
+                DrillDownPageID=Customer Ledger Entries }
+
+    { 15  ;2   ;Field     ;
+                SourceExpr="Approved Sales Orders";
+                DrillDownPageID=Sales Order List }
+
+    { 1400000;1;Group     ;
+                CaptionML=[ENU=Cash Management;
+                           ESM=Tesorer¡a;
+                           FRC=Gestion de tr‚sorerie;
+                           ENC=Cash Management];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 1400008 ;0   ;Action    ;
+                                  CaptionML=[ENU=New Deposit;
+                                             ESM=Nuevo dep¢sito;
+                                             FRC=Nouveau d‚p“t;
+                                             ENC=New Deposit];
+                                  RunObject=Page 10140;
+                                  RunPageMode=Create }
+                  { 1400009 ;0   ;Action    ;
+                                  CaptionML=[ENU=New Bank Reconciliation;
+                                             ESM=Nueva conciliaci¢n;
+                                             FRC=Nouveau rapprochement bancaire;
+                                             ENC=New Bank Reconciliation];
+                                  RunObject=Page 10120;
+                                  Image=BankAccountRec;
+                                  RunPageMode=Create }
+                }
+                 }
+
+    { 1400002;2;Field     ;
+                SourceExpr="Bank Reconciliations to Post";
+                DrillDownPageID=Bank Rec. List }
+
+    { 1400004;2;Field     ;
+                SourceExpr="Deposits to Post";
+                DrillDownPageID=Deposit List }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

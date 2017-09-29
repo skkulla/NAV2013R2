@@ -1,0 +1,31 @@
+OBJECT Codeunit 10001 Shipment Line - Edit
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/06/00;
+    Time=12:00:00 PM;
+    Version List=NAVNA4.00;
+  }
+  PROPERTIES
+  {
+    TableNo=111;
+    OnRun=BEGIN
+            SalesShipmentLine := Rec;
+            SalesShipmentLine.LOCKTABLE;
+            SalesShipmentLine.FIND;
+            SalesShipmentLine."Package Tracking No." := "Package Tracking No.";
+            SalesShipmentLine.MODIFY;
+            Rec := SalesShipmentLine;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      SalesShipmentLine@1020000 : Record 111;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,95 @@
+OBJECT Page 10015 IRS 1099 Form-Box
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=IRS 1099 Form-Box;
+               ESM=Form. IRS 1099-Campo;
+               FRC=Case du formulaire IRS 1099;
+               ENC=IRS 1099 Form-Box];
+    SourceTable=Table10010;
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1900153904;1 ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Magnetic Media;
+                                 ESM=Form. 1099 soportes magn‚t.;
+                                 FRC=Support magn‚tique 1099 de fournisseur;
+                                 ENC=Vendor 1099 Magnetic Media];
+                      RunObject=Report 10115;
+                      Promoted=Yes;
+                      Image=Export1099;
+                      PromotedCategory=Process }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1902858006;1 ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Div;
+                                 ESM=Form. prov. 1099 Div;
+                                 FRC=Fournisseur div 1099;
+                                 ENC=Vendor 1099 Div];
+                      RunObject=Report 10109;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902577106;1 ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Int;
+                                 ESM=Form. prov. 1099 Int;
+                                 FRC=Fournisseur int 1099;
+                                 ENC=Vendor 1099 Int];
+                      RunObject=Report 10111;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907012606;1 ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Misc;
+                                 ESM=Form. prov. 1099 Misc;
+                                 FRC=Fournisseur divers 1099;
+                                 ENC=Vendor 1099 Misc];
+                      RunObject=Report 10112;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902060306;1 ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Information;
+                                 ESM=Inf. form. prov. 1099;
+                                 FRC=Fournisseur information 1099;
+                                 ENC=Vendor 1099 Information];
+                      RunObject=Report 10110;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Minimum Reportable" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

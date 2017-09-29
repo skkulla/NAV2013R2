@@ -1,0 +1,250 @@
+OBJECT Codeunit 414 Release Sales Document
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800,NAVNA7.10.00.35800;
+  }
+  PROPERTIES
+  {
+    TableNo=36;
+    OnRun=VAR
+            SalesLine@1000 : Record 37;
+            TempVATAmountLine0@1001 : TEMPORARY Record 290;
+            TempVATAmountLine1@1002 : TEMPORARY Record 290;
+            NotOnlyDropShipment@1003 : Boolean;
+            PostingDate@1004 : Date;
+            PrintPostedDocuments@1005 : Boolean;
+          BEGIN
+            IF Status = Status::Released THEN
+              EXIT;
+
+            IF "Document Type" = "Document Type"::Quote THEN
+              IF CheckCustomerCreated(TRUE) THEN
+                GET("Document Type"::Quote,"No.")
+              ELSE
+                EXIT;
+
+            TESTFIELD("Sell-to Customer No.");
+
+            SalesLine.SETRANGE("Document Type","Document Type");
+            SalesLine.SETRANGE("Document No.","No.");
+            SalesLine.SETFILTER(Type,'>0');
+            SalesLine.SETFILTER(Quantity,'<>0');
+            IF NOT SalesLine.FIND('-') THEN
+              ERROR(Text001,"Document Type","No.");
+            InvtSetup.GET;
+            IF InvtSetup."Location Mandatory" THEN BEGIN
+              SalesLine.SETRANGE(Type,SalesLine.Type::Item);
+              IF SalesLine.FINDSET THEN
+                REPEAT
+                  IF NOT SalesLine.IsServiceItem THEN
+                    SalesLine.TESTFIELD("Location Code");
+                UNTIL SalesLine.NEXT = 0;
+              SalesLine.SETFILTER(Type,'>0');
+            END;
+            SalesLine.SETRANGE("Drop Shipment",FALSE);
+            NotOnlyDropShipment := SalesLine.FINDFIRST;
+            SalesLine.RESET;
+
+            SalesSetup.GET;
+            IF SalesSetup."Calc. Inv. Discount" THEN BEGIN
+              PostingDate := "Posting Date";
+              PrintPostedDocuments := "Print Posted Documents";
+              CODEUNIT.RUN(CODEUNIT::"Sales-Calc. Discount",SalesLine);
+              GET("Document Type","No.");
+              "Print Posted Documents" := PrintPostedDocuments;
+              IF PostingDate <> "Posting Date" THEN
+                VALIDATE("Posting Date",PostingDate);
+            END;
+
+            IF TestPrepayment(Rec) AND ("Document Type" = "Document Type"::Order) THEN BEGIN
+              Status := Status::"Pending Prepayment";
+              MODIFY(TRUE);
+              EXIT;
+            END
+              ;
+            Status := Status::Released;
+
+            SalesLine.SetSalesHeader(Rec);
+            IF "Tax Area Code" = '' THEN BEGIN  // VAT
+              SalesLine.CalcVATAmountLines(0,Rec,SalesLine,TempVATAmountLine0);
+              SalesLine.CalcVATAmountLines(1,Rec,SalesLine,TempVATAmountLine1);
+              SalesLine.UpdateVATOnLines(0,Rec,SalesLine,TempVATAmountLine0);
+              SalesLine.UpdateVATOnLines(1,Rec,SalesLine,TempVATAmountLine1);
+            END ELSE
+              SalesLine.CalcSalesTaxLines(Rec,SalesLine);
+
+            ReleaseATOs(Rec);
+
+            MODIFY(TRUE);
+
+            IF NotOnlyDropShipment THEN
+              IF "Document Type" IN ["Document Type"::Order,"Document Type"::"Return Order"] THEN
+                WhseSalesRelease.Release(Rec);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Text001@1001 : TextConst 'ENU=There is nothing to release for the document of type %1 with the number %2.;ESM=No hay nada que liberar para el documento de tipo %1 con el n£mero %2.;FRC=Il n''y a rien … lib‚rer pour le document de type %1 portant le num‚ro %2.;ENC=There is nothing to release for the document of type %1 with the number %2.';
+      SalesSetup@1002 : Record 311;
+      InvtSetup@1000 : Record 313;
+      WhseSalesRelease@1004 : Codeunit 5771;
+      Text002@1005 : TextConst 'ENU=This document can only be released when the approval process is complete.;ESM=Este documento s¢lo se puede lanzar una vez completado el proceso de aprobaci¢n.;FRC=Ce document ne peut ˆtre lanc‚ qu''… la fin du processus d''approbation.;ENC=This document can only be released when the approval process is complete.';
+      Text003@1003 : TextConst 'ENU=The approval process must be canceled or completed to reopen this document.;ESM=El proceso de aprobaci¢n se debe cancelar o completar para volver a abrir este documento.;FRC=On doit annuler ou terminer le processus d''approbation avant de rouvrir ce document.;ENC=The approval process must be cancelled or completed to reopen this document.';
+      Text004@1007 : TextConst 'ENU=There are unposted prepayment amounts on the document of type %1 with the number %2.;ESM=Hay importes anticipo sin registrar en el documento de tipo %1 con el n£mero %2.;FRC=Il existe des montants paiement anticip‚ non valid‚s sur le document de type %1 portant le num‚ro %2.;ENC=There are unposted prepayment amounts on the document of type %1 with the number %2.';
+      Text005@1006 : TextConst 'ENU=There are unpaid prepayment invoices that are related to the document of type %1 with the number %2.;ESM=Hay facturas anticipo sin pagar relacionadas con el documento de tipo %1 con el n£mero %2.;FRC=Il existe des factures de paiement anticip‚ impay‚es li‚es au document de type %1 portant le num‚ro %2.;ENC=There are unpaid prepayment invoices that are related to the document of type %1 with the number %2.';
+
+    PROCEDURE Reopen@1(VAR SalesHeader@1000 : Record 36);
+    BEGIN
+      WITH SalesHeader DO BEGIN
+        IF Status = Status::Open THEN
+          EXIT;
+        Status := Status::Open;
+
+        IF "Document Type" <> "Document Type"::Order THEN
+          ReopenATOs(SalesHeader);
+
+        MODIFY(TRUE);
+        IF "Document Type" IN ["Document Type"::Order,"Document Type"::"Return Order"] THEN
+          WhseSalesRelease.Reopen(SalesHeader);
+      END;
+    END;
+
+    PROCEDURE PerformManualRelease@2(VAR SalesHeader@1002 : Record 36);
+    VAR
+      ApprovalEntry@1004 : Record 454;
+      ApprovalManagement@1001 : Codeunit 439;
+      ApprovedOnly@1005 : Boolean;
+    BEGIN
+      WITH SalesHeader DO BEGIN
+        IF ApprovalManagement.TestSalesPrepayment(SalesHeader) THEN
+          ERROR(STRSUBSTNO(Text004,"Document Type","No."));
+        IF ("Document Type" = "Document Type"::Order) AND ApprovalManagement.TestSalesPayment(SalesHeader) THEN BEGIN
+          IF Status <> Status::"Pending Prepayment" THEN BEGIN
+            Status := Status::"Pending Prepayment";
+            MODIFY;
+            COMMIT;
+          END;
+          ERROR(STRSUBSTNO(Text005,"Document Type","No."));
+        END;
+
+        IF ApprovalManagement.CheckApprSalesDocument(SalesHeader) THEN BEGIN
+          CASE Status OF
+            Status::"Pending Approval":
+              ERROR(Text002);
+            Status::Released,Status::"Pending Prepayment":
+              CODEUNIT.RUN(CODEUNIT::"Release Sales Document",SalesHeader);
+            Status::Open:
+              BEGIN
+                ApprovedOnly := TRUE;
+                ApprovalEntry.SETCURRENTKEY("Table ID","Document Type","Document No.","Sequence No.");
+                ApprovalEntry.SETRANGE("Table ID",DATABASE::"Sales Header");
+                ApprovalEntry.SETRANGE("Document Type","Document Type");
+                ApprovalEntry.SETRANGE("Document No.","No.");
+                ApprovalEntry.SETFILTER(Status,'<>%1&<>%2',ApprovalEntry.Status::Rejected,ApprovalEntry.Status::Canceled);
+                IF ApprovalEntry.FINDSET THEN BEGIN
+                  REPEAT
+                    IF ApprovalEntry.Status <> ApprovalEntry.Status::Approved THEN
+                      ApprovedOnly := FALSE;
+                  UNTIL NOT ApprovedOnly OR (ApprovalEntry.NEXT = 0);
+
+                  IF ApprovedOnly AND TestApprovalLimit(SalesHeader) THEN
+                    CODEUNIT.RUN(CODEUNIT::"Release Sales Document",SalesHeader)
+                  ELSE
+                    ERROR(Text002);
+                END ELSE
+                  ERROR(Text002);
+              END;
+          END;
+        END ELSE
+          CODEUNIT.RUN(CODEUNIT::"Release Sales Document",SalesHeader);
+      END;
+    END;
+
+    PROCEDURE PerformManualReopen@3(VAR SalesHeader@1002 : Record 36);
+    VAR
+      ApprovalManagement@1001 : Codeunit 439;
+    BEGIN
+      WITH SalesHeader DO BEGIN
+        IF ApprovalManagement.CheckApprSalesDocument(SalesHeader) THEN BEGIN
+          CASE Status OF
+            Status::"Pending Approval":
+              ERROR(Text003);
+            Status::Open,Status::Released,Status::"Pending Prepayment":
+              Reopen(SalesHeader);
+          END;
+        END ELSE
+          Reopen(SalesHeader);
+      END;
+    END;
+
+    PROCEDURE TestPrepayment@31(SalesHeader@1000 : Record 36) : Boolean;
+    VAR
+      SalesLines@1001 : Record 37;
+    BEGIN
+      SalesLines.SETRANGE("Document Type",SalesHeader."Document Type");
+      SalesLines.SETRANGE("Document No.",SalesHeader."No.");
+      SalesLines.SETFILTER("Prepmt. Line Amount",'<>%1',0);
+      IF SalesLines.FIND('-') THEN
+        REPEAT
+          IF SalesLines."Prepmt. Amt. Inv." <> SalesLines."Prepmt. Line Amount" THEN
+            EXIT(TRUE);
+        UNTIL SalesLines.NEXT = 0;
+    END;
+
+    PROCEDURE TestApprovalLimit@4(SalesHeader@1000 : Record 36) : Boolean;
+    VAR
+      UserSetup@1004 : Record 91;
+      AppManagement@1001 : Codeunit 439;
+      AppAmount@1002 : Decimal;
+      AppAmountLCY@1003 : Decimal;
+    BEGIN
+      AppManagement.CalcSalesDocAmount(SalesHeader,AppAmount,AppAmountLCY);
+      UserSetup.GET(USERID);
+      IF UserSetup."Unlimited Sales Approval" THEN
+        EXIT(TRUE);
+
+      IF AppAmountLCY > UserSetup."Sales Amount Approval Limit" THEN
+        ERROR(Text002);
+
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE ReleaseATOs@5(SalesHeader@1000 : Record 36);
+    VAR
+      SalesLine@1001 : Record 37;
+      AsmHeader@1002 : Record 900;
+    BEGIN
+      SalesLine.SETRANGE("Document Type",SalesHeader."Document Type");
+      SalesLine.SETRANGE("Document No.",SalesHeader."No.");
+      IF SalesLine.FINDSET THEN
+        REPEAT
+          IF SalesLine.AsmToOrderExists(AsmHeader) THEN
+            CODEUNIT.RUN(CODEUNIT::"Release Assembly Document",AsmHeader);
+        UNTIL SalesLine.NEXT = 0;
+    END;
+
+    LOCAL PROCEDURE ReopenATOs@6(SalesHeader@1000 : Record 36);
+    VAR
+      SalesLine@1001 : Record 37;
+      AsmHeader@1002 : Record 900;
+      ReleaseAssemblyDocument@1003 : Codeunit 903;
+    BEGIN
+      SalesLine.SETRANGE("Document Type",SalesHeader."Document Type");
+      SalesLine.SETRANGE("Document No.",SalesHeader."No.");
+      IF SalesLine.FINDSET THEN
+        REPEAT
+          IF SalesLine.AsmToOrderExists(AsmHeader) THEN
+            ReleaseAssemblyDocument.Reopen(AsmHeader);
+        UNTIL SalesLine.NEXT = 0;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

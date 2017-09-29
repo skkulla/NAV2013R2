@@ -1,0 +1,259 @@
+OBJECT Page 5201 Employee List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Employee List;
+               ESM=Lista empleados;
+               FRC=Liste d'employ‚s;
+               ENC=Employee List];
+    SourceTable=Table5200;
+    PageType=List;
+    CardPageID=Employee Card;
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 33      ;1   ;ActionGroup;
+                      CaptionML=[ENU=E&mployee;
+                                 ESM=E&mpleado;
+                                 FRC=E&mploy‚;
+                                 ENC=E&mployee];
+                      Image=Employee }
+      { 43      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 5222;
+                      RunPageLink=Table Name=CONST(Employee),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 20      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions }
+      { 184     ;3   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions-Single;
+                                 ESM=Dimensiones-Individual;
+                                 FRC=Dimensions - Simples;
+                                 ENC=Dimensions-Single];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(5200),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 19      ;3   ;Action    ;
+                      CaptionML=[ENU=Dimensions-&Multiple;
+                                 ESM=Dimensiones-&M£ltiple;
+                                 FRC=Dimensions - &Multiples;
+                                 ENC=Dimensions-&Multiple];
+                      Image=DimensionSets;
+                      OnAction=VAR
+                                 Employee@1001 : Record 5200;
+                                 DefaultDimMultiple@1002 : Page 542;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(Employee);
+                                 DefaultDimMultiple.SetMultiEmployee(Employee);
+                                 DefaultDimMultiple.RUNMODAL;
+                               END;
+                                }
+      { 44      ;2   ;Action    ;
+                      CaptionML=[ENU=&Picture;
+                                 ESM=Ima&gen;
+                                 FRC=&Image;
+                                 ENC=&Picture];
+                      RunObject=Page 5202;
+                      RunPageLink=No.=FIELD(No.);
+                      Image=Picture }
+      { 45      ;2   ;Action    ;
+                      CaptionML=[ENU=&Alternative Addresses;
+                                 ESM=Direcs. altern&as;
+                                 FRC=Adresses &secondaires;
+                                 ENC=&Alternative Addresses];
+                      RunObject=Page 5204;
+                      RunPageLink=Employee No.=FIELD(No.);
+                      Image=Addresses }
+      { 46      ;2   ;Action    ;
+                      CaptionML=[ENU=Relati&ves;
+                                 ESM=Fami&liares;
+                                 FRC=&Parents;
+                                 ENC=&Relatives];
+                      RunObject=Page 5209;
+                      RunPageLink=Employee No.=FIELD(No.);
+                      Image=Relatives }
+      { 47      ;2   ;Action    ;
+                      CaptionML=[ENU=Mi&sc. Article Information;
+                                 ESM=Info. rec&s diversos;
+                                 FRC=Renseignements diver&s article;
+                                 ENC=Mi&sc. Article Information];
+                      RunObject=Page 5219;
+                      RunPageLink=Employee No.=FIELD(No.);
+                      Image=Filed }
+      { 48      ;2   ;Action    ;
+                      CaptionML=[ENU=Con&fidential Information;
+                                 ESM=Info. &confidencial;
+                                 FRC=Information con&fidentielle;
+                                 ENC=Co&nfidential Information];
+                      RunObject=Page 5221;
+                      RunPageLink=Employee No.=FIELD(No.);
+                      Image=Lock }
+      { 49      ;2   ;Action    ;
+                      CaptionML=[ENU=Q&ualifications;
+                                 ESM=&Habilidades;
+                                 FRC=&Comp‚tences;
+                                 ENC=Q&ualifications];
+                      RunObject=Page 5206;
+                      RunPageLink=Employee No.=FIELD(No.);
+                      Image=Certificate }
+      { 50      ;2   ;Action    ;
+                      CaptionML=[ENU=A&bsences;
+                                 ESM=&Ausencias;
+                                 FRC=A&bsences;
+                                 ENC=A&bsences];
+                      RunObject=Page 5211;
+                      RunPageLink=Employee No.=FIELD(No.);
+                      Image=Absence }
+      { 51      ;2   ;Separator  }
+      { 54      ;2   ;Action    ;
+                      CaptionML=[ENU=Absences b&y Categories;
+                                 ESM=Ausencias por ca&tegor¡as;
+                                 FRC=Absences &par cat‚gories;
+                                 ENC=Absences by Ca&tegories];
+                      RunObject=Page 5226;
+                      RunPageLink=No.=FIELD(No.),
+                                  Employee No. Filter=FIELD(No.);
+                      Image=AbsenceCategory }
+      { 55      ;2   ;Action    ;
+                      CaptionML=[ENU=Misc. Articles &Overview;
+                                 ESM=&Panorama recs. diversos;
+                                 FRC=&Aper‡u articles divers;
+                                 ENC=Misc. Articles &Overview];
+                      RunObject=Page 5228;
+                      Image=FiledOverview }
+      { 56      ;2   ;Action    ;
+                      CaptionML=[ENU=Confidential Info. Overvie&w;
+                                 ESM=Pa&nor mica info. confidencial;
+                                 FRC=&Aper‡u de l'information confidentielle;
+                                 ENC=Con&fidential Info. Overview];
+                      RunObject=Page 5229;
+                      Image=ConfidentialOverview }
+      { 57      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 58      ;1   ;Action    ;
+                      CaptionML=[ENU=Absence Registration;
+                                 ESM=Registro ausencias;
+                                 FRC=Saisie des absences;
+                                 ENC=Absence Registration];
+                      RunObject=Page 5212;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Absence;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 17  ;2   ;Field     ;
+                Name=FullName;
+                CaptionML=[ENU=Full Name;
+                           ESM=Nombre completo;
+                           FRC=Nom complet;
+                           ENC=Full Name];
+                SourceExpr=FullName }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="First Name";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Middle Name";
+                Visible=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Last Name";
+                Visible=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr=Initials;
+                Visible=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Job Title" }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Post Code";
+                Visible=FALSE }
+
+    { 84  ;2   ;Field     ;
+                SourceExpr="Country/Region Code";
+                Visible=FALSE }
+
+    { 80  ;2   ;Field     ;
+                SourceExpr=Extension }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Phone No.";
+                Visible=FALSE }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Mobile Phone No.";
+                Visible=FALSE }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="E-Mail";
+                Visible=FALSE }
+
+    { 52  ;2   ;Field     ;
+                SourceExpr="Statistics Group Code";
+                Visible=FALSE }
+
+    { 72  ;2   ;Field     ;
+                SourceExpr="Resource No.";
+                Visible=FALSE }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Search Name" }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr=Comment }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

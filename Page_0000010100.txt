@@ -1,0 +1,55 @@
+OBJECT Page 10100 Account Identifiers
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Account Identifiers;
+               ESM=Identificadores de cuenta;
+               FRC=Identificateurs de compte;
+               ENC=Account Identifiers];
+    SourceTable=Table10100;
+    PageType=Card;
+    OnNewRecord=BEGIN
+                  Company.GET;
+                  "Business No." := Company."Federal ID No.";
+                END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1030000;1;Group     ;
+                GroupType=Repeater }
+
+    { 1030001;2;Field     ;
+                SourceExpr="Business No.";
+                Visible=FALSE }
+
+    { 1030002;2;Field     ;
+                SourceExpr="Program Identifier" }
+
+    { 1030003;2;Field     ;
+                SourceExpr="Reference No." }
+
+    { 1030004;2;Field     ;
+                SourceExpr="Business Number";
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      Company@1030000 : Record 79;
+
+    BEGIN
+    END.
+  }
+}
+

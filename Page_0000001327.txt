@@ -1,0 +1,162 @@
+OBJECT Page 1327 Mini Adjust Inventory
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Adjust Inventory;
+               ESM=Adjust Inventory;
+               FRC=Adjust Inventory;
+               ENC=Adjust Inventory];
+    SourceTable=Table27;
+    PageType=StandardDialog;
+    OnQueryClosePage=BEGIN
+                       IF CloseAction IN [ACTION::OK,ACTION::LookupOK] THEN
+                         PostToItemLedger;
+                     END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           NewInventory := Inventory
+                         END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=General;
+                GroupType=Group }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit in which the item is held on inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.;
+                           ESM=Especifica la unidad en la que se guarda el producto en existencias. La unidad de medida base tambiÇn se usa como base de la conversi¢n para las unidades de medida alternas.;
+                           FRC=Indique l'unitÇ dans laquelle l'article est stockÇ. L'unitÇ de base sert Çgalement de base de conversion pour les unitÇs de remplacement.;
+                           ENC=Specifies the unit in which the item is held on inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.];
+                SourceExpr="Base Unit of Measure";
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                CaptionML=[ENU=Current Inventory;
+                           ESM=Inventario actual;
+                           FRC=Inventaire actuel;
+                           ENC=Current Inventory];
+                ToolTipML=[ENU=Specifies how many units, such as pieces, boxes, or cans, of the item are on inventory.;
+                           ESM=Especifica cu†ntas unidades (como piezas, cajas o envases) del producto hay en existencias.;
+                           FRC=Indique le nombre d'unitÇs (par exemple des piäces, des boåtes ou des palettes) en stock.;
+                           ENC=Specifies how many units, such as pieces, boxes, or cans, of the item are on inventory.];
+                SourceExpr=Inventory }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=New Inventory;
+                           ESM=Nuevo inventario;
+                           FRC=Nouvel inventaire;
+                           ENC=New Inventory];
+                ToolTipML=[ENU=Specifies the inventory quantity that will be recorded for the item when you choose the OK button. By default, the value in the Current Inventory field is inserted.;
+                           ESM=Especifica la cantidad de inventario que se registrar† para el art°culo cuando elige el bot¢n Aceptar. De forma predeterminada, el valor del campo Inventario actual se inserta.;
+                           FRC=SpÇcifie la quantitÇ en stock qui sera enregistrÇe pour l'article lorsque vous cliquez sur le bouton OK. Par dÇfaut, la valeur du champ Stock actuel champ est insÇrÇe.;
+                           ENC=Specifies the inventory quantity that will be recorded for the item when you choose the OK button. By default, the value in the Current Inventory field is inserted.];
+                DecimalPlaces=0:5;
+                SourceExpr=NewInventory }
+
+  }
+  CODE
+  {
+    VAR
+      CantFindTemplateOrBatchErr@1001 : TextConst 'ENU=Unable to find the correct Item Journal template or batch to post this change. Use Item Journal instead.;ESM=No se encuentra el libro o el lote correcto de diario de producto para registrar este cambio. Use el diario de productos en su lugar.;FRC=Impossible de trouver le modäle/nom journal article correct pour reporter ce changement. Utilisez plutìt le journal article.;ENC=Unable to find the correct Item Journal template or batch to post this change. Use Item Journal instead.';
+      SimpleInvJnlNameTxt@1000 : TextConst '@@@=The default name of the item journal;ENU=DEFAULT;ESM=PREDET;FRC=DêFAUT;ENC=DEFAULT';
+      ItemJnlMgt@1003 : Codeunit 240;
+      NewInventory@1002 : Decimal;
+
+    LOCAL PROCEDURE PostToItemLedger@2();
+    VAR
+      ItemJnlLine@1001 : Record 83;
+      Completed@1000 : Boolean;
+    BEGIN
+      IF Inventory = NewInventory THEN
+        EXIT;
+
+      ItemJnlLine.INIT;
+      ItemJnlLine.VALIDATE("Journal Template Name",SelectItemTemplate);
+      ItemJnlLine.VALIDATE("Journal Batch Name",CreateItemBatch(ItemJnlLine."Journal Template Name"));
+      ItemJnlLine.VALIDATE("Posting Date",TODAY);
+      ItemJnlLine."Document No." := "No.";
+
+      IF Inventory < NewInventory THEN
+        ItemJnlLine.VALIDATE("Entry Type",ItemJnlLine."Entry Type"::"Positive Adjmt.")
+      ELSE
+        ItemJnlLine.VALIDATE("Entry Type",ItemJnlLine."Entry Type"::"Negative Adjmt.");
+
+      ItemJnlLine.VALIDATE("Item No.","No.");
+      ItemJnlLine.VALIDATE(Description,Description);
+      ItemJnlLine.VALIDATE(Quantity,ABS(NewInventory - Inventory));
+      ItemJnlLine.INSERT(TRUE);
+      COMMIT;
+
+      Completed := CODEUNIT.RUN(CODEUNIT::"Item Jnl.-Post Batch",ItemJnlLine);
+
+      DeleteItemBatch(ItemJnlLine."Journal Template Name",ItemJnlLine."Journal Batch Name");
+
+      IF NOT Completed THEN
+        MESSAGE(GETLASTERRORTEXT);
+    END;
+
+    LOCAL PROCEDURE SelectItemTemplate@3() : Code[10];
+    VAR
+      ItemJnlTemplate@1002 : Record 82;
+      ItemJnlLine@1170000001 : Record 83;
+      JnlSelected@1000 : Boolean;
+    BEGIN
+      ItemJnlMgt.TemplateSelection(PAGE::"Item Journal",0,FALSE,ItemJnlLine,JnlSelected);
+
+      ItemJnlTemplate.SETRANGE("Page ID",PAGE::"Item Journal");
+      ItemJnlTemplate.SETRANGE(Recurring,FALSE);
+      ItemJnlTemplate.SETRANGE(Type,ItemJnlTemplate.Type::Item);
+      IF NOT ItemJnlTemplate.FINDFIRST THEN
+        ERROR(CantFindTemplateOrBatchErr);
+
+      EXIT(ItemJnlTemplate.Name);
+    END;
+
+    LOCAL PROCEDURE CreateItemBatch@4(TemplateName@1001 : Code[10]) : Code[10];
+    VAR
+      ItemJnlBatch@1002 : Record 233;
+    BEGIN
+      ItemJnlBatch.INIT;
+      ItemJnlBatch."Journal Template Name" := TemplateName;
+      ItemJnlBatch.Name := CreateBatchName;
+      ItemJnlBatch.Description := SimpleInvJnlNameTxt;
+      ItemJnlBatch.INSERT;
+
+      EXIT(ItemJnlBatch.Name);
+    END;
+
+    LOCAL PROCEDURE DeleteItemBatch@8(TemplateName@1001 : Code[10];BatchName@1000 : Code[10]);
+    VAR
+      ItemJnlBatch@1002 : Record 233;
+    BEGIN
+      IF ItemJnlBatch.GET(TemplateName,BatchName) THEN
+        ItemJnlBatch.DELETE(TRUE);
+    END;
+
+    LOCAL PROCEDURE CreateBatchName@5() : Code[10];
+    VAR
+      GuidStr@1213 : Text;
+      BatchName@1423 : Text;
+    BEGIN
+      GuidStr := FORMAT(CREATEGUID);
+      // Remove numbers to avoid batch name change by INCSTR in codeunit 23
+      BatchName := CONVERTSTR(GuidStr,'1234567890-','GHIJKLMNOPQ');
+      EXIT(COPYSTR(BatchName,2,10));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,247 @@
+OBJECT Page 240 Business Unit List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Business Unit List;
+               ESM=Lista de empresas;
+               FRC=EntitÇs commerciales;
+               ENC=Business Unit List];
+    SourceTable=Table220;
+    PageType=List;
+    CardPageID=Business Unit Card;
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 50      ;1   ;ActionGroup;
+                      CaptionML=[ENU=E&xch. Rates;
+                                 ESM=Tipos &cambio;
+                                 FRC=Taux de &change;
+                                 ENC=E&xch. Rates];
+                      Image=ManualExchangeRate }
+      { 51      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Average Rate (Manual);
+                                 ESM=Tipo de cambio medio (manual);
+                                 FRC=Taux moyen (manuel);
+                                 ENC=Average Rate (Manual)];
+                      Image=ManualExchangeRate;
+                      OnAction=BEGIN
+                                 ChangeExchangeRate.SetCaption(Text000);
+                                 ChangeExchangeRate.SetParameter("Currency Code","Income Currency Factor",WORKDATE);
+                                 IF ChangeExchangeRate.RUNMODAL = ACTION::OK THEN BEGIN
+                                   "Income Currency Factor" := ChangeExchangeRate.GetParameter;
+                                   MODIFY;
+                                 END;
+                                 CLEAR(ChangeExchangeRate);
+                               END;
+                                }
+      { 52      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Closing Rate;
+                                 ESM=Tipo de cambio al cierre;
+                                 FRC=Taux de fermeture;
+                                 ENC=Closing Rate];
+                      Image=Close;
+                      OnAction=BEGIN
+                                 ChangeExchangeRate.SetCaption(Text001);
+                                 ChangeExchangeRate.SetParameter("Currency Code","Balance Currency Factor",WORKDATE);
+                                 IF ChangeExchangeRate.RUNMODAL = ACTION::OK THEN BEGIN
+                                   "Balance Currency Factor" := ChangeExchangeRate.GetParameter;
+                                   MODIFY;
+                                 END;
+                                 CLEAR(ChangeExchangeRate);
+                               END;
+                                }
+      { 31      ;2   ;Action    ;
+                      CaptionML=[ENU=Last Closing Rate;
+                                 ESM=Èltimo cambio al cierre;
+                                 FRC=Dernier taux de fermeture;
+                                 ENC=Last Closing Rate];
+                      Image=Close;
+                      OnAction=BEGIN
+                                 ChangeExchangeRate.SetCaption(Text002);
+                                 ChangeExchangeRate.SetParameter("Currency Code","Last Balance Currency Factor",WORKDATE);
+                                 IF ChangeExchangeRate.RUNMODAL = ACTION::OK THEN BEGIN
+                                   "Last Balance Currency Factor" := ChangeExchangeRate.GetParameter;
+                                   MODIFY;
+                                 END;
+                                 CLEAR(ChangeExchangeRate);
+                               END;
+                                }
+      { 34      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Reports;
+                                 ESM=&Informes;
+                                 FRC=&Rapports;
+                                 ENC=&Reports];
+                      Image=Report }
+      { 35      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Eliminations;
+                                 ESM=Eliminaciones;
+                                 FRC=êliminations;
+                                 ENC=Eliminations];
+                      RunObject=Report 16;
+                      Image=Report }
+      { 36      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Trial B&alance;
+                                 ESM=B&alance comprobaci¢n;
+                                 FRC=B&alance de vÇrification;
+                                 ENC=Trial B&alance];
+                      RunObject=Report 10007;
+                      Image=Report }
+      { 37      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Trial &Balance (4);
+                                 ESM=&Balance comprobaci¢n (4);
+                                 FRC=&Balance de vÇrification (4);
+                                 ENC=Trial &Balance (4)];
+                      RunObject=Report 10008;
+                      Image=Report }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 28      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 29      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Test Database;
+                                 ESM=Test base de datos;
+                                 FRC=Tester la base de donnÇes;
+                                 ENC=Test Database];
+                      RunObject=Report 14;
+                      Image=TestDatabase }
+      { 30      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=T&est File;
+                                 ESM=T&est archivo;
+                                 FRC=T&ester fichier;
+                                 ENC=T&est File];
+                      RunObject=Report 15;
+                      Image=TestFile }
+      { 43      ;2   ;Separator  }
+      { 44      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Import Database;
+                                 ESM=Importar base de datos;
+                                 FRC=Importer base de donnÇes;
+                                 ENC=Import Database];
+                      RunObject=Report 90;
+                      Image=ImportDatabase }
+      { 45      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=I&mport File;
+                                 ESM=Importar &archivo;
+                                 FRC=I&mporter fichier;
+                                 ENC=I&mport File];
+                      RunObject=Report 92;
+                      Image=Import }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Company Name";
+                LookupPageID=Companies }
+
+    { 39  ;2   ;Field     ;
+                SourceExpr=Name;
+                Visible=FALSE }
+
+    { 41  ;2   ;Field     ;
+                SourceExpr="Currency Code";
+                LookupPageID=Currencies }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Currency Exchange Rate Table";
+                Visible=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Data Source";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Consolidate }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Consolidation %";
+                Editable=TRUE }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Exch. Rate Gains Acc.";
+                Visible=FALSE }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Exch. Rate Losses Acc.";
+                Visible=FALSE }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Residual Account";
+                Visible=FALSE }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Starting Date" }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr="Ending Date" }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="File Format";
+                Visible=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=Average Rate (Manual);ESM=Tipo de cambio medio (manual);FRC=Taux moyen (manuel);ENC=Average Rate (Manual)';
+      Text001@1001 : TextConst 'ENU=Closing Rate;ESM=Tipo de cambio al cierre;FRC=Taux de fermeture;ENC=Closing Rate';
+      Text002@1002 : TextConst 'ENU=Last Closing Rate;ESM=Èltimo cambio al cierre;FRC=Dernier taux de fermeture;ENC=Last Closing Rate';
+      ChangeExchangeRate@1003 : Page 511;
+
+    PROCEDURE GetSelectionFilter@2() : Text;
+    VAR
+      BusUnit@1001 : Record 220;
+      SelectionFilterManagement@1002 : Codeunit 46;
+    BEGIN
+      CurrPage.SETSELECTIONFILTER(BusUnit);
+      EXIT(SelectionFilterManagement.GetSelectionFilterForBusinessUnit(BusUnit));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

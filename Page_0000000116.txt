@@ -1,0 +1,228 @@
+OBJECT Page 116 G/L Registers
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=G/L Registers;
+               ESM=Registro movs.contabilidad;
+               FRC=Registres GL;
+               ENC=G/L Registers];
+    SourceTable=Table45;
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 10      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Register;
+                                 ESM=&Movs.;
+                                 FRC=&Registre;
+                                 ENC=&Register];
+                      Image=Register }
+      { 11      ;2   ;Action    ;
+                      CaptionML=[ENU=General Ledger;
+                                 ESM=Contabilidad;
+                                 FRC=Grand livre;
+                                 ENC=General Ledger];
+                      RunObject=Codeunit 235;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=GLRegisters;
+                      PromotedCategory=Process }
+      { 12      ;2   ;Action    ;
+                      CaptionML=[ENU=Customer &Ledger;
+                                 ESM=Movs. c&lientes;
+                                 FRC=Grand livre &client;
+                                 ENC=Customer &Ledger];
+                      RunObject=Codeunit 236;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CustomerLedger;
+                      PromotedCategory=Process }
+      { 13      ;2   ;Action    ;
+                      CaptionML=[ENU=Ven&dor Ledger;
+                                 ESM=Movs. &proveedores;
+                                 FRC=Grand livre de fo&urnisseur;
+                                 ENC=Ven&dor Ledger];
+                      RunObject=Codeunit 237;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=VendorLedger;
+                      PromotedCategory=Process }
+      { 24      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Account Ledger;
+                                 ESM=Movs. bancos;
+                                 FRC=Grand livre de compte bancaire;
+                                 ENC=Bank Account Ledger];
+                      RunObject=Codeunit 377;
+                      Promoted=Yes;
+                      Image=BankAccountLedger;
+                      PromotedCategory=Process }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=Fixed &Asset Ledger;
+                                 ESM=Movs. &activos;
+                                 FRC=Livre &immobilisations;
+                                 ENC=Fixed &Asset Ledger];
+                      RunObject=Codeunit 5619;
+                      Promoted=Yes;
+                      Image=FixedAssetLedger;
+                      PromotedCategory=Process }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=Maintenance Ledger;
+                                 ESM=Movs. mantenimiento;
+                                 FRC=Livre maintenance;
+                                 ENC=Maintenance Ledger];
+                      RunObject=Codeunit 5649;
+                      Promoted=Yes;
+                      Image=MaintenanceLedgerEntries;
+                      PromotedCategory=Process }
+      { 14      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Entries;
+                                 ESM=Movs. IVA;
+                                 FRC=êcritures TVA;
+                                 ENC=Tax Entries];
+                      RunObject=Codeunit 238;
+                      Promoted=Yes;
+                      Image=VATLedger;
+                      PromotedCategory=Process }
+      { 35      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Ledger Relation;
+                                 ESM=Relaci¢n movs. productos;
+                                 FRC=Lien au grand livre d'article;
+                                 ENC=Item Ledger Relation];
+                      RunObject=Page 5823;
+                      RunPageView=SORTING(G/L Register No.);
+                      RunPageLink=G/L Register No.=FIELD(No.);
+                      Image=ItemLedger }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 31      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 32      ;2   ;Action    ;
+                      Name=ReverseRegister;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Reverse Register;
+                                 ESM=Revertir mov.;
+                                 FRC=Inverser le registre;
+                                 ENC=Reverse Register];
+                      Promoted=Yes;
+                      Image=ReverseRegister;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ReversalEntry@1000 : Record 179;
+                               BEGIN
+                                 TESTFIELD("No.");
+                                 ReversalEntry.ReverseRegister("No.");
+                               END;
+                                }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1900670506;1 ;Action    ;
+                      CaptionML=[ENU=Detail Trial Balance;
+                                 ESM=Detalles del balance de comprobaci¢n;
+                                 FRC=Balance de vÇrification dÇtaillÇe;
+                                 ENC=Detail Trial Balance];
+                      RunObject=Report 4;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904082706;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance;
+                                 ESM=Balance comprobaci¢n;
+                                 FRC=Balance de vÇrification;
+                                 ENC=Trial Balance];
+                      RunObject=Report 10022;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902174606;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance by Period;
+                                 ESM=Bal. sumas y saldos/periodo;
+                                 FRC=Balance de vÇrification par pÇriode;
+                                 ENC=Trial Balance by Period];
+                      RunObject=Report 38;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900210206;1 ;Action    ;
+                      CaptionML=[ENU=G/L Register;
+                                 ESM=Registro movs. contabilidad;
+                                 FRC=Registre GL;
+                                 ENC=G/L Register];
+                      RunObject=Report 10019;
+                      Promoted=Yes;
+                      Image=GLRegisters;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Creation Date" }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="User ID" }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Source Code" }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Journal Batch Name" }
+
+    { 33  ;2   ;Field     ;
+                SourceExpr=Reversed;
+                Visible=FALSE }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="From Entry No." }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="To Entry No." }
+
+    { 27  ;2   ;Field     ;
+                SourceExpr="From VAT Entry No." }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr="To VAT Entry No." }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

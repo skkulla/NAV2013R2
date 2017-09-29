@@ -1,0 +1,322 @@
+OBJECT Page 190 Incoming Documents
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Incoming Documents;
+               ESM=Documentos entrantes;
+               FRC=Documents entrants;
+               ENC=Incoming Documents];
+    SourceTable=Table130;
+    DataCaptionFields=Description;
+    PageType=List;
+    OnOpenPage=BEGIN
+                 IsStatusEditable := NOT GUIALLOWED; // Only editable from web services
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       URL := GetURL;
+                     END;
+
+    OnNewRecord=BEGIN
+                  URL := '';
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 22      ;    ;ActionContainer;
+                      CaptionML=[ENU=New;
+                                 ESM=Nuevo;
+                                 FRC=Nouveau;
+                                 ENC=New];
+                      ActionContainerType=NewDocumentItems }
+      { 23      ;1   ;Action    ;
+                      Name=Journal;
+                      CaptionML=[ENU=Journal Line;
+                                 ESM=L¡nea de diario;
+                                 FRC=Ligne de journal;
+                                 ENC=Journal Line];
+                      Promoted=Yes;
+                      Image=Journal;
+                      OnAction=VAR
+                                 GenJournalBatch@1001 : Record 232;
+                                 GenJnlManagement@1002 : Codeunit 230;
+                               BEGIN
+                                 IncomingDocumentMultiSelectAction(MultiSelectAction::CreateGenJnlLine);
+                                 IncomingDocumentsSetup.Fetch;
+                                 GenJournalBatch.GET(IncomingDocumentsSetup."General Journal Template Name",IncomingDocumentsSetup."General Journal Batch Name");
+                                 GenJnlManagement.TemplateSelectionFromBatch(GenJournalBatch);
+                               END;
+                                }
+      { 26      ;1   ;Action    ;
+                      Name=PurchaseInvoice;
+                      CaptionML=[ENU=Purchase Invoice;
+                                 ESM=Factura compra;
+                                 FRC=Facture achat;
+                                 ENC=Purchase Invoice];
+                      Promoted=Yes;
+                      Image=Purchase;
+                      OnAction=BEGIN
+                                 IncomingDocumentMultiSelectAction(MultiSelectAction::CreatePurchInvoice);
+                               END;
+                                }
+      { 27      ;1   ;Action    ;
+                      Name=PurchaseCreditMemo;
+                      CaptionML=[ENU=Purchase Credit Memo;
+                                 ESM=Nota cr‚dito compra;
+                                 FRC=Note de cr‚dit d'achat;
+                                 ENC=Purchase Credit Memo];
+                      Image=CreditMemo;
+                      OnAction=BEGIN
+                                 IncomingDocumentMultiSelectAction(MultiSelectAction::CreatePurchCreditMemo);
+                               END;
+                                }
+      { 24      ;1   ;Action    ;
+                      Name=SalesInvoice;
+                      CaptionML=[ENU=Sales Invoice;
+                                 ESM=Factura venta;
+                                 FRC=Facture vente;
+                                 ENC=Sales Invoice];
+                      Image=Sales;
+                      OnAction=BEGIN
+                                 IncomingDocumentMultiSelectAction(MultiSelectAction::CreateSalesInvoice);
+                               END;
+                                }
+      { 25      ;1   ;Action    ;
+                      Name=SalesCreditMemo;
+                      CaptionML=[ENU=Sales Credit Memo;
+                                 ESM=Nota cr‚dito venta;
+                                 FRC=Note de cr‚dit de vente;
+                                 ENC=Sales Credit Memo];
+                      Image=CreditMemo;
+                      OnAction=BEGIN
+                                 IncomingDocumentMultiSelectAction(MultiSelectAction::CreateSalesCreditMemo);
+                               END;
+                                }
+      { 33      ;    ;ActionContainer;
+                      CaptionML=[ENU=Related Information;
+                                 ESM=Informaci¢n relacionada;
+                                 FRC=Informations connexes;
+                                 ENC=Related Information];
+                      ActionContainerType=RelatedInformation }
+      { 28      ;1   ;Action    ;
+                      Name=Navigate;
+                      CaptionML=[ENU=Navigate;
+                                 ESM=Navegar;
+                                 FRC=Naviguer;
+                                 ENC=Navigate];
+                      Image=Navigate;
+                      OnAction=VAR
+                                 NavigatePage@1000 : Page 344;
+                               BEGIN
+                                 TESTFIELD(Posted);
+                                 NavigatePage.SetDoc("Posting Date","Document No.");
+                                 NavigatePage.RUN;
+                               END;
+                                }
+      { 32      ;1   ;Action    ;
+                      Name=Setup;
+                      CaptionML=[ENU=Setup;
+                                 ESM=Instalaci¢n;
+                                 FRC=Configuration;
+                                 ENC=Setup];
+                      RunObject=Page 191;
+                      Image=Setup }
+      { 29      ;    ;ActionContainer;
+                      CaptionML=[ENU=Process;
+                                 ESM=Proceso;
+                                 FRC=Processus;
+                                 ENC=Process];
+                      ActionContainerType=ActionItems }
+      { 30      ;1   ;Action    ;
+                      Name=Approve;
+                      CaptionML=[ENU=Approve;
+                                 ESM=Aprobar;
+                                 FRC=Approuver;
+                                 ENC=Approve];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Approve;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 IncomingDocumentMultiSelectAction(MultiSelectAction::Approve);
+                               END;
+                                }
+      { 31      ;1   ;Action    ;
+                      Name=Reject;
+                      CaptionML=[ENU=Reject;
+                                 ESM=Rechazar;
+                                 FRC=Rejeter;
+                                 ENC=Reject];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Reject;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 IncomingDocumentMultiSelectAction(MultiSelectAction::Reject);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Entry No.";
+                Visible=false }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 34  ;2   ;Field     ;
+                Name=URL;
+                ExtendedDatatype=URL;
+                CaptionML=[ENU=Link to Document;
+                           ESM=V¡nculo al documento;
+                           FRC=Lien vers le document;
+                           ENC=Link to Document];
+                SourceExpr=URL;
+                OnValidate=BEGIN
+                             SetURL(URL);
+                           END;
+                            }
+
+    { 17  ;2   ;Field     ;
+                SourceExpr=Status;
+                Editable=IsStatusEditable }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Created Date-Time" }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Created By User Name";
+                Visible=false }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr=Approved }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Approved Date-Time";
+                Visible=false }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Approved By User Name";
+                Visible=false }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Last Date-Time Modified";
+                Visible=false }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Last Modified By User Name";
+                Visible=false }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr=Posted }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Posted Date-Time";
+                Visible=false }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Posted Document Type";
+                Visible=false }
+
+    { 15  ;2   ;Field     ;
+                SourceExpr="Document No.";
+                Visible=false }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Posting Date";
+                Visible=false }
+
+    { 35  ;2   ;Field     ;
+                SourceExpr=URL1;
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 36  ;2   ;Field     ;
+                SourceExpr=URL2;
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 37  ;2   ;Field     ;
+                SourceExpr=URL3;
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 38  ;2   ;Field     ;
+                SourceExpr=URL4;
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 18  ;0   ;Container ;
+                ContainerType=FactBoxArea }
+
+    { 19  ;1   ;Part      ;
+                Visible=false;
+                PartType=System;
+                SystemPartID=Notes }
+
+    { 20  ;1   ;Part      ;
+                Visible=false;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+    { 21  ;1   ;Part      ;
+                Visible=false;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+  }
+  CODE
+  {
+    VAR
+      IncomingDocumentsSetup@1001 : Record 131;
+      URL@1000 : Text;
+      MultiSelectAction@1002 : 'CreateGenJnlLine,CreatePurchInvoice,CreatePurchCreditMemo,CreateSalesInvoice,CreateSalesCreditMemo,Approve,Reject';
+      IsStatusEditable@1003 : Boolean;
+
+    LOCAL PROCEDURE IncomingDocumentMultiSelectAction@10(ActionName@1000 : Option);
+    VAR
+      IncomingDocument@1001 : Record 130;
+    BEGIN
+      CurrPage.SETSELECTIONFILTER(IncomingDocument);
+      IF IncomingDocument.FINDSET THEN
+        REPEAT
+          CASE ActionName OF
+            MultiSelectAction::CreateGenJnlLine:
+              IncomingDocument.CreateGenJnlLine;
+            MultiSelectAction::CreatePurchInvoice:
+              IncomingDocument.CreatePurchInvoice;
+            MultiSelectAction::CreatePurchCreditMemo:
+              IncomingDocument.CreatePurchCreditMemo;
+            MultiSelectAction::CreateSalesInvoice:
+              IncomingDocument.CreateSalesInvoice;
+            MultiSelectAction::CreateSalesCreditMemo:
+              IncomingDocument.CreateSalesCreditMemo;
+            MultiSelectAction::Approve:
+              IncomingDocument.Approve;
+            MultiSelectAction::Reject:
+              IncomingDocument.Reject;
+          END;
+          IncomingDocument.MODIFY;
+        UNTIL IncomingDocument.NEXT = 0;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

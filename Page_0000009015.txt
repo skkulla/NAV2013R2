@@ -1,0 +1,473 @@
+OBJECT Page 9015 Job Project Manager RC
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               ESM=µrea de tareas;
+               FRC=Tableau de bord;
+               ENC=Role Centre];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1400000 ;1   ;Action    ;
+                      CaptionML=[ENU=Job List;
+                                 ESM=Lista de proyectos;
+                                 FRC=Liste des projets;
+                                 ENC=Job List];
+                      RunObject=Report 10216;
+                      Image=Report }
+      { 1400001 ;1   ;Action    ;
+                      CaptionML=[ENU=Completed Jobs;
+                                 ESM=Proyectos terminados;
+                                 FRC=Projets terminÇs;
+                                 ENC=Completed Jobs];
+                      RunObject=Report 10212;
+                      Image=Report }
+      { 25      ;1   ;Action    ;
+                      CaptionML=[ENU=Job &Analysis;
+                                 ESM=&An†lisis proyecto;
+                                 FRC=Analyse de proje&t;
+                                 ENC=Job &Analysis];
+                      RunObject=Report 1008;
+                      Image=Report }
+      { 48      ;1   ;Action    ;
+                      CaptionML=[ENU=Job A&ctual to Budget (Cost);
+                                 ESM=&Resultado vs. ppto. proyecto (costo);
+                                 FRC=Projet a&ctuel Ö budgÇter (Coñt);
+                                 ENC=Job A&ctual to Budget (Cost)];
+                      RunObject=Report 10210 }
+      { 1480000 ;1   ;Action    ;
+                      CaptionML=[ENU=Job Actual to Budget (Price);
+                                 ESM=Resultado vs. ppto. proyecto (precio);
+                                 FRC=Projet actuel Ö budgÇter (Prix);
+                                 ENC=Job Actual to Budget (Price)];
+                      RunObject=Report 10211;
+                      Image=Report }
+      { 1480001 ;1   ;Action    ;
+                      CaptionML=[ENU=Job Cost Transaction Detail;
+                                 ESM=Movimientos costo proyecto;
+                                 FRC=DÇtails transact. coñts projet;
+                                 ENC=Job Cost Transaction Detail];
+                      RunObject=Report 10220;
+                      Image=Report }
+      { 26      ;1   ;Action    ;
+                      CaptionML=[ENU=Job - Pla&nning Line;
+                                 ESM=Proyecto - L°&nea planificaci¢n;
+                                 FRC=Projet - Ligne de pla&nification;
+                                 ENC=Job - Pla&nning Line];
+                      RunObject=Report 1006;
+                      Image=Report }
+      { 29      ;1   ;Separator  }
+      { 49      ;1   ;Action    ;
+                      CaptionML=[ENU=Job Cost Su&ggested Billing;
+                                 ESM=&Fact. prop. de costo proy.;
+                                 FRC=Factur. su&gg. par coñts projet;
+                                 ENC=Job Cost Su&ggested Billing];
+                      RunObject=Report 10219 }
+      { 50      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Jobs (Cost);
+                                 ESM=Proyectos por cliente (costo);
+                                 FRC=Projets clients (coñts);
+                                 ENC=Customer Jobs (Cost)];
+                      RunObject=Report 10213 }
+      { 1480002 ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Jobs (Price);
+                                 ESM=Proyectos por cliente (precio);
+                                 FRC=Projets clients (prix);
+                                 ENC=Customer Jobs (Price)];
+                      RunObject=Report 10214;
+                      Image=Report }
+      { 51      ;1   ;Action    ;
+                      CaptionML=[ENU=Items per &Job;
+                                 ESM=&Productos por proyecto;
+                                 FRC=Articles par pro&jet;
+                                 ENC=Items per &Job];
+                      RunObject=Report 1013;
+                      Image=Report }
+      { 52      ;1   ;Action    ;
+                      CaptionML=[ENU=Jobs per &Item;
+                                 ESM=Proyectos por pro&ducto;
+                                 FRC=Projets par art&icle;
+                                 ENC=Jobs per &Item];
+                      RunObject=Report 1014;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Jobs;
+                                 ESM=Proyectos;
+                                 FRC=Projets;
+                                 ENC=Jobs];
+                      RunObject=Page 89;
+                      Image=Job }
+      { 53      ;1   ;Action    ;
+                      CaptionML=[ENU=On Order;
+                                 ESM=En pedido;
+                                 FRC=Sur commande;
+                                 ENC=On Order];
+                      RunObject=Page 89;
+                      RunPageView=WHERE(Status=FILTER(Order)) }
+      { 54      ;1   ;Action    ;
+                      CaptionML=[ENU=Planned and Quoted;
+                                 ESM=Planificados y presupuestados;
+                                 FRC=PlanifiÇ et en devis;
+                                 ENC=Planned and Quoted];
+                      RunObject=Page 89;
+                      RunPageView=WHERE(Status=FILTER(Quote|Planning)) }
+      { 35      ;1   ;Action    ;
+                      CaptionML=[ENU=Completed;
+                                 ESM=Completados;
+                                 FRC=TerminÇ;
+                                 ENC=Completed];
+                      RunObject=Page 89;
+                      RunPageView=WHERE(Status=FILTER(Completed)) }
+      { 55      ;1   ;Action    ;
+                      CaptionML=[ENU=Unassigned;
+                                 ESM=No asignados;
+                                 FRC=Non attribuÇ;
+                                 ENC=Unassigned];
+                      RunObject=Page 89;
+                      RunPageView=WHERE(Person Responsible=FILTER('')) }
+      { 36      ;1   ;Action    ;
+                      CaptionML=[ENU=Job Tasks;
+                                 ESM=Tareas del trabajo;
+                                 FRC=TÉches de projet;
+                                 ENC=Job Tasks];
+                      RunObject=Page 1004 }
+      { 37      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Invoices;
+                                 ESM=Facturas venta;
+                                 FRC=Factures vente;
+                                 ENC=Sales Invoices];
+                      RunObject=Page 9301;
+                      Image=Invoice }
+      { 38      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Credit Memos;
+                                 ESM=Notas de CrÇdito de venta;
+                                 FRC=Notes de crÇdit de vente;
+                                 ENC=Sales Credit Memos];
+                      RunObject=Page 9302 }
+      { 39      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Orders;
+                                 ESM=Pedidos compra;
+                                 FRC=Bons de commande;
+                                 ENC=Purchase Orders];
+                      RunObject=Page 9307 }
+      { 40      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Invoices;
+                                 ESM=Facturas compra;
+                                 FRC=Factures d'achat;
+                                 ENC=Purchase Invoices];
+                      RunObject=Page 9308 }
+      { 41      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Credit Memos;
+                                 ESM=Notas de CrÇdito de compra;
+                                 FRC=Notes de crÇdit d'achat;
+                                 ENC=Purchase Credit Memos];
+                      RunObject=Page 9309 }
+      { 42      ;1   ;Action    ;
+                      CaptionML=[ENU=Resources;
+                                 ESM=Recursos;
+                                 FRC=Ressources;
+                                 ENC=Resources];
+                      RunObject=Page 77 }
+      { 43      ;1   ;Action    ;
+                      CaptionML=[ENU=Resource Groups;
+                                 ESM=Familia recursos;
+                                 FRC=Groupes de ressources;
+                                 ENC=Resource Groups];
+                      RunObject=Page 72 }
+      { 44      ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 ESM=Productos;
+                                 FRC=Articles;
+                                 ENC=Items];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 45      ;1   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 ESM=Clientes;
+                                 FRC=Clients;
+                                 ENC=Customers];
+                      RunObject=Page 22;
+                      Image=Customer }
+      { 4       ;1   ;Action    ;
+                      CaptionML=[ENU=Time Sheets;
+                                 ESM=Hojas de horas;
+                                 FRC=Feuilles de temps;
+                                 ENC=Time Sheets];
+                      RunObject=Page 951 }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 13      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Journals;
+                                 ESM=Diarios;
+                                 FRC=Journaux;
+                                 ENC=Journals];
+                      Image=Journals }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Job Journals;
+                                 ESM=Diarios de proyectos;
+                                 FRC=Journaux de projet;
+                                 ENC=Job Journals];
+                      RunObject=Page 276;
+                      RunPageView=WHERE(Recurring=CONST(No)) }
+      { 19      ;2   ;Action    ;
+                      CaptionML=[ENU=Job G/L Journals;
+                                 ESM=Diarios generales proyecto;
+                                 FRC=Journaux GL de projet;
+                                 ENC=Job G/L Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Jobs),
+                                        Recurring=CONST(No)) }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Journals;
+                                 ESM=Diarios de recursos;
+                                 FRC=Journaux de ressources;
+                                 ENC=Resource Journals];
+                      RunObject=Page 272;
+                      RunPageView=WHERE(Recurring=CONST(No)) }
+      { 22      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Journals;
+                                 ESM=Diarios de productos;
+                                 FRC=Journaux d'articles;
+                                 ENC=Item Journals];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Item),
+                                        Recurring=CONST(No)) }
+      { 23      ;2   ;Action    ;
+                      CaptionML=[ENU=Recurring Job Journals;
+                                 ESM=Diarios peri¢dico proyecto;
+                                 FRC=Journaux des tÉches rÇcurrentes;
+                                 ENC=Recurring Job Journals];
+                      RunObject=Page 276;
+                      RunPageView=WHERE(Recurring=CONST(Yes)) }
+      { 46      ;2   ;Action    ;
+                      CaptionML=[ENU=Recurring Resource Journals;
+                                 ESM=Diarios peri¢dicos recursos;
+                                 FRC=Journaux des ressources rÇcurrentes;
+                                 ENC=Recurring Resource Journals];
+                      RunObject=Page 272;
+                      RunPageView=WHERE(Recurring=CONST(Yes)) }
+      { 47      ;2   ;Action    ;
+                      CaptionML=[ENU=Recurring Item Journals;
+                                 ESM=Diario peri¢dico productos;
+                                 FRC=Journaux rÇcurrents d'articles;
+                                 ENC=Recurring Item Journals];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Item),
+                                        Recurring=CONST(Yes)) }
+      { 62      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posted Documents;
+                                 ESM=Documentos hist¢ricos;
+                                 FRC=Documents reportÇs;
+                                 ENC=Posted Documents];
+                      Image=FiledPosted }
+      { 67      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Shipments;
+                                 ESM=Hist¢rico env°os;
+                                 FRC=Livraisons reportÇes;
+                                 ENC=Posted Shipments];
+                      RunObject=Page 142 }
+      { 68      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Invoices;
+                                 ESM=Hist¢rico facturas venta;
+                                 FRC=Factures ventes reportÇes;
+                                 ENC=Posted Sales Invoices];
+                      RunObject=Page 143;
+                      Image=PostedOrder }
+      { 69      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Credit Memos;
+                                 ESM=Notas de crÇdito ventas registradas;
+                                 FRC=Notes crÇdit ventes reportÇes;
+                                 ENC=Posted Sales Credit Memos];
+                      RunObject=Page 144;
+                      Image=PostedOrder }
+      { 70      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Receipts;
+                                 ESM=Hist¢ricos recepciones de compra;
+                                 FRC=Factures d'achat reportÇes;
+                                 ENC=Posted Purchase Receipts];
+                      RunObject=Page 145 }
+      { 71      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Invoices;
+                                 ESM=Hist¢rico facturas compra;
+                                 FRC=Factures d'achat reportÇes;
+                                 ENC=Posted Purchase Invoices];
+                      RunObject=Page 146 }
+      { 72      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Credit Memos;
+                                 ESM=Notas de crÇdito compras registradas;
+                                 FRC=Notes de crÇdit achat reportÇes;
+                                 ENC=Posted Purchase Credit Memos];
+                      RunObject=Page 147 }
+      { 73      ;2   ;Action    ;
+                      CaptionML=[ENU=G/L Registers;
+                                 ESM=Registro movs. contabilidad;
+                                 FRC=Registres GL;
+                                 ENC=G/L Registers];
+                      RunObject=Page 116;
+                      Image=GLRegisters }
+      { 74      ;2   ;Action    ;
+                      CaptionML=[ENU=Job Registers;
+                                 ESM=Registro movs. proyectos;
+                                 FRC=Registres des projets;
+                                 ENC=Job Registers];
+                      RunObject=Page 278;
+                      Image=JobRegisters }
+      { 75      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Registers;
+                                 ESM=Registro movs. productos;
+                                 FRC=Registres des articles;
+                                 ENC=Item Registers];
+                      RunObject=Page 117;
+                      Image=ItemRegisters }
+      { 76      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Registers;
+                                 ESM=Registro movs. recursos;
+                                 FRC=Registres des ressources;
+                                 ENC=Resource Registers];
+                      RunObject=Page 274;
+                      Image=ResourceRegisters }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 17      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 ESM=Tareas;
+                                 FRC=TÉches;
+                                 ENC=Tasks];
+                      IsHeader=Yes }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Job J&ournal;
+                                 ESM=Diario pr&oyectos;
+                                 FRC=J&ournal projet;
+                                 ENC=Job J&ournal];
+                      RunObject=Page 201;
+                      Image=JobJournal }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Job G/L &Journal;
+                                 ESM=Diario &general proyecto;
+                                 FRC=&Journal GL de projet;
+                                 ENC=Job G/L &Journal];
+                      RunObject=Page 1020;
+                      Image=GLJournal }
+      { 16      ;1   ;Action    ;
+                      CaptionML=[ENU=R&esource Journal;
+                                 ESM=Diario r&ecursos;
+                                 FRC=Journal des r&essources;
+                                 ENC=R&esource Journal];
+                      RunObject=Page 207;
+                      Image=ResourceJournal }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=C&hange Job Planning Line Date;
+                                 ESM=Cambiar fec&has l°n. plan. proy.;
+                                 FRC=Mo&difier date de ligne de planification du projet;
+                                 ENC=C&hange Job Planning Line Date];
+                      RunObject=Report 1087;
+                      Image=Report }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Split Pla&nning Lines;
+                                 ESM=Dividir l°&neas planificaci¢n;
+                                 FRC=êclater lignes pla&nification;
+                                 ENC=Split Pla&nning Lines];
+                      RunObject=Report 1088;
+                      Image=Splitlines }
+      { 1       ;1   ;Action    ;
+                      CaptionML=[ENU=Manager Time Sheet by Job;
+                                 ESM=Hoja de horas del administrador por proyecto;
+                                 FRC=Feuille de temps administrateur par projet;
+                                 ENC=Manager Time Sheet by Job];
+                      RunObject=Page 954;
+                      Image=JobTimeSheet }
+      { 5       ;1   ;Separator  }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=Job &Create Sales Invoice;
+                                 ESM=&Crear factura venta proyecto;
+                                 FRC=Projet - &CrÇer facture de vente;
+                                 ENC=Job &Create Sales Invoice];
+                      RunObject=Report 1093;
+                      Image=CreateJobSalesInvoice }
+      { 7       ;1   ;Separator  }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=Update Job I&tem Cost;
+                                 ESM=Actuali&zar costo productos proyecto;
+                                 FRC=Mettre Ö jour le coñt d'ar&ticle de projet;
+                                 ENC=Update Job I&tem Cost];
+                      RunObject=Report 1095;
+                      Image=Report }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Job Calculate &WIP;
+                                 ESM=Calcular &WIP proyecto;
+                                 FRC=&Projet - Calculer TEC;
+                                 ENC=Job Calculate &WIP];
+                      RunObject=Report 1086;
+                      Image=Report }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Jo&b Post WIP to G/L;
+                                 ESM=&Registrar WIP en C/G proyecto;
+                                 FRC=Projet - &Reporter TEC au GL;
+                                 ENC=Jo&b Post WIP to G/L];
+                      RunObject=Report 1085;
+                      Image=Report }
+      { 11      ;1   ;Separator ;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      IsHeader=Yes }
+      { 24      ;1   ;Action    ;
+                      CaptionML=[ENU=Navi&gate;
+                                 ESM=N&avegar;
+                                 FRC=Navi&guer;
+                                 ENC=Navi&gate];
+                      RunObject=Page 344;
+                      Image=Navigate }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1904661108;2;Part   ;
+                PagePartID=Page9068;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                PartType=Page }
+
+    { 21  ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1903012608;2;Part   ;
+                PagePartID=Page9175;
+                PartType=Page }
+
+    { 1901377608;2;Part   ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

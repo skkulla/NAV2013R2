@@ -1,0 +1,124 @@
+OBJECT Page 675 My Job Queue
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=My Job Queue;
+               ESM=Mi cola proyecto;
+               FRC=Ma file d'attente des travaux;
+               ENC=My Job Queue];
+    SourceTable=Table472;
+    SourceTableView=SORTING(Priority,Last Ready State);
+    PageType=ListPart;
+    OnOpenPage=BEGIN
+                 SETRANGE("User ID",USERID);
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       StatusIsError := Status = Status::Error;
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 6       ;    ;ActionContainer;
+                      CaptionML=[ENU=Actions;
+                                 ESM=Acciones;
+                                 FRC=Actions;
+                                 ENC=Actions];
+                      ActionContainerType=ActionItems }
+      { 7       ;1   ;Action    ;
+                      Name=ShowError;
+                      CaptionML=[ENU=Show Error;
+                                 ESM=Mostrar error;
+                                 FRC=Afficher erreur;
+                                 ENC=Show Error];
+                      Image=Error;
+                      OnAction=BEGIN
+                                 ShowErrorMessage;
+                               END;
+                                }
+      { 10      ;1   ;Action    ;
+                      Name=Cancel;
+                      CaptionML=[ENU=Delete;
+                                 ESM=Eliminar;
+                                 FRC=Supprimer;
+                                 ENC=Delete];
+                      Image=Delete;
+                      OnAction=BEGIN
+                                 Cancel;
+                               END;
+                                }
+      { 9       ;1   ;Action    ;
+                      Name=Restart;
+                      CaptionML=[ENU=Restart;
+                                 ESM=Reiniciar;
+                                 FRC=Red‚marrer;
+                                 ENC=Restart];
+                      Image=Start;
+                      OnAction=BEGIN
+                                 Restart;
+                               END;
+                                }
+      { 13      ;1   ;Action    ;
+                      Name=ShowRecord;
+                      CaptionML=[ENU=Show Record;
+                                 ESM=Mostrar registro;
+                                 FRC=Afficher enregistrement;
+                                 ENC=Show Record];
+                      Image=ViewDetails;
+                      OnAction=BEGIN
+                                 LookupRecordToProcess;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Object Caption to Run";
+                Visible=false;
+                Style=Attention;
+                StyleExpr=StatusIsError }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Parameter String";
+                Visible=FALSE }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr=Description;
+                Style=Attention;
+                StyleExpr=StatusIsError }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Status;
+                Style=Attention;
+                StyleExpr=StatusIsError }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Job Queue Category Code";
+                Visible=false }
+
+  }
+  CODE
+  {
+    VAR
+      StatusIsError@1000 : Boolean INDATASET;
+
+    BEGIN
+    END.
+  }
+}
+

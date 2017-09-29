@@ -1,0 +1,554 @@
+OBJECT Page 9022 Small Business Role Center
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Small Business Role Center;
+               ESM=µrea de tareas de peque¤as empresas;
+               FRC=Tableau de bord pour petite entreprise;
+               ENC=Small Business Role Centre];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1       ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 4       ;1   ;ActionGroup;
+                      CaptionML=[ENU=New;
+                                 ESM=Nuevo;
+                                 FRC=Nouveau;
+                                 ENC=New] }
+      { 52      ;2   ;Action    ;
+                      CaptionML=[ENU=Sales Quote;
+                                 ESM=Cotizaci¢n venta;
+                                 FRC=Devis;
+                                 ENC=Sales Quote];
+                      ToolTipML=[ENU=Create a new sales quote;
+                                 ESM=Cree una nueva cotizaci¢n de venta;
+                                 FRC=Cr‚er un devis;
+                                 ENC=Create a new sales quote];
+                      RunObject=Page 1324;
+                      Image=Quote;
+                      RunPageMode=Create }
+      { 2       ;2   ;Action    ;
+                      CaptionML=[ENU=Sales Invoice;
+                                 ESM=Factura venta;
+                                 FRC=Facture vente;
+                                 ENC=Sales Invoice];
+                      ToolTipML=[ENU=Create a new sales invoice.;
+                                 ESM=Crear una factura de venta nueva.;
+                                 FRC=Cr‚ez une facture vente.;
+                                 ENC=Create a new sales invoice.];
+                      RunObject=Page 1304;
+                      Image=NewInvoice;
+                      RunPageMode=Create }
+      { 32      ;2   ;Action    ;
+                      CaptionML=[ENU=Purchase Invoice;
+                                 ESM=Factura compra;
+                                 FRC=Facture achat;
+                                 ENC=Purchase Invoice];
+                      ToolTipML=[ENU=Create a new purchase invoice.;
+                                 ESM=Cree una nueva factura de compra.;
+                                 FRC=Cr‚ez une facture achat.;
+                                 ENC=Create a new purchase invoice.];
+                      RunObject=Page 1354;
+                      Image=NewInvoice;
+                      RunPageMode=Create }
+      { 58      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Payments;
+                                 ESM=Pagos;
+                                 FRC=Paiements;
+                                 ENC=Payments] }
+      { 59      ;2   ;Action    ;
+                      CaptionML=[ENU=Payment Registration;
+                                 ESM=Registro de pago;
+                                 FRC=Enregistrement de paiement;
+                                 ENC=Payment Registration];
+                      ToolTipML=[ENU=Process your customers' payments by matching amounts received on your bank account with the related unpaid sales invoices and then post and apply the payments to your books.;
+                                 ESM=Procese los pagos de los clientes al hacer coincidir los importes recibidos en el banco con las facturas de venta no pagadas y luego registre y aplique los pagos a los libros.;
+                                 FRC=Traitez les paiements de vos clients en faisant correspondre les montants per‡us sur votre compte bancaires avec les factures vente impay‚es associ‚es, puis reportez et lettrez les paiements … votre comptabilit‚.;
+                                 ENC=Process your customers' payments by matching amounts received on your bank account with the related unpaid sales invoices and then post and apply the payments to your books.];
+                      RunObject=Page 981;
+                      Image=Payment }
+      { 21      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Setup;
+                                 ESM=Configuraci¢n;
+                                 FRC=Configuration;
+                                 ENC=Setup];
+                      Image=Setup }
+      { 27      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Setup;
+                                 ESM=Configuraci¢n;
+                                 FRC=Configuration;
+                                 ENC=Setup];
+                      Image=Setup }
+      { 49      ;3   ;Action    ;
+                      CaptionML=[ENU=Company Information;
+                                 ESM=Informaci¢n empresa;
+                                 FRC=Information sur la compagnie;
+                                 ENC=Company Information];
+                      ToolTipML=[ENU=Enter the company name, address, and bank information that will be inserted on your business documents.;
+                                 ESM=Especifique el nombre, la direcci¢n y la informaci¢n bancaria de la empresa que se insertar  en los documentos de negocio.;
+                                 FRC=Entrez le nom de la compagnie, l'adresse et les informations bancaires qui seront mentionn‚s sur vos documents professionnels.;
+                                 ENC=Enter the company name, address, and bank information that will be inserted on your business documents.];
+                      RunObject=Page 1352;
+                      Image=CompanyInformation }
+      { 22      ;3   ;Action    ;
+                      CaptionML=[ENU=General Ledger Setup;
+                                 ESM=Configuraci¢n contabilidad;
+                                 FRC=Configuration du grand livre;
+                                 ENC=General Ledger Setup];
+                      ToolTipML=[ENU=Define your general accounting policies, such as the allowed posting period and how payments are processed. Set up your default dimensions for financial analysis.;
+                                 ESM=Defina las directivas de contabilidad general, tal como el per¡odo de registro permitido y el procesamiento de los pagos. Configure las dimensiones predeterminadas para el an lisis financiero.;
+                                 FRC=D‚finissez vos strat‚gies comptables g‚n‚rales, comme la p‚riode de report autoris‚e et le mode de traitement des paiements. Configurez vos dimensions par d‚faut pour l'analyse financiŠre.;
+                                 ENC=Define your general accounting policies, such as the allowed posting period and how payments are processed. Set up your default dimensions for financial analysis.];
+                      RunObject=Page 1348;
+                      Image=JournalSetup }
+      { 31      ;3   ;Action    ;
+                      CaptionML=[ENU=Sales & Receivables Setup;
+                                 ESM=Conf. ventas y cobros;
+                                 FRC=Configuration ventes et … recevoir;
+                                 ENC=Sales & Receivables Setup];
+                      ToolTipML=[ENU=Define your general policies for sales invoicing and returns, such as when to show credit and stockout warnings and how to post sales discounts. Set up your number series for creating customers and different sales documents.;
+                                 ESM=Defina las directivas generales para la facturaci¢n de ventas y las devoluciones, tal como cu ndo mostrar advertencias de cr‚dito y de falta de stock y c¢mo registrar los descuentos de venta. Configure las series num‚ricas para la creaci¢n de clientes y los distintos documentos de venta.;
+                                 FRC=D‚finissez vos strat‚gies g‚n‚rales pour les retours et la facturation vente, par exemple quand afficher des avertissements de cr‚dit et de rupture de stock et comment reporter les escomptes vente. Configurez vos s‚ries de num‚ros pour cr‚er des clients et diff‚rents documents de vente.;
+                                 ENC=Define your general policies for sales invoicing and returns, such as when to show credit and stockout warnings and how to post sales discounts. Set up your number series for creating customers and different sales documents.];
+                      RunObject=Page 1350;
+                      Image=ReceivablesPayablesSetup }
+      { 46      ;3   ;Action    ;
+                      CaptionML=[ENU=Purchases & Payables Setup;
+                                 ESM=Conf. compras y pagos;
+                                 FRC=Configuration achats et … payer;
+                                 ENC=Purchases & Payables Setup];
+                      ToolTipML=[ENU=Define your general policies for purchase invoicing and returns, such as whether to require vendor invoice numbers and how to post purchase discounts. Set up your number series for creating vendors and different purchase documents.;
+                                 ESM=Defina las directivas generales para la facturaci¢n de compras y las devoluciones, tal como si se deben requerir n£meros de factura de proveedor y c¢mo registrar descuentos de compra. Defina las series num‚ricas para la creaci¢n de proveedores y los distintos documentos de compra.;
+                                 FRC=D‚finissez vos strat‚gies g‚n‚rales pour les retours et la facturation achat, par exemple si les num‚ros de facture fournisseur sont requis et comment reporter les escomptes achat. Configurez vos s‚ries de num‚ros pour cr‚er des fournisseurs et diff‚rents documents d'achat.;
+                                 ENC=Define your general policies for purchase invoicing and returns, such as whether to require vendor invoice numbers and how to post purchase discounts. Set up your number series for creating vendors and different purchase documents.];
+                      RunObject=Page 1349;
+                      Image=Purchase }
+      { 47      ;3   ;Action    ;
+                      CaptionML=[ENU=Inventory Setup;
+                                 ESM=Config. inventario;
+                                 FRC=Configuration de l'inventaire;
+                                 ENC=Inventory Setup];
+                      ToolTipML=[ENU=Define your general inventory policies, such as whether to allow negative inventory and how to post and adjust item costs. Set up your number series for creating new inventory items or services.;
+                                 ESM=Defina las directivas de inventario generales, tales como si se debe permitir un inventario negativo y c¢mo registrar y ajustar los costos de producto. Defina las series num‚ricas para la creaci¢n de nuevos productos o servicios de inventario.;
+                                 FRC=D‚finissez vos strat‚gies d'inventaire g‚n‚rales, par exemple si vous autorisez l'inventaire n‚gatif et comment reporter et ajuster les co–ts d'article. Configurez vos s‚ries de num‚ros pour cr‚er des services ou articles d'inventaire.;
+                                 ENC=Define your general inventory policies, such as whether to allow negative inventory and how to post and adjust item costs. Set up your number series for creating new inventory items or services.];
+                      RunObject=Page 1351;
+                      Image=InventorySetup }
+      { 60      ;3   ;Action    ;
+                      CaptionML=[ENU=Fixed Assets Setup;
+                                 ESM=Configuraci¢n de activos fijos;
+                                 FRC=Configuration des immobilisations;
+                                 ENC=Fixed Assets Setup];
+                      ToolTipML=[ENU=Define your accounting policies for fixed assets, such as the allowed posting period and whether to allow posting to main assets. Set up your number series for creating new fixed assets.;
+                                 ESM=Defina las directivas contables para los activos fijos, tales como el periodo contable permitido y si se permite el registro en activos principales. Configure los n£meros de serie para crear nuevos activos fijos.;
+                                 FRC=D‚finissez vos strat‚gies comptables pour les immobilisations, par exemple la p‚riode de report autoris‚e et si vous autorisez le report pour les immobilisations principales. Param‚trez vos s‚ries de num‚ros pour cr‚er des immobilisations.;
+                                 ENC=Define your accounting policies for fixed assets, such as the allowed posting period and whether to allow posting to main assets. Set up your number series for creating new fixed assets.];
+                      RunObject=Page 1353;
+                      Image=FixedAssets }
+      { 61      ;3   ;Action    ;
+                      CaptionML=[ENU=Human Resources Setup;
+                                 ESM=Config. recursos humanos;
+                                 FRC=Configuration des ressources humaines;
+                                 ENC=Human Resources Setup];
+                      ToolTipML=[ENU=Set up your number series for creating new employee cards and define if employment time is measured by days or hours.;
+                                 ESM=Configure los n£meros de serie para la creaci¢n de nuevas fichas de empleado y defina si el tiempo de empleo se mide en d¡as u horas.;
+                                 FRC=Param‚trez vos s‚ries de num‚ros pour cr‚er des fiches employ‚s et d‚finissez si la dur‚e du contrat de travail est calcul‚e en jours ou en heures.;
+                                 ENC=Set up your number series for creating new employee cards and define if employment time is measured by days or hours.];
+                      RunObject=Page 5233;
+                      Image=HRSetup }
+      { 65      ;1   ;ActionGroup;
+                      Name=Help;
+                      CaptionML=[ENU=Help;
+                                 ESM=Ayuda;
+                                 FRC=?;
+                                 ENC=Help] }
+      { 54      ;2   ;Action    ;
+                      CaptionML=[ENU=Show/Hide Getting Started;
+                                 ESM=Mostrar u ocultar introducci¢n;
+                                 FRC=Afficher/Masquer la mise en route;
+                                 ENC=Show/Hide Getting Started];
+                      RunObject=Codeunit 1321;
+                      Image=Help }
+      { 8       ;0   ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 ESM=Clientes;
+                                 FRC=Clients;
+                                 ENC=Customers];
+                      RunObject=Page 1301 }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=Vendors;
+                                 ESM=Proveedores;
+                                 FRC=Fournisseurs;
+                                 ENC=Vendors];
+                      RunObject=Page 1331 }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 ESM=Productos;
+                                 FRC=Articles;
+                                 ENC=Items];
+                      RunObject=Page 1303 }
+      { 5       ;1   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Invoices;
+                                 ESM=Hist¢rico facturas venta;
+                                 FRC=Factures ventes report‚es;
+                                 ENC=Posted Sales Invoices];
+                      RunObject=Page 1309 }
+      { 69      ;1   ;Action    ;
+                      Name=PostedPurchaseInvoices;
+                      CaptionML=[ENU=Posted Purchase Invoices;
+                                 ESM=Hist¢rico facturas compra;
+                                 FRC=Factures d'achat report‚es;
+                                 ENC=Posted Purchase Invoices];
+                      RunObject=Page 1359 }
+      { 38      ;    ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Bookkeeping;
+                                 ESM=Contabilidad;
+                                 FRC=Comptabilit‚;
+                                 ENC=Bookkeeping];
+                      Image=Journals }
+      { 37      ;2   ;Action    ;
+                      CaptionML=[ENU=Chart of Accounts;
+                                 ESM=Cat logo de cuentas;
+                                 FRC=Plan comptable;
+                                 ENC=Chart of Accounts];
+                      RunObject=Page 16 }
+      { 62      ;2   ;Action    ;
+                      CaptionML=[ENU=G/L Budgets;
+                                 ESM=Presupuestos contables;
+                                 FRC=Budgets GL;
+                                 ENC=G/L Budgets];
+                      RunObject=Page 121 }
+      { 63      ;2   ;Action    ;
+                      CaptionML=[ENU=Fixed Assets;
+                                 ESM=Activos fijos;
+                                 FRC=Immobilisations;
+                                 ENC=Fixed Assets];
+                      RunObject=Page 5601 }
+      { 64      ;2   ;Action    ;
+                      CaptionML=[ENU=Employees;
+                                 ESM=Empleados;
+                                 FRC=Employ‚s;
+                                 ENC=Employees];
+                      RunObject=Page 5201 }
+      { 40      ;2   ;Action    ;
+                      CaptionML=[ENU=General Journals;
+                                 ESM=Diarios generales;
+                                 FRC=Journaux g‚n‚raux;
+                                 ENC=General Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(General),
+                                        Recurring=CONST(No));
+                      Image=Journal }
+      { 43      ;2   ;Action    ;
+                      CaptionML=[ENU=Cash Receipt Journals;
+                                 ESM=Diarios de recibos de efectivo;
+                                 FRC=Journaux des encaissements;
+                                 ENC=Cash Receipt Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Cash Receipts),
+                                        Recurring=CONST(No));
+                      Image=Journals }
+      { 42      ;2   ;Action    ;
+                      CaptionML=[ENU=Payment Journals;
+                                 ESM=Diarios de pagos;
+                                 FRC=Journaux des paiements;
+                                 ENC=Payment Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Payments),
+                                        Recurring=CONST(No));
+                      Image=Journals }
+      { 57      ;2   ;Action    ;
+                      CaptionML=[ENU=Sales Invoices;
+                                 ESM=Facturas venta;
+                                 FRC=Factures vente;
+                                 ENC=Sales Invoices];
+                      RunObject=Page 1306 }
+      { 56      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Invoices;
+                                 ESM=Hist¢rico facturas venta;
+                                 FRC=Factures ventes report‚es;
+                                 ENC=Posted Sales Invoices];
+                      RunObject=Page 1309 }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=Sales Credit Memos;
+                                 ESM=Notas de cr‚dito de venta;
+                                 FRC=Notes de cr‚dit de vente;
+                                 ENC=Sales Credit Memos];
+                      RunObject=Page 1317 }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Credit Memos;
+                                 ESM=Notas de cr‚dito ventas registradas;
+                                 FRC=Notes cr‚dit ventes report‚es;
+                                 ENC=Posted Sales Credit Memos];
+                      RunObject=Page 1321 }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=Reminders;
+                                 ESM=Recordatorios;
+                                 FRC=Rappels;
+                                 ENC=Reminders];
+                      RunObject=Page 436;
+                      Image=Reminder }
+      { 30      ;2   ;Action    ;
+                      CaptionML=[ENU=Issued Reminders;
+                                 ESM=Recordatorios emitidos;
+                                 FRC=Rappels ‚mis;
+                                 ENC=Issued Reminders];
+                      RunObject=Page 440;
+                      Image=OrderReminder }
+      { 24      ;2   ;Action    ;
+                      CaptionML=[ENU=Finance Charge Memos;
+                                 ESM=Docs. inter‚s;
+                                 FRC=Notes de frais financiers;
+                                 ENC=Finance Charge Memos];
+                      RunObject=Page 448;
+                      Image=FinChargeMemo }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=Issued Finance Charge Memos;
+                                 ESM=Docs. de inter‚s emitidos;
+                                 FRC=Notes de frais financiers ‚mises;
+                                 ENC=Issued Finance Charge Memos];
+                      RunObject=Page 452;
+                      Image=PostedMemo }
+      { 34      ;2   ;Action    ;
+                      Name=<Page Mini Purchase Invoices>;
+                      CaptionML=[ENU=Purchase Invoices;
+                                 ESM=Facturas compra;
+                                 FRC=Factures d'achat;
+                                 ENC=Purchase Invoices];
+                      RunObject=Page 1356 }
+      { 18      ;2   ;Action    ;
+                      Name=<Page Mini Posted Purchase Invoices>;
+                      CaptionML=[ENU=Posted Purchase Invoices;
+                                 ESM=Hist¢rico facturas compra;
+                                 FRC=Factures d'achat report‚es;
+                                 ENC=Posted Purchase Invoices];
+                      RunObject=Page 1359 }
+      { 53      ;2   ;Action    ;
+                      Name=<Page Mini Purchase Credit Memos>;
+                      CaptionML=[ENU=Purchase Credit Memos;
+                                 ESM=Notas de cr‚dito de compra;
+                                 FRC=Notes de cr‚dit d'achat;
+                                 ENC=Purchase Credit Memos];
+                      RunObject=Page 1367 }
+      { 19      ;2   ;Action    ;
+                      Name=<Page Mini Posted Purchase Credit Memos>;
+                      CaptionML=[ENU=Posted Purchase Credit Memos;
+                                 ESM=Hist¢rico abono compra;
+                                 FRC=Notes de cr‚dit achat report‚es;
+                                 ENC=Posted Purchase Credit Memos];
+                      RunObject=Page 1371 }
+      { 70      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Analysis;
+                                 ESM=An lisis;
+                                 FRC=Analyse;
+                                 ENC=Analysis];
+                      Image=AnalysisView }
+      { 71      ;2   ;Action    ;
+                      CaptionML=[ENU=Account Schedules;
+                                 ESM=Estructuras de cuentas;
+                                 FRC=Tableaux d'analyse;
+                                 ENC=Account Schedules];
+                      RunObject=Page 103 }
+      { 72      ;2   ;Action    ;
+                      CaptionML=[ENU=Sales Analysis Reports;
+                                 ESM=Informes de an lisis de ventas;
+                                 FRC=Rapports d'analyse des ventes;
+                                 ENC=Sales Analysis Reports];
+                      RunObject=Page 9376 }
+      { 73      ;2   ;Action    ;
+                      CaptionML=[ENU=Purchase Analysis Reports;
+                                 ESM=Informes de an lisis de compras;
+                                 FRC=Rapports d'analyse des achats;
+                                 ENC=Purchase Analysis Reports];
+                      RunObject=Page 9375 }
+      { 74      ;2   ;Action    ;
+                      CaptionML=[ENU=Inventory Analysis Reports;
+                                 ESM=Informes de an lisis de invent.;
+                                 FRC=Rapports d'analyse de l'inventaire;
+                                 ENC=Inventory Analysis Reports];
+                      RunObject=Page 9377 }
+      { 79      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Reports;
+                                 ESM=Informes IVA;
+                                 FRC=Rapports TVA;
+                                 ENC=Tax Reports];
+                      RunObject=Page 744 }
+      { 75      ;2   ;Action    ;
+                      CaptionML=[ENU=Cash Flow Forecasts;
+                                 ESM=Previsiones de flujo de caja;
+                                 FRC=Pr‚visions de la tr‚sorerie;
+                                 ENC=Cash Flow Forecasts];
+                      RunObject=Page 849 }
+      { 76      ;2   ;Action    ;
+                      CaptionML=[ENU=Chart of Cash Flow Accounts;
+                                 ESM=Cat logo de cuentas de flujo de caja;
+                                 FRC=Plan comptable de tr‚sorerie;
+                                 ENC=Chart of Cash Flow Accounts];
+                      RunObject=Page 851 }
+      { 77      ;2   ;Action    ;
+                      CaptionML=[ENU=Cash Flow Manual Revenues;
+                                 ESM=Ingresos manuales de flujo de caja;
+                                 FRC=Op‚rations diverses positives de tr‚sorerie;
+                                 ENC=Cash Flow Manual Revenues];
+                      RunObject=Page 857 }
+      { 78      ;2   ;Action    ;
+                      CaptionML=[ENU=Cash Flow Manual Expenses;
+                                 ESM=Gastos manuales de flujo de caja;
+                                 FRC=Op‚rations diverses n‚gatives de tr‚sorerie;
+                                 ENC=Cash Flow Manual Expenses];
+                      RunObject=Page 859 }
+      { 23      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Bank & Payments;
+                                 ESM=Banco y pagos;
+                                 FRC=Banque & paiements;
+                                 ENC=Bank & Payments];
+                      Image=Bank }
+      { 17      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 ESM=Bancos;
+                                 FRC=Comptes bancaires;
+                                 ENC=Bank Accounts];
+                      RunObject=Page 371;
+                      Image=BankAccount }
+      { 28      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Acc. Reconciliations;
+                                 ESM=Conciliaci¢n bancos;
+                                 FRC=Rapprochements bancaires;
+                                 ENC=Bank Acc. Reconciliations];
+                      RunObject=Page 388;
+                      Image=BankAccountRec }
+      { 33      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Acc. Statements;
+                                 ESM=Estados de cuenta banco;
+                                 FRC=Relev‚s bancaires;
+                                 ENC=Bank Acc. Statements];
+                      RunObject=Page 389;
+                      Image=BankAccountStatement }
+      { 3       ;2   ;Action    ;
+                      CaptionML=[ENU=General Journals;
+                                 ESM=Diarios generales;
+                                 FRC=Journaux g‚n‚raux;
+                                 ENC=General Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(General),
+                                        Recurring=CONST(No));
+                      Image=Journal }
+      { 36      ;2   ;Action    ;
+                      CaptionML=[ENU=Payment Journals;
+                                 ESM=Diarios de pagos;
+                                 FRC=Journaux des paiements;
+                                 ENC=Payment Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Payments),
+                                        Recurring=CONST(No));
+                      Image=Journals }
+      { 41      ;2   ;Action    ;
+                      CaptionML=[ENU=Cash Receipt Journals;
+                                 ESM=Diarios de recibos de efectivo;
+                                 FRC=Journaux des encaissements;
+                                 ENC=Cash Receipt Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Cash Receipts),
+                                        Recurring=CONST(No));
+                      Image=Journals }
+      { 44      ;2   ;Action    ;
+                      CaptionML=[ENU=Currencies;
+                                 ESM=Divisas;
+                                 FRC=Devises;
+                                 ENC=Currencies];
+                      RunObject=Page 5;
+                      Image=Currency }
+      { 45      ;2   ;Action    ;
+                      CaptionML=[ENU=Direct Debit Collections;
+                                 ESM=Cobros por adeudo directo;
+                                 FRC=Recouvrements de pr‚lŠvement;
+                                 ENC=Direct Debit Collections];
+                      RunObject=Page 1207 }
+      { 35      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Tax Reporting;
+                                 ESM=Informes de IVA;
+                                 FRC=Rapports fiscaux;
+                                 ENC=Tax Reporting];
+                      Image=Statistics }
+      { 11      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Statements;
+                                 ESM=Declaraciones IVA;
+                                 FRC=Relev‚s fiscaux;
+                                 ENC=Tax Statements];
+                      RunObject=Page 320 }
+      { 80      ;2   ;Action    ;
+                      CaptionML=[ENU=Instrastat Journals;
+                                 ESM=Diarios Intrastat;
+                                 FRC=Journaux intracommunautaires;
+                                 ENC=Instrastat Journals];
+                      RunObject=Page 327 }
+      { 51      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Invoices;
+                                 ESM=Hist¢rico facturas venta;
+                                 FRC=Factures ventes report‚es;
+                                 ENC=Posted Sales Invoices];
+                      RunObject=Page 1309 }
+      { 48      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Credit Memos;
+                                 ESM=Notas de cr‚dito ventas registradas;
+                                 FRC=Notes cr‚dit ventes report‚es;
+                                 ENC=Posted Sales Credit Memos];
+                      RunObject=Page 1321 }
+      { 50      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Invoices;
+                                 ESM=Hist¢rico facturas compra;
+                                 FRC=Factures d'achat report‚es;
+                                 ENC=Posted Purchase Invoices];
+                      RunObject=Page 146 }
+    }
+  }
+  CONTROLS
+  {
+    { 13  ;0   ;Container ;
+                ContainerType=RoleCenterArea }
+
+    { 12  ;1   ;Group      }
+
+    { 16  ;2   ;Part      ;
+                PagePartID=Page1310;
+                PartType=Page }
+
+    { 7   ;2   ;Part      ;
+                CaptionML=[ENU=Favorite Customers;
+                           ESM=Clientes favoritos;
+                           FRC=Clients favoris;
+                           ENC=Favorite Customers];
+                PagePartID=Page9150;
+                PartType=Page }
+
+    { 10  ;1   ;Group     ;
+                GroupType=Group }
+
+    { 55  ;2   ;Part      ;
+                PagePartID=Page1390;
+                PartType=Page }
+
+    { 9   ;2   ;Part      ;
+                PagePartID=Page1393;
+                PartType=Page }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

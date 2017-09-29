@@ -1,0 +1,118 @@
+OBJECT Page 9034 Acc. Receivable Activities
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Activities;
+               ESM=Actividades;
+               FRC=Activit‚s;
+               ENC=Activities];
+    SourceTable=Table9054;
+    PageType=CardPart;
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+
+                 SETFILTER("Overdue Date Filter",'<%1',WORKDATE);
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 10  ;1   ;Group     ;
+                CaptionML=[ENU=Payments;
+                           ESM=Pagos;
+                           FRC=Paiements;
+                           ENC=Payments];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 8       ;0   ;Action    ;
+                                  CaptionML=[ENU=Edit Cash Receipt Journal;
+                                             ESM=Editar diario de recibos de efectivo;
+                                             FRC=Modifier le journal des encaissements;
+                                             ENC=Edit Cash Receipt Journal];
+                                  RunObject=Page 255 }
+                  { 9       ;0   ;Action    ;
+                                  CaptionML=[ENU=New Sales Credit Memo;
+                                             ESM=Nueva nota cr‚dito venta;
+                                             FRC=Nouvelle note de cr‚dit de vente;
+                                             ENC=New Sales Credit Memo];
+                                  RunObject=Page 44;
+                                  RunPageMode=Create }
+                }
+                 }
+
+    { 1   ;2   ;Field     ;
+                SourceExpr="Overdue Sales Documents";
+                DrillDownPageID=Customer Ledger Entries }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Sales Return Orders - All";
+                DrillDownPageID=Sales Return Order List }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Customers - Blocked";
+                DrillDownPageID=Customer List }
+
+    { 11  ;1   ;Group     ;
+                CaptionML=[ENU=Document Approvals;
+                           ESM=Aprobaci¢n documentos;
+                           FRC=Approbations de document;
+                           ENC=Document Approvals];
+                GroupType=CueGroup }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="SOs Pending Approval";
+                DrillDownPageID=Sales Order List }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Approved Sales Orders";
+                DrillDownPageID=Sales Order List }
+
+    { 1400002;1;Group     ;
+                CaptionML=[ENU=Deposits;
+                           ESM=Dep¢sitos;
+                           FRC=D‚p“ts;
+                           ENC=Deposits];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 1400009 ;0   ;Action    ;
+                                  CaptionML=[ENU=New Deposit;
+                                             ESM=Nuevo dep¢sito;
+                                             FRC=Nouveau d‚p“t;
+                                             ENC=New Deposit];
+                                  RunObject=Page 10140;
+                                  RunPageMode=Create }
+                }
+                 }
+
+    { 1400005;2;Field     ;
+                CaptionML=[ENU=Deposits to Post;
+                           ESM=Dep¢sitos a registrar;
+                           FRC=D‚p“ts … reporter;
+                           ENC=Deposits to Post];
+                SourceExpr="Deposits to Post";
+                DrillDownPageID=Deposit List }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

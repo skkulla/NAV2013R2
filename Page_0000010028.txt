@@ -1,0 +1,420 @@
+OBJECT Page 10028 Sales Order Invoice
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sales Order Invoice;
+               ESM=Factura pedido venta;
+               FRC=Document de vente - Facturation;
+               ENC=Sales Order Invoice];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table36;
+    SourceTableView=WHERE(Document Type=FILTER(Order));
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    OnOpenPage=BEGIN
+                 IF UserMgt.GetSalesFilter <> '' THEN BEGIN
+                   FILTERGROUP(2);
+                   SETRANGE("Responsibility Center",UserMgt.GetSalesFilter);
+                   FILTERGROUP(0);
+                 END;
+
+                 SETRANGE("Date Filter",0D,WORKDATE - 1);
+               END;
+
+    OnNewRecord=BEGIN
+                  "Responsibility Center" := UserMgt.GetSalesFilter;
+                END;
+
+    OnDeleteRecord=BEGIN
+                     CurrPage.SAVERECORD;
+                     EXIT(ConfirmDeletion);
+                   END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 59      ;1   ;ActionGroup;
+                      CaptionML=[ENU=O&rder;
+                                 ESM=&Pedido;
+                                 FRC=C&ommande;
+                                 ENC=O&rder];
+                      Image=Order }
+      { 61      ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 SalesSetup.GET;
+                                 IF SalesSetup."Calc. Inv. Discount" THEN BEGIN
+                                   CurrPage.SalesLines.PAGE.CalcInvDisc;
+                                   COMMIT
+                                 END;
+
+                                 IF "Tax Area Code" = '' THEN
+                                   PAGE.RUNMODAL(PAGE::"Sales Order Statistics",Rec)
+                                 ELSE
+                                   PAGE.RUNMODAL(PAGE::"Sales Order Stats.",Rec)
+                               END;
+                                }
+      { 62      ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Card;
+                                 ESM=Ficha;
+                                 FRC=Fiche;
+                                 ENC=Card];
+                      RunObject=Page 21;
+                      RunPageLink=No.=FIELD(Sell-to Customer No.);
+                      Image=EditLines }
+      { 63      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 67;
+                      RunPageLink=Document Type=FIELD(Document Type),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 64      ;2   ;Action    ;
+                      CaptionML=[ENU=S&hipments;
+                                 ESM=E&nv°os;
+                                 FRC=L&ivraisons;
+                                 ENC=S&hipments];
+                      RunObject=Page 142;
+                      RunPageView=SORTING(Order No.);
+                      RunPageLink=Order No.=FIELD(No.);
+                      Image=Shipment }
+      { 65      ;2   ;Action    ;
+                      CaptionML=[ENU=Invoices;
+                                 ESM=Facturas;
+                                 FRC=Factures;
+                                 ENC=Invoices];
+                      RunObject=Page 143;
+                      RunPageView=SORTING(Order No.);
+                      RunPageLink=Order No.=FIELD(No.);
+                      Image=Invoice }
+      { 122     ;2   ;Action    ;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDocDim;
+                                 CurrPage.SAVERECORD;
+                               END;
+                                }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 66      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 67      ;2   ;Action    ;
+                      CaptionML=[ENU=Calculate &Invoice Discount;
+                                 ESM=Calcular dto. en la &factura;
+                                 FRC=Calculer escompte &facture;
+                                 ENC=Calculate &Invoice Discount];
+                      Image=CalculateInvoiceDiscount;
+                      OnAction=BEGIN
+                                 ApproveCalcInvDisc;
+                               END;
+                                }
+      { 134     ;2   ;Action    ;
+                      CaptionML=[ENU=Re&open;
+                                 ESM=&Volver a abrir;
+                                 FRC=RÇ&ouvrir;
+                                 ENC=Re&open];
+                      Image=ReOpen;
+                      OnAction=VAR
+                                 ReleaseSalesDoc@1001 : Codeunit 414;
+                               BEGIN
+                                 ReleaseSalesDoc.Reopen(Rec);
+                               END;
+                                }
+      { 73      ;1   ;ActionGroup;
+                      CaptionML=[ENU=P&osting;
+                                 ESM=&Registro;
+                                 FRC=Rep&ort;
+                                 ENC=P&osting];
+                      Image=Post }
+      { 74      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Test Report;
+                                 ESM=Test;
+                                 FRC=Tester le report;
+                                 ENC=Test Report];
+                      Image=TestReport;
+                      OnAction=BEGIN
+                                 ReportPrint.PrintSalesHeader(Rec);
+                               END;
+                                }
+      { 75      ;2   ;Action    ;
+                      ShortCutKey=F9;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=P&ost;
+                                 ESM=&Registrar;
+                                 FRC=Rep&orter;
+                                 ENC=P&ost];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Post;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 PurchaseHeader@1020000 : Record 38;
+                                 ApprovalMgt@1020001 : Codeunit 439;
+                               BEGIN
+                                 IF ApprovalMgt.PrePostApprovalCheck(Rec,PurchaseHeader) THEN BEGIN
+                                   IF ApprovalMgt.TestSalesPrepayment(Rec) THEN
+                                     ERROR(STRSUBSTNO(Text001,"Document Type","No."));
+
+                                   IF ApprovalMgt.TestSalesPayment(Rec) THEN
+                                     ERROR(STRSUBSTNO(Text002,"Document Type","No."));
+
+                                   CODEUNIT.RUN(CODEUNIT::"Invoice-Post (Yes/No)",Rec);
+                                 END;
+                               END;
+                                }
+      { 76      ;2   ;Action    ;
+                      ShortCutKey=Shift+F9;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Post and &Print;
+                                 ESM=Registrar e &imprimir;
+                                 FRC=Reporter et im&primer;
+                                 ENC=Post and &Print];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostPrint;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 PurchaseHeader@1020001 : Record 38;
+                                 ApprovalMgt@1020000 : Codeunit 439;
+                               BEGIN
+                                 IF ApprovalMgt.PrePostApprovalCheck(Rec,PurchaseHeader) THEN BEGIN
+                                   IF ApprovalMgt.TestSalesPrepayment(Rec) THEN
+                                     ERROR(STRSUBSTNO(Text001,"Document Type","No."));
+
+                                   IF ApprovalMgt.TestSalesPayment(Rec) THEN
+                                     ERROR(STRSUBSTNO(Text002,"Document Type","No."));
+
+                                   CODEUNIT.RUN(CODEUNIT::"Invoice-Post + Print",Rec);
+                                 END;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No.";
+                Editable=FALSE;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Sell-to Customer No.";
+                Editable=FALSE;
+                OnValidate=BEGIN
+                             SelltoCustomerNoOnAfterValidat;
+                           END;
+                            }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Sell-to Customer Name";
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Posting Date" }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Order Date" }
+
+    { 45  ;2   ;Field     ;
+                SourceExpr="Document Date" }
+
+    { 155 ;2   ;Field     ;
+                SourceExpr="External Document No." }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Salesperson Code";
+                Editable=FALSE }
+
+    { 111 ;2   ;Field     ;
+                SourceExpr="Currency Code";
+                OnAssistEdit=BEGIN
+                               ChangeExchangeRate.SetParameter("Currency Code","Currency Factor","Posting Date");
+                               IF ChangeExchangeRate.RUNMODAL = ACTION::OK THEN BEGIN
+                                 VALIDATE("Currency Factor",ChangeExchangeRate.GetParameter);
+                                 CurrPage.UPDATE;
+                               END;
+                               CLEAR(ChangeExchangeRate);
+                             END;
+                              }
+
+    { 129 ;2   ;Field     ;
+                SourceExpr=Status }
+
+    { 58  ;1   ;Part      ;
+                Name=SalesLines;
+                SubPageLink=Document No.=FIELD(No.);
+                PagePartID=Page10029 }
+
+    { 1905885101;1;Group  ;
+                CaptionML=[ENU=Invoicing;
+                           ESM=Facturaci¢n;
+                           FRC=Facturation;
+                           ENC=Invoicing] }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Bill-to Customer No.";
+                OnValidate=BEGIN
+                             BilltoCustomerNoOnAfterValidat;
+                           END;
+                            }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Bill-to Name" }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Bill-to Address" }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Bill-to Address 2" }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr="Bill-to City" }
+
+    { 1020004;2;Field     ;
+                CaptionML=[ENU=State / ZIP Code;
+                           ESM=Estado / C.P.;
+                           FRC=êtat-Province/code postal;
+                           ENC=Prov./State /Postal/ZIP Code];
+                SourceExpr="Bill-to County" }
+
+    { 89  ;2   ;Field     ;
+                SourceExpr="Bill-to Post Code" }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Bill-to Contact" }
+
+    { 84  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code";
+                Editable=FALSE;
+                OnValidate=BEGIN
+                             ShortcutDimension1CodeOnAfterV;
+                           END;
+                            }
+
+    { 92  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code";
+                Editable=FALSE;
+                OnValidate=BEGIN
+                             ShortcutDimension2CodeOnAfterV;
+                           END;
+                            }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Payment Terms Code" }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Due Date" }
+
+    { 32  ;2   ;Field     ;
+                SourceExpr="Payment Discount %" }
+
+    { 34  ;2   ;Field     ;
+                SourceExpr="Pmt. Discount Date" }
+
+    { 105 ;2   ;Field     ;
+                SourceExpr="Payment Method Code" }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Tax Liable" }
+
+    { 1020008;2;Field     ;
+                SourceExpr="Tax Area Code" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                Editable=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=Unable to execute this function while in view only mode.;ESM=No es posible ejecutar esta funci¢n en el modo de solo lectura.;FRC=Impossible d''exÇcuter cette fonction dans le mode visualisation seulement.;ENC=Unable to execute this function while in view only mode.';
+      ReportPrint@1002 : Codeunit 228;
+      SalesSetup@1004 : Record 311;
+      ChangeExchangeRate@1005 : Page 511;
+      UserMgt@1006 : Codeunit 5700;
+      Text001@1020000 : TextConst 'ENU=There are non posted Prepayment Amounts on %1 %2.;ESM=No hay cantidades anticipo registradas en %1 %2.;FRC=Il y a des montants de paiement anticipÇ non reportÇs sur %1 %2.;ENC=There are non posted Prepayment Amounts on %1 %2.';
+      Text002@1020001 : TextConst 'ENU=There are unpaid Prepayment Invoices related to %1 %2.;ESM=Existen facturas anticipo sin abonar relacionadas con %1 %2.;FRC=Il y a des factures pour paiement anticipÇ non payÇes associÇes Ö %1 %2.;ENC=There are unpaid Prepayment Invoices related to %1 %2.';
+
+    PROCEDURE UpdateAllowed@1() : Boolean;
+    BEGIN
+      IF CurrPage.EDITABLE = FALSE THEN
+        ERROR(Text000);
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE ApproveCalcInvDisc@3();
+    BEGIN
+      CurrPage.SalesLines.PAGE.ApproveCalcInvDisc;
+    END;
+
+    LOCAL PROCEDURE SelltoCustomerNoOnAfterValidat@19034782();
+    BEGIN
+      CurrPage.UPDATE;
+    END;
+
+    LOCAL PROCEDURE BilltoCustomerNoOnAfterValidat@19044114();
+    BEGIN
+      CurrPage.UPDATE;
+    END;
+
+    LOCAL PROCEDURE ShortcutDimension1CodeOnAfterV@19029405();
+    BEGIN
+      CurrPage.SalesLines.PAGE.UpdateForm(TRUE);
+    END;
+
+    LOCAL PROCEDURE ShortcutDimension2CodeOnAfterV@19008725();
+    BEGIN
+      CurrPage.SalesLines.PAGE.UpdateForm(TRUE);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

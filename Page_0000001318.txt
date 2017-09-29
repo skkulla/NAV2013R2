@@ -1,0 +1,79 @@
+OBJECT Page 1318 Mini Sales Hist. Sell-to FactB
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sell-to Customer Sales History;
+               ESM=Historial de ventas del cliente de venta;
+               FRC=Historique des ventes - d‚biteur;
+               ENC=Sell-to Customer Sales History];
+    SourceTable=Table18;
+    PageType=CardPart;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 9   ;1   ;Field     ;
+                CaptionML=[ENU=Open Sales Invoices;
+                           ESM=Facturas ventas pendientes;
+                           FRC=Factures vente ouvertes;
+                           ENC=Open Sales Invoices];
+                ToolTipML=[ENU=Specifies the number of unposted sales invoices that have been registered for the customer.;
+                           ESM=Especifica el n£mero de facturas de venta no registradas que se han registrado para el cliente.;
+                           FRC=Indique le nombre factures vente enregistr‚es pour le client.;
+                           ENC=Specifies the number of unposted sales invoices that have been registered for the customer.];
+                SourceExpr="No. of Invoices";
+                DrillDownPageID=Mini Sales Invoice List }
+
+    { 13  ;1   ;Field     ;
+                CaptionML=[ENU=Open Sales Credit Memos;
+                           ESM=Notas de cr‚dito de venta abiertas;
+                           FRC=Notes de cr‚dit de vente ouvertes;
+                           ENC=Open Sales Credit Memos];
+                ToolTipML=[ENU=Specifies the number of unposted sales credit memos that have been registered for the customer.;
+                           ESM=Especifica el n£mero de notas de cr‚dito de venta no registradas que se han registrado para el cliente.;
+                           FRC=Indique le nombre d'avoirs vente non valid‚s enregistr‚s pour le client.;
+                           ENC=Specifies the number of unposted sales credit memos that have been registered for the customer.];
+                SourceExpr="No. of Credit Memos";
+                DrillDownPageID=Mini Sales Credit Memos }
+
+    { 17  ;1   ;Field     ;
+                CaptionML=[ENU=Posted Sales Invoices;
+                           ESM=Hist¢rico facturas venta;
+                           FRC=Factures ventes report‚es;
+                           ENC=Posted Sales Invoices];
+                ToolTipML=[ENU=Specifies the number of posted sales invoices that have been registered for the customer.;
+                           ESM=Especifica el n£mero de facturas de venta registradas que se han registrado para el cliente.;
+                           FRC=Indique le nombre de factures vente enregistr‚es pour le client.;
+                           ENC=Specifies the number of posted sales invoices that have been registered for the customer.];
+                SourceExpr="No. of Pstd. Invoices";
+                DrillDownPageID=Mini Posted Sales Invoices }
+
+    { 21  ;1   ;Field     ;
+                CaptionML=[ENU=Posted Sales Credit Memos;
+                           ESM=Notas de cr‚dito ventas registradas;
+                           FRC=Notes cr‚dit ventes report‚es;
+                           ENC=Posted Sales Credit Memos];
+                ToolTipML=[ENU=Specifies the number of posted sales credit memos that have been registered for the customer.;
+                           ESM=Especifica el n£mero de notas de cr‚dito de venta registradas que se han registrado para el cliente.;
+                           FRC=Indique le nombre d'avoirs vente valid‚s enregistr‚s pour le client.;
+                           ENC=Specifies the number of posted sales credit memos that have been registered for the customer.];
+                SourceExpr="No. of Pstd. Credit Memos";
+                DrillDownPageID=Mini Posted Sales Credit Memos }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

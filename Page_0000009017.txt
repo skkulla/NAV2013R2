@@ -1,0 +1,173 @@
+OBJECT Page 9017 Service Technician Role Center
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               ESM=µrea de tareas;
+               FRC=Tableau de bord;
+               ENC=Role Centre];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Service &Order;
+                                 ESM=Pedido &servicio;
+                                 FRC=C&ommande de service;
+                                 ENC=Service &Order];
+                      RunObject=Report 5900;
+                      Image=Document }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Service Items Out of &Warranty;
+                                 ESM=Prods. serv. fuera de &garant°a;
+                                 FRC=Articles de service hors &garantie;
+                                 ENC=Service Items Out of &Warranty];
+                      RunObject=Report 5937;
+                      Image=Report }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Service Item &Line Labels;
+                                 ESM=Etiquetas &l°n. prod. servicio;
+                                 FRC=êtiquettes de &lignes d'articles de service;
+                                 ENC=Service Item &Line Labels];
+                      RunObject=Report 5901;
+                      Image=Report }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Service &Item Worksheet;
+                                 ESM=&Hoja trabajo prod. serv.;
+                                 FRC=&Feuille activitÇ article de service;
+                                 ENC=Service &Item Worksheet];
+                      RunObject=Report 5936;
+                      Image=ServiceItemWorksheet }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 5       ;1   ;Action    ;
+                      CaptionML=[ENU=Service Orders;
+                                 ESM=Pedidos servicio;
+                                 FRC=Commandes de service;
+                                 ENC=Service Orders];
+                      RunObject=Page 9318;
+                      Image=Document }
+      { 17      ;1   ;Action    ;
+                      CaptionML=[ENU=In Process;
+                                 ESM=En proceso;
+                                 FRC=En cours;
+                                 ENC=In Process];
+                      RunObject=Page 9318;
+                      RunPageView=WHERE(Status=FILTER(In Process)) }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=Service Item Lines;
+                                 ESM=L°ns. prod. servicio;
+                                 FRC=Lignes article de service;
+                                 ENC=Service Item Lines];
+                      RunObject=Page 5903 }
+      { 18      ;1   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 ESM=Clientes;
+                                 FRC=Clients;
+                                 ENC=Customers];
+                      RunObject=Page 22;
+                      Image=Customer }
+      { 19      ;1   ;Action    ;
+                      CaptionML=[ENU=Loaners;
+                                 ESM=Prod. prestados;
+                                 FRC=Articles de pràt;
+                                 ENC=Loaners];
+                      RunObject=Page 5923;
+                      Image=Loaners }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=Service Items;
+                                 ESM=Prods. servicio;
+                                 FRC=Articles de service;
+                                 ENC=Service Items];
+                      RunObject=Page 5981;
+                      Image=ServiceItem }
+      { 22      ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 ESM=Productos;
+                                 FRC=Articles;
+                                 ENC=Items];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 1       ;0   ;ActionContainer;
+                      ActionContainerType=NewDocumentItems }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Service &Order;
+                                 ESM=Pedido &servicio;
+                                 FRC=C&ommande service;
+                                 ENC=Service &Order];
+                      RunObject=Page 5900;
+                      Promoted=No;
+                      Image=Document;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=&Loaner;
+                                 ESM=Prod. pres&tado;
+                                 FRC=&Article de pràt;
+                                 ENC=&Loaner];
+                      RunObject=Page 5922;
+                      Promoted=No;
+                      Image=Loaner;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 7       ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 ESM=Tareas;
+                                 FRC=TÉches;
+                                 ENC=Tasks];
+                      IsHeader=Yes }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Service Item &Worksheet;
+                                 ESM=&Hoja trabajo prod. serv.;
+                                 FRC=Feuille activitÇ article de ser&vice;
+                                 ENC=Service Item &Worksheet];
+                      RunObject=Page 5906;
+                      Image=ServiceItemWorksheet }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1900744308;2;Part   ;
+                PagePartID=Page9066;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 8   ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                PartType=Page }
+
+    { 1901377608;2;Part   ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

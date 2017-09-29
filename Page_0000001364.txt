@@ -1,0 +1,95 @@
+OBJECT Page 1364 Mini Standard Vendor Purchase
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Recurring Purchase Lines;
+               ESM=L¡neas de compra peri¢dicas;
+               FRC=Lignes achat r‚currentes;
+               ENC=Recurring Purchase Lines];
+    SourceTable=Table175;
+    DataCaptionFields=Vendor No.;
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 11      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Purchase;
+                                 ESM=&Compra;
+                                 FRC=&Achat;
+                                 ENC=&Purchase];
+                      Image=Purchasing }
+      { 12      ;2   ;Action    ;
+                      Name=Card;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Card;
+                                 ESM=Ficha;
+                                 FRC=Fiche;
+                                 ENC=Card];
+                      RunObject=Page 1361;
+                      RunPageLink=Code=FIELD(Code);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=EditLines;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor number of the vendor to which the standard purchase code is assigned.;
+                           ESM=Especifica el n£mero del proveedor al que est  asignado el c¢digo de compras est ndar.;
+                           FRC=Sp‚cifie le num‚ro du fournisseur auquel le code achat standard est affect‚.;
+                           ENC=Specifies the vendor number of the vendor to which the standard purchase code is assigned.];
+                SourceExpr="Vendor No.";
+                Visible=FALSE }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a standard purchase code from the Standard Purchase Code table.;
+                           ESM=Especifica un c¢digo de compra est ndar de la tabla respectiva.;
+                           FRC=Indique un code achat standard provenant de la table Code achat standard.;
+                           ENC=Specifies a standard purchase code from the Standard Purchase Code table.];
+                SourceExpr=Code;
+                OnLookup=VAR
+                           StdPurchaseCode@1000 : Record 173;
+                         BEGIN
+                           IF Code <> '' THEN
+                             StdPurchaseCode.GET(Code);
+
+                           IF PAGE.RUNMODAL(PAGE::"Mini Standard Purchase Codes",StdPurchaseCode) = ACTION::LookupOK THEN BEGIN
+                             VALIDATE(Code,StdPurchaseCode.Code);
+                             Text := Code;
+                           END;
+
+                           EXIT(TRUE);
+                         END;
+                          }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a description of the standard purchase code. When you fill in the Code field, the program automatically copies the description from the Standard Purchase Code table.;
+                           ESM=Especifica una descripci¢n del c¢digo de compras est ndar. Cuando se rellena el campo C¢digo, el sistema copia autom ticamente la descripci¢n de la tabla C¢digo compras est ndar.;
+                           FRC=Sp‚cifie la d‚signation du code achat standard. Lorsque vous renseignez le champ Code, le programme copie automatiquement la d‚signation … partir de la table Code achat standard.;
+                           ENC=Specifies a description of the standard purchase code. When you fill in the Code field, the program automatically copies the description from the Standard Purchase Code table.];
+                SourceExpr=Description }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,470 @@
+OBJECT Page 134 Posted Sales Credit Memo
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posted Sales Credit Memo;
+               ESM=Hist¢rico nota crÇdito venta;
+               FRC=Note de crÇdit vente reportÇe;
+               ENC=Posted Sales Credit Memo];
+    InsertAllowed=No;
+    SourceTable=Table114;
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    OnOpenPage=BEGIN
+                 SetSecurityFilterOnRespCenter;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 47      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Cr. Memo;
+                                 ESM=Nota &CrÇdito;
+                                 FRC=Note de &crÇdit;
+                                 ENC=&Cr. Memo];
+                      Image=CreditMemo }
+      { 8       ;2   ;Action    ;
+                      Name=Statistics;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 IF "Tax Area Code" = '' THEN
+                                   PAGE.RUNMODAL(PAGE::"Sales Credit Memo Statistics",Rec,"No.")
+                                 ELSE
+                                   PAGE.RUNMODAL(PAGE::"Sales Credit Memo Stats.",Rec,"No.");
+                               END;
+                                }
+      { 49      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 67;
+                      RunPageLink=Document Type=CONST(Posted Credit Memo),
+                                  No.=FIELD(No.),
+                                  Document Line No.=CONST(0);
+                      Image=ViewComments }
+      { 77      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+      { 92      ;2   ;Action    ;
+                      CaptionML=[ENU=Approvals;
+                                 ESM=Aprobaciones;
+                                 FRC=Approbations;
+                                 ENC=Approvals];
+                      Image=Approvals;
+                      OnAction=VAR
+                                 PostedApprovalEntries@1001 : Page 659;
+                               BEGIN
+                                 PostedApprovalEntries.Setfilters(DATABASE::"Sales Cr.Memo Header","No.");
+                                 PostedApprovalEntries.RUN;
+                               END;
+                                }
+      { 5       ;2   ;Separator  }
+      { 3       ;2   ;Action    ;
+                      CaptionML=[ENU=Credit Cards Transaction Lo&g Entries;
+                                 ESM=Movimientos de re&gistro de transacci¢n de tarjetas de crÇdito;
+                                 FRC=êcritures du re&gistre des transactions des cartes de crÇdit;
+                                 ENC=Credit Cards Transaction Lo&g Entries];
+                      RunObject=Page 829;
+                      RunPageLink=Document Type=CONST(Refund),
+                                  Document No.=FIELD(No.),
+                                  Customer No.=FIELD(Bill-to Customer No.);
+                      Image=CreditCardLog }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1020015 ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Electronic Document;
+                                 ESM=Documento &electr¢nico;
+                                 FRC=&Document Çlectronique;
+                                 ENC=&Electronic Document] }
+      { 1020017 ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=S&end;
+                                 ESM=&Enviar;
+                                 FRC=Envoy&er;
+                                 ENC=S&end];
+                      Image=SendTo;
+                      OnAction=BEGIN
+                                 RequestStampEDocument;
+                               END;
+                                }
+      { 1020018 ;2   ;Action    ;
+                      CaptionML=[ENU=Export E-Document as &XML;
+                                 ESM=Exportar documento electr¢nico como &XML;
+                                 FRC=Exporter le document Çlectronique au format &XML;
+                                 ENC=Export E-Document as &XML];
+                      Image=ExportElectronicDocument;
+                      OnAction=BEGIN
+                                 ExportEDocument;
+                               END;
+                                }
+      { 1020019 ;2   ;Action    ;
+                      CaptionML=[ENU=&Cancel;
+                                 ESM=&Cancelar;
+                                 FRC=&Annuler;
+                                 ENC=&Cancel];
+                      Image=Cancel;
+                      OnAction=BEGIN
+                                 CancelEDocument;
+                               END;
+                                }
+      { 50      ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=&Imprimir;
+                                 FRC=&Imprimer;
+                                 ENC=&Print];
+                      Promoted=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 CurrPage.SETSELECTIONFILTER(SalesCrMemoHeader);
+                                 SalesCrMemoHeader.PrintRecords(TRUE);
+                               END;
+                                }
+      { 51      ;1   ;Action    ;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      Promoted=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Sell-to Customer No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 95  ;2   ;Field     ;
+                SourceExpr="Sell-to Contact No.";
+                Editable=FALSE }
+
+    { 53  ;2   ;Field     ;
+                SourceExpr="Sell-to Customer Name";
+                Editable=FALSE }
+
+    { 55  ;2   ;Field     ;
+                SourceExpr="Sell-to Address";
+                Editable=FALSE }
+
+    { 57  ;2   ;Field     ;
+                SourceExpr="Sell-to Address 2";
+                Editable=FALSE }
+
+    { 59  ;2   ;Field     ;
+                SourceExpr="Sell-to City";
+                Editable=FALSE }
+
+    { 1020005;2;Field     ;
+                CaptionML=[ENU=Sell-to State / ZIP Code;
+                           ESM=Venta a-Estado / C.P.;
+                           FRC=êtat-Province/code postal (dÇbiteur);
+                           ENC=Sell-to Province/State / Postal/ZIP Code];
+                SourceExpr="Sell-to County";
+                Editable=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Sell-to Post Code";
+                Editable=FALSE }
+
+    { 61  ;2   ;Field     ;
+                SourceExpr="Sell-to Contact";
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Posting Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr="Document Date";
+                Editable=FALSE }
+
+    { 65  ;2   ;Field     ;
+                SourceExpr="Pre-Assigned No.";
+                Editable=FALSE }
+
+    { 84  ;2   ;Field     ;
+                SourceExpr="External Document No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Salesperson Code";
+                Editable=FALSE }
+
+    { 80  ;2   ;Field     ;
+                SourceExpr="Responsibility Center";
+                Editable=FALSE }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="No. Printed";
+                Editable=FALSE }
+
+    { 46  ;1   ;Part      ;
+                Name=SalesCrMemoLines;
+                SubPageLink=Document No.=FIELD(No.);
+                PagePartID=Page135 }
+
+    { 1905885101;1;Group  ;
+                CaptionML=[ENU=Invoicing;
+                           ESM=Facturaci¢n;
+                           FRC=Facturation;
+                           ENC=Invoicing] }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Bill-to Customer No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 97  ;2   ;Field     ;
+                SourceExpr="Bill-to Contact No.";
+                Editable=FALSE }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Bill-to Name";
+                Editable=FALSE }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr="Bill-to Address";
+                Editable=FALSE }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Bill-to Address 2";
+                Editable=FALSE }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Bill-to City";
+                Editable=FALSE }
+
+    { 1020008;2;Field     ;
+                CaptionML=[ENU=State / ZIP Code;
+                           ESM=Estado / C.P.;
+                           FRC=êtat-Province/code postal;
+                           ENC=Province/State / Postal/ZIP Code];
+                SourceExpr="Bill-to County";
+                Editable=FALSE }
+
+    { 70  ;2   ;Field     ;
+                SourceExpr="Bill-to Post Code";
+                Editable=FALSE }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Bill-to Contact";
+                Editable=FALSE }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code";
+                Editable=FALSE }
+
+    { 66  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code";
+                Editable=FALSE }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Applies-to Doc. Type";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Applies-to Doc. No.";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 282 ;2   ;Field     ;
+                SourceExpr="Payment Method Code";
+                Editable=FALSE }
+
+    { 127 ;2   ;Field     ;
+                SourceExpr="Credit Card No.";
+                Editable=FALSE }
+
+    { 126 ;2   ;Field     ;
+                CaptionML=[ENU=Cr. Card Number (Last 4 Digits);
+                           ESM=N£mero tarjeta crÇdito (cuatro £ltimos d°gitos);
+                           FRC=NumÇro de carte de crÇdit (4ˇderniers chiffres);
+                           ENC=Cr. Card Number (Last 4 Digits)];
+                SourceExpr=GetCreditcardNumber;
+                Editable=FALSE }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Tax Liable";
+                Editable=FALSE }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Tax Area Code";
+                Editable=FALSE }
+
+    { 1906801201;1;Group  ;
+                CaptionML=[ENU=Shipping;
+                           ESM=Env°o;
+                           FRC=Livraison;
+                           ENC=Shipping] }
+
+    { 32  ;2   ;Field     ;
+                SourceExpr="Ship-to Code";
+                Editable=FALSE }
+
+    { 34  ;2   ;Field     ;
+                SourceExpr="Ship-to Name";
+                Editable=FALSE }
+
+    { 36  ;2   ;Field     ;
+                SourceExpr="Ship-to Address";
+                Editable=FALSE }
+
+    { 38  ;2   ;Field     ;
+                SourceExpr="Ship-to Address 2";
+                Editable=FALSE }
+
+    { 40  ;2   ;Field     ;
+                SourceExpr="Ship-to City";
+                Editable=FALSE }
+
+    { 1020011;2;Field     ;
+                CaptionML=[ENU=Ship-to State / ZIP Code;
+                           ESM=Env°o a-Estado / C.P.;
+                           FRC=êtat-Province/code postal de livraison;
+                           ENC=Ship-to Province/State / Postal/ZIP Code];
+                SourceExpr="Ship-to County";
+                Editable=FALSE }
+
+    { 72  ;2   ;Field     ;
+                SourceExpr="Ship-to Post Code";
+                Editable=FALSE }
+
+    { 42  ;2   ;Field     ;
+                SourceExpr="Ship-to Contact";
+                Editable=FALSE }
+
+    { 1020013;2;Field     ;
+                SourceExpr="Ship-to UPS Zone";
+                Editable=FALSE }
+
+    { 68  ;2   ;Field     ;
+                SourceExpr="Location Code";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 1907468901;1;Group  ;
+                CaptionML=[ENU=Foreign Trade;
+                           ESM=Comercio exterior;
+                           FRC=Commerce Çtranger;
+                           ENC=Foreign Trade] }
+
+    { 75  ;2   ;Field     ;
+                SourceExpr="Currency Code";
+                Importance=Promoted;
+                OnAssistEdit=BEGIN
+                               ChangeExchangeRate.SetParameter("Currency Code","Currency Factor","Posting Date");
+                               ChangeExchangeRate.EDITABLE(FALSE);
+                               IF ChangeExchangeRate.RUNMODAL = ACTION::OK THEN BEGIN
+                                 "Currency Factor" := ChangeExchangeRate.GetParameter;
+                                 MODIFY;
+                               END;
+                               CLEAR(ChangeExchangeRate);
+                             END;
+                              }
+
+    { 1905198401;1;Group  ;
+                CaptionML=[ENU=Electronic Invoice;
+                           ESM=Factura electr¢nica;
+                           FRC=Facture Çlectronique;
+                           ENC=Electronic Invoice] }
+
+    { 1020021;2;Field     ;
+                SourceExpr="Electronic Document Status" }
+
+    { 1020023;2;Field     ;
+                SourceExpr="Date/Time Stamped" }
+
+    { 1020025;2;Field     ;
+                SourceExpr="Date/Time Sent" }
+
+    { 1020027;2;Field     ;
+                SourceExpr="Date/Time Canceled" }
+
+    { 1020029;2;Field     ;
+                SourceExpr="Error Code" }
+
+    { 1020031;2;Field     ;
+                SourceExpr="Error Description" }
+
+    { 1020033;2;Field     ;
+                SourceExpr="PAC Web Service Name" }
+
+    { 1020035;2;Field     ;
+                SourceExpr="Fiscal Invoice Number PAC" }
+
+    { 1020037;2;Field     ;
+                SourceExpr="No. of E-Documents Sent" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      SalesCrMemoHeader@1000 : Record 114;
+      ChangeExchangeRate@1001 : Page 511;
+
+    BEGIN
+    END.
+  }
+}
+

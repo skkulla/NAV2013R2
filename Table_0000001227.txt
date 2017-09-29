@@ -1,0 +1,94 @@
+OBJECT Table 1227 Posting Exch. Line Def
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36366;
+  }
+  PROPERTIES
+  {
+    OnInsert=VAR
+               PostingExchDef@1000 : Record 1222;
+               PostingExchLineDef@1002 : Record 1227;
+             BEGIN
+               PostingExchDef.GET("Posting Exch. Def Code");
+               IF PostingExchDef.Type <> PostingExchDef.Type::"Payment Export" THEN BEGIN
+                 PostingExchLineDef.SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+                 IF NOT PostingExchLineDef.ISEMPTY THEN
+                   FIELDERROR(Code,STRSUBSTNO(OnlySupportOneLineDefErr,TABLECAPTION));
+               END;
+             END;
+
+    OnDelete=VAR
+               PostExchMapping@1001 : Record 1224;
+               PostExchColumnDef@1000 : Record 1223;
+             BEGIN
+               PostExchMapping.SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+               PostExchMapping.SETRANGE("Posting Exch. Line Def Code",Code);
+               PostExchMapping.DELETEALL(TRUE);
+
+               PostExchColumnDef.SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+               PostExchColumnDef.SETRANGE("Posting Exch. Line Def Code",Code);
+               PostExchColumnDef.DELETEALL(TRUE);
+             END;
+
+    CaptionML=[ENU=Posting Exch. Line Def;
+               ESM=N.ß l°nea intercambio registro;
+               FRC=DÇf. ligne Çchge report;
+               ENC=Posting Exch. Line Def];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Posting Exch. Def Code;Code20      ;TableRelation="Posting Exch. Def".Code;
+                                                   CaptionML=[ENU=Posting Exch. Def Code;
+                                                              ESM=C¢digo def. intercambio registro;
+                                                              FRC=Code appellation Çchge report;
+                                                              ENC=Posting Exch. Def Code] }
+    { 2   ;   ;Code                ;Code20        ;CaptionML=[ENU=Code;
+                                                              ESM=C¢digo;
+                                                              FRC=Code;
+                                                              ENC=Code] }
+    { 3   ;   ;Name                ;Text100       ;CaptionML=[ENU=Name;
+                                                              ESM=Nombre;
+                                                              FRC=Nom;
+                                                              ENC=Name] }
+    { 4   ;   ;Column Count        ;Integer       ;CaptionML=[ENU=Column Count;
+                                                              ESM=Recuento de columnas;
+                                                              FRC=Nombre colonnes;
+                                                              ENC=Column Count] }
+    { 5   ;   ;Data Line Tag       ;Text250       ;CaptionML=[ENU=Data Line Tag;
+                                                              ESM=Etiqueta de l°nea de datos;
+                                                              FRC=êtiquette de ligne de donnÇes;
+                                                              ENC=Data Line Tag] }
+    { 6   ;   ;Namespace           ;Text250       ;CaptionML=[ENU=Namespace;
+                                                              ESM=Namespace;
+                                                              FRC=Namespace;
+                                                              ENC=Namespace] }
+  }
+  KEYS
+  {
+    {    ;Posting Exch. Def Code,Code             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      OnlySupportOneLineDefErr@1000 : TextConst 'ENU=Data exchange setup of type Import can only have one %1;ESM=La configuraci¢n de intercambio de datos del tipo Importar puede tener un solo %1;FRC=La configuration d''Çchange de donnÇes de type Importation ne peuvent avoir qu''un seul %1;ENC=Data exchange setup of type Import can only have one %1';
+
+    PROCEDURE InsertRec@7(PostExchDefCode@1000 : Code[20];Code@1001 : Code[20];Name@1002 : Text[100];ColumnCount@1003 : Integer);
+    BEGIN
+      VALIDATE("Posting Exch. Def Code",PostExchDefCode);
+      VALIDATE(Code,Code);
+      VALIDATE(Name,Name);
+      VALIDATE("Column Count",ColumnCount);
+      INSERT;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,312 @@
+OBJECT Page 1309 Mini Posted Sales Invoices
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Sales Invoices;
+               ESM=Hist¢rico facturas venta;
+               FRC=Factures ventes report‚es;
+               ENC=Posted Sales Invoices];
+    SourceTable=Table112;
+    PageType=List;
+    CardPageID=Mini Posted Sales Invoice;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Correct,Invoice;
+                                ESM=Nuevo,Proceso,Informe,Corregir,Factura;
+                                FRC=Nouveau,Traitement,Rapport,Correct,Facture;
+                                ENC=New,Process,Report,Correct,Invoice];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 11      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Correct;
+                                 ESM=Corregir;
+                                 FRC=Corriger;
+                                 ENC=Correct] }
+      { 16      ;2   ;Action    ;
+                      Name=CorrectInvoice;
+                      CaptionML=[ENU=Correct;
+                                 ESM=Corregir;
+                                 FRC=Corriger;
+                                 ENC=Correct];
+                      ToolTipML=[ENU=Create a new open version of this posted sales invoice where you can make the correction. This posted sales invoice will be canceled.;
+                                 ESM=Crear una nueva versi¢n abierta de esta factura de venta registrada en la que puede realizar la correcci¢n. Esta factura de venta registrada se cancelar .;
+                                 FRC=Cr‚ez une nouvelle version ouverte de cette facture de vente report‚e dans laquelle vous pourrez apporter la correction. Cette facture de vente report‚e sera annul‚e.;
+                                 ENC=Create a new open version of this posted sales invoice where you can make the correction. This posted sales invoice will be cancelled.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Undo;
+                      PromotedCategory=Category4;
+                      OnAction=BEGIN
+                                 CODEUNIT.RUN(CODEUNIT::"Correct PstdSalesInv (Yes/No)",Rec);
+                               END;
+                                }
+      { 14      ;2   ;Action    ;
+                      Name=CancelInvoice;
+                      CaptionML=[ENU=Cancel;
+                                 ESM=Cancelar;
+                                 FRC=Annuler;
+                                 ENC=Cancel];
+                      ToolTipML=[ENU=Create and post a sales credit memo that reverses this posted sales invoice. This posted sales invoice will be canceled.;
+                                 ESM=Crear y registrar una nota de cr‚dito de venta que revierte esta factura de venta registrada. Esta factura de venta registrada se cancelar .;
+                                 FRC=Cr‚ez et reportez une note de cr‚dit de vente qui inverse cette facture de vente report‚e. Cette facture de vente report‚e sera annul‚e.;
+                                 ENC=Create and post a sales credit memo that reverses this posted sales invoice. This posted sales invoice will be cancelled.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Cancel;
+                      PromotedCategory=Category4;
+                      OnAction=BEGIN
+                                 CODEUNIT.RUN(CODEUNIT::"Cancel PstdSalesInv (Yes/No)",Rec);
+                               END;
+                                }
+      { 8       ;2   ;Action    ;
+                      Name=CreateCreditMemo;
+                      CaptionML=[ENU=Create Corrective Credit Memo;
+                                 ESM=Crear nota de cr‚dito correctiva;
+                                 FRC=Cr‚er une note de cr‚dit de correction;
+                                 ENC=Create Corrective Credit Memo];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CreateCreditMemo;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 SalesHeader@1001 : Record 36;
+                                 CorrectPostedSalesInvoice@1000 : Codeunit 1303;
+                               BEGIN
+                                 CorrectPostedSalesInvoice.CreateCreditMemoCopyDocument(Rec,SalesHeader);
+                                 PAGE.RUN(PAGE::"Mini Sales Credit Memo",SalesHeader);
+                               END;
+                                }
+      { 12      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Send;
+                                 ESM=Enviar;
+                                 FRC=Envoyer;
+                                 ENC=Send] }
+      { 33      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=Im&primir;
+                                 FRC=Im&primer;
+                                 ENC=&Print];
+                      ToolTipML=[ENU=Print the selected posted sales document.;
+                                 ESM=Imprima el documento de venta registrado seleccionado.;
+                                 FRC=Imprimez le document de vente report‚ s‚lectionn‚.;
+                                 ENC=Print the selected posted sales document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 SalesInvHeader@1102 : Record 112;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(SalesInvHeader);
+                                 SalesInvHeader.PrintRecords(NOT AllowDotNetAddIn);
+                               END;
+                                }
+      { 4       ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Send PDF by &Email;
+                                 ESM=Enviar PDF por &correo electr¢nico;
+                                 FRC=Envoyer PDF par &courriel;
+                                 ENC=Send PDF by &Email];
+                      ToolTipML=[ENU=Attach the selected posted sales document to an email to the customer.;
+                                 ESM=Adjunte el documento de venta registrado seleccionado a un mensaje de correo electr¢nico para el cliente.;
+                                 FRC=Joignez le document vente report‚ s‚lectionn‚ … un courriel adress‚ au client.;
+                                 ENC=Attach the selected posted sales document to an email to the customer.];
+                      Promoted=Yes;
+                      Visible=AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=SendEmailPDF;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ReportDistributionManagement@1000 : Codeunit 452;
+                               BEGIN
+                                 ReportDistributionManagement.EmailDocumentReport(Rec);
+                               END;
+                                }
+      { 20      ;2   ;Action    ;
+                      Name=SaveCopy;
+                      CaptionML=[ENU=&Save PDF Document;
+                                 ESM=&Guardar documento PDF;
+                                 FRC=&Enregistrer document PDF;
+                                 ENC=&Save PDF Document];
+                      ToolTipML=[ENU=Save the posted sales document to your computer. You can then attach it to the email that you send to the customer.;
+                                 ESM=Guarde el documento de venta registrado en el ordenador. A continuaci¢n, podr  adjuntarlo al mensaje de correo electr¢nico que env¡e al cliente.;
+                                 FRC=Enregistrez le document vente report‚ sur votre ordinateur. Vous pouvez ensuite le joindre au courriel adress‚ au client.;
+                                 ENC=Save the posted sales document to your computer. You can then attach it to the email that you send to the customer.];
+                      Promoted=Yes;
+                      Visible=NOT AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ReportDistributionManagement@1000 : Codeunit 452;
+                               BEGIN
+                                 ReportDistributionManagement.SaveDocumentReport(Rec);
+                               END;
+                                }
+      { 19      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Invoice;
+                                 ESM=Factura;
+                                 FRC=Facture;
+                                 ENC=Invoice];
+                      Image=Invoice }
+      { 3       ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Customer;
+                                 ESM=Cliente;
+                                 FRC=Client;
+                                 ENC=Customer];
+                      ToolTipML=[ENU=View or edit detailed information about the customer on the selected posted sales document.;
+                                 ESM=Vea o edite la informaci¢n detallada sobre el cliente en el documento de venta registrado seleccionado.;
+                                 FRC=Affichez ou modifiez des informations d‚taill‚es concernant le client sur le document de vente report‚ s‚lectionn‚.;
+                                 ENC=View or edit detailed information about the customer on the selected posted sales document.];
+                      RunObject=Page 1300;
+                      RunPageLink=No.=FIELD(Sell-to Customer No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Customer;
+                      PromotedCategory=Category5 }
+      { 10      ;2   ;Action    ;
+                      Name=ShowCreditMemo;
+                      CaptionML=[ENU=Show Corrective Credit Memo;
+                                 ESM=Mostrar nota de cr‚dito correctiva;
+                                 FRC=Afficher une note de cr‚dit corrective;
+                                 ENC=Show Corrective Credit Memo];
+                      ToolTipML=[ENU=Open the posted sales credit memo that was created when you canceled the selected posted sales invoice.;
+                                 ESM=Abra la nota de cr‚dito de venta registrada que se cre¢ al cancelar la factura de venta registrada seleccionada.;
+                                 FRC=Ouvrez la note de cr‚dit de vente report‚e qui a ‚t‚ cr‚‚e lorsque vous avez annul‚ la facture de vente report‚e s‚lectionn‚e.;
+                                 ENC=Open the posted sales credit memo that was created when you cancelled the selected posted sales invoice.];
+                      RunObject=Page 1322;
+                      RunPageLink=No.=FIELD(Canceled By);
+                      Promoted=Yes;
+                      Enabled=Canceled;
+                      PromotedIsBig=Yes;
+                      Image=CreditMemo;
+                      PromotedCategory=Category5 }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      ToolTipML=[ENU=Find all entries and documents that exist for the document number and posting date on the selected posted sales document.;
+                                 ESM=Buscar todas las entradas y los documentos que existen para el n£mero de documento y la fecha de registro del documento de venta registrado seleccionado.;
+                                 FRC=Recherchez toutes les ‚critures et tous les documents qui existent pour le num‚ro de document et la date de report mentionn‚s sur le document de vente report‚ s‚lectionn‚.;
+                                 ENC=Find all entries and documents that exist for the document number and posting date on the selected posted sales document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the posted invoice number.;
+                           ESM=Especifica el n£mero de la factura registrada.;
+                           FRC=Sp‚cifie le num‚ro de facture enregistr‚e.;
+                           ENC=Specifies the posted invoice number.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Customer Name;
+                           ESM=Nombre cliente;
+                           FRC=Nom client;
+                           ENC=Customer Name];
+                ToolTipML=[ENU=Specifies the name of the customer that you shipped the items on the invoice to.;
+                           ESM=Especifica el nombre del cliente al que se enviaron los productos de la factura.;
+                           FRC=Affiche le nom du client auquel vous avez exp‚di‚ les articles qui figurent sur la facture initiale.;
+                           ENC=Specifies the name of the customer that you shipped the items on the invoice to.];
+                SourceExpr="Sell-to Customer Name" }
+
+    { 1102601007;2;Field  ;
+                ToolTipML=[ENU=Specifies the date on which the invoice is due for payment. The program calculates the date using the Payment Terms Code and Posting Date fields on the sales header.;
+                           ESM=Especifica la fecha en que vence el pago de la factura. El programa calcula la fecha a partir de los campos C¢d. t‚rminos pago y Fecha registro de la cabecera de ventas.;
+                           FRC=Indique la date … laquelle la facture doit ˆtre pay‚e. Le programme calcule la date … l'aide des champs Code modalit‚s de paiement et Date de report de l'en-tˆte vente.;
+                           ENC=Specifies the date on which the invoice is due for payment. The program calculates the date using the Payment Terms Code and Posting Date fields on the sales header.];
+                SourceExpr="Due Date" }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the total, in the currency of the invoice, of the amounts on all the invoice lines. The amount does not include VAT.;
+                           ESM=Especifica el total de los importes en todas las l¡neas de factura, en la divisa de la factura. El importe no incluye IVA.;
+                           FRC=Indique le total des montants de toutes les lignes facture, dans la devise de la facture. Ce montant n'inclut pas la TVA.;
+                           ENC=Specifies the total, in the currency of the invoice, of the amounts on all the invoice lines. The amount does not include tax.];
+                SourceExpr=Amount;
+                OnDrillDown=BEGIN
+                              SETRANGE("No.");
+                              PAGE.RUNMODAL(PAGE::"Mini Posted Sales Invoice",Rec)
+                            END;
+                             }
+
+    { 15  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the total of the amounts in all the amount fields on the invoice, in the currency of the invoice. The amount includes VAT.;
+                           ESM=Especifica el importe total de todos los campos de importe de la factura, en la divisa de la factura. El importe incluye IVA.;
+                           FRC=Indique le total des montants de tous les champs montants de la facture, dans la devise de la facture. Le montant inclut la TVA.;
+                           ENC=Specifies the total of the amounts in all the amount fields on the invoice, in the currency of the invoice. The amount includes tax.];
+                SourceExpr="Amount Including VAT";
+                OnDrillDown=BEGIN
+                              SETRANGE("No.");
+                              PAGE.RUNMODAL(PAGE::"Mini Posted Sales Invoice",Rec)
+                            END;
+                             }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the amount that remains to be paid for the posted sales invoice.;
+                           ESM=Especifica el importe pendiente de pago para la factura de venta registrada.;
+                           FRC=Sp‚cifie le montant qui reste … payer pour la facture vente valid‚e.;
+                           ENC=Specifies the amount that remains to be paid for the posted sales invoice.];
+                SourceExpr="Remaining Amount" }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted sales invoice is paid.;
+                           ESM=Especifica si la factura de venta registrada se ha pagado.;
+                           FRC=Indique si la facture vente valid‚e est pay‚e.;
+                           ENC=Specifies if the posted sales invoice is paid.];
+                SourceExpr=Paid }
+
+    { 9   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted sales invoice has been either corrected or canceled.;
+                           ESM=Especifica si se ha corregido o cancelado la factura de venta registrada.;
+                           FRC=Indique si la facture vente valid‚e a ‚t‚ corrig‚e ou annul‚e.;
+                           ENC=Specifies if the posted sales invoice has been either corrected or cancelled.];
+                SourceExpr=Canceled;
+                LookupPageID=Mini Posted Sales Credit Memos;
+                DrillDownPageID=Mini Posted Sales Credit Memos;
+                Style=Unfavorable;
+                StyleExpr=Canceled }
+
+  }
+  CODE
+  {
+    VAR
+      AllowDotNetAddIn@1000 : Boolean INDATASET;
+
+    BEGIN
+    END.
+  }
+}
+

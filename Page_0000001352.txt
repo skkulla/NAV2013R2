@@ -1,0 +1,372 @@
+OBJECT Page 1352 Mini Company Information
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Company Information;
+               ESM=Informaci¢n empresa;
+               FRC=Information sur la compagnie;
+               ENC=Company Information];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table79;
+    PageType=Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,System Settings,Currencies,Codes,Regional Settings;
+                                ESM=Nuevo,Proceso,Informe,Configuraci¢n del sistema,Divisas,C¢digos,Configuraci¢n regional;
+                                FRC=Nouveau,Traitement,Rapport,ParamŠtres systŠme,Devises,Codes,ParamŠtres r‚gionaux;
+                                ENC=New,Process,Report,System Settings,Currencies,Codes,Regional Settings];
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+               END;
+
+    OnClosePage=VAR
+                  MiniCompanyInformationMgt@1001 : Codeunit 1306;
+                BEGIN
+                  MiniCompanyInformationMgt.UpdateCompanyBankAccount(Rec);
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 31      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 32      ;1   ;Action    ;
+                      CaptionML=[ENU=Users;
+                                 ESM=Usuarios;
+                                 FRC=Utilisateurs;
+                                 ENC=Users];
+                      ToolTipML=[ENU=Set up the employees who will work in Microsoft Dynamics NAV (C5). The employees must already be set up as windows users on your IT network.;
+                                 ESM=Configure los empleados que trabajar n en Microsoft Dynamics NAV (C5). Los empleados ya deben estar configurados como usuarios de Windows en la red de TI.;
+                                 FRC=Param‚trez les employ‚s qui vont travailler dans Microsoft Dynamics NAV (C5). Ceux-ci doivent ˆtre d‚j… configur‚s en tant qu'utilisateurs Windows sur votre r‚seau informatique.;
+                                 ENC=Set up the employees who will work in Microsoft Dynamics NAV (C5). The employees must already be set up as windows users on your IT network.];
+                      RunObject=Page 9800;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Users;
+                      PromotedCategory=Category4 }
+      { 22      ;1   ;Action    ;
+                      CaptionML=[ENU=Permission Sets;
+                                 ESM=Conjuntos de permisos;
+                                 FRC=Ensembles d'autorisations;
+                                 ENC=Permission Sets];
+                      ToolTipML=[ENU=Define which feature objects users need to access and set the related permissions up in permission sets that you can assign to the users of the database.;
+                                 ESM=Defina la caracter¡stica a la que necesitan acceso los usuarios de objetos y establezca los permisos relacionados en los conjuntos de permisos que asigna a los usuarios de la base de datos.;
+                                 FRC=D‚finissez les objets caract‚ristiques auxquels les utilisateurs doivent acc‚der et d‚terminez les autorisations associ‚es dans les ensembles d'autorisations que vous pouvez affecter aux utilisateurs de la base de donn‚es.;
+                                 ENC=Define which feature objects users need to access and set the related permissions up in permission sets that you can assign to the users of the database.];
+                      RunObject=Page 9802;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Permission;
+                      PromotedCategory=Category4 }
+      { 33      ;1   ;Action    ;
+                      CaptionML=[ENU=Currencies;
+                                 ESM=Divisas;
+                                 FRC=Devises;
+                                 ENC=Currencies];
+                      ToolTipML=[ENU=Set up the different currencies that you trade in by defining which general ledger accounts the involved transactions are posted to and how the foreign currency amounts are rounded.;
+                                 ESM=Configure las distintas divisas con las que comercializa. Para ello, defina las cuentas contables a las que se registran las transacciones implicadas y c¢mo se redondean los importes de divisa extranjera.;
+                                 FRC=Param‚trez les diff‚rentes devises de n‚gociation en d‚finissant les comptes GL dans lesquels les transactions impliqu‚es sont report‚es et la m‚thode d'arrondissement appliqu‚e pour les montants en devise ‚trangŠre.;
+                                 ENC=Set up the different currencies that you trade in by defining which general ledger accounts the involved transactions are posted to and how the foreign currency amounts are rounded.];
+                      RunObject=Page 5;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Currencies;
+                      PromotedCategory=Category5 }
+      { 34      ;1   ;Action    ;
+                      CaptionML=[ENU=No. Series;
+                                 ESM=Nos. serie;
+                                 FRC=S‚ries de nø;
+                                 ENC=No. Series];
+                      ToolTipML=[ENU=Set up the number series from which a new number is automatically assigned to new cards and documents, such as item cards and sales invoices.;
+                                 ESM=Configure los n£meros de serie a partir de los que se asigna autom ticamente un n£mero nuevo a las fichas y los documentos nuevos, tales como fichas de producto y facturas de venta.;
+                                 FRC=Param‚trez les s‚ries de num‚ros … partir desquelles un nouveau num‚ro est automatiquement affect‚ aux nouvelles fiches et nouveaux documents, par exemple les fiches articles et les factures vente.;
+                                 ENC=Set up the number series from which a new number is automatically assigned to new cards and documents, such as item cards and sales invoices.];
+                      RunObject=Page 456;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=NumberSetup;
+                      PromotedCategory=Category6 }
+      { 25      ;1   ;Action    ;
+                      CaptionML=[ENU=SMTP Mail Setup;
+                                 ESM=Configuraci¢n correo SMTP;
+                                 FRC=Configuration de courrier SMTP;
+                                 ENC=SMTP Mail Setup];
+                      ToolTipML=[ENU=Set up the integration and security of the mail server at your site that handles email.;
+                                 ESM=Configure la integraci¢n y la seguridad del servidor de correo en el sitio que gestiona el correo electr¢nico.;
+                                 FRC=Param‚trez l'int‚gration et la s‚curit‚ du serveur de messagerie sur votre site qui gŠre le courriel.;
+                                 ENC=Set up the integration and security of the mail server at your site that handles email.];
+                      RunObject=Page 409;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=MailSetup;
+                      PromotedCategory=Category4 }
+      { 30      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Regional Settings;
+                                 ESM=Configuraci¢n regional;
+                                 FRC=ParamŠtres r‚gionaux;
+                                 ENC=Regional Settings] }
+      { 35      ;2   ;Action    ;
+                      CaptionML=[ENU=Countries/Regions;
+                                 ESM=Pa¡ses y regiones;
+                                 FRC=Pays/R‚gions;
+                                 ENC=Countries/Regions];
+                      ToolTipML=[ENU=Set up the country/regions where your different business partners are located, so that you can assign Country/Region codes to business partners where special local procedures are required.;
+                                 ESM=Configure el pa¡s o las regiones en los que se encuentran los distintos socios comerciales para poder asignarles c¢digos de pa¡s o regi¢n en los que se requieren procedimientos locales especiales.;
+                                 FRC=Param‚trez le pays/la r‚gion o— se trouvent vos diff‚rents partenaires, de maniŠre … pouvoir affecter les codes pays/r‚gion aux partenaires commerciaux pour lesquels des proc‚dures locales sp‚ciales sont requises.;
+                                 ENC=Set up the country/regions where your different business partners are located, so that you can assign Country/Region codes to business partners where special local procedures are required.];
+                      RunObject=Page 10;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CountryRegion;
+                      PromotedCategory=Category7 }
+      { 36      ;2   ;Action    ;
+                      CaptionML=[ENU=ZIP Codes;
+                                 ESM=C¢digos postales;
+                                 FRC=Codes postaux;
+                                 ENC=Postal/ZIP Codes];
+                      ToolTipML=[ENU=Set up the posts codes of cities where your business partners are located.;
+                                 ESM=Configure los c¢digos postales de los municipio/ciudades en los que se encuentran los socios comerciales.;
+                                 FRC=Param‚trez les codes postaux des villes o— se trouvent vos partenaires commerciaux.;
+                                 ENC=Set up the posts codes of cities where your business partners are located.];
+                      RunObject=Page 367;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=MailSetup;
+                      PromotedCategory=Category6 }
+      { 37      ;2   ;Action    ;
+                      CaptionML=[ENU=Online Map Setup;
+                                 ESM=Configuraci¢n Online Map;
+                                 FRC=Configuration Online Map;
+                                 ENC=Online Map Setup];
+                      ToolTipML=[ENU=Define which map provider to use and how routes and distances are displayed when you choose the Online Map field on business documents.;
+                                 ESM=Defina el proveedor de asignaciones que se debe usar y c¢mo se muestran las rutas y distancias al elegir el campo Online Map en los documentos empresariales.;
+                                 FRC=D‚finissez le fournisseur de carte … utiliser ainsi que le mode d'affichage des routes et des distances si vous choisissez le champ Online Map sur les documents commerciaux.;
+                                 ENC=Define which map provider to use and how routes and distances are displayed when you choose the Online Map field on business documents.];
+                      RunObject=Page 800;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=MapSetup;
+                      PromotedCategory=Category7 }
+      { 38      ;2   ;Action    ;
+                      CaptionML=[ENU=Languages;
+                                 ESM=Idiomas;
+                                 FRC=Langues;
+                                 ENC=Languages];
+                      ToolTipML=[ENU=Set up the languages that are spoken by your different business partners, so that you can print item names or descriptions in the appropriate language.;
+                                 ESM=Configure los idiomas que hablan los distintos socios comerciales para poder imprimir nombres o descripciones de producto en el idioma adecuado.;
+                                 FRC=Param‚trez les langues de vos diff‚rents partenaires commerciaux de fa‡on … pouvoir imprimer les noms d'articles ou leur description dans la langue appropri‚e.;
+                                 ENC=Set up the languages that are spoken by your different business partners, so that you can print item names or descriptions in the appropriate language.];
+                      RunObject=Page 9;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Language;
+                      PromotedCategory=Category7 }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Codes;
+                                 ESM=C¢digos;
+                                 FRC=Codes;
+                                 ENC=Codes];
+                      ActionContainerType=NewDocumentItems }
+      { 40      ;2   ;Action    ;
+                      CaptionML=[ENU=Source Codes;
+                                 ESM=C¢digos origen;
+                                 FRC=Codes d'origine;
+                                 ENC=Source Codes];
+                      ToolTipML=[ENU=Set up codes for your different types of business transactions, so that you can track the source of the transactions in auditing.;
+                                 ESM=Configure c¢digos para los distintos tipos de transacciones empresariales para que pueda realizar un seguimiento del origen de las transacciones durante las auditor¡as.;
+                                 FRC=Param‚trez les codes de vos diff‚rents types de transactions commerciales de fa‡on … pouvoir suivre la source des transactions en cours d'audit;
+                                 ENC=Set up codes for your different types of business transactions, so that you can track the source of the transactions in auditing.];
+                      RunObject=Page 257;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CodesList;
+                      PromotedCategory=Category6 }
+      { 41      ;2   ;Action    ;
+                      CaptionML=[ENU=Reason Codes;
+                                 ESM=C¢digos auditor¡a;
+                                 FRC=Codes de motif;
+                                 ENC=Reason Codes];
+                      ToolTipML=[ENU=Set up codes that specify reasons why entries were created, such as Return to specify why a purchase credit memo was posted.;
+                                 ESM=Configure los c¢digos que especifican los motivos por los que se crearon los movimientos, como Devoluci¢n para especificar por qu‚ se registr¢ una nota de cr‚dito de compra.;
+                                 FRC=Param‚trez des codes qui indiquent les raisons pour lesquelles des ‚critures ont ‚t‚ cr‚‚es, par exemple Retour pour sp‚cifier le motif de report de la note de cr‚dit.;
+                                 ENC=Set up codes that specify reasons why entries were created, such as Return to specify why a purchase credit memo was posted.];
+                      RunObject=Page 259;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CodesList;
+                      PromotedCategory=Category6 }
+    }
+  }
+  CONTROLS
+  {
+    { 101 ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 23  ;1   ;Group     ;
+                CaptionML=[ENU=Contact Details;
+                           ESM=Detalles contacto;
+                           FRC=D‚tails du contact;
+                           ENC=Contact Details];
+                GroupType=Group }
+
+    { 21  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's name and corporate form, for example, Inc. or Ltd.;
+                           ESM=Especifica el nombre de la empresa y el tipo de sociedad, por ejemplo, an¢nima o limitada.;
+                           FRC=Indique le nom de la soci‚t‚ et sa raison sociale, par exemple, S.A. ou SARL.;
+                           ENC=Specifies the company's name and corporate form, for example, Inc. or Ltd.];
+                SourceExpr=Name }
+
+    { 20  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's address.;
+                           ESM=Especifica la direcci¢n de la empresa.;
+                           FRC=Indique l'adresse de la soci‚t‚.;
+                           ENC=Specifies the company's address.];
+                SourceExpr=Address }
+
+    { 19  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies an additional part of the company's address.;
+                           ESM=Especifica una parte adicional de la direcci¢n de la empresa.;
+                           FRC=Sp‚cifie un compl‚ment … l'adresse de la soci‚t‚.;
+                           ENC=Specifies an additional part of the company's address.];
+                SourceExpr="Address 2" }
+
+    { 18  ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the company's post code.;
+                           ESM=Contiene el c¢digo postal de la empresa.;
+                           FRC=Contient le code postal de la soci‚t‚.;
+                           ENC=Contains the company's postal/ZIP code.];
+                SourceExpr="Post Code" }
+
+    { 17  ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the company's city.;
+                           ESM=Contiene el Municipio/Ciudad de la empresa.;
+                           FRC=Indique la ville de la soci‚t‚.;
+                           ENC=Contains the company's city.];
+                SourceExpr=City }
+
+    { 16  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the country/region code for your company. To see the country/region codes in the Country/Region table, choose the field.;
+                           ESM=Especifica el c¢digo de pa¡s/regi¢n de la empresa. Para ver los c¢digos de pa¡s/regi¢n en la tabla Pa¡s/regi¢n, seleccione el campo.;
+                           FRC=Sp‚cifie le code pays/r‚gion de la soci‚t‚. Pour visualiser les codes pays/r‚gion de la table Pays/r‚gion, cliquez sur le champ.;
+                           ENC=Specifies the country/region code for your company. To see the country/region codes in the Country/Region table, choose the field.];
+                SourceExpr="Country/Region Code" }
+
+    { 15  ;2   ;Field     ;
+                CaptionML=[ENU=Phone No.;
+                           ESM=N§ tel‚fono;
+                           FRC=Nø t‚l‚phone;
+                           ENC=Phone No.];
+                ToolTipML=[ENU=Specifies the company's telephone number.;
+                           ESM=Especifica el n£mero de tel‚fono de la empresa.;
+                           FRC=Sp‚cifie le num‚ro de t‚l‚phone de la soci‚t‚.;
+                           ENC=Specifies the company's telephone number.];
+                SourceExpr="Phone No." }
+
+    { 14  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's VAT registration number.;
+                           ESM=Especifica el n£mero RFC de la empresa.;
+                           FRC=Sp‚cifie le num‚ro identifiant TVA de la soci‚t‚.;
+                           ENC=Specifies the company's GST/HST registration number.];
+                SourceExpr="VAT Registration No." }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's email address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           ESM=Especifica la direcci¢n de correo electr¢nico de la empresa. Puede introducir un m ximo de 80 caracteres, tanto n£meros como letras.;
+                           FRC=Sp‚cifie l'adresse e-mail de la soci‚t‚. Vous pouvez entrer au maximum 80ÿcaractŠres, des chiffres ou des lettres.;
+                           ENC=Specifies the company's email address. You can enter a maximum of 80 characters, both numbers and letters.];
+                SourceExpr="E-Mail" }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's home page address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           ESM=Especifica la direcci¢n de la p gina web de la empresa. Puede introducir un m ximo de 80 caracteres, tanto n£meros como letras.;
+                           FRC=Sp‚cifie l'adresse de la page d'accueil de la soci‚t‚. Vous pouvez entrer au maximum 80ÿcaractŠres, des chiffres ou des lettres.;
+                           ENC=Specifies the company's home page address. You can enter a maximum of 80 characters, both numbers and letters.];
+                SourceExpr="Home Page" }
+
+    { 11  ;2   ;Field     ;
+                ToolTipML=[ENU="Shows the picture that has been set up for the company; a company logo, for example.";
+                           ESM=Muestra la imagen que se ha configurado para la empresa, por ejemplo, el logotipo de la empresa.;
+                           FRC=Montre l'image qui a ‚t‚ cr‚‚e pour la soci‚t‚, par exemple un logo.;
+                           ENC="Shows the picture that has been set up for the company; a company logo, for example."];
+                SourceExpr=Picture }
+
+    { 24  ;1   ;Group     ;
+                CaptionML=[ENU=Bank Account Details;
+                           ESM=Detalles banco;
+                           FRC=D‚tails du compte bancaire;
+                           ENC=Bank Account Details];
+                GroupType=Group }
+
+    { 9   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the bank the company uses.;
+                           ESM=Especifica el nombre del banque que usa la empresa.;
+                           FRC=Sp‚cifie le nom de la banque avec laquelle la soci‚t‚ travaille.;
+                           ENC=Specifies the name of the bank the company uses.];
+                SourceExpr="Bank Name" }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the bank's branch number.;
+                           ESM=Especifica el n£mero de la sucursal del banco.;
+                           FRC=Indique le num‚ro de l'‚tablissement de la banque.;
+                           ENC=Specifies the bank's branch number.];
+                SourceExpr="Bank Branch No." }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's bank account number.;
+                           ESM=Especifica el n£mero de cuenta bancaria de la empresa.;
+                           FRC=Indique le num‚ro du compte bancaire de la soci‚t‚.;
+                           ENC=Specifies the company's bank account number.];
+                SourceExpr="Bank Account No." }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's payment routing number.;
+                           ESM=Especifica el n£mero de ruta de pago de la empresa.;
+                           FRC=Indique le num‚ro de paiement automatique de la soci‚t‚.;
+                           ENC=Specifies the company's payment routing number.];
+                SourceExpr="Payment Routing No." }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's giro number.;
+                           ESM=Especifica el n£mero de giro de la empresa.;
+                           FRC=Indique le num‚ro de CCP de la soci‚t‚.;
+                           ENC=Specifies the company's giro number.];
+                SourceExpr="Giro No." }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the SWIFT code (international bank identifier code) of your primary bank.;
+                           ESM=Contiene el c¢digo SWIFT (c¢digo de identificaci¢n bancaria internacional) del banco donde tiene la cuenta principal.;
+                           FRC=Indique le code SWIFT (code international d'identification bancaire) de votre banque principale.;
+                           ENC=Contains the SWIFT code (international bank identifier code) of your primary bank.];
+                SourceExpr="SWIFT Code" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the international bank account number of your primary bank account.;
+                           ESM=Contiene el n£mero de cuenta internacional de la cuenta principal del banco.;
+                           FRC=Indique le num‚ro international de votre compte bancaire principal.;
+                           ENC=Contains the international bank account number of your primary bank account.];
+                SourceExpr=IBAN }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if you are allowed to create a sales invoice without filling the setup fields on this FastTab.;
+                           ESM=Especifica si se permite crear una factura de venta sin rellenar los campos de configuraci¢n de esta ficha desplegable.;
+                           FRC=Indique si vous ˆtes autoris‚ … cr‚er une facture vente sans remplir les champs de configuration sur ce raccourci.;
+                           ENC=Specifies if you are allowed to create a sales invoice without filling the setup fields on this FastTab.];
+                SourceExpr="Allow Blank Payment Info." }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

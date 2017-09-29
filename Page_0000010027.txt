@@ -1,0 +1,520 @@
+OBJECT Page 10027 Sales Order Shipment Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Lines;
+               ESM=L¡neas;
+               FRC=Lignes;
+               ENC=Lines];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table37;
+    DelayedInsert=Yes;
+    SourceTableView=WHERE(Document Type=FILTER(Order),
+                          Outstanding Quantity=FILTER(<>0));
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    OnInit=BEGIN
+             "Appl.-to Item EntryEditable" := TRUE;
+             "Appl.-from Item EntryEditable" := TRUE;
+             "FA Posting DateEditable" := TRUE;
+             "Shipping TimeEditable" := TRUE;
+             ShippingAgentServiceCodeEditab := TRUE;
+             "Shipping Agent CodeEditable" := TRUE;
+             "Shipment DateEditable" := TRUE;
+             "Planned Shipment DateEditable" := TRUE;
+             "Planned Delivery DateEditable" := TRUE;
+             "Promised Delivery DateEditable" := TRUE;
+             AllowItemChargeAssignmentEdita := TRUE;
+             "Qty. to ShipEditable" := TRUE;
+             "Package Tracking No.Editable" := TRUE;
+           END;
+
+    OnAfterGetRecord=BEGIN
+                       ShowShortcutDimCode(ShortcutDimCode);
+                     END;
+
+    OnNewRecord=BEGIN
+                  Type := xRec.Type;
+                  CLEAR(ShortcutDimCode);
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1906587504;1 ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=Fonction&s;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 1906533504;2 ;ActionGroup;
+                      CaptionML=[ENU=Drop Shipment;
+                                 ESM=Env¡o directo;
+                                 FRC=Livraison directe;
+                                 ENC=Drop Shipment];
+                      Image=Delivery }
+      { 1902139404;3 ;Action    ;
+                      CaptionML=[ENU=Purchase &Order;
+                                 ESM=Pedido c&ompra;
+                                 FRC=Bon de c&ommande;
+                                 ENC=Purchase &Order];
+                      Image=Document;
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10026. Unsupported part was commented. Please check it.
+                                 {CurrPage.SalesLines.PAGE.}
+                                 OpenPurchOrderForm;
+                               END;
+                                }
+      { 1906474904;2 ;ActionGroup;
+                      CaptionML=[ENU=Special Order;
+                                 ESM=Pedido especial;
+                                 FRC=Commande sp‚ciale;
+                                 ENC=Special Order];
+                      Image=SpecialOrder }
+      { 1902080804;3 ;Action    ;
+                      CaptionML=[ENU=Purchase &Order;
+                                 ESM=Pedido c&ompra;
+                                 FRC=Bon de c&ommande;
+                                 ENC=Purchase &Order];
+                      Image=Document;
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10026. Unsupported part was commented. Please check it.
+                                 {CurrPage.SalesLines.PAGE.}
+                                 OpenPurchOrderForm;
+                               END;
+                                }
+      { 1907935204;1 ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 ESM=&L¡nea;
+                                 FRC=&Ligne;
+                                 ENC=&Line];
+                      Image=Line }
+      { 1902085804;2 ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10026. Unsupported part was commented. Please check it.
+                                 {CurrPage.SalesLines.PAGE.}
+                                 _ShowDimensions;
+                               END;
+                                }
+      { 1907184504;2 ;Action    ;
+                      CaptionML=[ENU=Item Charge &Assignment;
+                                 ESM=&Asignaci¢n cargos prod.;
+                                 FRC=&Affectation frais annexes;
+                                 ENC=Item Charge &Assignment];
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10026. Unsupported part was commented. Please check it.
+                                 {CurrPage.SalesLines.PAGE.}
+                                 ItemChargeAssgnt;
+                               END;
+                                }
+      { 1900722704;2 ;Action    ;
+                      CaptionML=[ENU=Item &Tracking Lines;
+                                 ESM=L¡ns. se&guim. prod.;
+                                 FRC=&Lignes de tra‡abilit‚ d'article;
+                                 ENC=Item &Tracking Lines];
+                      Image=ItemTrackingLines;
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10026. Unsupported part was commented. Please check it.
+                                 {CurrPage.SalesLines.PAGE.}
+                                 _OpenItemTrackingLines;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Type;
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="No.";
+                Editable=FALSE;
+                OnValidate=BEGIN
+                             ShowShortcutDimCode(ShortcutDimCode);
+                             NoOnAfterValidate;
+                           END;
+                            }
+
+    { 68  ;2   ;Field     ;
+                SourceExpr="Cross-Reference No.";
+                Visible=FALSE;
+                Editable=FALSE;
+                OnLookup=BEGIN
+                           // Item Cross Ref - start
+                           IF Type = Type::Item THEN BEGIN
+                             SalesHeader.GET("Document Type","Document No.");
+                             ItemCrossReference.RESET;
+                             ItemCrossReference.SETCURRENTKEY("Cross-Reference Type","Cross-Reference Type No.");
+                             ItemCrossReference.SETRANGE("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::Customer);
+                             ItemCrossReference.SETRANGE("Cross-Reference Type No.",SalesHeader."Sell-to Customer No.");
+                             IF PAGE.RUNMODAL(PAGE::"Cross Reference List",ItemCrossReference) = ACTION::LookupOK THEN BEGIN
+                               VALIDATE("Cross-Reference No.",ItemCrossReference."Cross-Reference No.");
+                               InsertExtendedText(FALSE);
+                             END;
+                           END;
+                           // Item Cross Ref - end
+                         END;
+                          }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Variant Code";
+                Visible=FALSE;
+                Editable="Variant CodeEditable" }
+
+    { 104 ;2   ;Field     ;
+                SourceExpr="Substitution Available";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 74  ;2   ;Field     ;
+                SourceExpr="Purchasing Code";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 70  ;2   ;Field     ;
+                SourceExpr=Nonstock;
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Description;
+                Editable=FALSE }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Drop Shipment";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 106 ;2   ;Field     ;
+                SourceExpr="Special Order";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Package Tracking No.";
+                Visible=FALSE;
+                Editable="Package Tracking No.Editable" }
+
+    { 42  ;2   ;Field     ;
+                SourceExpr="Location Code";
+                Editable=FALSE }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Bin Code";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 8   ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr=Quantity;
+                Editable=FALSE;
+                OnValidate=BEGIN
+                             QuantityOnAfterValidate;
+                           END;
+                            }
+
+    { 48  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Reserved Quantity";
+                Editable=FALSE }
+
+    { 44  ;2   ;Field     ;
+                SourceExpr="Unit of Measure Code";
+                Editable=FALSE;
+                OnValidate=BEGIN
+                             UnitofMeasureCodeOnAfterValida;
+                           END;
+                            }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Unit of Measure";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 18  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Qty. to Ship";
+                Editable="Qty. to ShipEditable" }
+
+    { 20  ;2   ;Field     ;
+                BlankZero=Yes;
+                SourceExpr="Quantity Shipped" }
+
+    { 1020004;2;Field     ;
+                SourceExpr="Allow Item Charge Assignment";
+                Visible=FALSE;
+                Editable=AllowItemChargeAssignmentEdita }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Qty. to Assign";
+                Visible=FALSE }
+
+    { 1020008;2;Field     ;
+                SourceExpr="Qty. Assigned";
+                Visible=FALSE }
+
+    { 82  ;2   ;Field     ;
+                SourceExpr="Requested Delivery Date";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 84  ;2   ;Field     ;
+                SourceExpr="Promised Delivery Date";
+                Visible=FALSE;
+                Editable="Promised Delivery DateEditable" }
+
+    { 86  ;2   ;Field     ;
+                SourceExpr="Planned Delivery Date";
+                Editable="Planned Delivery DateEditable" }
+
+    { 88  ;2   ;Field     ;
+                SourceExpr="Planned Shipment Date";
+                Editable="Planned Shipment DateEditable" }
+
+    { 100 ;2   ;Field     ;
+                SourceExpr="Shipment Date";
+                Editable="Shipment DateEditable" }
+
+    { 92  ;2   ;Field     ;
+                SourceExpr="Shipping Agent Code";
+                Visible=FALSE;
+                Editable="Shipping Agent CodeEditable" }
+
+    { 94  ;2   ;Field     ;
+                SourceExpr="Shipping Agent Service Code";
+                Visible=FALSE;
+                Editable=ShippingAgentServiceCodeEditab }
+
+    { 96  ;2   ;Field     ;
+                SourceExpr="Shipping Time";
+                Visible=FALSE;
+                Editable="Shipping TimeEditable" }
+
+    { 58  ;2   ;Field     ;
+                SourceExpr="Whse. Outstanding Qty. (Base)";
+                Visible=FALSE }
+
+    { 98  ;2   ;Field     ;
+                SourceExpr="Outbound Whse. Handling Time";
+                Visible=FALSE }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="FA Posting Date";
+                Visible=FALSE;
+                Editable="FA Posting DateEditable" }
+
+    { 108 ;2   ;Field     ;
+                SourceExpr="Appl.-from Item Entry";
+                Visible=FALSE;
+                Editable="Appl.-from Item EntryEditable" }
+
+    { 60  ;2   ;Field     ;
+                SourceExpr="Appl.-to Item Entry";
+                Visible=FALSE;
+                Editable="Appl.-to Item EntryEditable" }
+
+  }
+  CODE
+  {
+    VAR
+      SalesHeader@1000 : Record 36;
+      ItemCrossReference@1001 : Record 5717;
+      TransferExtendedText@1002 : Codeunit 378;
+      ShortcutDimCode@1003 : ARRAY [8] OF Code[20];
+      "Variant CodeEditable"@19003611 : Boolean INDATASET;
+      "Package Tracking No.Editable"@19044372 : Boolean INDATASET;
+      "Qty. to ShipEditable"@19045867 : Boolean INDATASET;
+      AllowItemChargeAssignmentEdita@19072926 : Boolean INDATASET;
+      "Promised Delivery DateEditable"@19056991 : Boolean INDATASET;
+      "Planned Delivery DateEditable"@19056471 : Boolean INDATASET;
+      "Planned Shipment DateEditable"@19054193 : Boolean INDATASET;
+      "Shipment DateEditable"@19046400 : Boolean INDATASET;
+      "Shipping Agent CodeEditable"@19058680 : Boolean INDATASET;
+      ShippingAgentServiceCodeEditab@19027973 : Boolean INDATASET;
+      "Shipping TimeEditable"@19051550 : Boolean INDATASET;
+      "FA Posting DateEditable"@19009871 : Boolean INDATASET;
+      "Appl.-from Item EntryEditable"@19050177 : Boolean INDATASET;
+      "Appl.-to Item EntryEditable"@19008187 : Boolean INDATASET;
+
+    PROCEDURE ApproveCalcInvDisc@1();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Sales-Disc. (Yes/No)",Rec);
+    END;
+
+    PROCEDURE CalcInvDisc@6();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Sales-Calc. Discount",Rec);
+    END;
+
+    PROCEDURE ExplodeBOM@3();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Sales-Explode BOM",Rec);
+    END;
+
+    PROCEDURE OpenPurchOrderForm@4();
+    VAR
+      PurchHeader@1000 : Record 38;
+      PurchOrder@1001 : Page 50;
+    BEGIN
+      PurchHeader.SETRANGE("No.","Purchase Order No.");
+      PurchOrder.SETTABLEVIEW(PurchHeader);
+      PurchOrder.EDITABLE := FALSE;
+      PurchOrder.RUN;
+    END;
+
+    PROCEDURE OpenSpecialPurchOrderForm@14();
+    VAR
+      PurchHeader@1001 : Record 38;
+      PurchOrder@1000 : Page 50;
+    BEGIN
+      PurchHeader.SETRANGE("No.","Special Order Purchase No.");
+      PurchOrder.SETTABLEVIEW(PurchHeader);
+      PurchOrder.EDITABLE := FALSE;
+      PurchOrder.RUN;
+    END;
+
+    PROCEDURE InsertExtendedText@5(Unconditionally@1000 : Boolean);
+    BEGIN
+      IF TransferExtendedText.SalesCheckIfAnyExtText(Rec,Unconditionally) THEN BEGIN
+        CurrPage.SAVERECORD;
+        TransferExtendedText.InsertSalesExtText(Rec);
+      END;
+      IF TransferExtendedText.MakeUpdate THEN
+        UpdateForm(TRUE);
+    END;
+
+    PROCEDURE ShowReservation@2();
+    BEGIN
+      FIND;
+      ShowReservation;
+    END;
+
+    PROCEDURE ItemAvailability@7(AvailabilityType@1000 : 'Date,Variant,Location,Bin');
+    BEGIN
+      ItemAvailability(AvailabilityType);
+    END;
+
+    PROCEDURE ShowReservationEntries@9();
+    BEGIN
+      ShowReservationEntries(TRUE);
+    END;
+
+    PROCEDURE _ShowDimensions@19020529();
+    BEGIN
+      ShowDimensions;
+    END;
+
+    PROCEDURE ShowDimensions@8();
+    BEGIN
+      ShowDimensions;
+    END;
+
+    PROCEDURE ShowItemSub@10();
+    BEGIN
+      ShowItemSub;
+    END;
+
+    PROCEDURE ShowNonstockItems@11();
+    BEGIN
+      ShowNonstock;
+    END;
+
+    PROCEDURE _OpenItemTrackingLines@19054693();
+    BEGIN
+      OpenItemTrackingLines;
+    END;
+
+    PROCEDURE OpenItemTrackingLines@6500();
+    BEGIN
+      OpenItemTrackingLines;
+    END;
+
+    PROCEDURE ShowTracking@13();
+    VAR
+      TrackingForm@1000 : Page 99000822;
+    BEGIN
+      TrackingForm.SetSalesLine(Rec);
+      TrackingForm.RUNMODAL;
+    END;
+
+    PROCEDURE ItemChargeAssgnt@5800();
+    BEGIN
+      ShowItemChargeAssgnt;
+    END;
+
+    PROCEDURE UpdateForm@12(SetSaveRecord@1000 : Boolean);
+    BEGIN
+      CurrPage.UPDATE(SetSaveRecord);
+    END;
+
+    PROCEDURE OrderOnHold@1000(OnHold@1020000 : Boolean);
+    BEGIN
+      "Variant CodeEditable" := NOT OnHold;
+      "Package Tracking No.Editable" := NOT OnHold;
+      "Qty. to ShipEditable" := NOT OnHold;
+      AllowItemChargeAssignmentEdita := NOT OnHold;
+      "Promised Delivery DateEditable" := NOT OnHold;
+      "Planned Delivery DateEditable" := NOT OnHold;
+      "Planned Shipment DateEditable" := NOT OnHold;
+      "Shipment DateEditable" := NOT OnHold;
+      "Shipping Agent CodeEditable" := NOT OnHold;
+      ShippingAgentServiceCodeEditab := NOT OnHold;
+      "Shipping TimeEditable" := NOT OnHold;
+      "FA Posting DateEditable" := NOT OnHold;
+      "Appl.-from Item EntryEditable" := NOT OnHold;
+      "Appl.-to Item EntryEditable" := NOT OnHold;
+    END;
+
+    LOCAL PROCEDURE NoOnAfterValidate@19066594();
+    BEGIN
+      InsertExtendedText(FALSE);
+      IF (Type = Type::"Charge (Item)") AND ("No." <> xRec."No.") AND
+         (xRec."No." <> '')
+      THEN
+        CurrPage.SAVERECORD;
+    END;
+
+    LOCAL PROCEDURE QuantityOnAfterValidate@19032465();
+    BEGIN
+      IF Reserve = Reserve::Always THEN BEGIN
+        CurrPage.SAVERECORD;
+        AutoReserve(TRUE);
+        CurrPage.UPDATE(FALSE);
+      END;
+    END;
+
+    LOCAL PROCEDURE UnitofMeasureCodeOnAfterValida@19057939();
+    BEGIN
+      IF Reserve = Reserve::Always THEN BEGIN
+        CurrPage.SAVERECORD;
+        AutoReserve(TRUE);
+        CurrPage.UPDATE(FALSE);
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

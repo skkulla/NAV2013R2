@@ -1,0 +1,155 @@
+OBJECT Codeunit 1262 Pre & Post Process XML import
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      BalTypeTxt@1006 : TextConst '@@@={Locked};ENU=/Document/BkToCstmrStmt/Stmt/Bal/Tp/CdOrPrtry/Cd;ESM=/Document/BkToCstmrStmt/Stmt/Bal/Tp/CdOrPrtry/Cd;FRC=/Document/BkToCstmrStmt/Stmt/Bal/Tp/CdOrPrtry/Cd;ENC=/Document/BkToCstmrStmt/Stmt/Bal/Tp/CdOrPrtry/Cd';
+      ClosingBalTxt@1005 : TextConst '@@@={Locked};ENU=/Document/BkToCstmrStmt/Stmt/Bal/Amt;ESM=/Document/BkToCstmrStmt/Stmt/Bal/Amt;FRC=/Document/BkToCstmrStmt/Stmt/Bal/Amt;ENC=/Document/BkToCstmrStmt/Stmt/Bal/Amt';
+      StatementDateTxt@1004 : TextConst '@@@={Locked};ENU=/Document/BkToCstmrStmt/Stmt/CreDtTm;ESM=/Document/BkToCstmrStmt/Stmt/CreDtTm;FRC=/Document/BkToCstmrStmt/Stmt/CreDtTm;ENC=/Document/BkToCstmrStmt/Stmt/CreDtTm';
+      IBANTxt@1003 : TextConst '@@@={Locked};ENU=/Document/BkToCstmrStmt/Stmt/Acct/Id/IBAN;ESM=/Document/BkToCstmrStmt/Stmt/Acct/Id/IBAN;FRC=/Document/BkToCstmrStmt/Stmt/Acct/Id/IBAN;ENC=/Document/BkToCstmrStmt/Stmt/Acct/Id/IBAN';
+      CurrencyTxt@1002 : TextConst '@@@={Locked};ENU=/Document/BkToCstmrStmt/Stmt/Bal/Amt[@Ccy];ESM=/Document/BkToCstmrStmt/Stmt/Bal/Amt[@Ccy];FRC=/Document/BkToCstmrStmt/Stmt/Bal/Amt[@Ccy];ENC=/Document/BkToCstmrStmt/Stmt/Bal/Amt[@Ccy]';
+      StatementIDTxt@1001 : TextConst '@@@={Locked};ENU=/Document/BkToCstmrStmt/Stmt/Id;ESM=/Document/BkToCstmrStmt/Stmt/Id;FRC=/Document/BkToCstmrStmt/Stmt/Id;ENC=/Document/BkToCstmrStmt/Stmt/Id';
+      CrdDbtIndTxt@1007 : TextConst '@@@={Locked};ENU=/Document/BkToCstmrStmt/Stmt/Bal/CdtDbtInd;ESM=/Document/BkToCstmrStmt/Stmt/Bal/CdtDbtInd;FRC=/Document/BkToCstmrStmt/Stmt/Bal/CdtDbtInd;ENC=/Document/BkToCstmrStmt/Stmt/Bal/CdtDbtInd';
+      StatementErr@1000 : TextConst 'ENU=The file you are trying to import contains more than one bank statement.;ESM=El archivo que intenta importar contiene m s de un estado de cuenta de banco.;FRC=Le fichier que vous tentez d''importer contient plusieurs relev‚s bancaires.;ENC=The file you are trying to import contains more than one bank statement.';
+      MissingIBANQst@1008 : TextConst '@@@="%1=Value";ENU=Bank account %1 does not have an IBAN. Do you want to continue?;ESM=El banco %1 no tiene IBAN. ¨Desea continuar?;FRC=Le compte bancaire %1 ne possŠde pas d''IBAN. Voulez-vous continuer?;ENC=Bank account %1 does not have an IBAN. Do you want to continue?';
+      IBANMissMatchErr@1009 : TextConst '@@@="%1=Value";ENU=Bank account %1 does not have the same IBAN as specified in the bank statement file.;ESM=El banco %1 no tiene el mismo IBAN que el especificado en el archivo de estado de cuenta de banco.;FRC=Le compte bancaire %1 ne possŠde pas le mˆme IBAN que celui sp‚cifi‚ dans le fichier du relev‚ bancaire.;ENC=Bank account %1 does not have the same IBAN as specified in the bank statement file.';
+      MissingIBANInDataErr@1011 : TextConst 'ENU=IBAN was not found in the data to be imported.;ESM=No se encontr¢ el IBAN en los datos que se van a importar.;FRC=IBAN introuvable dans les donn‚es … importer.;ENC=IBAN was not found in the data to be imported.';
+      MissingStatementDateInDataErr@1012 : TextConst 'ENU=The statement date was not found in the data to be imported.;ESM=No se encontr¢ la fecha del estado de cuenta de banco en los datos que se van a importar.;FRC=Date de relev‚ introuvable dans les donn‚es … importer.;ENC=The statement date was not found in the data to be imported.';
+      MissingCrdDbtIndInDataMsg@1013 : TextConst 'ENU=The credit/debit indicator was not found in the data to be imported.;ESM=No se encontr¢ el indicador de cr‚dito/d‚bito en los datos que se van a importar.;FRC=Indicateur cr‚dit/d‚bit introuvable dans les donn‚es … importer.;ENC=The credit/debit indicator was not found in the data to be imported.';
+      MissingBalTypeInDataMsg@1014 : TextConst 'ENU=The balance type was not found in the data to be imported.;ESM=No se encontr¢ el tipo de balance en los datos que se van a importar.;FRC=Type de solde introuvable dans les donn‚es … importer.;ENC=The balance type was not found in the data to be imported.';
+      MissingClosingBalanceInDataMsg@1015 : TextConst 'ENU=The closing balance was not found in the data to be imported.;ESM=No se encontr¢ el cierre del balance en los datos que se van a importar.;FRC=Solde de fermeture introuvable dans les donn‚es … importer.;ENC=The closing balance was not found in the data to be imported.';
+
+    PROCEDURE PostProcessStatementDate@3(PostingExch@1002 : Record 1220;VAR RecRef@1000 : RecordRef;FieldNo@1001 : Integer);
+    VAR
+      PostingExchColumnDef@1003 : Record 1223;
+      PostingExchField@1005 : Record 1221;
+      ProcessPostingExch@1006 : Codeunit 1201;
+    BEGIN
+      PostingExchColumnDef.SETRANGE("Posting Exch. Def Code",PostingExch."Posting Exch. Def Code");
+      PostingExchColumnDef.SETRANGE("Posting Exch. Line Def Code",PostingExch."Posting Exch. Line Def Code");
+      PostingExch.GetStmtPostingExchField(PostingExchField,PostingExchColumnDef.GetColumnNoFromPath(StatementDateTxt));
+      IF NOT PostingExchField.FINDFIRST THEN
+        ERROR(MissingStatementDateInDataErr);
+
+      ProcessPostingExch.SetField(RecRef,FieldNo,PostingExchField,PostingExch."Posting Exch. Def Code",
+        PostingExch."Posting Exch. Line Def Code",1);
+      RecRef.MODIFY;
+    END;
+
+    PROCEDURE PostProcessStatementEndingBalance@11(PostingExch@1004 : Record 1220;VAR RecRef@1000 : RecordRef;FieldNo@1001 : Integer);
+    VAR
+      PostingExchColumnDef@1003 : Record 1223;
+      PostingExchField@1005 : Record 1221;
+      ProcessPostingExch@1006 : Codeunit 1201;
+      GroupNodeID@1002 : Text;
+    BEGIN
+      PostingExchColumnDef.SETRANGE("Posting Exch. Def Code",PostingExch."Posting Exch. Def Code");
+      PostingExchColumnDef.SETRANGE("Posting Exch. Line Def Code",PostingExch."Posting Exch. Line Def Code");
+      PostingExch.GetStmtPostingExchField(PostingExchField,PostingExchColumnDef.GetColumnNoFromPath(BalTypeTxt));
+      PostingExchField.SETRANGE(Value,'CLBD');
+      IF NOT PostingExchField.FINDFIRST THEN BEGIN
+        MESSAGE(MissingBalTypeInDataMsg);
+        EXIT;
+      END;
+
+      GroupNodeID := GetSubTreeRoot(PostingExchField."Node Id",GetNodeDepth(PostingExchField."Node Id") - 2);
+
+      PostingExch.GetStmtPostingExchField(PostingExchField,PostingExchColumnDef.GetColumnNoFromPath(ClosingBalTxt));
+      PostingExchField.SETFILTER("Node Id",'%1',GroupNodeID + '*');
+      IF NOT PostingExchField.FINDFIRST THEN BEGIN
+        MESSAGE(MissingClosingBalanceInDataMsg);
+        EXIT;
+      END;
+
+      ProcessPostingExch.SetField(RecRef,FieldNo,PostingExchField,
+        PostingExch."Posting Exch. Def Code",PostingExch."Posting Exch. Line Def Code",1);
+
+      PostingExch.GetStmtPostingExchField(PostingExchField,PostingExchColumnDef.GetColumnNoFromPath(CrdDbtIndTxt));
+      PostingExchField.SETFILTER("Node Id",'%1',GroupNodeID + '*');
+      IF NOT PostingExchField.FINDFIRST THEN BEGIN
+        MESSAGE(MissingCrdDbtIndInDataMsg);
+        EXIT;
+      END;
+      ProcessPostingExch.SetField(RecRef,FieldNo,PostingExchField,
+        PostingExch."Posting Exch. Def Code",PostingExch."Posting Exch. Line Def Code",1);
+
+      RecRef.MODIFY;
+    END;
+
+    PROCEDURE PreProcessBankAccount@5(PostingExch@1005 : Record 1220;BankAccNo@1004 : Code[20]);
+    VAR
+      PostingExchField@1002 : Record 1221;
+      PostingExchColumnDef@1003 : Record 1223;
+      BankAccount@1001 : Record 270;
+      GLSetup@1000 : Record 98;
+    BEGIN
+      PostingExchColumnDef.SETRANGE("Posting Exch. Def Code",PostingExch."Posting Exch. Def Code");
+      PostingExchColumnDef.SETRANGE("Posting Exch. Line Def Code",PostingExch."Posting Exch. Line Def Code");
+
+      GLSetup.GET;
+      BankAccount.GET(BankAccNo);
+      IF BankAccount.IBAN = '' THEN
+        IF NOT CONFIRM(STRSUBSTNO(MissingIBANQst,BankAccount."No.")) THEN
+          ERROR('');
+
+      PostingExchField.SETRANGE("Posting Exch. No.",PostingExch."Entry No.");
+      PostingExchField.SETRANGE("Line No.",0); // Set filter on statement header
+
+      // Check IBAN
+      IF BankAccount.IBAN <> '' THEN BEGIN
+        PostingExchField.SETRANGE("Column No.",PostingExchColumnDef.GetColumnNoFromPath(IBANTxt));
+        IF NOT PostingExchField.FINDFIRST THEN
+          ERROR(MissingIBANInDataErr);
+        IF UPPERCASE(DELCHR(BankAccount.IBAN)) <> UPPERCASE(DELCHR(PostingExchField.Value)) THEN
+          ERROR(IBANMissMatchErr,BankAccount."No.");
+      END;
+
+      // Check Currency
+      PostingExchField.SETRANGE("Column No.",PostingExchColumnDef.GetColumnNoFromPath(CurrencyTxt));
+      PostingExchField.FINDFIRST;
+      BankAccount.TESTFIELD("Currency Code",GLSetup.GetCurrencyCode(COPYSTR(PostingExchField.Value,1,10)));
+    END;
+
+    PROCEDURE PreProcessFile@6(PostingExch@1000 : Record 1220);
+    VAR
+      PostingExchField@1003 : Record 1221;
+      PostingExchColumnDef@1002 : Record 1223;
+    BEGIN
+      PostingExchColumnDef.SETRANGE("Posting Exch. Def Code",PostingExch."Posting Exch. Def Code");
+      PostingExchColumnDef.SETRANGE("Posting Exch. Line Def Code",PostingExch."Posting Exch. Line Def Code");
+
+      PostingExchField.SETRANGE("Posting Exch. No.",PostingExch."Entry No.");
+
+      // Check Multiple Statement
+      PostingExchField.SETRANGE("Column No.",PostingExchColumnDef.GetColumnNoFromPath(StatementIDTxt));
+      IF PostingExchField.COUNT <> 1 THEN
+        ERROR(StatementErr);
+    END;
+
+    LOCAL PROCEDURE GetSubTreeRoot@13(Node@1002 : Text;Distance@1001 : Integer) : Text;
+    BEGIN
+      EXIT(COPYSTR(Node,1,STRLEN(Node) - Distance * 4));
+    END;
+
+    LOCAL PROCEDURE GetNodeDepth@25(Node@1001 : Text) : Integer;
+    BEGIN
+      EXIT(STRLEN(Node) / 4 - 1);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

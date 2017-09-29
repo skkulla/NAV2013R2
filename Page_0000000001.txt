@@ -1,0 +1,377 @@
+OBJECT Page 1 Company Information
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Company Information;
+               ESM=Informaci¢n empresa;
+               FRC=Informations sur la compagnie;
+               ENC=Company Information];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table79;
+    PageType=Card;
+    OnInit=BEGIN
+             MapPointVisible := TRUE;
+           END;
+
+    OnOpenPage=VAR
+                 MapMgt@1000 : Codeunit 802;
+               BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+
+                 IF NOT MapMgt.TestSetup THEN
+                   MapPointVisible := FALSE;
+               END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           UpdateSystemIndicator;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 66      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Company;
+                                 ESM=&Empresa;
+                                 FRC=&Compagnie;
+                                 ENC=&Company];
+                      Image=Company }
+      { 70      ;2   ;Action    ;
+                      CaptionML=[ENU=Responsibility Centers;
+                                 ESM=Centros responsabilidad;
+                                 FRC=Centres de gestion;
+                                 ENC=Responsibility Centres];
+                      RunObject=Page 5715;
+                      Image=Position }
+      { 91      ;2   ;Separator  }
+      { 92      ;2   ;Action    ;
+                      CaptionML=[ENU=Online Map;
+                                 ESM=Online Map;
+                                 FRC=Online Map;
+                                 ENC=Online Map];
+                      Image=Map;
+                      OnAction=BEGIN
+                                 DisplayMap;
+                               END;
+                                }
+      { 1030000 ;2   ;Separator  }
+      { 1030001 ;2   ;Action    ;
+                      CaptionML=[ENU=Account Identifier;
+                                 ESM=Identificador de cuenta;
+                                 FRC=Identificateur de compte;
+                                 ENC=Account Identifier];
+                      RunObject=Page 10100;
+                      Image=Description }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Address }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Address 2" }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr=City }
+
+    { 1020001;2;Field     ;
+                CaptionML=[ENU=State / ZIP Code;
+                           ESM=Estado / C.P.;
+                           FRC=êtat-Province/code postal;
+                           ENC=Province/State / Postal/ZIP Code];
+                SourceExpr=County }
+
+    { 34  ;2   ;Field     ;
+                SourceExpr="Post Code" }
+
+    { 42  ;2   ;Field     ;
+                SourceExpr="Country/Region Code" }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Phone No." }
+
+    { 1020012;2;Field     ;
+                SourceExpr="Federal ID No." }
+
+    { 76  ;2   ;Field     ;
+                SourceExpr="Industrial Classification" }
+
+    { 33  ;2   ;Field     ;
+                SourceExpr=Picture }
+
+    { 1902768601;1;Group  ;
+                CaptionML=[ENU=Communication;
+                           ESM=Comunicaci¢n;
+                           FRC=Communications;
+                           ENC=Communication] }
+
+    { 50  ;2   ;Field     ;
+                Name=Phone No.2;
+                SourceExpr="Phone No." }
+
+    { 54  ;2   ;Field     ;
+                SourceExpr="Fax No." }
+
+    { 56  ;2   ;Field     ;
+                SourceExpr="E-Mail" }
+
+    { 58  ;2   ;Field     ;
+                SourceExpr="Home Page" }
+
+    { 78  ;2   ;Field     ;
+                SourceExpr="IC Partner Code" }
+
+    { 80  ;2   ;Field     ;
+                SourceExpr="IC Inbox Type" }
+
+    { 82  ;2   ;Field     ;
+                SourceExpr="IC Inbox Details" }
+
+    { 1901677601;1;Group  ;
+                CaptionML=[ENU=Payments;
+                           ESM=Pagos;
+                           FRC=Paiements;
+                           ENC=Payments] }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Bank Name" }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Bank Branch No." }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Bank Account No." }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Payment Routing No." }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr="Giro No." }
+
+    { 72  ;2   ;Field     ;
+                SourceExpr="SWIFT Code" }
+
+    { 74  ;2   ;Field     ;
+                SourceExpr=IBAN }
+
+    { 1480000;2;Field     ;
+                SourceExpr="US Country/Region Code" }
+
+    { 1480002;2;Field     ;
+                SourceExpr="Canada Country/Region Code" }
+
+    { 1480004;2;Field     ;
+                SourceExpr="Mexico Country/Region Code" }
+
+    { 1906801201;1;Group  ;
+                CaptionML=[ENU=Shipping;
+                           ESM=Env°o;
+                           FRC=Livraison;
+                           ENC=Shipping] }
+
+    { 35  ;2   ;Field     ;
+                SourceExpr="Ship-to Name" }
+
+    { 37  ;2   ;Field     ;
+                SourceExpr="Ship-to Address" }
+
+    { 39  ;2   ;Field     ;
+                SourceExpr="Ship-to Address 2" }
+
+    { 49  ;2   ;Field     ;
+                SourceExpr="Ship-to City" }
+
+    { 1020004;2;Field     ;
+                CaptionML=[ENU=Ship-to State / ZIP Code;
+                           ESM=Env°o a-Estado / C.P.;
+                           FRC=êtat-Province/code postal de livraison;
+                           ENC=Ship-to Province/State / Postal/ZIP Code];
+                SourceExpr="Ship-to County" }
+
+    { 51  ;2   ;Field     ;
+                SourceExpr="Ship-to Post Code" }
+
+    { 60  ;2   ;Field     ;
+                SourceExpr="Ship-to Country/Region Code" }
+
+    { 43  ;2   ;Field     ;
+                SourceExpr="Ship-to Contact" }
+
+    { 1020014;2;Field     ;
+                SourceExpr="Ship-to UPS Zone" }
+
+    { 47  ;2   ;Field     ;
+                SourceExpr="Location Code" }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Responsibility Center" }
+
+    { 62  ;2   ;Field     ;
+                SourceExpr="Check-Avail. Period Calc." }
+
+    { 64  ;2   ;Field     ;
+                SourceExpr="Check-Avail. Time Bucket" }
+
+    { 67  ;2   ;Field     ;
+                DrillDown=No;
+                SourceExpr="Base Calendar Code" }
+
+    { 69  ;2   ;Field     ;
+                Name=Customized Calendar;
+                DrillDown=Yes;
+                CaptionML=[ENU=Customized Calendar;
+                           ESM=Calendario personalizado;
+                           FRC=Calendrier personnalisÇ;
+                           ENC=Customized Calendar];
+                SourceExpr=CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Company,'','',"Base Calendar Code");
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              CurrPage.SAVERECORD;
+                              TESTFIELD("Base Calendar Code");
+                              CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Company,'','',"Base Calendar Code");
+                            END;
+                             }
+
+    { 84  ;2   ;Field     ;
+                SourceExpr="Cal. Convergence Time Frame" }
+
+    { 1901079801;1;Group  ;
+                CaptionML=[ENU=Tax;
+                           ESM=Impuesto;
+                           FRC=Taxe;
+                           ENC=Tax] }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="VAT Registration No." }
+
+    { 1020010;2;Field     ;
+                SourceExpr="QST Registration No." }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Tax Area Code" }
+
+    { 1020008;2;Field     ;
+                SourceExpr="Tax Exemption No." }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Tax Scheme" }
+
+    { 1400000;2;Field     ;
+                SourceExpr="Provincial Tax Area Code" }
+
+    { 1020018;2;Field     ;
+                SourceExpr="RFC No." }
+
+    { 1020020;2;Field     ;
+                SourceExpr="CURP No." }
+
+    { 1020022;2;Field     ;
+                SourceExpr="State Inscription" }
+
+    { 1030002;2;Field     ;
+                SourceExpr="Software Identification Code" }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Allow Blank Payment Info." }
+
+    { 1904604101;1;Group  ;
+                CaptionML=[ENU=System Indicator;
+                           ESM=Indicador del sistema;
+                           FRC=Indicateur systäme;
+                           ENC=System Indicator] }
+
+    { 100 ;2   ;Field     ;
+                SourceExpr="System Indicator";
+                OnValidate=BEGIN
+                             SystemIndicatorOnAfterValidate;
+                           END;
+                            }
+
+    { 104 ;2   ;Field     ;
+                SourceExpr="System Indicator Style" }
+
+    { 102 ;2   ;Field     ;
+                Name=System Indicator Text;
+                CaptionML=[ENU=System Indicator Text;
+                           ESM=Texto de indicador del sistema;
+                           FRC=Texte de l'indicateur systäme;
+                           ENC=System Indicator Text];
+                SourceExpr=SystemIndicatorText;
+                Editable=SystemIndicatorTextEditable;
+                OnValidate=BEGIN
+                             "Custom System Indicator Text" := SystemIndicatorText;
+                             SystemIndicatorTextOnAfterVali;
+                           END;
+                            }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      CustomizedCalEntry@1007 : Record 7603;
+      CustomizedCalendar@1005 : Record 7602;
+      CalendarMgmt@1004 : Codeunit 7600;
+      SystemIndicatorText@1006 : Text[250];
+      MapPointVisible@19022708 : Boolean INDATASET;
+      SystemIndicatorTextEditable@19043996 : Boolean INDATASET;
+
+    PROCEDURE UpdateSystemIndicator@1008();
+    VAR
+      IndicatorStyle@1000 : Option;
+    BEGIN
+      GetSystemIndicator(SystemIndicatorText,IndicatorStyle); // IndicatorStyle is not used
+      SystemIndicatorTextEditable := CurrPage.EDITABLE AND ("System Indicator" = "System Indicator"::"Custom Text");
+    END;
+
+    LOCAL PROCEDURE SystemIndicatorTextOnAfterVali@19070270();
+    BEGIN
+      UpdateSystemIndicator
+    END;
+
+    LOCAL PROCEDURE SystemIndicatorOnAfterValidate@19079461();
+    BEGIN
+      UpdateSystemIndicator
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

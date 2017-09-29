@@ -1,0 +1,430 @@
+OBJECT Report 5756 Create Warehouse Location
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Create Warehouse Location;
+               ESM=Crear un almac‚n;
+               FRC=Cr‚er un emplacement d'entrep“t;
+               ENC=Create Warehouse Location];
+    ProcessingOnly=Yes;
+    OnPreReport=BEGIN
+                  IF LocCode = '' THEN
+                    ERROR(Text001);
+                  IF AdjBinCode = '' THEN
+                    ERROR(Text002);
+
+                  ItemLedgEntry.RESET;
+                  ItemLedgEntry.SETCURRENTKEY("Item No.",Open);
+                  IF ItemLedgEntry.FIND('-') THEN
+                    REPEAT
+                      ItemLedgEntry.SETRANGE("Item No.",ItemLedgEntry."Item No.");
+                      ItemLedgEntry.SETRANGE(Open,TRUE);
+                      ItemLedgEntry.SETRANGE("Location Code",LocCode);
+                      Found := ItemLedgEntry.FIND('-');
+                      IF Found AND NOT HideValidationDialog THEN
+                        IF NOT CONFIRM(
+                             Text010 + Text011 + Text012 + Text013 + Text014 +
+                             Text015 + Text016 + Text017,FALSE,Location.TABLECAPTION,LocCode)
+                        THEN
+                          CurrReport.QUIT;
+                      ItemLedgEntry.SETRANGE("Location Code");
+                      ItemLedgEntry.SETRANGE(Open);
+                      ItemLedgEntry.FIND('+');
+                      ItemLedgEntry.SETRANGE("Item No.");
+                    UNTIL (ItemLedgEntry.NEXT = 0) OR Found;
+
+                  IF NOT Found THEN
+                    ERROR(Text018,Location.TABLECAPTION,Location.FIELDCAPTION(Code),LocCode);
+                  CLEAR(ItemLedgEntry);
+
+                  WhseEntry.RESET;
+                  WhseEntry.SETCURRENTKEY("Location Code");
+                  WhseEntry.SETRANGE("Location Code",LocCode);
+                  IF WhseEntry.FINDFIRST THEN
+                    ERROR(
+                      Text019,Location.TABLECAPTION,LocCode,WhseEntry.TABLECAPTION);
+
+                  TempWhseJnlLine.RESET;
+                  TempWhseJnlLine.DELETEALL;
+
+                  LastLineNo := 0;
+
+                  WITH ItemLedgEntry DO BEGIN
+                    SETCURRENTKEY(
+                      "Item No.","Location Code",Open,"Variant Code","Unit of Measure Code","Lot No.","Serial No.");
+
+                    Location.GET(LocCode);
+                    Location.TESTFIELD("Adjustment Bin Code",'');
+                    CheckWhseDocs;
+
+                    Bin.GET(LocCode,AdjBinCode);
+
+                    IF FIND('-') THEN BEGIN
+                      IF NOT HideValidationDialog THEN BEGIN
+                        Window.OPEN(STRSUBSTNO(Text020,FIELDCAPTION("Location Code"),"Location Code") + Text003);
+                        i := 1;
+                        CountItemLedgEntries := COUNT;
+                      END;
+
+                      REPEAT
+                        IF NOT HideValidationDialog THEN BEGIN
+                          Window.UPDATE(100,i);
+                          Window.UPDATE(102,ROUND(i / CountItemLedgEntries * 10000,1));
+                        END;
+
+                        SETRANGE("Item No.","Item No.");
+                        IF FIND('-') THEN BEGIN
+                          SETRANGE("Location Code",LocCode);
+                          SETRANGE(Open,TRUE);
+                          IF FIND('-') THEN
+                            REPEAT
+                              SETRANGE("Variant Code","Variant Code");
+                              IF FIND('-') THEN
+                                REPEAT
+                                  SETRANGE("Unit of Measure Code","Unit of Measure Code");
+                                  IF FIND('-') THEN
+                                    REPEAT
+                                      SETRANGE("Lot No.","Lot No.");
+                                      IF FIND('-') THEN
+                                        REPEAT
+                                          SETRANGE("Serial No.","Serial No.");
+
+                                          CALCSUMS("Remaining Quantity");
+
+                                          IF "Remaining Quantity" < 0 THEN
+                                            ERROR(
+                                              STRSUBSTNO(Text005,BuildErrorText) +
+                                              STRSUBSTNO(Text009,CheckNegInv.OBJECTID));
+
+                                          IF "Remaining Quantity" > 0 THEN
+                                            CreateWhseJnlLine;
+                                          FIND('+');
+                                          SETRANGE("Serial No.");
+                                        UNTIL NEXT = 0;
+
+                                      FIND('+');
+                                      SETRANGE("Lot No.");
+                                    UNTIL NEXT = 0;
+
+                                  FIND('+');
+                                  SETRANGE("Unit of Measure Code")
+                                UNTIL NEXT = 0;
+
+                              FIND('+');
+                              SETRANGE("Variant Code");
+                            UNTIL NEXT = 0;
+                        END;
+
+                        SETRANGE(Open);
+                        SETRANGE("Location Code");
+                        FIND('+');
+                        IF NOT HideValidationDialog THEN
+                          i := i + COUNT;
+                        SETRANGE("Item No.");
+                      UNTIL NEXT = 0;
+                    END;
+                  END;
+                END;
+
+    OnPostReport=BEGIN
+                   Location."Bin Mandatory" := TRUE;
+                   Location.VALIDATE("Directed Put-away and Pick",TRUE);
+                   Location.VALIDATE("Adjustment Bin Code",AdjBinCode);
+                   Location.MODIFY;
+
+                   IF TempWhseJnlLine.FIND('-') THEN
+                     REPEAT
+                       WhseJnlLinePost.RUN(TempWhseJnlLine);
+                     UNTIL TempWhseJnlLine.NEXT = 0;
+
+                   IF NOT HideValidationDialog THEN BEGIN
+                     Window.CLOSE;
+                     MESSAGE(Text004);
+                   END;
+                 END;
+
+  }
+  DATASET
+  {
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             ESM=Opciones;
+                             FRC=Options;
+                             ENC=Options] }
+
+      { 1   ;2   ;Field     ;
+                  CaptionML=[ENU=Location Code;
+                             ESM=C¢d. almac‚n;
+                             FRC=Code d'emplacement;
+                             ENC=Location Code];
+                  SourceExpr=LocCode;
+                  OnValidate=BEGIN
+                               Location.GET(LocCode);
+                               Location.TESTFIELD("Bin Mandatory",FALSE);
+                               Location.TESTFIELD("Use As In-Transit",FALSE);
+                               Location.TESTFIELD("Directed Put-away and Pick",FALSE);
+                             END;
+
+                  OnLookup=BEGIN
+                             CLEAR(Location);
+                             IF LocCode <> '' THEN
+                               Location.Code := LocCode;
+                             IF PAGE.RUNMODAL(0,Location) = ACTION::LookupOK THEN BEGIN
+                               Location.TESTFIELD("Bin Mandatory",FALSE);
+                               Location.TESTFIELD("Use As In-Transit",FALSE);
+                               Location.TESTFIELD("Directed Put-away and Pick",FALSE);
+                               LocCode := Location.Code;
+                             END;
+                           END;
+                            }
+
+      { 3   ;2   ;Field     ;
+                  CaptionML=[ENU=Adjustment Bin Code;
+                             ESM=C¢d. ubicaci¢n ajuste;
+                             FRC=Code de zone ajustement;
+                             ENC=Adjustment Bin Code];
+                  SourceExpr=AdjBinCode;
+                  OnValidate=BEGIN
+                               IF AdjBinCode <> '' THEN
+                                 IF LocCode <> '' THEN
+                                   Bin.GET(LocCode,AdjBinCode)
+                                 ELSE BEGIN
+                                   Bin.SETRANGE(Code,AdjBinCode);
+                                   Bin.FINDFIRST;
+                                   LocCode := Bin."Location Code";
+                                 END;
+                             END;
+
+                  OnLookup=BEGIN
+                             Bin.RESET;
+                             IF LocCode <> '' THEN
+                               Bin.SETRANGE("Location Code",LocCode);
+
+                             IF PAGE.RUNMODAL(0,Bin) = ACTION::LookupOK THEN BEGIN
+                               IF LocCode = '' THEN
+                                 LocCode := Bin."Location Code";
+                               AdjBinCode := Bin.Code;
+                             END;
+                           END;
+                            }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      TempWhseJnlLine@1007 : TEMPORARY Record 7311;
+      Item@1020 : Record 27;
+      ItemLedgEntry@1011 : Record 32;
+      WhseEntry@1040 : Record 7312;
+      ItemUnitOfMeasure@1001 : Record 5404;
+      Location@1002 : Record 14;
+      Bin@1003 : Record 7354;
+      WhseRcptHeader@1028 : Record 7316;
+      WhseShipHeader@1027 : Record 7320;
+      WhseActivHeader@1026 : Record 5766;
+      WhseWkshLine@1025 : Record 7326;
+      WhseJnlLinePost@1010 : Codeunit 7301;
+      WMSMgt@1019 : Codeunit 7302;
+      CheckNegInv@1014 : Report 5757;
+      Window@1013 : Dialog;
+      LocCode@1000 : Code[10];
+      Text001@1042 : TextConst 'ENU=Please enter a location code!;ESM=Por favor introduzca c¢d. almac‚n;FRC=Veuillez entrer un code d''emplacement!;ENC=Please enter a location code!';
+      Text002@1012 : TextConst 'ENU=Please enter an adjustment bin code!;ESM=Por favor introduzca un c¢d. ubicaci¢n de ajuste;FRC=Veuillez entrer un code de zone d''ajustement!;ENC=Please enter an adjustment bin code!';
+      Text003@1004 : TextConst 'ENU=Count #100##### @102@@@@@@@@;ESM=Cuenta #100##### @102@@@@@@@@;FRC=D‚nombrement #100##### @102@@@@@@@@;ENC=Count #100##### @102@@@@@@@@';
+      AdjBinCode@1009 : Code[20];
+      i@1005 : Integer;
+      CountItemLedgEntries@1029 : Integer;
+      LastLineNo@1008 : Integer;
+      Text004@1015 : TextConst 'ENU=Conversion successfully completed!;ESM=­Conversi¢n realizada con ‚xito!;FRC=Conversion compl‚t‚e avec succŠs;ENC=Conversion successfully completed!';
+      Text005@1016 : TextConst 'ENU=Negative inventory was found in the location. You must clear this negative inventory in the program before you can proceed with the conversion!\\%1.\\;ESM=Hay inventario negativo en almac‚n. Debe corregir este inventario negativo en el programa antes de lanzar la conversi¢n\\%1.\\;FRC=Un inventaire n‚gatif a ‚t‚ trouv‚ dans l''emplacement. Vous devez effacer cet inventaire n‚gatif dans le programme avant de proc‚der … la conversion!\\%1.\\;ENC=Negative inventory was found in the location. You must clear this negative inventory in the program before you can proceed with the conversion!\\%1.\\';
+      HideValidationDialog@1018 : Boolean;
+      Text006@1022 : TextConst 'ENU=%1 %2 cannot be converted because at least one %3 is not completely posted yet!\\Post or delete all of them before restarting the conversion batch job!;ESM=%1 %2 no se pueden convertir por que no est  registrado todav¡a al menos un %3\\Registre o borre todos antes de reiniciar el proceso de conversi¢n!;FRC=%1 %2 ne peut pas ˆtre converti, puisque au moins un %3 n''est pas encore totalement report‚!\\Reportez-les ou supprimez-les tous avant de red‚marrer le travail par lots de conversion!;ENC=%1 %2 cannot be converted because at least one %3 is not completely posted yet!\\Post or delete all of them before restarting the conversion batch job!';
+      Text007@1023 : TextConst 'ENU=%1 %2 cannot be converted because at least one %3 is not completely registered yet!\\Register or delete all of them before restarting the conversion batch job!;ESM=%1 %2 no pueden convertirse por que no est  completamente registrado todav¡a al menos un %3!\\Registre o borre todos antes de reiniciar el proceso de conversi¢n!;FRC=%1 %2 ne peut pas ˆtre converti, puisque au moins un %3 n''est pas encore totalement enregistr‚!\\Enregistrez-les ou supprimez-les tous avant de red‚marrer le travail par lots de conversion!;ENC=%1 %2 cannot be converted because at least one %3 is not completely registered yet!\\Register or delete all of them before restarting the conversion batch job!';
+      Text008@1024 : TextConst 'ENU=%1 %2 cannot be converted because at least one %3 exists!\\Delete all of them before restarting the conversion batch job!;ESM=%1 %2 no puede convertirse por que existe al menos un %3\\Borre todos antes de reiniciar el proceso de conversi¢n;FRC=%1 %2 ne peut pas ˆtre converti, puisque au moins un %3 existe!\\Supprimez-les tous avant de  red‚marrer le travail par lots de conversion!;ENC=%1 %2 cannot be converted because at least one %3 exists!\\Delete all of them before restarting the conversion batch job!';
+      Text009@1030 : TextConst 'ENU=Run %1 for a report of all negative inventory in the location.;ESM=Ejecute %1 para un informe de todo el inventario negativo en el almac‚n.;FRC=Ex‚cutez %1 pour obtenir un rapport de tous les inventaires n‚gatifs de l''emplacement.;ENC=Run %1 for a report of all negative inventory in the location.';
+
+      Text010@1039 : TextConst
+        'ENU=Inventory exists on this location. By clicking Yes from this warning, you are confirming that you want to enable this location to use Warehouse Management Systems by running a batch job to create warehouse entries for the inventory in this location.\\',
+        'ESM=Hay inventario en este almac‚n. Si selecciona S¡ en la advertencia, confirmar  que quiere permitir habilitar este almac‚n para usar el Sistema de Gesti¢n de almacenes para lanzar un proceso que crea movs. de almac‚n para el inventario de este almac‚n.\\',
+        'FRC=Un inventaire existe dans cet emplacement. En cliquant sur Oui … partir de cet avertissement, vous confirmez que vous voulez activer cet emplacement en vue d''utiliser les systŠmes de gestion d''entrep“t en ex‚cutant un travail par lots afin de cr‚er des ‚critures d''entrep“t pour l''inventaire de ce dernier.\\',
+        'ENC=Inventory exists on this location. By clicking Yes from this warning, you are confirming that you want to enable this location to use Warehouse Management Systems by running a batch job to create warehouse entries for the inventory in this location.\\';
+
+      Text011@1038 : TextConst
+        'ENU="If you wish to proceed, you must first ensure that no negative inventory exists in the location. Negative inventory is not allowed in a location that uses warehouse management logic and must be cleared by posting a suitable quantity to inventory. "',
+        'ESM="Si quiere continuar, debe asegurarse primero de que no haya inventario negativo en el almac‚n. No est  permitido tener inventario negativo en un almac‚n que use una l¢gica de gesti¢n de almac‚n y que quedar  ajustado registr ndose una cantidad adecuada de inventario. "',
+        'FRC="Si vous d‚sirez poursuivre, vous devez d''abord vous assurer qu''il n''y a pas d''inventaire n‚gatif dans l''emplacement. Un inventaire n‚gatif est interdit dans un emplacement qui utilise la logique de gestion d''entrep“t et doit ˆtre effac‚ par le report d''une quantit‚ appropri‚e dans l''inventaire. "',
+        'ENC="If you wish to proceed, you must first ensure that no negative inventory exists in the location. Negative inventory is not allowed in a location that uses warehouse management logic and must be cleared by posting a suitable quantity to inventory. "';
+      Text012@1037 : TextConst 'ENU=You can perform a check for negative inventory by using report Check on Negative Inventory.\\;ESM=Puede comprobar el inventario negativo utilizando el informe Comprobar inventario negativo.\\;FRC=Vous pouvez v‚rifier la pr‚sence d''un inventaire n‚gatif en utilisant le rapport V‚rifier la pr‚sence d''un inventaire n‚gatif.\\;ENC=You can perform a check for negative inventory by using report Check on Negative Inventory.\\';
+      Text013@1036 : TextConst 'ENU="If you can confirm that no negative inventory exists in the location, proceed with the conversion batch job. If the program finds negative inventory, it will stop the batch job with an error message. ";ESM="Si est  seguro de que no hay inventario negativo en el almac‚n, ejecute el proceso de conversi¢n. Si el programa encuentra inventario negativo, detendr  el proceso con un mensage de error. ";FRC="Si vous pouvez confirmer qu''aucun inventaire n‚gatif n''est pr‚sent dans l''emplacement, poursuivez avec le travail par lots de conversion. Si le programme trouve un inventaire n‚gatif, il interrompra le travail par lots et g‚n‚rera un message d''erreur. ";ENC="If you can confirm that no negative inventory exists in the location, proceed with the conversion batch job. If the program finds negative inventory, it will stop the batch job with an error message. "';
+
+      Text014@1035 : TextConst
+        'ENU=The result of this batch job is that initial warehouse entries will be created. You must balance these initial warehouse entries on the adjustment bin by posting a warehouse physical inventory journal or a warehouse item journal to assign zones and bins to items.\',
+        'ESM=El resultado de este proceso es la creaci¢n de movs. iniciales de almac‚n. Debe ajustar estos movs. iniciales de almac‚n en la ubic. de ajuste registrando un diario de inventario f¡sico o un diario producto almac‚n para asignar zonas y ubicaciones a los productos.\',
+        'FRC=Le r‚sultat de ce travail par lots est que des ‚critures d''entrep“t initiales seront cr‚‚es. Vous devez ‚quilibrer ces ‚critures d''entrep“t initiales dans la zone d''ajustement en effectuant un report de journal d''inventaire physique d''entrep“t ou de journal d''article d''entrep“t pour attribuer des zones aux articles.\',
+        'ENC=The result of this batch job is that initial warehouse entries will be created. You must balance these initial warehouse entries on the adjustment bin by posting a warehouse physical inventory journal or a warehouse item journal to assign zones and bins to items.\';
+      Text015@1034 : TextConst 'ENU=You must create zones and bins before posting a warehouse physical inventory.\\;ESM=Debe crear zonas y ubicaciones antes de registrar un inventario f¡sico en almac‚n.\\;FRC=Vous devez cr‚er des zones avant de reporter un inventaire physique d''entrep“t.\\;ENC=You must create zones and bins before posting a warehouse physical inventory.\\';
+      Text016@1033 : TextConst 'ENU=%1 %2 will be a warehouse management location after the batch job has run successfully! This conversion cannot be reversed or undone after it has run!;ESM=%1 %2 ser  un almac‚n despu‚s de que se haya ejecutado correctamente el proceso. Esta conversi¢n no es reversible o no puede deshacerse despu‚s ejecutarse.;FRC=%1 %2 sera un emplacement de gestion d''entrep“t une fois le travail par lots compl‚t‚ avec succŠs! Cette conversion ne peut pas ˆtre invers‚e ou annul‚e une fois qu''elle a ‚t‚ ex‚cut‚e!;ENC=%1 %2 will be a warehouse management location after the batch job has run successfully! This conversion cannot be reversed or undone after it has run!';
+      Text017@1032 : TextConst 'ENU=\\Do you really want to proceed?;ESM=\\¨Est  seguro de querer continuar?;FRC=\\Voulez-vous vraiment continuer?;ENC=\\Do you really want to proceed?';
+      Text018@1031 : TextConst 'ENU=There is nothing to convert for %1 %2 ''%3''.;ESM=No hay nada que convertir para %1 %2 ''%3''.;FRC=Il n''y a rien … convertir pour %1 %2 ''%3 ''.;ENC=There is nothing to convert for %1 %2 ''%3''.';
+      Text019@1041 : TextConst 'ENU=%1 %2 cannot be converted because at least one %3 exists for this %1!;ESM=­%1 %2 no puede convertirse por que existe al menos un %3 para este %1!;FRC=%1 %2 ne peut pas ˆtre converti, puisque au moins un %3 existe pour ce %1!;ENC=%1 %2 cannot be converted because at least one %3 exists for this %1!';
+      Text020@1006 : TextConst 'ENU=%1 %2 will be converted to a WMS location!\\This might take some time so please be patient!;ESM=­%1 %2 se convertir  en un almac‚n!\\­Esto puede llevar tiempo, por favor sea paciente!;FRC="%1 %2 sera converti vers un emplacement SGT!\\Cette proc‚dure peut prendre un certain temps; veuillez donc patienter!";ENC=%1 %2 will be converted to a WMS location!\\This might take some time so please be patient!';
+      Found@1017 : Boolean;
+
+    PROCEDURE CheckWhseDocs@5();
+    BEGIN
+      WhseRcptHeader.SETCURRENTKEY("Location Code");
+      WhseRcptHeader.SETRANGE("Location Code",Location.Code);
+      IF WhseRcptHeader.FINDFIRST THEN
+        ERROR(
+          Text006,
+          Location.TABLECAPTION,
+          Location.Code,
+          WhseRcptHeader.TABLECAPTION);
+
+      WhseShipHeader.SETCURRENTKEY("Location Code");
+      WhseShipHeader.SETRANGE("Location Code",Location.Code);
+      IF WhseShipHeader.FINDFIRST THEN
+        ERROR(
+          Text006,
+          Location.TABLECAPTION,
+          Location.Code,
+          WhseShipHeader.TABLECAPTION);
+
+      WhseActivHeader.SETCURRENTKEY("Location Code");
+      WhseActivHeader.SETRANGE("Location Code",Location.Code);
+      IF WhseActivHeader.FINDFIRST THEN
+        ERROR(
+          Text007,
+          Location.TABLECAPTION,
+          Location.Code,
+          WhseActivHeader.Type);
+
+      WhseWkshLine.SETCURRENTKEY("Item No.","Location Code");
+      WhseWkshLine.SETRANGE("Location Code",Location.Code);
+      IF WhseWkshLine.FINDFIRST THEN
+        ERROR(
+          Text008,
+          Location.TABLECAPTION,
+          Location.Code,
+          WhseWkshLine.TABLECAPTION);
+    END;
+
+    LOCAL PROCEDURE CreateWhseJnlLine@4();
+    BEGIN
+      LastLineNo := LastLineNo + 10000;
+
+      WITH ItemLedgEntry DO BEGIN
+        TempWhseJnlLine.INIT;
+        TempWhseJnlLine."Entry Type" := TempWhseJnlLine."Entry Type"::"Positive Adjmt.";
+        TempWhseJnlLine."Line No." := LastLineNo;
+        TempWhseJnlLine."Location Code" := "Location Code";
+        TempWhseJnlLine."Registering Date" := TODAY;
+        TempWhseJnlLine."Item No." := "Item No.";
+        TempWhseJnlLine.Quantity := ROUND("Remaining Quantity" / "Qty. per Unit of Measure",0.00001);
+        TempWhseJnlLine."Qty. (Base)" := "Remaining Quantity";
+        TempWhseJnlLine."Qty. (Absolute)" := ROUND(ABS("Remaining Quantity") / "Qty. per Unit of Measure",0.00001);
+        TempWhseJnlLine."Qty. (Absolute, Base)" := ABS("Remaining Quantity");
+        TempWhseJnlLine."User ID" := USERID;
+        TempWhseJnlLine."Variant Code" := "Variant Code";
+        IF "Unit of Measure Code" = '' THEN BEGIN
+          Item.GET("Item No.");
+          "Unit of Measure Code" := Item."Base Unit of Measure";
+        END;
+        TempWhseJnlLine."Unit of Measure Code" := "Unit of Measure Code";
+        TempWhseJnlLine."Qty. per Unit of Measure" := "Qty. per Unit of Measure";
+        TempWhseJnlLine."Lot No." := "Lot No.";
+        TempWhseJnlLine."Serial No." := "Serial No.";
+        TempWhseJnlLine.VALIDATE("Zone Code",Bin."Zone Code");
+        TempWhseJnlLine."Bin Code" := AdjBinCode;
+        TempWhseJnlLine."To Bin Code" := AdjBinCode;
+        GetItemUnitOfMeasure("Item No.","Unit of Measure Code");
+        TempWhseJnlLine.Cubage :=
+          TempWhseJnlLine."Qty. (Absolute)" * ItemUnitOfMeasure.Cubage;
+        TempWhseJnlLine.Weight :=
+          TempWhseJnlLine."Qty. (Absolute)" * ItemUnitOfMeasure.Weight;
+
+        WMSMgt.CheckWhseJnlLine(TempWhseJnlLine,0,0,FALSE);
+        TempWhseJnlLine.INSERT;
+      END;
+    END;
+
+    LOCAL PROCEDURE GetItemUnitOfMeasure@15(ItemNo@1000 : Code[20];UOMCode@1001 : Code[10]);
+    BEGIN
+      IF (ItemUnitOfMeasure."Item No." <> ItemNo) OR
+         (ItemUnitOfMeasure.Code <> UOMCode)
+      THEN
+        IF NOT ItemUnitOfMeasure.GET(ItemNo,UOMCode) THEN
+          ItemUnitOfMeasure.INIT;
+    END;
+
+    LOCAL PROCEDURE BuildErrorText@7() : Text[250];
+    VAR
+      Text@1000 : Text[250];
+    BEGIN
+      WITH ItemLedgEntry DO BEGIN
+        Text :=
+          STRSUBSTNO(
+            '%1: %2, %3: %4',
+            FIELDCAPTION("Location Code"),"Location Code",
+            FIELDCAPTION("Item No."),"Item No.");
+        IF "Variant Code" <> '' THEN
+          Text :=
+            STRSUBSTNO('%1, %2: %3',Text,
+              FIELDCAPTION("Variant Code"),"Variant Code");
+        IF "Unit of Measure Code" <> '' THEN
+          Text :=
+            STRSUBSTNO('%1, %2: %3',Text,
+              FIELDCAPTION("Unit of Measure Code"),
+              "Unit of Measure Code");
+        IF "Lot No." <> '' THEN
+          Text :=
+            STRSUBSTNO('%1, %2: %3',Text,
+              FIELDCAPTION("Lot No."),"Lot No.");
+        IF "Serial No." <> '' THEN
+          Text :=
+            STRSUBSTNO('%1, %2: %3',Text,
+              FIELDCAPTION("Serial No."),"Serial No.");
+      END;
+      EXIT(Text);
+    END;
+
+    PROCEDURE InitializeRequest@2(LocationCode@1000 : Code[10];AdjustmentBinCode@1001 : Code[20]);
+    BEGIN
+      LocCode := LocationCode;
+      AdjBinCode := AdjustmentBinCode;
+    END;
+
+    PROCEDURE SetHideValidationDialog@7380(NewHideValidationDialog@1000 : Boolean);
+    BEGIN
+      HideValidationDialog := NewHideValidationDialog;
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

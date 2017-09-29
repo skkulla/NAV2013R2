@@ -1,0 +1,398 @@
+OBJECT Page 1348 Mini General Ledger Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=General Ledger Setup;
+               ESM=Configuraci¢n contabilidad;
+               FRC=Configuration du grand livre;
+               ENC=General Ledger Setup];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table98;
+    PageType=Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,General,Posting,Tax,Bank,Journal Templates;
+                                ESM=Nuevo,Proceso,Informe,General,Registro,IVA,Banco,Libros diario;
+                                FRC=Nouveau,Traitement,Rapport,G‚n‚ral,Report,TVA,Banque,ModŠles journal;
+                                ENC=New,Process,Report,General,Posting,Tax,Bank,Journal Templates];
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 10      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 11      ;1   ;Action    ;
+                      Name=<Page Accounting Periods>;
+                      CaptionML=[ENU=Accounting Periods;
+                                 ESM=Periodos contables;
+                                 FRC=P‚riodes comptables;
+                                 ENC=Accounting Periods];
+                      ToolTipML=[ENU=Set up a new fiscal year and the number of accounting periods, such as 12 monthly periods, within the fiscal year and specify which period is the start of the new fiscal year. Accounting periods can be used as a time reference in various financial analysis, such as the grouping of posted entries in the Income & Expense chart.;
+                                 ESM=Configure un nuevo ejercicio y el n£mero de periodos contables, tal como 12 periodos mensuales, dentro del ejercicio, y especifique qu‚ periodo es el inicio del nuevo ejercicio. Los periodos contables se pueden usar como referencia de tiempo en distintos an lisis financieros, tal como la agrupaci¢n de movimientos registrados en el gr fico Ingresos y gastos.;
+                                 FRC=Param‚trez un exercice financier, d‚finissez le nombre de p‚riodes comptables (12ÿp‚riodes mensuelles par exemple) dans l'exercice et indiquez par quelle p‚riode un nouvel exercice financier d‚bute. Les p‚riodes comptables peuvent ˆtre utilis‚es comme r‚f‚rences temporelles dans plusieurs analyses financiŠres, par exemple le regroupement d'‚critures report‚es dans le graphique Revenus et d‚penses.;
+                                 ENC=Set up a new fiscal year and the number of accounting periods, such as 12 monthly periods, within the fiscal year and specify which period is the start of the new fiscal year. Accounting periods can be used as a time reference in various financial analysis, such as the grouping of posted entries in the Income & Expense chart.];
+                      RunObject=Page 100;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=AccountingPeriods;
+                      PromotedCategory=Category4 }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      ToolTipML=[ENU=Set up the department and project dimensions that you can assign to sales and purchase documents for financial analysis of your transaction history.;
+                                 ESM=Configure las dimensiones de departamento y proyecto que puede asignar a los documentos de ventas y compras para los an lisis financieros del historial de transacciones.;
+                                 FRC=Param‚trez les dimensions du d‚partement et du projet que vous pouvez affecter … des documents vente et achat pour l'analyse financiŠre de votre historique de transactions.;
+                                 ENC=Set up the department and project dimensions that you can assign to sales and purchase documents for financial analysis of your transaction history.];
+                      RunObject=Page 536;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category4 }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=User Setup;
+                                 ESM=Configuraci¢n usuarios;
+                                 FRC=Configuration des utilisateurs;
+                                 ENC=User Setup];
+                      ToolTipML=[ENU=Set up users IDs and passwords for each user to secure your database from unauthorized access.;
+                                 ESM=Configure los identificadores y las contrase¤as para cada usuario con el fin de proteger la base de datos contra el acceso no autorizado.;
+                                 FRC=Param‚trez des codes utilisateur et des mots de passe pour chaque utilisateur afin de prot‚ger votre base de donn‚es d'un accŠs non autoris‚.;
+                                 ENC=Set up users IDs and passwords for each user to secure your database from unauthorized access.];
+                      RunObject=Page 119;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=UserSetup;
+                      PromotedCategory=Category4 }
+      { 35      ;1   ;Action    ;
+                      CaptionML=[ENU=Cash Flow Setup;
+                                 ESM=Configuraci¢n flujos efectivo;
+                                 FRC=Configuration tr‚sorerie;
+                                 ENC=Cash Flow Setup];
+                      ToolTipML=[ENU=Set up the accounts where cash-flow figures for sales, purchase, and fixed-asset transactions are stored.;
+                                 ESM=Configure las cuentas en las que se almacenan las cifras de flujo de caja para las transacciones de compra, venta y activo fijo.;
+                                 FRC=Param‚trez les comptes dans lesquels sont enregistr‚s les chiffres de tr‚sorerie pour les transactions de vente, d'achat et d'immobilisation.;
+                                 ENC=Set up the accounts where cash-flow figures for sales, purchase, and fixed-asset transactions are stored.];
+                      RunObject=Page 846;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CashFlowSetup;
+                      PromotedCategory=Category4 }
+      { 39      ;1   ;Action    ;
+                      CaptionML=[ENU=Bank Export/Import Setup;
+                                 ESM=Configuraci¢n de importaci¢n/exportaci¢n de banco;
+                                 FRC=Configuration exportation/importation bancaire;
+                                 ENC=Bank Export/Import Setup];
+                      ToolTipML=[ENU=Set up the formats for exporting vendor payments, such as Giro and FIK. Set up the formats for importing bank statements, such as Danske Bank and Nordea.;
+                                 ESM=Configure los formatos para exportar los pagos de proveedor, tal como Giro y FIK. Configure los formatos para importar estados de cuenta bancarios, tales como Danske Bank y Nordea.;
+                                 FRC=Param‚trez les formats d'exportation des paiements fournisseur, tels que le CCP et le FIK. Cr‚ez les formats d'importation des relev‚s bancaires, par exemple la Danske Bank et la Nordea.;
+                                 ENC=Set up the formats for exporting vendor payments, such as Giro and FIK. Set up the formats for importing bank statements, such as Danske Bank and Nordea.];
+                      RunObject=Page 1200;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ImportExport;
+                      PromotedCategory=Category7 }
+      { 14      ;1   ;ActionGroup;
+                      CaptionML=[ENU=General Ledger Posting;
+                                 ESM=Registro en contabilidad;
+                                 FRC=Report dans le grand livre;
+                                 ENC=General Ledger Posting] }
+      { 15      ;2   ;Action    ;
+                      CaptionML=[ENU=General Posting Setup;
+                                 ESM=Configuraci¢n grupos contables;
+                                 FRC=Config. paramŠtres report;
+                                 ENC=General Posting Setup];
+                      ToolTipML=[ENU=Set up combinations of general business and general product posting groups by specifying account numbers for posting of sales and purchase transactions.;
+                                 ESM=Configure combinaciones de grupos contables de negocio general y de producto general. Para ello, especifique n£meros de cuentas para registrar transacciones de venta y compra.;
+                                 FRC=Param‚trez des combinaisons de groupes de report march‚ et de report produit en sp‚cifiant les num‚ros de compte en vue de reporter les transactions de vente ou d'achat.;
+                                 ENC=Set up combinations of general business and general product posting groups by specifying account numbers for posting of sales and purchase transactions.];
+                      RunObject=Page 314;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=GeneralPostingSetup;
+                      PromotedCategory=Category5 }
+      { 16      ;2   ;Action    ;
+                      CaptionML=[ENU=Gen. Business Posting Groups;
+                                 ESM=Grupos contables negocio;
+                                 FRC=ParamŠtres report march‚;
+                                 ENC=Gen. Business Posting Groups];
+                      ToolTipML=[ENU=Set up the trade-type posting groups that you assign to customer and vendor cards to link transactions with the appropriate general ledger account.;
+                                 ESM=Configure los grupos contables de tipo de comercio que asignar  a las fichas de cliente y proveedor para vincular las transacciones con la cuenta contable adecuada.;
+                                 FRC=Param‚trez les groupes de report de type commercial que vous affectez aux fiches client et fournisseur afin de lier les transactions au compte GL appropri‚.;
+                                 ENC=Set up the trade-type posting groups that you assign to customer and vendor cards to link transactions with the appropriate general ledger account.];
+                      RunObject=Page 312;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=GeneralPostingSetup;
+                      PromotedCategory=Category5 }
+      { 17      ;2   ;Action    ;
+                      CaptionML=[ENU=Gen. Product Posting Groups;
+                                 ESM=Grupos contables productos;
+                                 FRC=ParamŠtres report produit;
+                                 ENC=Gen. Product Posting Groups];
+                      ToolTipML=[ENU=Set up the item-type posting groups that you assign to customer and vendor cards to link transactions with the appropriate general ledger account.;
+                                 ESM=Configure los grupos contables de tipo de producto que asignar  a las fichas de cliente y proveedor para vincular transacciones con la cuenta contable adecuada.;
+                                 FRC=Param‚trez les groupes de report de type article que vous affectez aux fiches client et fournisseur afin de lier les transactions au compte GL appropri‚.;
+                                 ENC=Set up the item-type posting groups that you assign to customer and vendor cards to link transactions with the appropriate general ledger account.];
+                      RunObject=Page 313;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=GeneralPostingSetup;
+                      PromotedCategory=Category5 }
+      { 31      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Tax Posting;
+                                 ESM=Tipo mov. IVA;
+                                 FRC=Report TVA;
+                                 ENC=Tax Posting] }
+      { 19      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Posting Setup;
+                                 ESM=Config. grupos registro IVA;
+                                 FRC=Configuration report de taxe;
+                                 ENC=Tax Posting Setup];
+                      ToolTipML=[ENU=Set up combinations of tax business posting groups and tax product posting groups by specifying a tax percent, a tax calculation type, and account numbers for posting of tax related to sales and purchases.;
+                                 ESM=Configure combinaciones de grupos contables de negocio de IVA y grupos contables de producto de IVA. Para ello, especifique un porcentaje de IVA, un tipo de c lculo del IVA y los n£meros de cuenta para los registros del IVA relacionados a las ventas y las compras.;
+                                 FRC=Param‚trez des combinaisons de groupes de report march‚ TVA et de report produit TVA en sp‚cifiant un pourcentage TVA, un mode de calcul TVA et des num‚ros de compte en vue de reporter la TVA associ‚e aux ventes et aux achats.;
+                                 ENC=Set up combinations of tax business posting groups and tax product posting groups by specifying a tax percent, a tax calculation type, and account numbers for posting of tax related to sales and purchases.];
+                      RunObject=Page 472;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=VATPostingSetup;
+                      PromotedCategory=Category6 }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Business Posting Groups;
+                                 ESM=Grupos registro IVA negocio;
+                                 FRC=ParamŠtres report march‚ taxe;
+                                 ENC=Tax Business Posting Groups];
+                      ToolTipML=[ENU=Set up the trade-type posting groups that you assign to customer and vendor cards to link tax amounts with the appropriate general ledger account.;
+                                 ESM=Configure los grupos contables de tipo de comercio que asignar  a las fichas de cliente y proveedor para vincular los importes de IVA con la cuenta contable adecuada.;
+                                 FRC=Param‚trez les groupes de report de type commercial que vous affectez aux fiches client et fournisseur afin de lier les montants de TVA au compte g‚n‚ral appropri‚.;
+                                 ENC=Set up the trade-type posting groups that you assign to customer and vendor cards to link tax amounts with the appropriate general ledger account.];
+                      RunObject=Page 470;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=VATPostingSetup;
+                      PromotedCategory=Category6 }
+      { 21      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Product Posting Groups;
+                                 ESM=Grupos registro IVA producto;
+                                 FRC=ParamŠtres report produit taxe;
+                                 ENC=Tax Product Posting Groups];
+                      ToolTipML=[ENU=Set up the item-type posting groups that you assign to customer and vendor cards to link tax amounts with the appropriate general ledger account.;
+                                 ESM=Configure los grupos contables de tipo de producto que asignar  a las fichas de cliente y proveedor para vincular los importes de IVA con la cuenta contable adecuada.;
+                                 FRC=Param‚trez les groupes de report de type article que vous affectez aux fiches client et fournisseur afin de lier les montants de TVA au compte GL appropri‚.;
+                                 ENC=Set up the item-type posting groups that you assign to customer and vendor cards to link tax amounts with the appropriate general ledger account.];
+                      RunObject=Page 471;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=VATPostingSetup;
+                      PromotedCategory=Category6 }
+      { 22      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Report Setup;
+                                 ESM=Configuraci¢n informe IVA;
+                                 FRC=Configuration ‚tat TVA;
+                                 ENC=Tax Report Setup];
+                      ToolTipML=[ENU=Setup number series and options for the report that you periodically send to the authorities to declare your tax.;
+                                 ESM=Configure n£meros de serie y opciones para el informe que env¡a peri¢dicamente a las autoridades para la declaraci¢n de IVA.;
+                                 FRC=Cr‚ez une s‚rie de num‚ros et des options pour le rapport que vous envoyez r‚guliŠrement aux autorit‚s pour d‚clarer votre TVA.;
+                                 ENC=Setup number series and options for the report that you periodically send to the authorities to declare your tax.];
+                      RunObject=Page 743;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=VATPostingSetup;
+                      PromotedCategory=Category6 }
+      { 23      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Bank Posting;
+                                 ESM=Registro de banco;
+                                 FRC=Report bancaire;
+                                 ENC=Bank Posting] }
+      { 24      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Account Posting Groups;
+                                 ESM=Grupos contables bancos;
+                                 FRC=ParamŠtres report compte bancaire;
+                                 ENC=Bank Account Posting Groups];
+                      ToolTipML=[ENU=Set up posting groups that you assign to your bank accounts, so that payments in and out of the bank account are posted to the general ledger account that is linked to the bank posting group.;
+                                 ESM=Configure los grupos contables que asigna a sus bancos de modo que los pagos que entran y salen de la cuenta bancaria se registren en la cuenta contable vinculada al grupo contable de banco.;
+                                 FRC=Param‚trez des groupes de report que vous affectez … vos comptes bancaires, de sorte … reporter les rŠglements entrants et sortants du compte bancaire sur le compte GL qui est li‚ au groupe de report banque.;
+                                 ENC=Set up posting groups that you assign to your bank accounts, so that payments in and out of the bank account are posted to the general ledger account that is linked to the bank posting group.];
+                      RunObject=Page 373;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=BankAccount;
+                      PromotedCategory=Category7 }
+      { 25      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Journal Templates;
+                                 ESM=Libros diario;
+                                 FRC=ModŠles de journal;
+                                 ENC=Journal Templates] }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=General Journal Templates;
+                                 ESM=Libros diario general;
+                                 FRC=ModŠles journaux g‚n‚raux;
+                                 ENC=General Journal Templates];
+                      ToolTipML=[ENU=Set up balancing accounts, number series, and reason codes in the journals that you use for bookkeeping tasks, such as cash receipt and payment. By using different templates you can design windows with different layouts and you can assign trace codes, number series, and reports to each template.;
+                                 ESM=Configure cuentas de contrapartida, n£meros de serie y c¢digos de motivo en los diarios que usa para las tareas de contabilidad, tales como recepci¢n de efectivo y pagos. A trav‚s de distintos libros, se pueden dise¤ar ventanas con distintos contenidos y asignar c¢digos de seguimiento, n£meros de serie e informes a cada libro.;
+                                 FRC=Param‚trez des comptes de contrepartie, des s‚ries de num‚ros et des codes motif dans les journaux que vous utilisez pour les tƒches de comptabilit‚, par exemple le rŠglement et le paiement. En utilisant diff‚rents modŠles, vous pouvez cr‚er des fenˆtres d'aspects diff‚rents et vous pouvez affecter des codes trace, des s‚ries de num‚ros et des rapports … chaque modŠle.;
+                                 ENC=Set up balancing accounts, number series, and reason codes in the journals that you use for bookkeeping tasks, such as cash receipt and payment. By using different templates you can design windows with different layouts and you can assign trace codes, number series, and reports to each template.];
+                      RunObject=Page 101;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=JournalSetup;
+                      PromotedCategory=Category8 }
+      { 27      ;2   ;Action    ;
+                      CaptionML=[ENU=Tax Statement Templates;
+                                 ESM=Libros declaraci¢n IVA;
+                                 FRC=ModŠles de relev‚ fiscal;
+                                 ENC=Tax Statement Templates];
+                      ToolTipML=[ENU=Set up the reports that you use to settle tax and report to the customs and tax authorities.;
+                                 ESM=Configure informes que usa para liquidar el IVA y realizar las declaraciones a las autoridades fiscales y aduaneras.;
+                                 FRC=Param‚trez les rapports que vous utilisez pour r‚gler la TVA et effectuer les d‚clarations auprŠs des administrations douaniŠres et fiscales.;
+                                 ENC=Set up the reports that you use to settle tax and report to the customs and tax authorities.];
+                      RunObject=Page 318;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=VATStatement;
+                      PromotedCategory=Category8 }
+      { 38      ;2   ;Action    ;
+                      CaptionML=[ENU=Intrastat Templates;
+                                 ESM=Diarios Intrastat;
+                                 FRC=ModŠles Intrastat;
+                                 ENC=Intrastat Templates];
+                      ToolTipML=[ENU=Define how you want to set up and keep track of journals to report Intrastat figures. By using different templates you can design windows with different layouts and you can assign trace codes, number series, and reports to each template.;
+                                 ESM=Defina c¢mo desea configurar los diarios para notificar las cifras Intrastat y realizar el seguimiento de estos. Mediante distintos libros, se pueden dise¤ar ventanas con distintos contenidos y asignar c¢digos de seguimiento, n£meros de serie e informes a cada libro.;
+                                 FRC=D‚finissez la maniŠre dont vous souhaitez param‚trer et suivre les journaux afin de signaler les chiffres Intrastat. En utilisant diff‚rents modŠles, vous pouvez cr‚er des fenˆtres d'aspects diff‚rents et vous pouvez affecter des codes trace, des s‚ries de num‚ros et des rapports … chaque modŠle.;
+                                 ENC=Define how you want to set up and keep track of journals to report Intrastat figures. By using different templates you can design windows with different layouts and you can assign trace codes, number series, and reports to each template.];
+                      RunObject=Page 325;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Template;
+                      PromotedCategory=Category8 }
+      { 28      ;0   ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 29      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Funci&ones;
+                                 FRC=Fonction&s;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 30      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Change Global Dimensions;
+                                 ESM=Cambiar dimen. globales;
+                                 FRC=Modifier dimensions principales;
+                                 ENC=Change Global Dimensions];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ChangeDimensions;
+                      PromotedCategory=Category4;
+                      OnAction=BEGIN
+                                 REPORT.RUNMODAL(REPORT::"Change Global Dimensions");
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 101 ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Setup Fields;
+                           ESM=Configurar campos;
+                           FRC=Champs de configuration;
+                           ENC=Setup Fields];
+                GroupType=Group }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the earliest date on which posting to the company is allowed.;
+                           ESM=Especifica la fecha m s pr¢xima en que se podr n efectuar operaciones de registro para la empresa.;
+                           FRC=Sp‚cifie la date la plus proche … laquelle la validation dans la soci‚t‚ est autoris‚e.;
+                           ENC=Specifies the earliest date on which posting to the company is allowed.];
+                SourceExpr="Allow Posting From" }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the last date on which posting to the company is allowed.;
+                           ESM=Especifica la £ltima fecha en que se podr n efectuar operaciones de registro para la empresa.;
+                           FRC=Sp‚cifie la derniŠre date … laquelle la validation dans la soci‚t‚ est autoris‚e.;
+                           ENC=Specifies the last date on which posting to the company is allowed.];
+                SourceExpr="Allow Posting To" }
+
+    { 67  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the format in which addresses must appear on printouts. If an address includes a country/region code, the format defined for that country/region code will overrule the format that is defined here.;
+                           ESM=Especifica aqu¡ el formato en que deben aparecer impresas las direcciones. Si una direcci¢n incluye un c¢digo de pa¡s o regi¢n, el formato definido para dicho c¢digo de pa¡s o regi¢n anular  el formato que aqu¡ se defina.;
+                           FRC=Sp‚cifie le format des adresses sur les documents imprim‚s. Si une adresse comprend un code pays/r‚gion, le format d‚fini pour ce code pays/r‚gion est prioritaire sur celui d‚fini ici.;
+                           ENC=Specifies the format in which addresses must appear on printouts. If an address includes a country/region code, the format defined for that country/region code will overrule the format that is defined here.];
+                SourceExpr="Local Address Format" }
+
+    { 77  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the size of the interval to be used when rounding amounts in your local currency. You can also specify invoice rounding for each currency in the Currency table.;
+                           ESM=Especifica el tama¤o del intervalo que se utilizar  para redondear importes en la divisa nacional de la empresa. Tambi‚n puede especificar el redondeo de factura en cada divisa en la tabla Divisa.;
+                           FRC=Sp‚cifie l'intervalle … utiliser pour arrondir les montants en devise soci‚t‚. Vous pouvez pr‚ciser l'arrondi facture pour chaque devise dans votre table Devise.;
+                           ENC=Specifies the size of the interval to be used when rounding amounts in your local currency. You can also specify invoice rounding for each currency in the Currency table.];
+                SourceExpr="Inv. Rounding Precision (LCY)" }
+
+    { 75  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies whether an invoice amount will be rounded up or down. The program uses this information together with the interval for rounding that you have specified in the Inv. Rounding Precision (LCY) field.;
+                           ESM=Especifica si desea que un importe de factura se redondee al alza o a la baja. El programa utiliza esta informaci¢n junto con el intervalo de redondeo especificado en el campo Precisi¢n redondeo fact. ($).;
+                           FRC=Sp‚cifie si le montant d'une facture est arrondi par excŠs ou par d‚faut. Le programme utilise cette information et l'intervalle d'arrondi que vous avez sp‚cifi‚ dans le champ Pr‚cis. arrondis. fact. ($).;
+                           ENC=Specifies whether an invoice amount will be rounded up or down. The program uses this information together with the interval for rounding that you have specified in the Inv. Rounding Precision ($) field.];
+                SourceExpr="Inv. Rounding Type (LCY)" }
+
+    { 18  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the currency code for LCY.;
+                           ESM=Especifica el c¢digo de la divisa que va a utilizar como $.;
+                           FRC=Indique le code de la devise soci‚t‚.;
+                           ENC=Specifies the currency code for $.];
+                SourceExpr="LCY Code" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how the program will round VAT when calculated for the local currency. To see the available options, choose the field.;
+                           ESM=Especifica c¢mo el sistema va a redondear el IVA cuando se calcule para la divisa local. Para ver las opciones disponibles, seleccione el campo.;
+                           FRC=Indique la maniŠre dont le programme arrondit la TVA de la devise soci‚t‚. Pour visualiser les options disponibles, cliquez sur le champ.;
+                           ENC=Specifies how the program will round VAT when calculated for the local currency. To see the available options, choose the field.];
+                SourceExpr="VAT Rounding Type" }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Bank Account Numbers;
+                           ESM=N£meros banco;
+                           FRC=Num‚ros de compte bancaire;
+                           ENC=Bank Account Numbers];
+                ToolTipML=[ENU=Specifies the code for the number series that will be used to assign numbers to bank accounts. To see the number series that have been set up in the No. Series window, choose the field.;
+                           ESM=Especifica el c¢digo de la serie num‚rica que se utilizar  para asignar n£meros a las cuentas bancarias. Para consultar la serie num‚rica que se ha configurado en la ventana Nos. serie, seleccione el campo.;
+                           FRC=Affiche le code de la souche de num‚ros utilis‚e pour affecter des num‚ros aux comptes bancaires. Pour visualiser les souches de num‚ros qui ont ‚t‚ d‚finies dans la fenˆtre S‚ries de nø, s‚lectionnez le champ.;
+                           ENC=Specifies the code for the number series that will be used to assign numbers to bank accounts. To see the number series that have been set up in the No. Series window, choose the field.];
+                SourceExpr="Bank Account Nos." }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the code for Global Dimension 1. You must select the Global Dimension 1 code from one of the dimension codes already set up by you in the Dimension table. You should determine which dimensions you are likely to analyze frequently and select one of these as one of the two global dimensions.;
+                           ESM=Especifica el c¢digo para la dimensi¢n global 1. Debe seleccionar el c¢digo de dimensi¢n global 1 de uno de los c¢digos de dimensi¢n que ya haya definido en la tabla Dimensi¢n. Debe determinar qu‚ dimensiones desear¡a analizar con frecuencia y seleccionar una de ellas como una de las dos dimensiones globales.;
+                           FRC=Sp‚cifie le code Axe principalÿ1. Vous devez s‚lectionner le code Axe principalÿ1 … partir d'un des codes axe d‚j… param‚tr‚s dans la table Dimension. Vous devez d‚terminer les axes qui sont fr‚quemment analys‚s et en s‚lectionner un pour qu'il fasse partie des deux axes principaux.;
+                           ENC=Specifies the code for Global Dimension 1. You must select the Global Dimension 1 code from one of the dimension codes already set up by you in the Dimension table. You should determine which dimensions you are likely to analyse frequently and select one of these as one of the two global dimensions.];
+                SourceExpr="Global Dimension 1 Code" }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the code for Global Dimension 2. You must select the Global Dimension 2 code from one of the dimension codes already set up by you in the Dimension table. You should determine which dimensions you are likely to analyze frequently and select one of these as one of the two global dimensions.;
+                           ESM=Especifica el c¢digo para la dimensi¢n global 2. Debe seleccionar el c¢digo de dimensi¢n global 2 de uno de los c¢digos de dimensi¢n que ya haya definido en la tabla Dimensi¢n. Debe determinar qu‚ dimensiones desear¡a analizar con frecuencia y seleccionar una de ellas como una de las dos dimensiones globales.;
+                           FRC=Sp‚cifie le code Axe principalÿ2. Vous devez s‚lectionner le code Axe principalÿ2 … partir d'un des codes axe d‚j… param‚tr‚s dans la table Dimension. Vous devez d‚terminer les axes qui sont fr‚quemment analys‚s et en s‚lectionner un pour qu'il fasse partie des deux axes principaux.;
+                           ENC=Specifies the code for Global Dimension 2. You must select the Global Dimension 2 code from one of the dimension codes already set up by you in the Dimension table. You should determine which dimensions you are likely to analyse frequently and select one of these as one of the two global dimensions.];
+                SourceExpr="Global Dimension 2 Code" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,211 @@
+OBJECT Codeunit 415 Release Purchase Document
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701,NAVNA7.10.00.35701;
+  }
+  PROPERTIES
+  {
+    TableNo=38;
+    OnRun=VAR
+            PurchLine@1000 : Record 39;
+            TempVATAmountLine0@1001 : TEMPORARY Record 290;
+            TempVATAmountLine1@1002 : TEMPORARY Record 290;
+            NotOnlyDropShipment@1003 : Boolean;
+            PostingDate@1004 : Date;
+            PrintPostedDocuments@1005 : Boolean;
+          BEGIN
+            IF Status = Status::Released THEN
+              EXIT;
+
+            TESTFIELD("Buy-from Vendor No.");
+
+            PurchLine.SETRANGE("Document Type","Document Type");
+            PurchLine.SETRANGE("Document No.","No.");
+            PurchLine.SETFILTER(Type,'>0');
+            PurchLine.SETFILTER(Quantity,'<>0');
+            IF NOT PurchLine.FIND('-') THEN
+              ERROR(Text001,"Document Type","No.");
+            InvtSetup.GET;
+            IF InvtSetup."Location Mandatory" THEN BEGIN
+              PurchLine.SETRANGE(Type,PurchLine.Type::Item);
+              IF PurchLine.FIND('-') THEN
+                REPEAT
+                  IF NOT PurchLine.IsServiceItem THEN
+                    PurchLine.TESTFIELD("Location Code");
+                UNTIL PurchLine.NEXT = 0;
+              PurchLine.SETFILTER(Type,'>0');
+            END;
+            PurchLine.SETRANGE("Drop Shipment",FALSE);
+            NotOnlyDropShipment := PurchLine.FIND('-');
+            PurchLine.RESET;
+
+            PurchSetup.GET;
+            IF PurchSetup."Calc. Inv. Discount" THEN BEGIN
+              PostingDate := "Posting Date";
+              PrintPostedDocuments := "Print Posted Documents";
+              CODEUNIT.RUN(CODEUNIT::"Purch.-Calc.Discount",PurchLine);
+              GET("Document Type","No.");
+              "Print Posted Documents" := PrintPostedDocuments;
+              IF PostingDate <> "Posting Date" THEN
+                VALIDATE("Posting Date",PostingDate);
+            END;
+
+            IF TestPrepayment(Rec) AND ("Document Type" = "Document Type"::Order) THEN BEGIN
+              Status := Status::"Pending Prepayment";
+              MODIFY(TRUE);
+              EXIT;
+            END
+              ;
+            Status := Status::Released;
+
+            PurchLine.SetPurchHeader(Rec);
+            IF "Tax Area Code" = '' THEN BEGIN  // VAT
+              PurchLine.CalcVATAmountLines(0,Rec,PurchLine,TempVATAmountLine0);
+              PurchLine.CalcVATAmountLines(1,Rec,PurchLine,TempVATAmountLine1);
+              PurchLine.UpdateVATOnLines(0,Rec,PurchLine,TempVATAmountLine0);
+              PurchLine.UpdateVATOnLines(1,Rec,PurchLine,TempVATAmountLine1);
+            END ELSE
+              PurchLine.CalcSalesTaxLines(Rec,PurchLine);
+
+            MODIFY(TRUE);
+
+            IF NotOnlyDropShipment THEN
+              IF "Document Type" IN ["Document Type"::Order,"Document Type"::"Return Order"] THEN
+                WhsePurchRelease.Release(Rec);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Text001@1010 : TextConst 'ENU=There is nothing to release for the document of type %1 with the number %2.;ESM=No hay nada que liberar para el documento de tipo %1 con el n£mero %2.;FRC=Il n''y a rien … lib‚rer pour le document de type %1 portant le num‚ro %2.;ENC=There is nothing to release for the document of type %1 with the number %2.';
+      PurchSetup@1002 : Record 312;
+      InvtSetup@1000 : Record 313;
+      WhsePurchRelease@1004 : Codeunit 5772;
+      Text002@1005 : TextConst 'ENU=This document can only be released when the approval process is complete.;ESM=Este documento s¢lo se puede lanzar una vez completado el proceso de aprobaci¢n.;FRC=Ce document ne peut ˆtre lanc‚ qu''… la fin du processus d''approbation.;ENC=This document can only be released when the approval process is complete.';
+      Text003@1006 : TextConst 'ENU=The approval process must be canceled or completed to reopen this document.;ESM=El proceso de aprobaci¢n se debe cancelar o completar para volver a abrir este documento.;FRC=On doit annuler ou terminer le processus d''approbation avant de rouvrir ce document.;ENC=The approval process must be cancelled or completed to reopen this document.';
+      Text004@1003 : TextConst 'ENU=There are unposted prepayment amounts on the document of type %1 with the number %2.;ESM=Hay importes anticipo sin registrar en el documento de tipo %1 con el n£mero %2.;FRC=Il existe des montants paiement anticip‚ non valid‚s sur le document de type %1 portant le num‚ro %2.;ENC=There are unposted prepayment amounts on the document of type %1 with the number %2.';
+      Text005@1001 : TextConst 'ENU=There are unpaid prepayment invoices that are related to the document of type %1 with the number %2.;ESM=Hay facturas anticipo sin pagar relacionadas con el documento de tipo %1 con el n£mero %2.;FRC=Il existe des factures de paiement anticip‚ impay‚es li‚es au document de type %1 portant le num‚ro %2.;ENC=There are unpaid prepayment invoices that are related to the document of type %1 with the number %2.';
+
+    PROCEDURE Reopen@1(VAR PurchHeader@1000 : Record 38);
+    BEGIN
+      WITH PurchHeader DO BEGIN
+        IF Status = Status::Open THEN
+          EXIT;
+        IF "Document Type" IN ["Document Type"::Order,"Document Type"::"Return Order"] THEN
+          WhsePurchRelease.Reopen(PurchHeader);
+        Status := Status::Open;
+
+        ZeroAmountInLines;
+        MODIFY(TRUE);
+      END;
+    END;
+
+    PROCEDURE PerformManualRelease@2(VAR PurchHeader@1002 : Record 38);
+    VAR
+      ApprovalEntry@1004 : Record 454;
+      ApprovalManagement@1001 : Codeunit 439;
+      ApprovedOnly@1005 : Boolean;
+    BEGIN
+      WITH PurchHeader DO BEGIN
+        IF ApprovalManagement.TestPurchasePrepayment(PurchHeader) THEN
+          ERROR(STRSUBSTNO(Text004,"Document Type","No."));
+        IF ("Document Type" = "Document Type"::Order) AND ApprovalManagement.TestPurchasePayment(PurchHeader) THEN BEGIN
+          IF Status <> Status::"Pending Prepayment" THEN BEGIN
+            Status := Status::"Pending Prepayment";
+            MODIFY;
+            COMMIT;
+          END;
+          ERROR(STRSUBSTNO(Text005,"Document Type","No."));
+        END;
+
+        IF ApprovalManagement.CheckApprPurchaseDocument(PurchHeader) THEN BEGIN
+          CASE Status OF
+            Status::"Pending Approval":
+              ERROR(Text002);
+            Status::Released,Status::"Pending Prepayment":
+              CODEUNIT.RUN(CODEUNIT::"Release Purchase Document",PurchHeader);
+            Status::Open:
+              BEGIN
+                ApprovedOnly := TRUE;
+                ApprovalEntry.SETCURRENTKEY("Table ID","Document Type","Document No.","Sequence No.");
+                ApprovalEntry.SETRANGE("Table ID",DATABASE::"Purchase Header");
+                ApprovalEntry.SETRANGE("Document Type","Document Type");
+                ApprovalEntry.SETRANGE("Document No.","No.");
+                ApprovalEntry.SETFILTER(Status,'<>%1&<>%2',ApprovalEntry.Status::Rejected,ApprovalEntry.Status::Canceled);
+                IF ApprovalEntry.FINDSET THEN BEGIN
+                  REPEAT
+                    IF ApprovalEntry.Status <> ApprovalEntry.Status::Approved THEN
+                      ApprovedOnly := FALSE;
+                  UNTIL NOT ApprovedOnly OR (ApprovalEntry.NEXT = 0);
+
+                  IF ApprovedOnly AND TestApprovalLimit(PurchHeader) THEN
+                    CODEUNIT.RUN(CODEUNIT::"Release Purchase Document",PurchHeader)
+                  ELSE
+                    ERROR(Text002);
+                END ELSE
+                  ERROR(Text002);
+              END;
+          END;
+        END ELSE
+          CODEUNIT.RUN(CODEUNIT::"Release Purchase Document",PurchHeader);
+      END;
+    END;
+
+    PROCEDURE PerformManualReopen@3(VAR PurchHeader@1002 : Record 38);
+    VAR
+      ApprovalManagement@1001 : Codeunit 439;
+    BEGIN
+      WITH PurchHeader DO BEGIN
+        IF ApprovalManagement.CheckApprPurchaseDocument(PurchHeader) THEN BEGIN
+          CASE Status OF
+            Status::"Pending Approval":
+              ERROR(Text003);
+            Status::Open,Status::Released,Status::"Pending Prepayment":
+              Reopen(PurchHeader);
+          END;
+        END ELSE
+          Reopen(PurchHeader);
+      END;
+    END;
+
+    PROCEDURE TestPrepayment@31(PurchaseHeader@1000 : Record 38) : Boolean;
+    VAR
+      PurchaseLines@1001 : Record 39;
+    BEGIN
+      PurchaseLines.SETRANGE("Document Type",PurchaseHeader."Document Type");
+      PurchaseLines.SETRANGE("Document No.",PurchaseHeader."No.");
+      PurchaseLines.SETFILTER("Prepmt. Line Amount",'<>%1',0);
+      IF PurchaseLines.FIND('-') THEN
+        REPEAT
+          IF PurchaseLines."Prepmt. Amt. Inv." <> PurchaseLines."Prepmt. Line Amount" THEN
+            EXIT(TRUE);
+        UNTIL PurchaseLines.NEXT = 0;
+    END;
+
+    PROCEDURE TestApprovalLimit@4(PurchaseHeader@1000 : Record 38) : Boolean;
+    VAR
+      UserSetup@1004 : Record 91;
+      AppManagement@1001 : Codeunit 439;
+      AppAmount@1002 : Decimal;
+      AppAmountLCY@1003 : Decimal;
+    BEGIN
+      AppManagement.CalcPurchaseDocAmount(PurchaseHeader,AppAmount,AppAmountLCY);
+      UserSetup.GET(USERID);
+      IF UserSetup."Unlimited Purchase Approval" THEN
+        EXIT(TRUE);
+
+      IF AppAmountLCY > UserSetup."Purchase Amount Approval Limit" THEN
+        ERROR(Text002);
+
+      EXIT(TRUE);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,308 @@
+OBJECT Page 8625 Config. Package Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36040;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Tables;
+               ESM=Tablas;
+               FRC=Tables;
+               ENC=Tables];
+    SourceTable=Table8613;
+    DelayedInsert=Yes;
+    PageType=ListPart;
+    OnOpenPage=BEGIN
+                 SETFILTER("Company Filter (Source Table)",'%1',COMPANYNAME);
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       NoOfErrorsStyleTxt := SetFieldStyle(FIELDNO("No. of Package Errors"));
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 23      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Table;
+                                 ESM=Tabla;
+                                 FRC=Table;
+                                 ENC=Table] }
+      { 32      ;2   ;Action    ;
+                      Name=PackageRecords;
+                      CaptionML=[ENU=Package Data;
+                                 ESM=Datos de paquete;
+                                 FRC=Donn‚es package;
+                                 ENC=Package Data];
+                      Image=Grid;
+                      OnAction=BEGIN
+                                 ShowPackageRecords(Show::Records,"Dimensions as Columns");
+                               END;
+                                }
+      { 30      ;2   ;Action    ;
+                      Name=DatabaseRecords;
+                      CaptionML=[ENU=Database Data;
+                                 ESM=Datos de base de datos;
+                                 FRC=Donn‚es base de donn‚es;
+                                 ENC=Database Data];
+                      Image=Database;
+                      OnAction=BEGIN
+                                 ShowDatabaseRecords;
+                               END;
+                                }
+      { 29      ;2   ;Action    ;
+                      Name=PackageErrors;
+                      CaptionML=[ENU=Errors;
+                                 ESM=Errores;
+                                 FRC=Erreurs;
+                                 ENC=Errors];
+                      Image=ErrorLog;
+                      OnAction=BEGIN
+                                 ShowPackageRecords(Show::Errors,"Dimensions as Columns");
+                               END;
+                                }
+      { 24      ;2   ;Action    ;
+                      Name=PackageFields;
+                      CaptionML=[ENU=Fields;
+                                 ESM=Campos;
+                                 FRC=Champs;
+                                 ENC=Fields];
+                      Image=CheckList;
+                      OnAction=BEGIN
+                                 ShowPackageFields;
+                               END;
+                                }
+      { 7       ;2   ;Action    ;
+                      Name=PackageFilters;
+                      CaptionML=[ENU=Filters;
+                                 ESM=Filtros;
+                                 FRC=Filtres;
+                                 ENC=Filters];
+                      Image=Filter;
+                      OnAction=BEGIN
+                                 ShowFilters;
+                               END;
+                                }
+      { 26      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Funci&ones;
+                                 FRC=Fonction&s;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 34      ;2   ;Action    ;
+                      Name=GetRelatedTables;
+                      CaptionML=[ENU=Get Related Tables;
+                                 ESM=Obtener tablas relacionadas;
+                                 FRC=Extraire tables associ‚es;
+                                 ENC=Get Related Tables];
+                      Image=GetLines;
+                      OnAction=VAR
+                                 ConfigPackageTable@1000 : Record 8613;
+                                 ConfigPackageMgt@1004 : Codeunit 8611;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(ConfigPackageTable);
+                                 ConfigPackageMgt.GetRelatedTables(ConfigPackageTable);
+                               END;
+                                }
+      { 9       ;2   ;Action    ;
+                      Name=ValidateRelations;
+                      CaptionML=[ENU=Validate Relations;
+                                 ESM=Validar relaciones;
+                                 FRC=Valider relations;
+                                 ENC=Validate Relations];
+                      Image=CheckRulesSyntax;
+                      OnAction=VAR
+                                 TempConfigPackageTable@1001 : TEMPORARY Record 8613;
+                                 ConfigPackageMgt@1002 : Codeunit 8611;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(ConfigPackageTable);
+                                 IF CONFIRM(Text005,TRUE,ConfigPackageTable.COUNT) THEN
+                                   ConfigPackageMgt.ValidatePackageRelations(ConfigPackageTable,TempConfigPackageTable,TRUE);
+                               END;
+                                }
+      { 8       ;2   ;Action    ;
+                      Name=ApplyData;
+                      CaptionML=[ENU=Apply Data;
+                                 ESM=Aplicar datos;
+                                 FRC=Appliquer donn‚es;
+                                 ENC=Apply Data];
+                      Image=Apply;
+                      OnAction=VAR
+                                 ConfigPackage@1000 : Record 8623;
+                                 ConfigPackageMgt@1001 : Codeunit 8611;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(ConfigPackageTable);
+                                 IF CONFIRM(Text005,TRUE,ConfigPackageTable.COUNT) THEN BEGIN
+                                   ConfigPackage.GET("Package Code");
+                                   ConfigPackageMgt.ApplyPackage(ConfigPackage,ConfigPackageTable,TRUE);
+                                 END;
+                               END;
+                                }
+      { 19      ;1   ;ActionGroup;
+                      CaptionML=[ENU=E&xcel;
+                                 ESM=E&xcel;
+                                 FRC=E&xcel;
+                                 ENC=E&xcel] }
+      { 21      ;2   ;Action    ;
+                      Name=ExportToExcel;
+                      CaptionML=[ENU=Export to Excel;
+                                 ESM=Exportar a Excel;
+                                 FRC=Exporter dans Excel;
+                                 ENC=Export to Excel];
+                      Image=ExportToExcel;
+                      OnAction=VAR
+                                 ConfigExcelExchange@1001 : Codeunit 8618;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(ConfigPackageTable);
+                                 IF CONFIRM(Text005,TRUE,ConfigPackageTable.COUNT) THEN
+                                   ConfigExcelExchange.ExportExcelFromTables(ConfigPackageTable);
+                               END;
+                                }
+      { 20      ;2   ;Action    ;
+                      Name=ImportFromExcel;
+                      CaptionML=[ENU=Import from Excel;
+                                 ESM=Importar desde Excel;
+                                 FRC=Importer d'Excel;
+                                 ENC=Import from Excel];
+                      Image=ImportExcel;
+                      OnAction=VAR
+                                 ConfigExcelExchange@1000 : Codeunit 8618;
+                               BEGIN
+                                 ConfigExcelExchange.ImportExcelFromPackage;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Table ID";
+                StyleExpr=NoOfErrorsStyleTxt;
+                OnValidate=BEGIN
+                             CALCFIELDS("Table Name");
+                           END;
+                            }
+
+    { 4   ;2   ;Field     ;
+                DrillDown=No;
+                SourceExpr="Table Name";
+                StyleExpr=NoOfErrorsStyleTxt }
+
+    { 13  ;2   ;Field     ;
+                DrillDown=No;
+                SourceExpr="Table Caption";
+                Visible=FALSE }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Data Template";
+                OnLookup=VAR
+                           ConfigTemplateHeader@1001 : Record 8618;
+                         BEGIN
+                           ConfigTemplateHeader.SETRANGE("Table ID","Table ID");
+                           IF PAGE.RUNMODAL(PAGE::"Config. Template List",ConfigTemplateHeader,ConfigTemplateHeader.Code) = ACTION::LookupOK THEN
+                             "Data Template" := ConfigTemplateHeader.Code;
+                         END;
+                          }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Processing Order";
+                Visible=FALSE }
+
+    { 17  ;2   ;Field     ;
+                SourceExpr="Skip Table Triggers" }
+
+    { 6   ;2   ;Field     ;
+                DrillDown=Yes;
+                SourceExpr="No. of Package Records";
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              ShowPackageRecords(Show::All,"Dimensions as Columns");
+                              CurrPage.UPDATE;
+                            END;
+                             }
+
+    { 11  ;2   ;Field     ;
+                DrillDown=Yes;
+                SourceExpr="No. of Fields Available";
+                DrillDownPageID=Config. Package Fields }
+
+    { 15  ;2   ;Field     ;
+                DrillDown=Yes;
+                SourceExpr="No. of Fields Included";
+                DrillDownPageID=Config. Package Fields }
+
+    { 25  ;2   ;Field     ;
+                DrillDown=Yes;
+                SourceExpr="No. of Fields to Validate";
+                DrillDownPageID=Config. Package Fields }
+
+    { 31  ;2   ;Field     ;
+                DrillDown=Yes;
+                SourceExpr="No. of Package Errors";
+                Editable=FALSE;
+                StyleExpr=NoOfErrorsStyleTxt;
+                OnDrillDown=BEGIN
+                              ShowPackageRecords(Show::Errors,"Dimensions as Columns");
+                              CurrPage.UPDATE;
+                            END;
+                             }
+
+    { 10  ;2   ;Field     ;
+                Name=NoOfDatabaseRecords;
+                DrillDown=Yes;
+                CaptionML=[ENU=No. of Database Records;
+                           ESM=No. of Database Records;
+                           FRC=No. of Database Records;
+                           ENC=No. of Database Records];
+                SourceExpr=GetNoOfDatabaseRecords;
+                OnDrillDown=BEGIN
+                              ShowDatabaseRecords;
+                            END;
+                             }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr=Filtered }
+
+    { 39  ;2   ;Field     ;
+                SourceExpr="Page ID" }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr=Comments }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Created Date and Time" }
+
+    { 27  ;2   ;Field     ;
+                SourceExpr="Created by User ID" }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Imported Date and Time";
+                Editable=FALSE }
+
+    { 33  ;2   ;Field     ;
+                SourceExpr="Imported by User ID" }
+
+  }
+  CODE
+  {
+    VAR
+      Text005@1003 : TextConst 'ENU=%1 tables have been selected. Do you want to continue?;ESM=%1 tabla(s) seleccionada(s). ¨Desea continuar?;FRC=%1 tables ont ‚t‚ s‚lectionn‚es. Voulez-vous continuerÿ?;ENC=%1 tables have been selected. Do you want to continue?';
+      ConfigPackageTable@1005 : Record 8613;
+      Show@1000 : 'Records,Errors,All';
+      NoOfErrorsStyleTxt@1001 : Text INDATASET;
+
+    BEGIN
+    END.
+  }
+}
+

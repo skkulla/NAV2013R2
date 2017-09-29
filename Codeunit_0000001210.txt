@@ -1,0 +1,850 @@
+OBJECT Codeunit 1210 Payment Export Mgt
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    TableNo=81;
+    Permissions=TableData 21=rm,
+                TableData 25=rm,
+                TableData 81=rm;
+    OnRun=BEGIN
+            ExportJournalPaymentFile(Rec);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      ExportAgainQst@1002 : TextConst 'ENU=One or more of the selected lines has already been exported. Do you want to export it again?;ESM=Una o m s de las l¡neas seleccionadas ya se han exportado. ¨Desea repetir la exportaci¢n?;FRC=Une ou plusieurs des lignes s‚lectionn‚es ont d‚j… ‚t‚ export‚es. Souhaitez-vous les exporter … nouveauÿ?;ENC=One or more of the selected lines has already been exported. Do you want to export it again?';
+      ProgressMsg@1001 : TextConst 'ENU=Processing line no. #1######.;ESM=Procesando la l¡nea n.§ #1######.;FRC=Traitement de la ligne nø #1######.;ENC=Processing line no. #1######.';
+      ServerFileExtension@1005 : Text[3];
+      ServerFileName@1004 : Text;
+      SilentServerMode@1003 : Boolean;
+      IncorrectLengthOfValuesErr@1000 : TextConst '@@@="%1=Post Exch.Def Type;%2=Post Exch. Def Code;%3=Field;%4=Expected length;%5=Actual length;%6=Actual Value";ENU=The payment that you are trying to export is different from the specified %1, %2.\\The value in the %3 field does not have the length that is required by the export format. \Expected: %4 \Actual: %5 \Field Value: %6.;ESM=El pago que est  intentando exportar es distinto del especificado %1, %2.\\El valor del campo %3 no tiene la longitud necesaria para el formato de exportaci¢n. \Esperado: %4 \Real: %5 \Valor del campo: %6.;FRC=Le paiement que vous tentez d''exporter est diff‚rent du %1 sp‚cifi‚, %2.\\La valeur du champ %3 ne pr‚sente pas la longueur requise par le format d''exportation. \Attenduÿ: %4 \R‚elÿ: %5 \Valeur du champÿ: %6.;ENC=The payment that you are trying to export is different from the specified %1, %2.\\The value in the %3 field does not have the length that is required by the export format. \Expected: %4 \Actual: %5 \Field Value: %6.';
+      FormatNotDefinedErr@1006 : TextConst '@@@="%1 = Post. Exch. Def. Code";ENU=You must choose a valid export format for the bank account. Format %1 is not correctly defined.;ESM=Debe elegir un formato de exportaci¢n v lido para el banco. El formato %1 no se ha definido correctamente.;FRC=Vous devez choisir un format d''exportation valide pour le compte bancaire. Le format %1 n''est pas d‚fini correctement.;ENC=You must choose a valid export format for the bank account. Format %1 is not correctly defined.';
+      PostExchLineDefNotFoundErr@1007 : TextConst '@@@="%1=Post. Exch. Def. Name;%2=Post. Exch. Line Def. Code";ENU=The %1 export format does not support the Payment Type %2.;ESM=El formato de exportaci¢n %1 no admite el tipo de pago %2.;FRC=Le format d''exportation %1 ne prend pas en charge le mode de paiement %2.;ENC=The %1 export format does not support the Payment Type %2.';
+
+    LOCAL PROCEDURE CreateCustLedgerPostingExchLine@20(PostingExchEntryNo@1000 : Integer;CustLedgerEntry@1001 : Record 21;LineNo@1002 : Integer);
+    VAR
+      PaymentExportData@1003 : Record 1226;
+      RecipientBankAccountNo@1004 : Text[50];
+    BEGIN
+      WITH CustLedgerEntry DO BEGIN
+        GetCustomerRecipientBankAccount("Customer No.","Recipient Bank Account",RecipientBankAccountNo);
+        PreparePaymentExportDataCLE(PaymentExportData,CustLedgerEntry,PostingExchEntryNo,RecipientBankAccountNo,LineNo);
+        CreatePaymentLines(PaymentExportData);
+      END;
+    END;
+
+    LOCAL PROCEDURE CreateGenJnlPostingExchLine@16(PostingExchEntryNo@1000 : Integer;GenJnlLine@1001 : Record 81;LineNo@1002 : Integer);
+    VAR
+      GenJournalBatch@1003 : Record 232;
+      TempPaymentExportData@1004 : TEMPORARY Record 1226;
+      RecipientBankAccountNo@1005 : Text[50];
+    BEGIN
+      WITH GenJnlLine DO BEGIN
+        GetVendorRecipientBankAccount("Account No.","Recipient Bank Account",RecipientBankAccountNo);
+        GenJournalBatch.GET("Journal Template Name","Journal Batch Name");
+        PreparePaymentExportDataJnl(TempPaymentExportData,GenJnlLine,PostingExchEntryNo,RecipientBankAccountNo,LineNo);
+        CreatePaymentLines(TempPaymentExportData);
+      END;
+    END;
+
+    LOCAL PROCEDURE CreateVendLedgerPostingExchLine@18(PostingExchEntryNo@1000 : Integer;VendorLedgerEntry@1001 : Record 25;LineNo@1002 : Integer);
+    VAR
+      PaymentExportData@1003 : Record 1226;
+      RecipientBankAccountNo@1004 : Text[50];
+    BEGIN
+      WITH VendorLedgerEntry DO BEGIN
+        GetVendorRecipientBankAccount("Vendor No.","Recipient Bank Account",RecipientBankAccountNo);
+        PreparePaymentExportDataVLE(PaymentExportData,VendorLedgerEntry,PostingExchEntryNo,RecipientBankAccountNo,LineNo);
+        CreatePaymentLines(PaymentExportData);
+      END;
+    END;
+
+    PROCEDURE CreatePaymentLines@10(VAR PaymentExportData@1000 : Record 1226);
+    VAR
+      BankAccount@1007 : Record 270;
+      PostingExch@1006 : Record 1220;
+      PaymentExportDataRecRef@1001 : RecordRef;
+    BEGIN
+      BankAccount.GET(PaymentExportData."Sender Bank Account Code");
+      PaymentExportData."Sender Bank Account No." := GetSenderBankAccount(BankAccount);
+      PaymentExportData.MODIFY;
+
+      PostingExch.GET(PaymentExportData."Posting Exch Entry No.");
+      PaymentExportDataRecRef.GETTABLE(PaymentExportData);
+      ProcessColumnMapping(PostingExch,PaymentExportDataRecRef,
+        PaymentExportData."Line No.",PaymentExportData."Posting Exch. Line Def Code");
+    END;
+
+    PROCEDURE CreatePostingExch@4(VAR PostingExch@1000 : Record 1220;BankAccountCode@1001 : Code[20]);
+    VAR
+      BankAccount@1002 : Record 270;
+      BankExportImportSetup@1003 : Record 1200;
+    BEGIN
+      BankAccount.GET(BankAccountCode);
+      BankAccount.TESTFIELD("Payment Export Format");
+      BankExportImportSetup.GET(BankAccount."Payment Export Format");
+      BankExportImportSetup.TESTFIELD("Posting Exch. Def. Code");
+      WITH PostingExch DO BEGIN
+        INIT;
+        "Posting Exch. Def Code" := BankExportImportSetup."Posting Exch. Def. Code";
+        INSERT(TRUE);
+      END;
+    END;
+
+    PROCEDURE EnableExportToServerTempFile@27(NewMode@1000 : Boolean;NewExtension@1001 : Text[3]);
+    BEGIN
+      SilentServerMode := NewMode;
+      ServerFileExtension := NewExtension;
+    END;
+
+    PROCEDURE ExportCustLedgerEntry@19(VAR CustLedgerEntry@1000 : Record 21);
+    VAR
+      CustLedgerEntry2@1004 : Record 21;
+      PostingExch@1001 : Record 1220;
+      Window@1003 : Dialog;
+      LineNo@1002 : Integer;
+    BEGIN
+      CustLedgerEntry2.COPY(CustLedgerEntry);
+      CreatePostingExch(PostingExch,CustLedgerEntry2."Bal. Account No.");
+      Window.OPEN(ProgressMsg);
+      REPEAT
+        LineNo += 1;
+        Window.UPDATE(1,LineNo);
+        CreateCustLedgerPostingExchLine(PostingExch."Entry No.",CustLedgerEntry2,LineNo);
+      UNTIL CustLedgerEntry2.NEXT = 0;
+      Window.CLOSE;
+      ExportToFile(PostingExch."Entry No.")
+    END;
+
+    PROCEDURE ExportCustPaymentFile@112(VAR CustLedgerEntry@1000 : Record 21);
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Pmt. Export Cust. Ledger Check",CustLedgerEntry);
+      ExportCustLedgerEntry(CustLedgerEntry);
+      SetExportFlagOnCustLedgerEntries(CustLedgerEntry);
+    END;
+
+    PROCEDURE ExportCustPaymentFileYN@7(VAR CustLedgerEntry@1000 : Record 21);
+    BEGIN
+      IF IsCustLedgerEntryExported(CustLedgerEntry) OR IsAppliedToCustPaymentExported(CustLedgerEntry) THEN
+        IF NOT CONFIRM(ExportAgainQst) THEN
+          EXIT;
+      ExportCustPaymentFile(CustLedgerEntry);
+    END;
+
+    PROCEDURE ExportGenJnlLine@15(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GenJnlLine2@1004 : Record 81;
+      PostingExch@1001 : Record 1220;
+      CreditTransferRegister@1005 : Record 1205;
+      CreditTransferEntry@1006 : Record 1206;
+      Window@1002 : Dialog;
+      LineNo@1003 : Integer;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.FINDSET;
+      CreatePostingExch(PostingExch,GenJnlLine2."Bal. Account No.");
+      Window.OPEN(ProgressMsg);
+      CreditTransferRegister.CreateNew('',GenJnlLine2."Bal. Account No.");
+      REPEAT
+        LineNo += 1;
+        Window.UPDATE(1,LineNo);
+        CreateGenJnlPostingExchLine(PostingExch."Entry No.",GenJnlLine2,LineNo);
+
+        CreditTransferEntry.CreateNew(
+          CreditTransferRegister."No.",LineNo,
+          GenJnlLine2."Account Type",GenJnlLine2."Account No.",
+          GenJnlLine2.GetAppliesToDocEntryNo,
+          GenJnlLine2."Posting Date",GenJnlLine2."Currency Code",GenJnlLine2.Amount,'');
+      UNTIL GenJnlLine2.NEXT = 0;
+      CreditTransferRegister.SetStatus(CreditTransferRegister.Status::"File Created");
+      Window.CLOSE;
+      ExportToFile(PostingExch."Entry No.")
+    END;
+
+    PROCEDURE ExportJournalPaymentFile@118(VAR GenJnlLine@1001 : Record 81);
+    VAR
+      PaymentJnlExportErrorText@1002 : Record 1228;
+    BEGIN
+      GenJnlLine.SETRANGE("Journal Template Name",GenJnlLine."Journal Template Name");
+      GenJnlLine.SETRANGE("Journal Batch Name",GenJnlLine."Journal Batch Name");
+      PaymentJnlExportErrorText.DeleteJnlBatchErrors(GenJnlLine);
+      CODEUNIT.RUN(CODEUNIT::"Payment Export Gen. Jnl Check",GenJnlLine);
+      ExportGenJnlLine(GenJnlLine);
+      SetExportFlagOnGenJnlLine(GenJnlLine);
+    END;
+
+    PROCEDURE ExportJournalPaymentFileYN@2(VAR GenJnlLine@1001 : Record 81);
+    BEGIN
+      GenJnlLine.SETRANGE("Journal Template Name",GenJnlLine."Journal Template Name");
+      GenJnlLine.SETRANGE("Journal Batch Name",GenJnlLine."Journal Batch Name");
+      IF IsPaymentJournallLineExported(GenJnlLine) OR IsAppliedToVendorLedgerEntryExported(GenJnlLine) THEN
+        IF NOT CONFIRM(ExportAgainQst) THEN
+          EXIT;
+      ExportJournalPaymentFile(GenJnlLine);
+    END;
+
+    PROCEDURE ExportToFile@5(EntryNo@1000 : Integer);
+    VAR
+      PostingExch@1003 : Record 1220;
+      PostingExchDef@1001 : Record 1222;
+      PostingExchField@1002 : Record 1221;
+    BEGIN
+      PostingExch.GET(EntryNo);
+      PostingExchDef.GET(PostingExch."Posting Exch. Def Code");
+      PostingExchField.SETRANGE("Posting Exch. No.",PostingExch."Entry No.");
+      PostingExchDef.TESTFIELD("Processing XMLport");
+      IF NOT SilentServerMode THEN
+        XMLPORT.RUN(PostingExchDef."Processing XMLport",FALSE,FALSE,PostingExchField)
+      ELSE
+        ExportToServerTempFile(PostingExchDef."Processing XMLport",PostingExchField);
+
+      PostingExchField.DELETEALL;
+      PostingExch.DELETE
+    END;
+
+    LOCAL PROCEDURE ExportToServerTempFile@25(XMLPortID@1006 : Integer;VAR PostingExchField@1000 : Record 1221);
+    VAR
+      FileManagement@1005 : Codeunit 419;
+      ExportFile@1003 : File;
+      OutStream@1004 : OutStream;
+    BEGIN
+      ServerFileName := FileManagement.ServerTempFileName(ServerFileExtension);
+
+      ExportFile.WRITEMODE := TRUE;
+      ExportFile.TEXTMODE := TRUE;
+      ExportFile.CREATE(ServerFileName);
+      ExportFile.CREATEOUTSTREAM(OutStream);
+      XMLPORT.EXPORT(XMLPortID,OutStream,PostingExchField);
+      ExportFile.CLOSE;
+    END;
+
+    PROCEDURE ExportVendLedgerEntry@17(VAR VendorLedgerEntry@1000 : Record 25);
+    VAR
+      VendorLedgerEntry2@1004 : Record 25;
+      PostingExch@1001 : Record 1220;
+      Window@1003 : Dialog;
+      LineNo@1002 : Integer;
+    BEGIN
+      VendorLedgerEntry2.COPY(VendorLedgerEntry);
+      CreatePostingExch(PostingExch,VendorLedgerEntry2."Bal. Account No.");
+      Window.OPEN(ProgressMsg);
+      REPEAT
+        LineNo += 1;
+        Window.UPDATE(1,LineNo);
+        CreateVendLedgerPostingExchLine(PostingExch."Entry No.",VendorLedgerEntry2,LineNo);
+      UNTIL VendorLedgerEntry2.NEXT = 0;
+      Window.CLOSE;
+      ExportToFile(PostingExch."Entry No.")
+    END;
+
+    PROCEDURE ExportVendorPaymentFile@115(VAR VendorLedgerEntry@1000 : Record 25);
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Pmt. Export Vend. Ledger Check",VendorLedgerEntry);
+      ExportVendLedgerEntry(VendorLedgerEntry);
+      SetExportFlagOnVendorLedgerEntries(VendorLedgerEntry);
+    END;
+
+    PROCEDURE ExportVendorPaymentFileYN@23(VAR VendorLedgerEntry@1000 : Record 25);
+    BEGIN
+      IF IsVendorLedgerEntryExported(VendorLedgerEntry) OR IsAppliedToVendorPaymentExported(VendorLedgerEntry) THEN
+        IF NOT CONFIRM(ExportAgainQst) THEN
+          EXIT;
+      ExportVendorPaymentFile(VendorLedgerEntry);
+    END;
+
+    PROCEDURE GetCustomerRecipientBankAccount@8(AccountNo@1001 : Code[20];CLERecipientBankAccountNo@1002 : Code[20];VAR RecipientBankAccountNo@1003 : Text[50]);
+    VAR
+      CustomerBankAccount@1000 : Record 287;
+    BEGIN
+      CustomerBankAccount.GET(AccountNo,CLERecipientBankAccountNo);
+      IF (CustomerBankAccount."Bank Branch No." = '') OR (CustomerBankAccount."Bank Account No." = '') THEN BEGIN
+        CustomerBankAccount.TESTFIELD(IBAN);
+        RecipientBankAccountNo := CustomerBankAccount.IBAN
+      END ELSE BEGIN
+        CustomerBankAccount.TESTFIELD("Bank Branch No.");
+        CustomerBankAccount.TESTFIELD("Bank Account No.");
+        RecipientBankAccountNo := CustomerBankAccount."Bank Branch No." + CustomerBankAccount."Bank Account No."
+      END;
+    END;
+
+    PROCEDURE GetSenderBankAccount@9(BankAccount@1000 : Record 270) SenderBankAccountNo : Text[50];
+    BEGIN
+      IF (BankAccount."Bank Branch No." = '') OR (BankAccount."Bank Account No." = '') THEN BEGIN
+        BankAccount.TESTFIELD(IBAN);
+        SenderBankAccountNo := BankAccount.IBAN
+      END ELSE BEGIN
+        BankAccount.TESTFIELD("Bank Branch No.");
+        BankAccount.TESTFIELD("Bank Account No.");
+        SenderBankAccountNo := BankAccount."Bank Branch No." + BankAccount."Bank Account No.";
+      END;
+    END;
+
+    PROCEDURE GetServerTempFileName@29() : Text[1024];
+    BEGIN
+      EXIT(ServerFileName);
+    END;
+
+    PROCEDURE GetVendorRecipientBankAccount@3(AccountNo@1001 : Code[20];VLERecipientBankAccountNo@1002 : Code[20];VAR RecipientBankAccountNo@1003 : Text[50]);
+    VAR
+      VendorBankAccount@1000 : Record 288;
+    BEGIN
+      IF VendorBankAccount.GET(AccountNo,VLERecipientBankAccountNo) THEN
+        IF (VendorBankAccount."Bank Branch No." = '') OR (VendorBankAccount."Bank Account No." = '') THEN BEGIN
+          VendorBankAccount.TESTFIELD(IBAN);
+          RecipientBankAccountNo := VendorBankAccount.IBAN
+        END ELSE BEGIN
+          VendorBankAccount.TESTFIELD("Bank Branch No.");
+          VendorBankAccount.TESTFIELD("Bank Account No.");
+          RecipientBankAccountNo := VendorBankAccount."Bank Branch No." + VendorBankAccount."Bank Account No."
+        END;
+    END;
+
+    LOCAL PROCEDURE IsAppliedToCustPaymentExported@33(VAR CustLedgerEntry@1000 : Record 21) : Boolean;
+    VAR
+      AppliedToCustLedgerEntry@1002 : Record 21;
+      ExportCustLedgerEntry@1001 : Record 21;
+    BEGIN
+      CASE TRUE OF
+        CustLedgerEntry.MARKEDONLY:
+          ExportCustLedgerEntry.MARKEDONLY(TRUE);
+        CustLedgerEntry.HASFILTER:
+          BEGIN
+            ExportCustLedgerEntry.COPYFILTERS(CustLedgerEntry);
+            ExportCustLedgerEntry.FINDSET;
+          END;
+        ELSE
+          ExportCustLedgerEntry.COPY(CustLedgerEntry);
+      END;
+
+      AppliedToCustLedgerEntry.SETRANGE("Exported to Payment File",TRUE);
+      REPEAT
+        AppliedToCustLedgerEntry.SETRANGE("Closed by Entry No.",ExportCustLedgerEntry."Entry No.");
+        IF NOT AppliedToCustLedgerEntry.ISEMPTY THEN
+          EXIT(TRUE);
+      UNTIL ExportCustLedgerEntry.NEXT = 0;
+
+      EXIT(FALSE);
+    END;
+
+    PROCEDURE IsAppliedToVendorLedgerEntryExported@38(VAR GenJnlLine@1000 : Record 81) : Boolean;
+    VAR
+      GenJnlLine2@1001 : Record 81;
+      VendLedgerEntry@1002 : Record 25;
+    BEGIN
+      GenJnlLine2.COPYFILTERS(GenJnlLine);
+      GenJnlLine2.FINDSET;
+
+      REPEAT
+        IF GenJnlLine2.IsApplied THEN
+          WITH VendLedgerEntry DO BEGIN
+            SETRANGE("Vendor No.",GenJnlLine2."Account No.");
+            IF GenJnlLine2."Applies-to Doc. No." <> '' THEN BEGIN
+              SETRANGE("Document Type",GenJnlLine2."Applies-to Doc. Type");
+              SETRANGE("Document No.",GenJnlLine2."Applies-to Doc. No.");
+            END;
+            IF GenJnlLine2."Applies-to ID" <> '' THEN
+              SETRANGE("Applies-to ID",GenJnlLine2."Applies-to ID");
+            SETRANGE("Exported to Payment File",TRUE);
+            IF NOT ISEMPTY THEN
+              EXIT(TRUE);
+          END;
+
+        WITH VendLedgerEntry DO BEGIN
+          RESET;
+          SETRANGE("Vendor No.",GenJnlLine2."Account No.");
+          SETRANGE("Applies-to Doc. Type",GenJnlLine2."Document Type");
+          SETRANGE("Applies-to Doc. No.",GenJnlLine2."Document No.");
+          SETRANGE("Exported to Payment File",TRUE);
+          IF NOT ISEMPTY THEN
+            EXIT(TRUE);
+        END;
+      UNTIL GenJnlLine2.NEXT = 0;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE IsAppliedToVendorPaymentExported@32(VAR VendorLedgerEntry@1000 : Record 25) : Boolean;
+    VAR
+      AppliedToVendLedgerEntry@1002 : Record 25;
+      ExportVendLedgerEntry@1001 : Record 25;
+    BEGIN
+      CASE TRUE OF
+        VendorLedgerEntry.MARKEDONLY:
+          ExportVendLedgerEntry.MARKEDONLY(TRUE);
+        VendorLedgerEntry.HASFILTER:
+          BEGIN
+            ExportVendLedgerEntry.COPYFILTERS(VendorLedgerEntry);
+            ExportVendLedgerEntry.FINDSET;
+          END;
+        ELSE
+          ExportVendLedgerEntry.COPY(VendorLedgerEntry);
+      END;
+
+      AppliedToVendLedgerEntry.SETRANGE("Exported to Payment File",TRUE);
+      REPEAT
+        AppliedToVendLedgerEntry.SETRANGE("Closed by Entry No.",ExportVendLedgerEntry."Entry No.");
+        IF NOT AppliedToVendLedgerEntry.ISEMPTY THEN
+          EXIT(TRUE);
+      UNTIL ExportVendLedgerEntry.NEXT = 0;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE IsCustLedgerEntryExported@28(VAR CustLedgerEntry@1000 : Record 21) : Boolean;
+    VAR
+      CustLedgerEntry2@1001 : Record 21;
+    BEGIN
+      // In case of selecting more than one line on the page.
+      IF CustLedgerEntry.MARKEDONLY THEN
+        WITH CustLedgerEntry2 DO BEGIN
+          MARKEDONLY(TRUE);
+          SETRANGE("Exported to Payment File",TRUE);
+          EXIT(NOT ISEMPTY);
+        END;
+
+      // In case of selecting one line on the page or passing a variable directly.
+      IF CustLedgerEntry.HASFILTER THEN
+        WITH CustLedgerEntry2 DO BEGIN
+          COPYFILTERS(CustLedgerEntry);
+          SETRANGE("Exported to Payment File",TRUE);
+          EXIT(NOT ISEMPTY);
+        END;
+
+      // The case of a record not being passed via the user interface is not supported.
+      EXIT(FALSE);
+    END;
+
+    PROCEDURE IsPaymentJournallLineExported@37(VAR GenJnlLine@1000 : Record 81) : Boolean;
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      WITH GenJnlLine2 DO BEGIN
+        COPYFILTERS(GenJnlLine);
+        SETRANGE("Exported to Payment File",TRUE);
+        EXIT(NOT ISEMPTY);
+      END;
+    END;
+
+    LOCAL PROCEDURE IsVendorLedgerEntryExported@26(VAR VendorLedgerEntry@1000 : Record 25) : Boolean;
+    VAR
+      VendorLedgerEntry2@1001 : Record 25;
+    BEGIN
+      // In case of selecting more than one line on the page.
+      IF VendorLedgerEntry.MARKEDONLY THEN
+        WITH VendorLedgerEntry2 DO BEGIN
+          MARKEDONLY(TRUE);
+          SETRANGE("Exported to Payment File",TRUE);
+          EXIT(NOT ISEMPTY);
+        END;
+
+      // In case of selecting one line on the page or passing a variable directly.
+      IF VendorLedgerEntry.HASFILTER THEN
+        WITH VendorLedgerEntry2 DO BEGIN
+          COPYFILTERS(VendorLedgerEntry);
+          SETRANGE("Exported to Payment File",TRUE);
+          EXIT(NOT ISEMPTY);
+        END;
+
+      // The case of a record not being passed via the user interface is not supported.
+      EXIT(FALSE);
+    END;
+
+    PROCEDURE PreparePaymentExportDataCLE@14(VAR TempPaymentExportData@1000 : TEMPORARY Record 1226;CustLedgerEntry@1001 : Record 21;PostingExchEntryNo@1003 : Integer;RecipientBankAccountNo@1004 : Text[50];LineNo@1007 : Integer);
+    VAR
+      Customer@1006 : Record 18;
+      CustomerBankAccount@1008 : Record 287;
+      GeneralLedgerSetup@1002 : Record 98;
+      PaymentMethod@1009 : Record 289;
+      BankAccount@1005 : Record 270;
+    BEGIN
+      GeneralLedgerSetup.GET;
+      Customer.GET(CustLedgerEntry."Customer No.");
+      CustomerBankAccount.GET(CustLedgerEntry."Customer No.",CustLedgerEntry."Recipient Bank Account");
+
+      WITH TempPaymentExportData DO BEGIN
+        INIT;
+        "Posting Exch Entry No." := PostingExchEntryNo;
+        "Sender Bank Account Code" := CustLedgerEntry."Bal. Account No.";
+        "Recipient Bank Acc. No." := RecipientBankAccountNo;
+        BankAccount.GET("Sender Bank Account Code");
+
+        IF BankAccount."Country/Region Code" = CustomerBankAccount."Country/Region Code" THEN BEGIN
+          CustLedgerEntry.CALCFIELDS("Amount (LCY)");
+          Amount := CustLedgerEntry."Amount (LCY)";
+          "Currency Code" := GeneralLedgerSetup."LCY Code";
+        END ELSE BEGIN
+          CustLedgerEntry.CALCFIELDS(Amount);
+          Amount := CustLedgerEntry.Amount;
+          IF CustLedgerEntry."Currency Code" = '' THEN
+            "Currency Code" := GeneralLedgerSetup."LCY Code"
+          ELSE
+            "Currency Code" := CustLedgerEntry."Currency Code";
+          "Recipient Bank Country/Region" := CustomerBankAccount."Country/Region Code";
+          "Recipient Bank Name" := COPYSTR(CustomerBankAccount.Name,1,35);
+          "Recipient Bank Address" := COPYSTR(CustomerBankAccount.Address,1,35);
+          "Recipient Bank City" := COPYSTR(CustomerBankAccount."Post Code" + CustomerBankAccount.City,1,35);
+          "Recipient Bank BIC" := CustomerBankAccount."SWIFT Code";
+        END;
+
+        "Recipient Name" := COPYSTR(Customer.Name,1,35);
+        "Recipient Address" := COPYSTR(Customer.Address,1,35);
+        "Recipient City" := COPYSTR(Customer."Post Code" + ' ' + Customer.City,1,35);
+        "Transfer Date" := CustLedgerEntry."Posting Date";
+        "Message to Recipient 1" := COPYSTR(CustLedgerEntry."Message to Recipient",1,35);
+        "Message to Recipient 2" := COPYSTR(CustLedgerEntry."Message to Recipient",36,70);
+        "Document No." := CustLedgerEntry."Document No.";
+        "Applies-to Ext. Doc. No." := CustLedgerEntry."Applies-to Ext. Doc. No.";
+        "Line No." := LineNo;
+        IF PaymentMethod.GET(CustLedgerEntry."Payment Method Code") THEN
+          "Posting Exch. Line Def Code" := PaymentMethod."Payment Type";
+        INSERT;
+      END;
+    END;
+
+    PROCEDURE PreparePaymentExportDataJnl@12(VAR TempPaymentExportData@1000 : TEMPORARY Record 1226;GenJnlLine@1001 : Record 81;PostingExchEntryNo@1003 : Integer;RecipientBankAccountNo@1004 : Text[50];LineNo@1007 : Integer);
+    VAR
+      GeneralLedgerSetup@1009 : Record 98;
+      Vendor@1006 : Record 23;
+      VendorBankAccount@1008 : Record 288;
+      PaymentMethod@1010 : Record 289;
+      BankAccount@1002 : Record 270;
+    BEGIN
+      GeneralLedgerSetup.GET;
+      Vendor.GET(GenJnlLine."Account No.");
+
+      WITH TempPaymentExportData DO BEGIN
+        INIT;
+        "Posting Exch Entry No." := PostingExchEntryNo;
+        "Sender Bank Account Code" := GenJnlLine."Bal. Account No.";
+        "Recipient Bank Acc. No." := RecipientBankAccountNo;
+        BankAccount.GET("Sender Bank Account Code");
+
+        IF VendorBankAccount.GET(GenJnlLine."Account No.",GenJnlLine."Recipient Bank Account") THEN
+          IF BankAccount."Country/Region Code" = VendorBankAccount."Country/Region Code" THEN BEGIN
+            Amount := GenJnlLine."Amount (LCY)";
+            "Currency Code" := GeneralLedgerSetup."LCY Code";
+          END ELSE BEGIN
+            Amount := GenJnlLine.Amount;
+            IF GenJnlLine."Currency Code" = '' THEN
+              "Currency Code" := GeneralLedgerSetup."LCY Code"
+            ELSE
+              "Currency Code" := GenJnlLine."Currency Code";
+            "Recipient Bank Country/Region" := VendorBankAccount."Country/Region Code";
+            "Recipient Bank Name" := COPYSTR(VendorBankAccount.Name,1,35);
+            "Recipient Bank Address" := COPYSTR(VendorBankAccount.Address,1,35);
+            "Recipient Bank City" := COPYSTR(VendorBankAccount."Post Code" + VendorBankAccount.City,1,35);
+            "Recipient Bank BIC" := VendorBankAccount."SWIFT Code";
+          END
+        ELSE
+          IF GenJnlLine."Creditor No." <> '' THEN BEGIN
+            Amount := GenJnlLine."Amount (LCY)";
+            "Currency Code" := GeneralLedgerSetup."LCY Code";
+          END;
+
+        "Recipient Name" := COPYSTR(Vendor.Name,1,35);
+        "Recipient Address" := COPYSTR(Vendor.Address,1,35);
+        "Recipient City" := COPYSTR(Vendor."Post Code" + ' ' + Vendor.City,1,35);
+        "Transfer Date" := GenJnlLine."Posting Date";
+        "Message to Recipient 1" := COPYSTR(GenJnlLine."Message to Recipient",1,35);
+        "Message to Recipient 2" := COPYSTR(GenJnlLine."Message to Recipient",36,70);
+        "Document No." := GenJnlLine."Document No.";
+        "Applies-to Ext. Doc. No." := GenJnlLine."Applies-to Ext. Doc. No.";
+        "Line No." := LineNo;
+        "Payment Reference" := GenJnlLine."Payment Reference";
+        IF PaymentMethod.GET(GenJnlLine."Payment Method Code") THEN
+          "Posting Exch. Line Def Code" := PaymentMethod."Payment Type";
+        "Recipient Creditor No." := GenJnlLine."Creditor No.";
+        INSERT;
+      END;
+    END;
+
+    PROCEDURE PreparePaymentExportDataVLE@13(VAR TempPaymentExportData@1000 : TEMPORARY Record 1226;VendorLedgerEntry@1001 : Record 25;PostingExchEntryNo@1003 : Integer;RecipientBankAccountNo@1004 : Text[50];LineNo@1007 : Integer);
+    VAR
+      GeneralLedgerSetup@1002 : Record 98;
+      Vendor@1006 : Record 23;
+      VendorBankAccount@1008 : Record 288;
+      PaymentMethod@1009 : Record 289;
+      BankAccount@1010 : Record 270;
+    BEGIN
+      GeneralLedgerSetup.GET;
+      Vendor.GET(VendorLedgerEntry."Vendor No.");
+
+      WITH TempPaymentExportData DO BEGIN
+        INIT;
+        "Posting Exch Entry No." := PostingExchEntryNo;
+        "Sender Bank Account Code" := VendorLedgerEntry."Bal. Account No.";
+        "Recipient Bank Acc. No." := RecipientBankAccountNo;
+        BankAccount.GET("Sender Bank Account Code");
+
+        IF VendorBankAccount.GET(VendorLedgerEntry."Vendor No.",VendorLedgerEntry."Recipient Bank Account") THEN
+          IF BankAccount."Country/Region Code" = VendorBankAccount."Country/Region Code" THEN BEGIN
+            VendorLedgerEntry.CALCFIELDS("Amount (LCY)");
+            Amount := VendorLedgerEntry."Amount (LCY)";
+            "Currency Code" := GeneralLedgerSetup."LCY Code";
+          END ELSE BEGIN
+            VendorLedgerEntry.CALCFIELDS(Amount);
+            Amount := VendorLedgerEntry.Amount;
+            IF VendorLedgerEntry."Currency Code" = '' THEN
+              "Currency Code" := GeneralLedgerSetup."LCY Code"
+            ELSE
+              "Currency Code" := VendorLedgerEntry."Currency Code";
+            "Recipient Bank Country/Region" := VendorBankAccount."Country/Region Code";
+            "Recipient Bank Name" := COPYSTR(VendorBankAccount.Name,1,35);
+            "Recipient Bank Address" := COPYSTR(VendorBankAccount.Address,1,35);
+            "Recipient Bank City" := COPYSTR(VendorBankAccount."Post Code" + VendorBankAccount.City,1,35);
+            "Recipient Bank BIC" := VendorBankAccount."SWIFT Code";
+          END
+        ELSE
+          IF VendorLedgerEntry."Creditor No." <> '' THEN BEGIN
+            VendorLedgerEntry.CALCFIELDS("Amount (LCY)");
+            Amount := VendorLedgerEntry."Amount (LCY)";
+            "Currency Code" := GeneralLedgerSetup."LCY Code";
+          END;
+
+        "Recipient Name" := COPYSTR(Vendor.Name,1,35);
+        "Recipient Address" := COPYSTR(Vendor.Address,1,35);
+        "Recipient City" := COPYSTR(Vendor."Post Code" + ' ' + Vendor.City,1,35);
+        "Transfer Date" := VendorLedgerEntry."Posting Date";
+        "Message to Recipient 1" := COPYSTR(VendorLedgerEntry."Message to Recipient",1,35);
+        "Message to Recipient 2" := COPYSTR(VendorLedgerEntry."Message to Recipient",36,70);
+        "Document No." := VendorLedgerEntry."Document No.";
+        "Applies-to Ext. Doc. No." := VendorLedgerEntry."Applies-to Ext. Doc. No.";
+        "Line No." := LineNo;
+        "Payment Reference" := VendorLedgerEntry."Payment Reference";
+        IF PaymentMethod.GET(VendorLedgerEntry."Payment Method Code") THEN
+          "Posting Exch. Line Def Code" := PaymentMethod."Payment Type";
+        "Recipient Creditor No." := VendorLedgerEntry."Creditor No.";
+        INSERT;
+      END;
+    END;
+
+    LOCAL PROCEDURE ProcessColumnMapping@11(PostingExch@1004 : Record 1220;RecRef@1016 : RecordRef;LineNo@1017 : Integer;PostingExchLineDefCode@1003 : Code[20]);
+    VAR
+      PostingExchDef@1023 : Record 1222;
+      PostingExchColumnDef@1001 : Record 1223;
+      PostingExchField@1009 : Record 1221;
+      PostingExchFieldMapping@1010 : Record 1225;
+      ValueAsDestType@1007 : Variant;
+      FieldRef@1002 : FieldRef;
+      ValueAsString@1000 : Text[250];
+    BEGIN
+      IF NOT PostingExchDef.GET(PostingExch."Posting Exch. Def Code") THEN
+        ERROR(FormatNotDefinedErr,PostingExch."Posting Exch. Def Code");
+
+      PrepopulateColumns(PostingExchDef,PostingExchLineDefCode,PostingExch."Entry No.",LineNo);
+
+      PostingExchFieldMapping.SETRANGE("Posting Exch. Def Code",PostingExchDef.Code);
+      PostingExchFieldMapping.SETRANGE("Posting Exch. Line Def Code",PostingExchLineDefCode);
+      PostingExchFieldMapping.SETRANGE("Table ID",DATABASE::"Payment Export Data");
+      PostingExchFieldMapping.FINDSET;
+
+      REPEAT
+        PostingExchColumnDef.GET(PostingExchDef.Code,PostingExchLineDefCode,PostingExchFieldMapping."Column No.");
+
+        IF PostingExchFieldMapping."Use Default Value" THEN
+          ValueAsString := PostingExchFieldMapping."Default Value"
+        ELSE BEGIN
+          FieldRef := RecRef.FIELD(PostingExchFieldMapping."Field ID");
+          CheckOptional(PostingExchFieldMapping.Optional,FieldRef);
+          CastToDestinationType(ValueAsDestType,FieldRef.VALUE,PostingExchColumnDef,PostingExchFieldMapping.Multiplier);
+          ValueAsString := FormatToText(ValueAsDestType,PostingExchDef,PostingExchColumnDef);
+        END;
+
+        CheckLength(ValueAsString,RecRef.FIELD(PostingExchFieldMapping."Field ID"),PostingExchDef,PostingExchColumnDef);
+
+        PostingExchField.GET(PostingExch."Entry No.",LineNo,PostingExchFieldMapping."Column No.");
+        PostingExchField.Value := ValueAsString;
+        PostingExchField.MODIFY;
+      UNTIL PostingExchFieldMapping.NEXT = 0;
+    END;
+
+    LOCAL PROCEDURE PrepopulateColumns@39(PostingExchDef@1000 : Record 1222;PostingExchLineDefCode@1001 : Code[20];PostingExchEntryNo@1004 : Integer;PostingExchLineNo@1005 : Integer);
+    VAR
+      PostingExchField@1002 : Record 1221;
+      PostingExchLineDef@1007 : Record 1227;
+      PostingExchColumnDef@1003 : Record 1223;
+      ColumnIndex@1006 : Integer;
+    BEGIN
+      IF PostingExchDef."File Type" = PostingExchDef."File Type"::"Fixed Text" THEN BEGIN
+        PostingExchColumnDef.SETRANGE("Posting Exch. Def Code",PostingExchDef.Code);
+        PostingExchColumnDef.SETRANGE("Posting Exch. Line Def Code",PostingExchLineDefCode);
+        IF NOT PostingExchColumnDef.FINDSET THEN
+          ERROR(PostExchLineDefNotFoundErr,PostingExchDef.Name,PostingExchLineDefCode);
+        REPEAT
+          PostingExchField.InsertRec(
+            PostingExchEntryNo,PostingExchLineNo,PostingExchColumnDef."Column No.",
+            PADSTR(PostingExchColumnDef.Constant,PostingExchColumnDef.Length))
+        UNTIL PostingExchColumnDef.NEXT = 0;
+      END ELSE BEGIN
+        IF NOT PostingExchLineDef.GET(PostingExchDef.Code,PostingExchLineDefCode) THEN
+          ERROR(PostExchLineDefNotFoundErr,PostingExchDef.Name,PostingExchLineDefCode);
+        FOR ColumnIndex := 1 TO PostingExchLineDef."Column Count" DO
+          IF PostingExchColumnDef.GET(PostingExchDef.Code,PostingExchLineDef.Code,ColumnIndex) THEN
+            PostingExchField.InsertRec(PostingExchEntryNo,PostingExchLineNo,ColumnIndex,PostingExchColumnDef.Constant)
+          ELSE
+            PostingExchField.InsertRec(PostingExchEntryNo,PostingExchLineNo,ColumnIndex,'');
+      END;
+    END;
+
+    LOCAL PROCEDURE CastToDestinationType@44(VAR DestinationValue@1004 : Variant;SourceValue@1005 : Variant;PostingExchColumnDef@1003 : Record 1223;NewMultiplier@1001 : Decimal);
+    VAR
+      ValueAsDecimal@1002 : Decimal;
+      ValueAsDate@1000 : Date;
+    BEGIN
+      WITH PostingExchColumnDef DO
+        CASE "Data Type" OF
+          "Data Type"::Decimal:
+            BEGIN
+              IF FORMAT(SourceValue) = '' THEN
+                ValueAsDecimal := 0
+              ELSE
+                EVALUATE(ValueAsDecimal,FORMAT(SourceValue));
+              DestinationValue := NewMultiplier * ValueAsDecimal;
+            END;
+          "Data Type"::Text:
+            DestinationValue := FORMAT(SourceValue);
+          "Data Type"::Date:
+            BEGIN
+              EVALUATE(ValueAsDate,FORMAT(SourceValue));
+              DestinationValue := ValueAsDate;
+            END;
+        END;
+    END;
+
+    LOCAL PROCEDURE FormatToText@46(ValueToFormat@1003 : Variant;PostingExchDef@1001 : Record 1222;PostingExchColumnDef@1000 : Record 1223) : Text[250];
+    BEGIN
+      IF PostingExchColumnDef."Data Format" <> '' THEN
+        EXIT(FORMAT(ValueToFormat,0,PostingExchColumnDef."Data Format"));
+
+      IF (PostingExchDef."File Type" = PostingExchDef."File Type"::"Fixed Text") AND
+         (PostingExchColumnDef."Data Type" = PostingExchColumnDef."Data Type"::Text)
+      THEN
+        EXIT(FORMAT(ValueToFormat,0,STRSUBSTNO('<Text,%1>',PostingExchColumnDef.Length)));
+
+      EXIT(FORMAT(ValueToFormat));
+    END;
+
+    LOCAL PROCEDURE CheckLength@49(Value@1001 : Text;FieldRef@1002 : FieldRef;PostingExchDef@1003 : Record 1222;PostingExchColumnDef@1000 : Record 1223);
+    VAR
+      PostingExchDefCode@1004 : Code[20];
+    BEGIN
+      PostingExchDefCode := PostingExchColumnDef."Posting Exch. Def Code";
+
+      IF (PostingExchColumnDef.Length > 0) AND (STRLEN(Value) > PostingExchColumnDef.Length) THEN
+        ERROR(IncorrectLengthOfValuesErr,GetType(PostingExchDefCode),PostingExchDefCode,
+          FieldRef.CAPTION,PostingExchColumnDef.Length,STRLEN(Value),Value);
+
+      IF (PostingExchDef."File Type" = PostingExchDef."File Type"::"Fixed Text") AND
+         (STRLEN(Value) <> PostingExchColumnDef.Length)
+      THEN
+        ERROR(IncorrectLengthOfValuesErr,GetType(PostingExchDefCode),PostingExchDefCode,FieldRef.CAPTION,
+          PostingExchColumnDef.Length,STRLEN(Value),Value);
+    END;
+
+    LOCAL PROCEDURE CheckOptional@21(Optional@1000 : Boolean;FieldRef@1001 : FieldRef);
+    VAR
+      Value@1002 : Variant;
+      StringValue@1003 : Text;
+    BEGIN
+      IF Optional THEN
+        EXIT;
+
+      Value := FieldRef.VALUE;
+      StringValue := FORMAT(Value);
+
+      IF ((Value.ISDECIMAL OR Value.ISINTEGER OR Value.ISBIGINTEGER) AND (StringValue = '0')) OR
+         (StringValue = '')
+      THEN
+        FieldRef.TESTFIELD
+    END;
+
+    LOCAL PROCEDURE SetExportFlagOnCustLedgerEntries@40(VAR CustLedgerEntry@1000 : Record 21);
+    VAR
+      CustLedgerEntry2@1001 : Record 21;
+    BEGIN
+      WITH CustLedgerEntry2 DO BEGIN
+        COPY(CustLedgerEntry);
+        REPEAT
+          VALIDATE("Exported to Payment File",TRUE);
+          CODEUNIT.RUN(CODEUNIT::"Cust. Entry-Edit",CustLedgerEntry2);
+        UNTIL NEXT = 0;
+      END;
+    END;
+
+    LOCAL PROCEDURE SetExportFlagOnGenJnlLine@1(VAR GenJnlLine@1000 : Record 81);
+    VAR
+      GenJnlLine2@1001 : Record 81;
+    BEGIN
+      WITH GenJnlLine2 DO BEGIN
+        COPYFILTERS(GenJnlLine);
+        FINDSET;
+        REPEAT
+          SetExportFlagOnAppliedVendorLedgerEntry(GenJnlLine2);
+          VALIDATE("Exported to Payment File",TRUE);
+          MODIFY(TRUE);
+        UNTIL NEXT = 0;
+      END;
+    END;
+
+    LOCAL PROCEDURE SetExportFlagOnVendorLedgerEntries@41(VAR VendorLedgerEntry@1000 : Record 25);
+    VAR
+      VendorLedgerEntry2@1001 : Record 25;
+    BEGIN
+      WITH VendorLedgerEntry2 DO BEGIN
+        COPY(VendorLedgerEntry);
+        REPEAT
+          VALIDATE("Exported to Payment File",TRUE);
+          CODEUNIT.RUN(CODEUNIT::"Vend. Entry-Edit",VendorLedgerEntry2);
+        UNTIL NEXT = 0;
+      END;
+    END;
+
+    LOCAL PROCEDURE SetExportFlagOnAppliedVendorLedgerEntry@31(GenJnlLine@1000 : Record 81);
+    VAR
+      VendLedgerEntry@1001 : Record 25;
+    BEGIN
+      WITH VendLedgerEntry DO
+        IF GenJnlLine.IsApplied THEN BEGIN
+          SETRANGE("Vendor No.",GenJnlLine."Account No.");
+          SETRANGE("Document Type",GenJnlLine."Applies-to Doc. Type");
+          SETRANGE("Document No.",GenJnlLine."Applies-to Doc. No.");
+          IF FINDFIRST THEN BEGIN
+            VALIDATE("Exported to Payment File",TRUE);
+            CODEUNIT.RUN(CODEUNIT::"Vend. Entry-Edit",VendLedgerEntry);
+            EXIT;
+          END;
+
+          RESET;
+          SETRANGE("Vendor No.",GenJnlLine."Account No.");
+          SETRANGE("Applies-to Doc. Type",GenJnlLine."Applies-to Doc. Type");
+          SETRANGE("Applies-to Doc. No.",GenJnlLine."Applies-to Doc. No.");
+          SETRANGE("Applies-to ID",GenJnlLine."Applies-to ID");
+          IF FINDSET THEN
+            REPEAT
+              VALIDATE("Exported to Payment File",TRUE);
+              CODEUNIT.RUN(CODEUNIT::"Vend. Entry-Edit",VendLedgerEntry);
+            UNTIL NEXT = 0;
+        END;
+    END;
+
+    PROCEDURE GetType@6(PostExchDefCode@1000 : Code[20]) : Text;
+    VAR
+      PostingExchDef@1001 : Record 1222;
+    BEGIN
+      PostingExchDef.GET(PostExchDefCode);
+      EXIT(FORMAT(PostingExchDef.Type));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,704 @@
+OBJECT Page 1302 Mini Item Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Item Card;
+               ESM=Ficha producto;
+               FRC=Fiche article;
+               ENC=Item Card];
+    SourceTable=Table27;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Item,History,View;
+                                ESM=Nuevo,Proceso,Informe,Producto,Historial,Ver;
+                                FRC=Nouveau,Traitement,Rapport,Article,Historique,Vue;
+                                ENC=New,Process,Report,Item,History,View];
+    OnInit=BEGIN
+             InventoryItemEditable := TRUE;
+             "Costing Method" := "Costing Method"::FIFO;
+             UnitCostEditable := TRUE;
+           END;
+
+    OnOpenPage=BEGIN
+                 EnableControls;
+                 VisualizingControls;
+                 CurrPage.PriceAndLineDisc.PAGE.InitPage(TRUE);
+                 ViewSetup := ShouldBeLoadedInSetupView;
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       EnableControls;
+                     END;
+
+    OnNewRecord=BEGIN
+                  EnableControls;
+                END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           GetSalesPricesAndSalesLineDisc;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 10      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 42      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Item;
+                                 ESM=Producto;
+                                 FRC=Article;
+                                 ENC=Item];
+                      Image=<DataEntry> }
+      { 28      ;2   ;Action    ;
+                      CaptionML=[ENU=&Units of Measure;
+                                 ESM=&Unidades de medida;
+                                 FRC=&UnitÇs de mesure;
+                                 ENC=&Units of Measure];
+                      ToolTipML=[ENU=Set up the different units that the item can be traded in, such as piece, box, or hour.;
+                                 ESM=Configurar las diferentes unidades en las que se puede comercializar el producto, como una pieza, una caja o una hora.;
+                                 FRC=Configurez les diffÇrentes unitÇs dans lesquelles l'article peut àtre nÇgociÇ, par exemple piäce, boåte ou heure.;
+                                 ENC=Set up the different units that the item can be traded in, such as piece, box, or hour.];
+                      RunObject=Page 5404;
+                      RunPageLink=Item No.=FIELD(No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=UnitOfMeasure;
+                      PromotedCategory=Category4 }
+      { 27      ;2   ;Action    ;
+                      CaptionML=[ENU=Cross Re&ferences;
+                                 ESM=Referencias cru&zadas;
+                                 FRC=&RÇfÇrences externes;
+                                 ENC=Cross Re&ferences];
+                      ToolTipML=[ENU=Set up a customer's own identification of the item. Cross-references to the customer's item number means that their item number is automatically shown on sales documents instead of the number that you use.;
+                                 ESM=Configurar una identificaci¢n del producto propia del cliente. Las referencias cruzadas con el n£mero de producto del cliente significan que su n£mero de producto se muestra autom†ticamente en los documentos de venta, en lugar del n£mero que usa usted.;
+                                 FRC=Configurez la maniäre dont un client identifie l'article. Les rÇfÇrences externes au numÇro d'article du client impliquent que le numÇro d'article est automatiquement affichÇ sur les documents vente au lieu du numÇro que vous utilisez.;
+                                 ENC=Set up a customer's own identification of the item. Cross-references to the customer's item number means that their item number is automatically shown on sales documents instead of the number that you use.];
+                      RunObject=Page 5721;
+                      RunPageLink=Item No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Change;
+                      PromotedCategory=Category4 }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=E&xtended Text;
+                                 ESM=Te&xtos adicionales;
+                                 FRC=T&extes Çtendus;
+                                 ENC=E&xtended Text];
+                      ToolTipML=[ENU=Set up longer text for the description of the item. Extended text can be inserted under the Description field on document lines for the item.;
+                                 ESM=Configurar un texto m†s largo para la descripci¢n del producto. Se puede insertar texto ampliado en el campo Descripci¢n de las l°neas del documento del producto.;
+                                 FRC=DÇfinissez un texte plus long pour la description de l'article. Vous pouvez insÇrer ce texte plus long sous le champ Description sur les lignes de document de l'article.;
+                                 ENC=Set up longer text for the description of the item. Extended text can be inserted under the Description field on document lines for the item.];
+                      RunObject=Page 1316;
+                      RunPageView=SORTING(Table Name,No.,Language Code,All Language Codes,Starting Date,Ending Date);
+                      RunPageLink=Table Name=CONST(Item),
+                                  No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Text;
+                      PromotedCategory=Category4 }
+      { 23      ;2   ;Action    ;
+                      CaptionML=[ENU=Translations;
+                                 ESM=Traducciones;
+                                 FRC=Traductions;
+                                 ENC=Translations];
+                      ToolTipML=[ENU=Set up translated item descriptions. Translated item descriptions are automatically inserted on documents according to the language code.;
+                                 ESM=Configurar descripciones de productos traducidas. Las descripciones de productos traducidas se insertan autom†ticamente en los documentos seg£n el c¢digo de idioma.;
+                                 FRC=DÇfinissez des descriptions d'article traduites. Les descriptions d'articles traduites sont automatiquement insÇrÇes dans les documents en fonction du code de langue.;
+                                 ENC=Set up translated item descriptions. Translated item descriptions are automatically inserted on documents according to the language code.];
+                      RunObject=Page 35;
+                      RunPageLink=Item No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Translations;
+                      PromotedCategory=Category4 }
+      { 21      ;2   ;Action    ;
+                      CaptionML=[ENU=&Picture;
+                                 ESM=&Imagen;
+                                 FRC=&Image;
+                                 ENC=&Picture];
+                      ToolTipML=[ENU=View or add a picture of the item.;
+                                 ESM=Ver o agregar una imagen del producto.;
+                                 FRC=Affichez ou ajoutez une image de l'article.;
+                                 ENC=View or add a picture of the item.];
+                      RunObject=Page 346;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Location Filter=FIELD(Location Filter),
+                                  Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                                  Variant Filter=FIELD(Variant Filter);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Picture;
+                      PromotedCategory=Category4 }
+      { 5       ;2   ;Action    ;
+                      Name=AdjustInventory;
+                      CaptionML=[ENU=Adjust Inventory;
+                                 ESM=Ajustar inventario;
+                                 FRC=Ajuster inventaire;
+                                 ENC=Adjust Inventory];
+                      ToolTipML=[ENU=Increase or decrease the item's inventory quantity manually by entering a new quantity. Adjusting the inventory quantity manually may be relevant after a physical count or if you do not record purchased quantities.;
+                                 ESM=Especifique una nueva cantidad para aumentar o disminuir la cantidad de inventario del producto manualmente. Ajustar la cantidad de inventario manualmente podr°a ser pertinente despuÇs de un recuento f°sico o si no se registran las cantidades compradas.;
+                                 FRC=Vous pouvez augmenter ou diminuer manuellement la quantitÇ en inventaire d'un article en entrant une nouvelle quantitÇ. Il peut s'avÇrer utile d'ajuster manuellement la quantitÇ d'inventaire apräs un dÇcompte physique ou si vous n'enregistrez pas les quantitÇs achetÇes.;
+                                 ENC=Increase or decrease the item's inventory quantity manually by entering a new quantity. Adjusting the inventory quantity manually may be relevant after a physical count or if you do not record purchased quantities.];
+                      Enabled=InventoryItemEditable;
+                      Image=InventoryCalculation;
+                      OnAction=BEGIN
+                                 COMMIT;
+                                 PAGE.RUNMODAL(PAGE::"Mini Adjust Inventory",Rec)
+                               END;
+                                }
+      { 18      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      ToolTipML=[ENU=Set up default dimensions for the item, such as a department or project code. You can assign dimension codes to transactions to distribute costs and analyze historical information.;
+                                 ESM=Configurar dimensiones predeterminadas para el producto, como un departamento o c¢digo de proyecto. Puede asignar c¢digos de dimensi¢n a transacciones para distribuir los costos y analizar la informaci¢n hist¢rica.;
+                                 FRC=Configurez les dimensions par dÇfaut de l'article, comme un code de projet ou de dÇpartement. Vous pouvez affecter des codes de dimension aux transactions dans le but de rÇpartir les coñts et d'analyser les informations d'historique.;
+                                 ENC=Set up default dimensions for the item, such as a department or project code. You can assign dimension codes to transactions to distribute costs and analyse historical information.];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(27),
+                                  No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category4 }
+      { 126     ;1   ;ActionGroup;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      Image=History }
+      { 101     ;2   ;ActionGroup;
+                      CaptionML=[ENU=E&ntries;
+                                 ESM=&Movimientos;
+                                 FRC=ê&critures;
+                                 ENC=E&ntries];
+                      Image=Entries }
+      { 105     ;3   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=&Movimientos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      ToolTipML=[ENU=View the history of positive and negative inventory changes that reflect transactions with the item.;
+                                 ESM=Ver el historial de cambios positivos y negativos en el inventario que reflejan las transacciones con el producto.;
+                                 FRC=Affichez l'historique des modifications d'inventaire positives et nÇgatives qui reflätent les transactions avec l'article.;
+                                 ENC=View the history of positive and negative inventory changes that reflect transactions with the item.];
+                      RunObject=Page 38;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=ItemLedger;
+                      PromotedCategory=Category5 }
+      { 112     ;3   ;Action    ;
+                      CaptionML=[ENU=&Phys. Inventory Ledger Entries;
+                                 ESM=Movs. inventario &f°sico;
+                                 FRC=êcritures du grand livre de l'inventaire &physique;
+                                 ENC=&Phys. Inventory Ledger Entries];
+                      ToolTipML=[ENU=View how many units of the item you had on stock at the last physical count.;
+                                 ESM=Ver cu†ntas unidades del producto hab°a en stock en el £ltimo recuento f°sico.;
+                                 FRC=Affichez le nombre d'unitÇs de l'article que vous aviez en stock au dernier comptage physique.;
+                                 ENC=View how many units of the item you had on stock at the last physical count.];
+                      RunObject=Page 390;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=PhysicalInventoryLedger;
+                      PromotedCategory=Category5 }
+      { 3       ;1   ;ActionGroup;
+                      Name=PricesandDiscounts;
+                      CaptionML=[ENU=Prices and Discounts;
+                                 ESM=Precios y descuentos;
+                                 FRC=Prix et escomptes;
+                                 ENC=Prices and Discounts] }
+      { 82      ;2   ;Action    ;
+                      CaptionML=[ENU=Prices;
+                                 ESM=Precios;
+                                 FRC=Prix;
+                                 ENC=Prices];
+                      ToolTipML=[ENU=Set up different prices for the item. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.;
+                                 ESM=Configurar precios diferentes para el producto. Un precio de producto se concede autom†ticamente en las l°neas de factura cuando se cumplen los criterios especificados, como el cliente, la cantidad o la fecha final.;
+                                 FRC=Configurez des prix diffÇrents pour l'article. Un prix article est automatiquement affectÇ sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le client, la quantitÇ ou la date de fin.;
+                                 ENC=Set up different prices for the item. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.];
+                      RunObject=Page 7002;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=Price }
+      { 80      ;2   ;Action    ;
+                      CaptionML=[ENU=Line Discounts;
+                                 ESM=Descuentos l°nea;
+                                 FRC=Ligne Escomptes;
+                                 ENC=Line Discounts];
+                      ToolTipML=[ENU=Set up different discounts for the item. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.;
+                                 ESM=Configurar descuentos diferentes para el producto. Un descuento de producto se concede autom†ticamente en las l°neas de factura cuando se cumplen los criterios especificados, como el cliente, la cantidad o la fecha final.;
+                                 FRC=Configurez des escomptes diffÇrents pour l'article. Un escompte d'article est automatiquement accordÇ sur les lignes de facture en cas de satisfaction des critäres spÇcifiÇs, par exemple, client, quantitÇ ou date de fin.;
+                                 ENC=Set up different discounts for the item. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.];
+                      RunObject=Page 7004;
+                      RunPageView=SORTING(Type,Code);
+                      RunPageLink=Type=CONST(Item),
+                                  Code=FIELD(No.);
+                      Image=LineDiscount }
+      { 39      ;1   ;ActionGroup;
+                      Name=DataTemplate;
+                      CaptionML=[ENU=Data Template;
+                                 ESM=Plantilla datos;
+                                 FRC=Modäle donnÇes;
+                                 ENC=Data Template] }
+      { 37      ;2   ;Action    ;
+                      Name=SaveAsTemplate;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Save as Template;
+                                 ESM=Guardar como Plantilla;
+                                 FRC=Sauvegarder comme modäle;
+                                 ENC=Save as Template];
+                      ToolTipML=[ENU=Save the item card as a template that can be reused to create new item cards. Item templates contain preset information to help you fill fields on item cards.;
+                                 ESM=Guardar la ficha de producto como plantilla que se podr† usar para crear nuevas fichas de producto. Las plantillas de producto contienen informaci¢n predefinida para ayudarle a completar los cambios de las fichas de producto.;
+                                 FRC=Enregistrez la fiche article comme modäle que vous pourrez rÇutiliser pour crÇer de nouvelles fiches article. Les modäles article contiennent des informations prÇdÇfinies pour vous aider Ö complÇter les fiches article.;
+                                 ENC=Save the item card as a template that can be reused to create new item cards. Item templates contain preset information to help you fill fields on item cards.];
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=New;
+                      OnAction=VAR
+                                 TempMiniItemTemplate@1002 : TEMPORARY Record 1301;
+                               BEGIN
+                                 TempMiniItemTemplate.SaveAsTemplate(Rec);
+                               END;
+                                }
+      { 8       ;2   ;Action    ;
+                      Name=Templates;
+                      CaptionML=[ENU=Templates;
+                                 ESM=Plantillas;
+                                 FRC=Modäles;
+                                 ENC=Templates];
+                      ToolTipML=[ENU=View or edit item templates.;
+                                 ESM=Vea o edite las plantillas de producto.;
+                                 FRC=Affichez ou modifiez des modäles article.;
+                                 ENC=View or edit item templates.];
+                      RunObject=Page 1340;
+                      RunPageView=WHERE(Table ID=CONST(27));
+                      PromotedIsBig=Yes;
+                      Image=Template }
+      { 35      ;1   ;ActionGroup;
+                      Name=View;
+                      CaptionML=[ENU=View;
+                                 ESM=Vista;
+                                 FRC=Affichage;
+                                 ENC=View] }
+      { 25      ;2   ;Action    ;
+                      Name=ShowMainView;
+                      CaptionML=[ENU=Setup;
+                                 ESM=Configuraci¢n;
+                                 FRC=Configuration;
+                                 ENC=Setup];
+                      ToolTipML=[ENU=View setup information for the item, such as cost fields and posting groups.;
+                                 ESM=Vea la informaci¢n de configuraci¢n del producto, como los campos de costo y los grupos contables.;
+                                 FRC=Affichez des informations de configuration pour l'article, comme les groupes de report et les champs coñt.;
+                                 ENC=View setup information for the item, such as cost fields and posting groups.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Setup;
+                      PromotedCategory=Category6;
+                      OnAction=BEGIN
+                                 ViewSetup := NOT ViewSetup;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                Name=Item;
+                CaptionML=[ENU=Item;
+                           ESM=Producto;
+                           FRC=Article;
+                           ENC=Item];
+                GroupType=Group }
+
+    { 7   ;2   ;Group     ;
+                GroupType=Group }
+
+    { 2   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the item. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.;
+                           ESM=Especifica las cantidades del producto. El campo se rellena autom†ticamente a partir de un n£mero de serie definido o el n£mero se especifica manualmente porque se ha habilitado la entrada manual de n£meros en la configuraci¢n de n£mero de serie.;
+                           FRC=Indique le numÇro de l'article. Le champ est renseignÇ soit automatiquement Ö partir d'une souche de numÇros dÇfinie, soit vous entrez manuellement le numÇro car vous avez activÇ la saisie manuelle de numÇro dans le paramÇtrage de la souche de numÇros.;
+                           ENC=Specifies the number of the item. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.];
+                SourceExpr="No.";
+                Importance=Promoted;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a description of the item. You can enter a maximum of 30 characters, both numbers and letters.;
+                           ESM=Especifica una descripci¢n del producto. Puede introducir un m†ximo de 30 caracteres, tanto n£meros como letras.;
+                           FRC=Indique la dÇsignation de l'article. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.;
+                           ENC=Specifies a description of the item. You can enter a maximum of 30 characters, both numbers and letters.];
+                SourceExpr=Description }
+
+    { 20  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if transactions with the item should be blocked, for example, because the item is in quarantine.;
+                           ESM=Especifica si las transacciones con el producto deben bloquearse, por ejemplo, porque el producto est† en cuarentena.;
+                           FRC=SpÇcifie si les transactions avec l'article doivent àtre bloquÇes, par exemple, parce que l'article est en contrìle.;
+                           ENC=Specifies if transactions with the item should be blocked, for example, because the item is in quarantine.];
+                SourceExpr=Blocked }
+
+    { 6   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if the item card represents a physical item (Inventory) or a service (Service).;
+                           ESM=Especifica si la ficha de producto representa un producto f°sico (Inventario) o un servicio (Servicio).;
+                           FRC=SpÇcifie si la fiche article reprÇsente un article physique (Stock) ou un service (Service).;
+                           ENC=Specifies if the item card represents a physical item (Inventory) or a service (Service).];
+                SourceExpr=Type;
+                OnValidate=BEGIN
+                             EnableControls;
+                           END;
+                            }
+
+    { 11  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit in which the item is held on inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.;
+                           ESM=Especifica la unidad en la que se guarda el producto en existencias. La unidad de medida base tambiÇn se usa como base de la conversi¢n para las unidades de medida alternas.;
+                           FRC=Indique l'unitÇ dans laquelle l'article est stockÇ. L'unitÇ de base sert Çgalement de base de conversion pour les unitÇs de remplacement.;
+                           ENC=Specifies the unit in which the item is held on inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.];
+                SourceExpr="Base Unit of Measure";
+                Importance=Promoted }
+
+    { 12  ;2   ;Group     ;
+                GroupType=Group }
+
+    { 14  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies how many units, such as pieces, boxes, or cans, of the item are on inventory.;
+                           ESM=Especifica cu†ntas unidades (como piezas, cajas o envases) del producto hay en existencias.;
+                           FRC=Indique le nombre d'unitÇs (par exemple des piäces, des boåtes ou des palettes) en stock.;
+                           ENC=Specifies how many units, such as pieces, boxes, or cans, of the item are on inventory.];
+                SourceExpr=Inventory;
+                Importance=Promoted;
+                Enabled=InventoryItemEditable }
+
+    { 47  ;3   ;Field     ;
+                CaptionML=[ENU=Stockout Warning;
+                           ESM=Advertencia falta existencias;
+                           FRC=Alerte rupture stock;
+                           ENC=Stockout Warning];
+                ToolTipML=[ENU=Specifies if a warning is displayed when you enter a quantity on a sales document that brings the item's inventory below zero. The calculation includes all sales document lines that have not yet been posted.;
+                           ESM=Especifica si se muestra una advertencia cuando introduce una cantidad en un documento de venta que lleve el inventario del producto por debajo de cero. El c†lculo incluye todas las l°neas del documento de venta que a£n no se han registrado.;
+                           FRC=Indique si un avertissement s'affiche lorsque vous entrez une quantitÇ sur un document vente qui entraåne un stock d'article nÇgatif. Le calcul inclut toutes les lignes document vente qui n'ont pas encore ÇtÇ validÇes.;
+                           ENC=Specifies if a warning is displayed when you enter a quantity on a sales document that brings the item's inventory below zero. The calculation includes all sales document lines that have not yet been posted.];
+                OptionCaptionML=[ENU=Default (Yes),No,Yes;
+                                 ESM=Predeterminado (S°),No,S°;
+                                 FRC=Par dÇfaut (Oui),Non,Oui;
+                                 ENC=Default (Yes),No,Yes];
+                SourceExpr="Stockout Warning";
+                Visible=ShowStockoutWarningDefaultYes }
+
+    { 46  ;3   ;Field     ;
+                Name=StockoutWarningDefNo;
+                CaptionML=[ENU=Stockout Warning;
+                           ESM=Advertencia falta existencias;
+                           FRC=Alerte rupture stock;
+                           ENC=Stockout Warning];
+                ToolTipML=[ENU=Specifies if a warning is displayed when you enter a quantity on a sales document that brings the item's inventory below zero. The calculation includes all sales document lines that have not yet been posted.;
+                           ESM=Especifica si se muestra una advertencia cuando introduce una cantidad en un documento de venta que lleve el inventario del producto por debajo de cero. El c†lculo incluye todas las l°neas del documento de venta que a£n no se han registrado.;
+                           FRC=Indique si un avertissement s'affiche lorsque vous entrez une quantitÇ sur un document vente qui entraåne un stock d'article nÇgatif. Le calcul inclut toutes les lignes document vente qui n'ont pas encore ÇtÇ validÇes.;
+                           ENC=Specifies if a warning is displayed when you enter a quantity on a sales document that brings the item's inventory below zero. The calculation includes all sales document lines that have not yet been posted.];
+                OptionCaptionML=[ENU=Default (No),No,Yes;
+                                 ESM=Predeterminado (No),No,S°;
+                                 FRC=Par dÇfaut (Non),Non,Oui;
+                                 ENC=Default (No),No,Yes];
+                SourceExpr="Stockout Warning";
+                Visible=ShowStockoutWarningDefaultNo }
+
+    { 45  ;3   ;Field     ;
+                CaptionML=[ENU=Prevent Negative Inventory;
+                           ESM=Evitar inventario negativo;
+                           FRC=êviter inventaire nÇgatif;
+                           ENC=Prevent Negative Inventory];
+                ToolTipML=[ENU=Specifies if you can post a transaction that will bring the item's inventory below zero.;
+                           ESM=Especifica si se puede registrar una transacci¢n que lleve el inventario del producto debajo de cero.;
+                           FRC=Indique si vous pouvez valider une transaction qui entraånerait un stock de l'article nÇgatif.;
+                           ENC=Specifies if you can post a transaction that will bring the item's inventory below zero.];
+                OptionCaptionML=[ENU=Default (Yes),No,Yes;
+                                 ESM=Predeterminado (S°),No,S°;
+                                 FRC=Par dÇfaut (Oui),Non,Oui;
+                                 ENC=Default (Yes),No,Yes];
+                SourceExpr="Prevent Negative Inventory";
+                Visible=PreventNegInventoryDefaultYes }
+
+    { 43  ;3   ;Field     ;
+                Name=PreventNegativeInventoryDefNo;
+                CaptionML=[ENU=Prevent Negative Inventory;
+                           ESM=Evitar inventario negativo;
+                           FRC=êviter inventaire nÇgatif;
+                           ENC=Prevent Negative Inventory];
+                ToolTipML=[ENU=Specifies if you can post a transaction that will bring the item's inventory below zero.;
+                           ESM=Especifica si se puede registrar una transacci¢n que lleve el inventario del producto debajo de cero.;
+                           FRC=Indique si vous pouvez valider une transaction qui entraånerait un stock de l'article nÇgatif.;
+                           ENC=Specifies if you can post a transaction that will bring the item's inventory below zero.];
+                OptionCaptionML=[ENU=Default (No),No,Yes;
+                                 ESM=Predeterminado (No),No,S°;
+                                 FRC=Par dÇfaut (Non),Non,Oui;
+                                 ENC=Default (No),No,Yes];
+                SourceExpr=["Prevent Negative Inventory" ];
+                Visible=PreventNegInventoryDefaultNo }
+
+    { 49  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies that an extended text that you have set up will be added automatically on sales or purchase documents for this item.;
+                           ESM=Especifica que se agregar† autom†ticamente un texto adicional configurado en los documentos de compra y de venta de este producto.;
+                           FRC=Indique qu'un texte Çtendu que vous avez dÇfini sera automatiquement ajoutÇ aux documents vente ou achat de cet article.;
+                           ENC=Specifies that an extended text that you have set up will be added automatically on sales or purchase documents for this item.];
+                SourceExpr="Automatic Ext. Texts" }
+
+    { 50  ;3   ;Field     ;
+                ToolTipML=[ENU=Shows when the item card was last modified.;
+                           ESM=Muestra cu†ndo se hizo el £ltimo cambio en la ficha de producto.;
+                           FRC=Affiche la date Ö laquelle la fiche article a ÇtÇ modifiÇe pour la derniäre fois.;
+                           ENC=Shows when the item card was last modified.];
+                SourceExpr="Last Date Modified" }
+
+    { 9   ;1   ;Group     ;
+                Name=Price;
+                CaptionML=[ENU=Price;
+                           ESM=Precio;
+                           FRC=Prix;
+                           ENC=Price];
+                GroupType=Group }
+
+    { 38  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the price for one unit of the item, in LCY. You can enter a price manually or have it entered according to the Price/Profit Calculation field.;
+                           ESM=Especifica el precio unitario del producto, en $. Puede introducir un precio manualmente o introducirlo seg£n el campo C†lculo precio/bfß bruto.;
+                           FRC=SpÇcifie le prix d'une unitÇ de l'article, en devise sociÇtÇ. Vous pouvez saisir manuellement un prix ou qu'il soit indiquÇ en fonction du champ Mode de calcul prix/profit.;
+                           ENC=Specifies the price for one unit of the item, in $. You can enter a price manually or have it entered according to the Price/Profit Calculation field.];
+                SourceExpr="Unit Price";
+                Importance=Promoted }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr=CalcUnitPriceExclVAT;
+                CaptionClass='2,0,' + FIELDCAPTION("Unit Price") }
+
+    { 29  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Unit Price and Line Amount fields on sales document lines for this item should be shown with or without VAT.;
+                           ESM=Especifica si los campos Precio unitario y Importe l°nea de las l°neas de documento de venta de este art°culo se deben mostrar con o sin IVA.;
+                           FRC=SpÇcifie si les champs Prix unitaire et Montant ligne des lignes document vente pour cet article sont affichÇs avec ou sans la TVA.;
+                           ENC=Specifies if the Unit Price and Line Amount fields on sales document lines for this item should be shown with or without tax.];
+                SourceExpr="Price Includes VAT";
+                OnValidate=BEGIN
+                             IF "Price Includes VAT" = xRec."Price Includes VAT" THEN
+                               EXIT;
+
+                             CurrPage.PriceAndLineDisc.PAGE.RunUpdatePriceIncludesVatAndPrices("Price Includes VAT");
+                           END;
+                            }
+
+    { 34  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Profit % field, the Unit Price field, or neither field is calculated and filled. The value in the Profit % field is what is generally understood as the profit margin.;
+                           ESM=Especifica si se calcula el campo % Bfß bruto, el campo Precio unitario o ninguno de los campos se calcula y se rellena. El valor del campo % Bfß bruto es el se entender† normalmente como el margen de beneficio bruto.;
+                           FRC=SpÇcifie si le champ % profit, le champ Prix unitaire, ou aucun des deux champs est calculÇ et renseignÇ. GÇnÇralement, la valeur du champ % profit correspond Ö la marge bÇnÇficiaire.;
+                           ENC=Specifies if the Profit % field, the Unit Price field, or neither field is calculated and filled. The value in the Profit % field is what is generally understood as the profit margin.];
+                SourceExpr="Price/Profit Calculation" }
+
+    { 36  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the profit margin that you want to sell the item at. You can enter a profit percentage manually or have it entered according to the Price/Profit Calculation field.;
+                           ESM=Especifica el margen de ganancias en el que desea vender el producto. Puede introducir un porcentaje de beneficio manualmente o introducirlo seg£n el campo C†lculo precio/bfß bruto.;
+                           FRC=SpÇcifie la marge bÇnÇficiaire avec laquelle vous souhaitez vendre l'article. Vous pouvez saisir manuellement un pourcentage de marge ou qu'il soit indiquÇ en fonction du champ Mode de calcul prix/profit.;
+                           ENC=Specifies the profit margin that you want to sell the item at. You can enter a profit percentage manually or have it entered according to the Price/Profit Calculation field.];
+                DecimalPlaces=2:2;
+                SourceExpr="Profit %" }
+
+    { 44  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the item should be included in the calculation of an invoice discount on documents where the item is traded.;
+                           ESM=Especifica si el producto se incluye en el c†lculo de un descuento en factura en los documentos en los que se comercializa el producto.;
+                           FRC=SpÇcifie si l'article doit àtre inclus dans le calcul d'une remise facture sur les documents dans lesquels l'article est achetÇ ou vendu.;
+                           ENC=Specifies if the item should be included in the calculation of an invoice discount on documents where the item is traded.];
+                SourceExpr="Allow Invoice Disc." }
+
+    { 48  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies an item group code that can be used as a criterion to grant a discount when the item is sold to a certain customer.;
+                           ESM=Especifica un c¢digo del grupo de productos que se utilizar† como criterio para conceder un descuento cuando el producto se vende a un determinado cliente.;
+                           FRC=Indique le code groupe articles qui peut àtre utilisÇ comme critäre pour obtenir un escompte lorsque l'article est vendu Ö un certain client.;
+                           ENC=Specifies an item group code that can be used as a criterion to grant a discount when the item is sold to a certain customer.];
+                SourceExpr="Item Disc. Group";
+                Importance=Promoted }
+
+    { 1905885101;1;Group  ;
+                Name=Cost;
+                CaptionML=[ENU=Cost;
+                           ESM=Costo;
+                           FRC=Coñt;
+                           ENC=Cost];
+                Visible=ViewSetup;
+                Editable=ViewSetup;
+                GroupType=Group }
+
+    { 24  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how the item's cost flow is recorded and whether an actual or budgeted value is capitalized and used in the cost calculation.;
+                           ESM=Especifica c¢mo se registra el flujo de costo del producto y si un el valor real o presupuestado se capitaliza y utiliza en el c†lculo del costo.;
+                           FRC=SpÇcifie la maniäre dont le flux des coñts de l'article est enregistrÇ et si une valeur rÇelle ou budgÇtÇe est capitalisÇe et utilisÇe dans le calcul des coñts.;
+                           ENC=Specifies how the item's cost flow is recorded and whether an actual or budgeted value is capitalized and used in the cost calculation.];
+                SourceExpr="Costing Method";
+                Importance=Promoted;
+                Enabled=FALSE }
+
+    { 30  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the most recent average cost for one unit of the item. After each sale, the unit cost is updated by automatic cost adjustment.;
+                           ESM=Especifica el costo promedio m†s reciente para una unidad del producto. DespuÇs de cada venta, el costo unitario se actualiza seg£n el ajuste autom†tico del costo.;
+                           FRC=Indique le coñt moyen le plus rÇcent d'une unitÇ de l'article. Apräs chaque vente, le coñt unitaire est mis Ö jour par l'ajustement automatique des coñts.;
+                           ENC=Specifies the most recent average cost for one unit of the item. After each sale, the unit cost is updated by automatic cost adjustment.];
+                SourceExpr="Unit Cost";
+                Editable=UnitCostEditable;
+                OnDrillDown=VAR
+                              ShowAvgCalcItem@1000 : Codeunit 5803;
+                            BEGIN
+                              ShowAvgCalcItem.DrillDownAvgCostAdjmtPoint(Rec)
+                            END;
+                             }
+
+    { 155 ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the percentage of the item's last purchase cost that includes indirect costs, such as freight that is associated with the purchase of the item.;
+                           ESM=Especifica el porcentaje del £ltimo costo de compra de un producto, que incluye los costos indirectos, como el flete asociado con la compra del producto.;
+                           FRC=SpÇcifie le pourcentage du dernier coñt d'achat de l'article qui inclut les coñts indirects comme la gestion du fret et des entrepìts associÇs Ö l'achat de l'article.;
+                           ENC=Specifies the percentage of the item's last purchase cost that includes indirect costs, such as freight that is associated with the purchase of the item.];
+                SourceExpr="Indirect Cost %" }
+
+    { 32  ;2   ;Field     ;
+                CaptionML=[ENU=Last Purchase Cost;
+                           ESM=Costo £ltima compra;
+                           FRC=Dernier coñt d'achat;
+                           ENC=Last Purchase Cost];
+                ToolTipML=[ENU=Specifies the item's most recent purchase cost as invoiced by your vendor in the last posted purchase invoice for the item.;
+                           ESM=Especifica el costo de compra m†s reciente del producto seg£n sea facturado por el proveedor en la £ltima factura de compra registrada para el producto.;
+                           FRC=SpÇcifie le coñt d'achat le plus rÇcent de l'article tel qu'il a ÇtÇ facturÇ par votre fournisseur sur la derniäre facture achat enregistrÇe pour l'article.;
+                           ENC=Specifies the item's most recent purchase cost as invoiced by your vendor in the last posted purchase invoice for the item.];
+                SourceExpr="Last Direct Cost" }
+
+    { 17  ;1   ;Group     ;
+                Name=Financial Details;
+                Visible=ViewSetup;
+                GroupType=Group }
+
+    { 95  ;2   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for this item with the general ledger to account for the value of trade with the item.;
+                           ESM=Vincula las transacciones de negocio realizadas para este producto con la contabilidad en la cuenta para el valor de comercio con el producto.;
+                           FRC=Lie les transactions effectuÇes pour cet article avec les Çcritures comptables pour reprÇsenter la valeur commerciale de l'article.;
+                           ENC=Links business transactions made for this item with the general ledger to account for the value of trade with the item.];
+                SourceExpr="Gen. Prod. Posting Group";
+                Importance=Promoted }
+
+    { 66  ;2   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for this item with the general ledger to account for VAT amounts that result from trade with the item.;
+                           ESM=Vincula las transacciones de negocio realizadas para este producto con la contabilidad en la cuenta los importes de IVA que sean resultados del comercio con el producto.;
+                           FRC=Lie les transactions effectuÇes pour cet article avec les Çcritures comptables pour reprÇsenter les montants de TVA dÇcoulant de la vente de l'article.;
+                           ENC=Links business transactions made for this item with the general ledger to account for VAT amounts that result from trade with the item.];
+                SourceExpr="VAT Prod. Posting Group" }
+
+    { 40  ;2   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for the item with an inventory account in the general ledger to group amounts for that item type.;
+                           ESM=Vincula las transacciones de negocio realizadas para el producto con una cuenta de inventario en la contabilidad para agrupar los importes para ese tipo de producto.;
+                           FRC=Lie les transactions commerciales effectuÇes pour l'article avec un compte stock en comptabilitÇ pour regrouper les montants de ce type d'article.;
+                           ENC=Links business transactions made for the item with an inventory account in the general ledger to group amounts for that item type.];
+                SourceExpr="Inventory Posting Group";
+                Importance=Promoted;
+                Editable=InventoryItemEditable }
+
+    { 19  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a code for the item's tariff number. To see the tariff numbers in the Tariff Numbers window, choose the field.;
+                           ESM=Especifica un c¢digo para el n£mero de tarifa del producto. Para ver los c¢digos arancelarios de la ventana C¢digos arancelarios, seleccione el campo.;
+                           FRC=Indique un code pour la nomenclature produit de l'article. Pour afficher les nomenclatures produits de la fenàtre Nomenclatures produits, cliquez sur le champ.;
+                           ENC=Specifies a code for the item's tariff number. To see the tariff numbers in the Tariff Numbers window, choose the field.];
+                SourceExpr="Tariff No." }
+
+    { 22  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the net weight of the item.;
+                           ESM=Especifica el peso neto del producto.;
+                           FRC=Indique le poids net de l'article.;
+                           ENC=Specifies the net weight of the item.];
+                SourceExpr="Net Weight" }
+
+    { 41  ;1   ;Part      ;
+                Name=PriceAndLineDisc;
+                PagePartID=Page1345;
+                PartType=Page }
+
+    { 15  ;1   ;Field     ;
+                Name=PageReady;
+                ControlAddIn=[Microsoft.Dynamics.Nav.Client.PageReady;PublicKeyToken=31bf3856ad364e35] }
+
+  }
+  CODE
+  {
+    VAR
+      InventoryItemEditable@1000 : Boolean INDATASET;
+      UnitCostEditable@1001 : Boolean INDATASET;
+      ViewSetup@1003 : Boolean;
+      ShowStockoutWarningDefaultYes@1007 : Boolean;
+      ShowStockoutWarningDefaultNo@1006 : Boolean;
+      PreventNegInventoryDefaultYes@1005 : Boolean;
+      PreventNegInventoryDefaultNo@1004 : Boolean;
+
+    LOCAL PROCEDURE EnableControls@3();
+    VAR
+      ItemLedgerEntry@1000 : Record 32;
+    BEGIN
+      InventoryItemEditable := Type = Type::Inventory;
+
+      IF Type = Type::Inventory THEN BEGIN
+        ItemLedgerEntry.SETRANGE("Item No.","No.");
+        UnitCostEditable := ItemLedgerEntry.ISEMPTY;
+      END ELSE
+        UnitCostEditable := TRUE;
+    END;
+
+    LOCAL PROCEDURE VisualizingControls@5();
+    VAR
+      SalesSetup@1001 : Record 311;
+      InventorySetup@1002 : Record 313;
+    BEGIN
+      SalesSetup.GET;
+      ShowStockoutWarningDefaultYes := SalesSetup."Stockout Warning";
+      ShowStockoutWarningDefaultNo := NOT ShowStockoutWarningDefaultYes;
+      InventorySetup.GET;
+      PreventNegInventoryDefaultYes := InventorySetup."Prevent Negative Inventory";
+      PreventNegInventoryDefaultNo := NOT PreventNegInventoryDefaultYes;
+    END;
+
+    LOCAL PROCEDURE GetSalesPricesAndSalesLineDisc@4();
+    BEGIN
+      IF "No." <> CurrPage.PriceAndLineDisc.PAGE.GetLoadedItemNo THEN BEGIN
+        CurrPage.PriceAndLineDisc.PAGE.LoadItem(Rec);
+        CurrPage.PriceAndLineDisc.PAGE.UPDATE(FALSE);
+      END;
+    END;
+
+    LOCAL PROCEDURE ShouldBeLoadedInSetupView@2() : Boolean;
+    BEGIN
+      EXIT('' IN [Description,
+                  "VAT Prod. Posting Group",
+                  "Gen. Prod. Posting Group"])
+    END;
+
+    EVENT PageReady@-15::AddInReady@0();
+    VAR
+      MiniItemTemplate@1000 : Record 1301;
+      NewItemCode@1001 : Code[20];
+    BEGIN
+      IF "No." = '' THEN BEGIN
+        NewItemCode := MiniItemTemplate.NewItemFromTemplate;
+        IF NewItemCode <> '' THEN BEGIN
+          GET(NewItemCode);
+          CurrPage.UPDATE;
+        END;
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

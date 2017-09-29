@@ -1,0 +1,141 @@
+OBJECT Page 9050 Whse Ship & Receive Activities
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Activities;
+               ESM=Actividades;
+               FRC=Activit‚s;
+               ENC=Activities];
+    SourceTable=Table9050;
+    PageType=CardPart;
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+
+                 SETRANGE("Date Filter",0D,WORKDATE);
+                 SETRANGE("Date Filter2",WORKDATE,WORKDATE);
+
+                 LocationCode := WhseWMSCue.GetEmployeeLocation(USERID);
+                 SETFILTER("Location Filter",LocationCode);
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Outbound - Today;
+                           ESM=Salida - Hoy;
+                           FRC=Sortie - Aujourd'hui;
+                           ENC=Outbound - Today];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 8       ;0   ;Action    ;
+                                  CaptionML=[ENU=New Transfer Order;
+                                             ESM=Nuevo pedido transferencia;
+                                             FRC=Nouvel ordre de transfert;
+                                             ENC=New Transfer Order];
+                                  RunObject=Page 5740;
+                                  RunPageMode=Create }
+                }
+                 }
+
+    { 5   ;2   ;Field     ;
+                DrillDown=Yes;
+                SourceExpr="Released Sales Orders - Today";
+                DrillDownPageID=Sales Order List }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Posted Sales Shipments - Today";
+                DrillDownPageID=Posted Sales Shipments }
+
+    { 7   ;1   ;Group     ;
+                CaptionML=[ENU=Inbound - Today;
+                           ESM=Entrada - Hoy;
+                           FRC=Entr‚e - Aujourd'hui;
+                           ENC=Inbound - Today];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 14      ;0   ;Action    ;
+                                  CaptionML=[ENU=New Purchase Order;
+                                             ESM=Nuevo pedido de compra;
+                                             FRC=Nouveau bon de commande;
+                                             ENC=New Purchase Order];
+                                  RunObject=Page 50;
+                                  RunPageMode=Create }
+                }
+                 }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Expected Purch. Orders - Today";
+                DrillDownPageID=Purchase Order List }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Posted Purch. Receipts - Today";
+                DrillDownPageID=Posted Purchase Receipts }
+
+    { 15  ;1   ;Group     ;
+                CaptionML=[ENU=Internal;
+                           ESM=Interno;
+                           FRC=Interne;
+                           ENC=Internal];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 21      ;0   ;Action    ;
+                                  CaptionML=[ENU=New Inventory Pick;
+                                             ESM=Nuevo picking inventario;
+                                             FRC=Nouveau pr‚lŠvement de stock;
+                                             ENC=New Inventory Pick];
+                                  RunObject=Page 7377;
+                                  RunPageMode=Create }
+                  { 22      ;0   ;Action    ;
+                                  CaptionML=[ENU=New Inventory Put-away;
+                                             ESM=Nueva ubicaci¢n inventario;
+                                             FRC=Nouveau rangement de stock;
+                                             ENC=New Inventory Put-away];
+                                  RunObject=Page 7375;
+                                  RunPageMode=Create }
+                  { 23      ;0   ;Action    ;
+                                  CaptionML=[ENU=Edit Item Reclassification Journal;
+                                             ESM=Editar diario reclasificaci¢n producto;
+                                             FRC=Modifier le journal de reclassements d'articles;
+                                             ENC=Edit Item Reclassification Journal];
+                                  RunObject=Page 393;
+                                  Image=OpenWorksheet }
+                }
+                 }
+
+    { 19  ;2   ;Field     ;
+                SourceExpr="Inventory Picks - Today";
+                DrillDownPageID=Inventory Picks }
+
+    { 17  ;2   ;Field     ;
+                SourceExpr="Inventory Put-aways - Today";
+                DrillDownPageID=Inventory Put-aways }
+
+  }
+  CODE
+  {
+    VAR
+      WhseWMSCue@1001 : Record 9051;
+      LocationCode@1000 : Text[1024];
+
+    BEGIN
+    END.
+  }
+}
+

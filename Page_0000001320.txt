@@ -1,0 +1,390 @@
+OBJECT Page 1320 Mini Sales Cr.Memo Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Lines;
+               ESM=L¡neas;
+               FRC=Lignes;
+               ENC=Lines];
+    MultipleNewLines=Yes;
+    LinksAllowed=No;
+    SourceTable=Table37;
+    DelayedInsert=Yes;
+    SourceTableView=WHERE(Document Type=FILTER(Credit Memo));
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    OnNewRecord=BEGIN
+                  Type := Type::Item;
+                END;
+
+    OnDeleteRecord=BEGIN
+                     DELETE;
+                     UpdatePage;
+                   END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           TotalsOnLinesSubforms.CalculateSalesHeaderTotals(TotalSalesHeader,VATAmount,Rec);
+                           UpdateEditableOnRow;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1900206204;1 ;Action    ;
+                      Name=InsertExtTextsAction;
+                      CaptionML=[ENU=Insert &Ext. Text;
+                                 ESM=Insertar t&exto adicional;
+                                 FRC=Ins‚rer te&xte ‚tendu;
+                                 ENC=Insert &Ext. Text];
+                      ToolTipML=[ENU=Insert the extended item description that is set up for the item.;
+                                 ESM=Insertar la descripci¢n ampliada configurada para el producto.;
+                                 FRC=Ins‚rez la description plus longue qui est configur‚e pour l'article.;
+                                 ENC=Insert the extended item description that is set up for the item.];
+                      Image=Text;
+                      OnAction=BEGIN
+                                 InsertExtendedText(TRUE);
+                               END;
+                                }
+      { 1904522204;1 ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      ToolTipML=[ENU=View or edit the dimension sets that are set up for the combination of customer and item on the invoice line.;
+                                 ESM=Ver o editar los grupos de dimensiones configurados para la combinaci¢n de cliente y producto en la l¡nea de factura.;
+                                 FRC=Affichez ou modifiez les ensembles de dimensions qui sont configur‚s pour la combinaison client-article sur la ligne facture.;
+                                 ENC=View or edit the dimension sets that are set up for the combination of customer and item on the invoice line.];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Item No.;
+                           ESM=N§ producto;
+                           FRC=Nø d'article;
+                           ENC=Item No.];
+                ToolTipML=[ENU=Specifies the number of a general ledger account, an item, a resource, an additional cost or a fixed asset, depending on what you selected in the Type field.;
+                           ESM=Especifica el n£mero de una cuenta de contabilidad, producto, recurso, costo adicional o activo, dependiendo de lo que hubiera seleccionado en el campo Tipo.;
+                           FRC=Sp‚cifie le num‚ro d'un compte g‚n‚ral, d'un article, d'une ressource, d'un co–t suppl‚mentaire ou d'une immobilisation, selon la s‚lection effectu‚e dans le champ Type.;
+                           ENC=Specifies the number of a general ledger account, an item, a resource, an additional cost or a fixed asset, depending on what you selected in the Type field.];
+                SourceExpr="No.";
+                LookupPageID=Mini Item List;
+                DrillDownPageID=Mini Item List;
+                OnValidate=BEGIN
+                             NoOnAfterValidate;
+                             UpdateEditableOnRow;
+                             UpdatePage;
+                           END;
+                            }
+
+    { 58  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies an item cross-reference number.;
+                           ESM=Especifica un n£mero de referencia cruzada de producto.;
+                           FRC=Sp‚cifie le num‚ro de r‚f‚rence externe article.;
+                           ENC=Specifies an item cross-reference number.];
+                SourceExpr="Cross-Reference No.";
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             CrossReferenceNoOnAfterValidat;
+                           END;
+
+                OnLookup=BEGIN
+                           CrossReferenceNoLookUp;
+                           InsertExtendedText(FALSE);
+                         END;
+                          }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Description/Comment;
+                           ESM=Descripci¢n o comentario;
+                           FRC=Description/Commentaire;
+                           ENC=Description/Comment];
+                ToolTipML=[ENU=Contains a description of the entry. The description depends on what you chose in the Type field. If you did not choose Blank, the program will fill in the field when you enter something in the No. field.;
+                           ESM=Contiene una descripci¢n del movimiento. La descripci¢n depende de la selecci¢n del campo Tipo. Si no eligi¢ En blanco, el programa completar  dicho campo al escribir algo en el campo N§.;
+                           FRC=Indique la d‚signation de l'‚criture. Cette description d‚pend de votre choix dans le champ Type. Si vous n'avez pas choisi Vide, le programme renseigne le champ lorsque vous renseignez le champ Nø.;
+                           ENC=Contains a description of the entry. The description depends on what you chose in the Type field. If you did not choose Blank, the program will fill in the field when you enter something in the No. field.];
+                SourceExpr=Description;
+                OnValidate=VAR
+                             MiniLinesInstructionMgt@1000 : Codeunit 1320;
+                           BEGIN
+                             MiniLinesInstructionMgt.ShowCreateLineInstruction("No.");
+                           END;
+                            }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how many units of the item you want to sell. This field affects the values in the Line Amount and Line Discount Amount fields.;
+                           ESM=Especifica cu ntas unidades de producto desea vender. Este afecta a los valores de los campos Importe l¡nea y Importe dto. l¡nea.;
+                           FRC=Sp‚cifie le nombre d'unit‚s de l'article que vous souhaitez vendre. Ce champ affecte les valeurs des champs Montant ligne et Ligne Montant d'escompte.;
+                           ENC=Specifies how many units of the item you want to sell. This field affects the values in the Line Amount and Line Discount Amount fields.];
+                BlankZero=Yes;
+                SourceExpr=Quantity;
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             QuantityOnAfterValidate;
+                             UpdatePage;
+                           END;
+                            }
+
+    { 34  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit of measure code to use to determine the unit price. If the Sales Unit of Measure field on the item card is filled in, the value is automatically copied from that field when the sales line is filled in.;
+                           ESM=Especifica el c¢digo de unidad de medida que se debe usar para determinar el precio de venta. Si el campo Unidad medida venta de la ficha de producto est  relleno, el valor se copia autom ticamente de ese campo cuando se rellena la l¡nea de venta.;
+                           FRC=Indique le code unit‚ … utiliser pour d‚terminer le prix unitaire. Si le champ Unit‚ de vente sur la fiche article est renseign‚, la valeur est automatiquement copi‚e … partir de ce champ lorsque la ligne vente est renseign‚e.;
+                           ENC=Specifies the unit of measure code to use to determine the unit price. If the Sales Unit of Measure field on the item card is filled in, the value is automatically copied from that field when the sales line is filled in.];
+                SourceExpr="Unit of Measure Code";
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UnitofMeasureCodeOnAfterValida;
+                             UpdatePage;
+                           END;
+                            }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit price of the item.;
+                           ESM=Especifica el precio unitario del producto.;
+                           FRC=Sp‚cifie le prix unitaire de l'article.;
+                           ENC=Specifies the unit price of the item.];
+                BlankZero=Yes;
+                SourceExpr="Unit Price";
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+                            }
+
+    { 16  ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the line discount percentage that is valid for the item quantity on the line.;
+                           ESM=Contiene el porcentaje de descuento de l¡nea v lido para la cantidad de productos de la l¡nea.;
+                           FRC=Indique le pourcentage de remise ligne valable pour la quantit‚ article de la ligne.;
+                           ENC=Contains the line discount percentage that is valid for the item quantity on the line.];
+                BlankZero=Yes;
+                SourceExpr="Line Discount %";
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+                            }
+
+    { 40  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the amount of the discount that will be given on the invoice line. The program uses the Line Discount %, Quantity and Unit Price tables to calculate the amount.;
+                           ESM=Especifica el importe del descuento que se aplicar  en la l¡nea de factura. El programa utiliza las tablas % Descuento l¡nea, Cantidad y Precio unitario para calcular el importe.;
+                           FRC=Indique le montant de la remise qui est accord‚e sur la ligne facture. Le programme utilise les tables Ligne % escompte , Quantit‚ et Prix unitaire pour calculer le montant.;
+                           ENC=Specifies the amount of the discount that will be given on the invoice line. The program uses the Line Discount %, Quantity and Unit Price tables to calculate the amount.];
+                SourceExpr="Line Discount Amount";
+                Visible=FALSE;
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+                            }
+
+    { 64  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the net amount (excluding the invoice discount amount) of the line, in the currency of the sales document. If you have placed a check mark in the Prices Including VAT field, the amount displayed will include VAT.;
+                           ESM=Especifica el importe neto de la l¡nea (sin el importe de descuento en factura) en la divisa del documento de venta. Si activ¢ el campo Precios IVA incluido, el importe que se muestre incluir  el IVA.;
+                           FRC=Indique le montant net (excluant le montant remise facture) de la ligne, dans la devise du document vente. Si vous avez activ‚ le champ Prix incluant la TVA, le montant affich‚ inclut la TVA.;
+                           ENC=Specifies the net amount (excluding the invoice discount amount) of the line, in the currency of the sales document. If you have placed a check mark in the Prices Including VAT field, the amount displayed will include VAT.];
+                BlankZero=Yes;
+                SourceExpr="Line Amount";
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+                            }
+
+    { 100 ;1   ;Group     ;
+                GroupType=FixedLayout }
+
+    { 101 ;2   ;Group     ;
+                GroupType=Group }
+
+    { 102 ;3   ;Field     ;
+                SourceExpr='';
+                Enabled=FALSE;
+                Editable=FALSE }
+
+    { 103 ;1   ;Group     ;
+                GroupType=Group }
+
+    { 104 ;2   ;Group     ;
+                GroupType=GridLayout;
+                Layout=Columns }
+
+    { 105 ;3   ;Group     ;
+                GroupType=Group }
+
+    { 106 ;4   ;Group     ;
+                GroupType=Group }
+
+    { 107 ;5   ;Field     ;
+                Name=Invoice Discount Amount;
+                CaptionML=[ENU=Invoice Discount Amount;
+                           ESM=Importe descuento factura;
+                           FRC=Montant d'escompte de la facture;
+                           ENC=Invoice Discount Amount];
+                SourceExpr=TotalSalesHeader."Invoice Discount Amount";
+                OnValidate=VAR
+                             SalesHeader@1000 : Record 36;
+                           BEGIN
+                             SalesHeader.GET("Document Type","Document No.");
+                             SalesCalcDiscByType.ApplyInvDiscBasedOnAmt(TotalSalesHeader."Invoice Discount Amount",SalesHeader);
+                             CurrPage.UPDATE;
+                           END;
+                            }
+
+    { 108 ;5   ;Field     ;
+                Name=Cust. Invoice Disc. Pct.;
+                CaptionML=[ENU=Customer Invoice Discount %;
+                           ESM=% descuento de la factura del cliente;
+                           FRC=Escompte de facture client %;
+                           ENC=Customer Invoice Discount %];
+                DecimalPlaces=0:1;
+                SourceExpr=SalesCalcDiscByType.GetCustInvoiceDiscountPct(Rec);
+                Visible=TRUE;
+                Editable=FALSE }
+
+    { 120 ;3   ;Group     ;
+                GroupType=Group }
+
+    { 121 ;4   ;Group     ;
+                GroupType=Group }
+
+    { 122 ;5   ;Group     ;
+                GroupType=FixedLayout }
+
+    { 123 ;6   ;Group     ;
+                GroupType=Group }
+
+    { 124 ;7   ;Field     ;
+                SourceExpr='';
+                Enabled=FALSE;
+                Editable=FALSE }
+
+    { 130 ;3   ;Group     ;
+                GroupType=Group }
+
+    { 131 ;4   ;Group     ;
+                GroupType=Group }
+
+    { 7   ;5   ;Field     ;
+                Name=Total Amount Excl. VAT;
+                DrillDown=No;
+                SourceExpr=TotalSalesHeader.Amount;
+                CaptionClass=TotalsOnLinesSubforms.GetTotalExclVATCaption(TotalSalesHeader."Currency Code");
+                Editable=FALSE }
+
+    { 2   ;5   ;Field     ;
+                Name=Total VAT Amount;
+                SourceExpr=VATAmount;
+                CaptionClass=TotalsOnLinesSubforms.GetTotalVATCaption(TotalSalesHeader."Currency Code");
+                Editable=FALSE }
+
+    { 3   ;5   ;Field     ;
+                Name=Total Amount Incl. VAT;
+                SourceExpr=TotalSalesHeader."Amount Including VAT";
+                CaptionClass=TotalsOnLinesSubforms.GetTotalInclVATCaption(TotalSalesHeader."Currency Code");
+                Editable=FALSE;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+  }
+  CODE
+  {
+    VAR
+      TotalSalesHeader@1000 : Record 36;
+      TransferExtendedText@1003 : Codeunit 378;
+      SalesCalcDiscByType@1001 : Codeunit 1300;
+      TotalsOnLinesSubforms@1002 : Codeunit 1301;
+      VATAmount@1004 : Decimal;
+      RowEditable@1005 : Boolean;
+
+    PROCEDURE ApproveCalcInvDisc@1();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Sales-Disc. (Yes/No)",Rec);
+    END;
+
+    PROCEDURE CalcInvDisc@8();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Sales-Calc. Discount",Rec);
+    END;
+
+    PROCEDURE InsertExtendedText@7(Unconditionally@1000 : Boolean);
+    BEGIN
+      IF TransferExtendedText.SalesCheckIfAnyExtText(Rec,Unconditionally) THEN BEGIN
+        CurrPage.SAVERECORD;
+        COMMIT;
+        TransferExtendedText.InsertSalesExtText(Rec);
+      END;
+      IF TransferExtendedText.MakeUpdate THEN
+        UpdatePage;
+    END;
+
+    PROCEDURE UpdatePage@12();
+    VAR
+      SalesHeader@1001 : Record 36;
+    BEGIN
+      CurrPage.UPDATE;
+      SalesHeader.GET("Document Type","Document No.");
+      SalesCalcDiscByType.ApplyDefaultInvoiceDiscount(TotalSalesHeader."Invoice Discount Amount",SalesHeader);
+    END;
+
+    LOCAL PROCEDURE NoOnAfterValidate@19066594();
+    BEGIN
+      InsertExtendedText(FALSE);
+      TESTFIELD(Type,Type::Item);
+    END;
+
+    LOCAL PROCEDURE CrossReferenceNoOnAfterValidat@19048248();
+    BEGIN
+      InsertExtendedText(FALSE);
+    END;
+
+    LOCAL PROCEDURE QuantityOnAfterValidate@19032465();
+    BEGIN
+      IF Reserve = Reserve::Always THEN BEGIN
+        CurrPage.SAVERECORD;
+        AutoReserve(TRUE);
+      END;
+    END;
+
+    LOCAL PROCEDURE UnitofMeasureCodeOnAfterValida@19057939();
+    BEGIN
+      IF Reserve = Reserve::Always THEN BEGIN
+        CurrPage.SAVERECORD;
+        AutoReserve(TRUE);
+      END;
+    END;
+
+    LOCAL PROCEDURE UpdateEditableOnRow@2();
+    BEGIN
+      RowEditable := "No." <> '';
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

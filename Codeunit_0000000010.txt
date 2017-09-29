@@ -1,0 +1,72 @@
+OBJECT Codeunit 10 System Variable Functions
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      UnsupportedTypeErr@1000 : TextConst 'ENU=Type not supported by EVALUATE.;ESM=Tipo no compatible con EVALUATE.;FRC=Type non pris en charge par EVALUATE.;ENC=Type not supported by EVALUATE.';
+
+    PROCEDURE EVALUATE@3(VAR Variable@1000 : Variant;String@1001 : Text;Format@1002 : Text;CultureName@1003 : Text) : Boolean;
+    BEGIN
+      // Variable is return type containing the string value
+      // String is input to evaluate
+      // Format is in format "MM/dd/yyyy" only supported on date, search MSDN for more details ("CultureInfo.Name Property")
+      // CultureName is in format "en-US", search MSDN for more details ("Custom Date and Time Format Strings")
+      CASE TRUE OF
+        Variable.ISDATE:
+          EXIT(TryEvaluateDate(String,Format,CultureName,Variable));
+        Variable.ISDECIMAL:
+          EXIT(TryEvaluateDecimal(String,CultureName,Variable));
+        ELSE
+          ERROR(UnsupportedTypeErr);
+      END;
+    END;
+
+    LOCAL PROCEDURE TryEvaluateDate@12(DateText@1000 : Text;Format@1001 : Text;CultureName@1004 : Text;VAR EvaluatedDate@1006 : Date) : Boolean;
+    VAR
+      CultureInfo@1003 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Globalization.CultureInfo";
+      DotNetDateTime@1002 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.DateTime";
+      DateTimeStyles@1005 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Globalization.DateTimeStyles";
+      XMLConvert@1007 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlConvert";
+    BEGIN
+      IF (Format = '') AND (CultureName = '') THEN
+        DotNetDateTime := XMLConvert.ToDateTime(DateText)
+      ELSE BEGIN
+        DotNetDateTime := DotNetDateTime.DateTime(0);
+        CultureInfo := CultureInfo.GetCultureInfo(CultureName);
+        IF NOT DotNetDateTime.TryParseExact(DateText,Format,CultureInfo,DateTimeStyles.None,DotNetDateTime) THEN
+          EXIT(FALSE);
+      END;
+
+      EvaluatedDate := DMY2DATE(DotNetDateTime.Day,DotNetDateTime.Month,DotNetDateTime.Year);
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE TryEvaluateDecimal@13(DecimalText@1000 : Text;CultureName@1001 : Text;VAR EvaluatedDecimal@1006 : Decimal) : Boolean;
+    VAR
+      CultureInfo@1003 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Globalization.CultureInfo";
+      DotNetDecimal@1002 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Decimal";
+      NumberStyles@1004 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Globalization.NumberStyles";
+    BEGIN
+      EvaluatedDecimal := 0;
+      IF DotNetDecimal.TryParse(DecimalText,NumberStyles.Number,CultureInfo.GetCultureInfo(CultureName),EvaluatedDecimal) THEN
+        EXIT(TRUE);
+      EXIT(FALSE)
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

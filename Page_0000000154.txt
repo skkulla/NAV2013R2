@@ -1,0 +1,326 @@
+OBJECT Page 154 G/L Account Balance/Budget
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=G/L Account Balance/Budget;
+               ESM=Saldo cuenta/presupuesto;
+               FRC=Solde/budget de compte du grand livre;
+               ENC=G/L Account Balance/Budget];
+    SaveValues=Yes;
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table15;
+    PageType=ListPlus;
+    OnOpenPage=BEGIN
+                 CODEUNIT.RUN(CODEUNIT::"GLBudget-Open",Rec);
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       UpdateSubForm;
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 2       ;1   ;ActionGroup;
+                      CaptionML=[ENU=A&ccount;
+                                 ESM=&Cuenta;
+                                 FRC=&Compte;
+                                 ENC=A&ccount];
+                      Image=ChartOfAccounts }
+      { 20      ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Card;
+                                 ESM=Ficha;
+                                 FRC=Fiche;
+                                 ENC=Card];
+                      RunObject=Page 17;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Budget Filter=FIELD(Budget Filter),
+                                  Business Unit Filter=FIELD(Business Unit Filter);
+                      Image=EditLines }
+      { 22      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 ESM=&Movimientos;
+                                 FRC=ê&critures comptables;
+                                 ENC=Ledger E&ntries];
+                      RunObject=Page 20;
+                      RunPageView=SORTING(G/L Account No.);
+                      RunPageLink=G/L Account No.=FIELD(No.);
+                      Promoted=No;
+                      Image=GLRegisters;
+                      PromotedCategory=Process }
+      { 23      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 124;
+                      RunPageLink=Table Name=CONST(G/L Account),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 184     ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(15),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 24      ;2   ;Action    ;
+                      CaptionML=[ENU=E&xtended Text;
+                                 ESM=Te&xtos adicionales;
+                                 FRC=&Textes Çtendus;
+                                 ENC=E&xtended Text];
+                      RunObject=Page 391;
+                      RunPageView=SORTING(Table Name,No.,Language Code,All Language Codes,Starting Date,Ending Date);
+                      RunPageLink=Table Name=CONST(G/L Account),
+                                  No.=FIELD(No.);
+                      Image=Text }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 3       ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 28      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Copy Budget;
+                                 ESM=Copiar presupuesto;
+                                 FRC=Copier budget;
+                                 ENC=Copy Budget];
+                      RunObject=Report 96;
+                      Image=CopyBudget }
+      { 1020000 ;2   ;ActionGroup;
+                      CaptionML=[ENU=C&reate Budget;
+                                 ESM=C&rear ppto.;
+                                 FRC=CrÇer &budget;
+                                 ENC=C&reate Budget];
+                      Image=CreateLedgerBudget }
+      { 1020001 ;3   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Amount by Period;
+                                 ESM=Importe por per°odo;
+                                 FRC=Montant par pÇriode;
+                                 ENC=Amount by Period];
+                      Image=AmountByPeriod;
+                      OnAction=BEGIN
+                                 GLAcc.COPY(Rec);
+                                 GLAcc.SETRANGE("No.","No.");
+                                 GLAcc.SETRANGE("Date Filter");
+                                 REPORT.RUN(REPORT::"Budget Amount by Period",TRUE,FALSE,GLAcc);
+                               END;
+                                }
+      { 1020002 ;3   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=From History;
+                                 ESM=Del historial;
+                                 FRC=De l'historique;
+                                 ENC=From History];
+                      Image=CopyLedgerToBudget;
+                      OnAction=BEGIN
+                                 GLAcc.COPY(Rec);
+                                 GLAcc.SETRANGE("No.","No.");
+                                 GLAcc.SETRANGE("Date Filter");
+                                 REPORT.RUN(REPORT::"Budget from History",TRUE,FALSE,GLAcc);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 14  ;1   ;Group     ;
+                CaptionML=[ENU=Options;
+                           ESM=Opciones;
+                           FRC=Options;
+                           ENC=Options] }
+
+    { 19  ;2   ;Field     ;
+                CaptionML=[ENU=Closing Entries;
+                           ESM=Movs. regularizaci¢n;
+                           FRC=êcritures de fermeture;
+                           ENC=Closing Entries];
+                OptionCaptionML=[ENU=Include,Exclude;
+                                 ESM=Incluir,Excluir;
+                                 FRC=Inclure,Exclure;
+                                 ENC=Include,Exclude];
+                SourceExpr=ClosingEntryFilter;
+                OnValidate=BEGIN
+                             UpdateSubForm;
+                           END;
+                            }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=View by;
+                           ESM=Ver por;
+                           FRC=Afficher par;
+                           ENC=View by];
+                ToolTipML=[ENU=Day;
+                           ESM=D°a;
+                           FRC=Jour;
+                           ENC=Day];
+                OptionCaptionML=[ENU=Day,Week,Month,Quarter,Year,Accounting Period;
+                                 ESM=D°a,Semana,Mes,Trimestre,A§o,Periodo contable;
+                                 FRC=Jour,Semaine,Mois,Trimestre,AnnÇe,PÇriode comptable;
+                                 ENC=Day,Week,Month,Quarter,Year,Accounting Period];
+                SourceExpr=PeriodType;
+                OnValidate=BEGIN
+                             IF PeriodType = PeriodType::"Accounting Period" THEN
+                               AccountingPerioPeriodTypeOnVal;
+                             IF PeriodType = PeriodType::Year THEN
+                               YearPeriodTypeOnValidate;
+                             IF PeriodType = PeriodType::Quarter THEN
+                               QuarterPeriodTypeOnValidate;
+                             IF PeriodType = PeriodType::Month THEN
+                               MonthPeriodTypeOnValidate;
+                             IF PeriodType = PeriodType::Week THEN
+                               WeekPeriodTypeOnValidate;
+                             IF PeriodType = PeriodType::Day THEN
+                               DayPeriodTypeOnValidate;
+                           END;
+                            }
+
+    { 1   ;2   ;Field     ;
+                CaptionML=[ENU=View as;
+                           ESM=Ver como;
+                           FRC=Afficher en tant que;
+                           ENC=View as];
+                ToolTipML=[ENU=Net Change;
+                           ESM=Saldo periodo;
+                           FRC=Variation nette;
+                           ENC=Net Change];
+                OptionCaptionML=[ENU=Net Change,Balance at Date;
+                                 ESM=Saldo periodo,Saldo a la fecha;
+                                 FRC=Variation nette,Solde en date du;
+                                 ENC=Net Change,Balance at Date];
+                SourceExpr=AmountType;
+                OnValidate=BEGIN
+                             IF AmountType = AmountType::"Balance at Date" THEN
+                               BalanceatDateAmountTypeOnValid;
+                             IF AmountType = AmountType::"Net Change" THEN
+                               NetChangeAmountTypeOnValidate;
+                           END;
+                            }
+
+    { 5   ;1   ;Part      ;
+                Name=GLBalanceLines;
+                PagePartID=Page350 }
+
+  }
+  CODE
+  {
+    VAR
+      GLAcc@1020000 : Record 15;
+      PeriodType@1000 : 'Day,Week,Month,Quarter,Year,Accounting Period';
+      AmountType@1001 : 'Net Change,Balance at Date';
+      ClosingEntryFilter@1002 : 'Include,Exclude';
+
+    LOCAL PROCEDURE UpdateSubForm@1();
+    BEGIN
+      CurrPage.GLBalanceLines.PAGE.Set(Rec,PeriodType,AmountType,ClosingEntryFilter);
+    END;
+
+    LOCAL PROCEDURE DayPeriodTypeOnPush@19008851();
+    BEGIN
+      UpdateSubForm;
+    END;
+
+    LOCAL PROCEDURE WeekPeriodTypeOnPush@19046063();
+    BEGIN
+      UpdateSubForm;
+    END;
+
+    LOCAL PROCEDURE MonthPeriodTypeOnPush@19047374();
+    BEGIN
+      UpdateSubForm;
+    END;
+
+    LOCAL PROCEDURE QuarterPeriodTypeOnPush@19018850();
+    BEGIN
+      UpdateSubForm;
+    END;
+
+    LOCAL PROCEDURE YearPeriodTypeOnPush@19051042();
+    BEGIN
+      UpdateSubForm;
+    END;
+
+    LOCAL PROCEDURE AccountingPerioPeriodTypOnPush@19038761();
+    BEGIN
+      UpdateSubForm;
+    END;
+
+    LOCAL PROCEDURE NetChangeAmountTypeOnPush@19074855();
+    BEGIN
+      UpdateSubForm;
+    END;
+
+    LOCAL PROCEDURE BalanceatDateAmountTypeOnPush@19049003();
+    BEGIN
+      UpdateSubForm;
+    END;
+
+    LOCAL PROCEDURE DayPeriodTypeOnValidate@19012979();
+    BEGIN
+      DayPeriodTypeOnPush;
+    END;
+
+    LOCAL PROCEDURE WeekPeriodTypeOnValidate@19058475();
+    BEGIN
+      WeekPeriodTypeOnPush;
+    END;
+
+    LOCAL PROCEDURE MonthPeriodTypeOnValidate@19021027();
+    BEGIN
+      MonthPeriodTypeOnPush;
+    END;
+
+    LOCAL PROCEDURE QuarterPeriodTypeOnValidate@19015346();
+    BEGIN
+      QuarterPeriodTypeOnPush;
+    END;
+
+    LOCAL PROCEDURE YearPeriodTypeOnValidate@19064743();
+    BEGIN
+      YearPeriodTypeOnPush;
+    END;
+
+    LOCAL PROCEDURE AccountingPerioPeriodTypeOnVal@19058901();
+    BEGIN
+      AccountingPerioPeriodTypOnPush;
+    END;
+
+    LOCAL PROCEDURE NetChangeAmountTypeOnValidate@19062218();
+    BEGIN
+      NetChangeAmountTypeOnPush;
+    END;
+
+    LOCAL PROCEDURE BalanceatDateAmountTypeOnValid@19007073();
+    BEGIN
+      BalanceatDateAmountTypeOnPush;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

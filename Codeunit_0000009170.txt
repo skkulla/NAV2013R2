@@ -1,0 +1,222 @@
+OBJECT Codeunit 9170 Conf./Personalization Mgt.
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36366,NAVNA7.10.00.36366;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            InitializeProfiles;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Text001@1000 : TextConst 'ENU=This will delete all configuration changes made for this profile.  Do you want to continue?;ESM=Esto eliminar  todos los cambios de configuraci¢n realizados para este perfil. ¨Desea continuar?;FRC=Cette op‚ration va supprimer toutes les modifications de configuration apport‚es … ce profil. Voulez-vous continuer ?;ENC=This will delete all configuration changes made for this profile.  Do you want to continue?';
+      Text002@1001 : TextConst 'ENU=This will delete all personalization changes made by this user.  Do you want to continue?;ESM=Esto eliminar  todos los cambios de personalizaci¢n realizados por el usuario. ¨Desea continuar?;FRC=Cette op‚ration va supprimer toutes les modifications de personnalisation apport‚es par cet utilisateur. Voulez-vous continuer ?;ENC=This will delete all personalization changes made by this user.  Do you want to continue?';
+      Text003@1044 : TextConst 'ENU=You cannot delete a profile with default Role Center.;ESM=No puede eliminar un perfil con el µrea de tareas predeterminada.;FRC=Vous ne pouvez pas supprimer un profil avec un Tableau de bord par d‚faut.;ENC=You cannot delete a profile with default Role Centre.';
+      Text004@1043 : TextConst 'ENU=Accounting Manager;ESM=Administrador de contabilidad;FRC=Responsable de la comptabilit‚;ENC=Accounting Manager';
+      Text005@1042 : TextConst 'ENU=Accounting Manager;ESM=Administrador de contabilidad;FRC=Responsable de la comptabilit‚;ENC=Accounting Manager';
+      Text006@1041 : TextConst 'ENU=AP Coordinator;ESM=Coordinador Cuentas por pagar;FRC=Coordonnateur Achats;ENC=AP Coordinator';
+      Text007@1040 : TextConst 'ENU=Accounts Payable Coordinator;ESM=Coordinador Cuentas por pagar;FRC=Coordonnateur Achats;ENC=Accounts Payable Coordinator';
+      Text008@1039 : TextConst 'ENU=AR Administrator;ESM=Coordinador Cobros;FRC=Administrateur Ventes;ENC=AR Administrator';
+      Text009@1038 : TextConst 'ENU=Accounts Receivable Administrator;ESM=Administrador Cobros;FRC=Administrateur Ventes;ENC=Accounts Receivable Administrator';
+      Text010@1037 : TextConst 'ENU=Bookkeeper;ESM=Contable;FRC=Aide-comptable;ENC=Bookkeeper';
+      Text011@1036 : TextConst 'ENU=Bookkeeper;ESM=Contable;FRC=Aide-comptable;ENC=Bookkeeper';
+      Text012@1035 : TextConst 'ENU=Sales Manager;ESM=Director de ventas;FRC=Directeur des ventes;ENC=Sales Manager';
+      Text013@1034 : TextConst 'ENU=Sales Manager;ESM=Director de ventas;FRC=Directeur des ventes;ENC=Sales Manager';
+      Text014@1033 : TextConst 'ENU=Order Processor;ESM=Procesador de pedidos;FRC=Pr‚parateur de commandes;ENC=Order Processor';
+      Text015@1032 : TextConst 'ENU="Sales Order Processor ";ESM="Procesador de pedidos de ventas ";FRC="Pr‚parateur de documents de vente ";ENC="Sales Order Processor "';
+      Text016@1031 : TextConst 'ENU=Purchasing Agent;ESM=Agente de compras;FRC=Agent d''achats;ENC=Purchasing Agent';
+      Text017@1030 : TextConst 'ENU=Purchasing Agent;ESM=Agente de compras;FRC=Agent d''achats;ENC=Purchasing Agent';
+      Text018@1029 : TextConst 'ENU=Shipping and Receiving - WMS;ESM=Env¡o y recepci¢n - WMS;FRC=Livraison et r‚ception - WMS;ENC=Shipping and Receiving - WMS';
+      Text019@1028 : TextConst 'ENU=Shipping and Receiving - Warehouse Management System;ESM=Env¡o y recepci¢n - Sistema de gesti¢n de almacenes;FRC=Livraison et r‚ception - Warehouse Management System;ENC=Shipping and Receiving - Warehouse Management System';
+      Text020@1027 : TextConst 'ENU=Shipping and Receiving;ESM=Env¡o y recepci¢n;FRC=Livraison et r‚ception;ENC=Shipping and Receiving';
+      Text021@1026 : TextConst 'ENU=Shipping and Receiving - Order-by-Order;ESM=Env¡o y recepci¢n - Pedido a pedido;FRC=Livraison et r‚ception - Par commande;ENC=Shipping and Receiving - Order-by-Order';
+      Text022@1025 : TextConst 'ENU=Warehouse Worker - WMS;ESM=Operario de Almacen - WMS;FRC=Employ‚ d''entrep“t - WMS;ENC=Warehouse Worker - WMS';
+      Text023@1024 : TextConst 'ENU=Warehouse Worker - Warehouse Management System;ESM=Trabajador de almac‚n - Sistema de gesti¢n de almacenes;FRC=Employ‚ d''entrep“t - Warehouse Management System;ENC=Warehouse Worker - Warehouse Management System';
+      Text024@1023 : TextConst 'ENU=Production Planner;ESM=Planificador de producci¢n;FRC=Gestionnaire de production;ENC=Production Planner';
+      Text025@1022 : TextConst 'ENU=Production Planner;ESM=Planificador de producci¢n;FRC=Gestionnaire de production;ENC=Production Planner';
+      Text026@1021 : TextConst 'ENU=Shop Supervisor;ESM=Supervisor de planta;FRC=Chef des ateliers;ENC=Shop Supervisor';
+      Text027@1020 : TextConst 'ENU=Shop Supervisor - Manufacturing Comprehensive;ESM=Supervisor de planta - Fabricaci¢n exhaustiva;FRC=Chef des ateliers - Production globale;ENC=Shop Supervisor - Manufacturing Comprehensive';
+      Text028@1019 : TextConst 'ENU=Shop Supervisor - Foundation;ESM=Supervisor planta - Fundaci¢n;FRC=Chef des ateliers - Fondation;ENC=Shop Supervisor - Foundation';
+      Text029@1018 : TextConst 'ENU=Shop Supervisor - Manufacturing Foundation;ESM=Supervisor de planta - Fundaci¢n de fabricaci¢n;FRC=Chef des ateliers - Manufacturing Foundation;ENC=Shop Supervisor - Manufacturing Foundation';
+      Text030@1017 : TextConst 'ENU=Machine Operator;ESM=Operador de m quina;FRC=Op‚rateur;ENC=Machine Operator';
+      Text031@1016 : TextConst 'ENU=Machine Operator - Manufacturing Comprehensive;ESM=Operador de m quina - Fabricaci¢n exhaustiva;FRC=Op‚rateur - Production globale;ENC=Machine Operator - Manufacturing Comprehensive';
+      Text032@1015 : TextConst 'ENU=Resource Manager;ESM=Administrador de recursos;FRC=Directeur ressources humaines;ENC=Resource Manager';
+      Text033@1014 : TextConst 'ENU=Resource Manager;ESM=Administrador de recursos;FRC=Directeur ressources humaines;ENC=Resource Manager';
+      Text034@1013 : TextConst 'ENU=Project Manager;ESM=Director de proyectos;FRC=Chef de projet;ENC=Project Manager';
+      Text035@1012 : TextConst 'ENU=Project Manager;ESM=Director de proyectos;FRC=Chef de projet;ENC=Project Manager';
+      Text036@1011 : TextConst 'ENU=Dispatcher;ESM=Distribuidor;FRC=R‚partiteur;ENC=Dispatcher';
+      Text037@1010 : TextConst 'ENU=Dispatcher - Customer Service;ESM=Distribuidor - Servicio al cliente;FRC=R‚partiteur - Service client;ENC=Dispatcher - Customer Service';
+      Text038@1009 : TextConst 'ENU=Outbound Technician;ESM=T‚cnico de salida;FRC=Technicien de d‚senlogement;ENC=Outbound Technician';
+      Text039@1008 : TextConst 'ENU=Outbound Technician - Customer Service;ESM=T‚cnico de salida - Servicio al cliente;FRC=Technicien de d‚senlogement - Service client;ENC=Outbound Technician - Customer Service';
+      Text040@1007 : TextConst 'ENU=IT Manager;ESM=Director de TI;FRC=Responsable informatique;ENC=IT Manager';
+      Text041@1006 : TextConst 'ENU=IT Manager;ESM=Director de TI;FRC=Responsable informatique;ENC=IT Manager';
+      Text042@1005 : TextConst 'ENU="President ";ESM="Presidente ";FRC="Pr‚sident ";ENC="President "';
+      Text043@1004 : TextConst 'ENU="President ";ESM="Presidente ";FRC="Pr‚sident ";ENC="President "';
+      Text044@1003 : TextConst 'ENU=President - Small Business;ESM=Presidente - Peque¤a empresa;FRC=Pr‚sident - Petite entreprise;ENC=President - Small Business';
+      Text045@1002 : TextConst 'ENU=President - Small Business;ESM=Presidente - Peque¤a empresa;FRC=Pr‚sident - Petite entreprise;ENC=President - Small Business';
+      Text1480000@1480000 : TextConst 'ENU=" HR Manager";ESM=" Director de RR.HH.";FRC=" Gestionnaire RH";ENC=" HR Manager"';
+      Text1480001@1480001 : TextConst 'ENU=" Human Resources Manager";ESM=" Director de recursos humanos";FRC=" Gestionnaire des ressources humaines";ENC=" Human Resources Manager"';
+      Text1480002@1480002 : TextConst 'ENU=" Payroll Administrator";ESM=" Administrador de n¢minas";FRC=" Administrateur de la paie";ENC=" Payroll Administrator"';
+      Text1480003@1480003 : TextConst 'ENU=" Payroll Administrator";ESM=" Administrador de n¢minas";FRC=" Administrateur de la paie";ENC=" Payroll Administrator"';
+      Text1480004@1480004 : TextConst 'ENU=" Credit Manager";ESM=" Director de cr‚dito";FRC=" Gestionnaire de cr‚dit";ENC=" Credit Manager"';
+      Text1480005@1480005 : TextConst 'ENU=" Credit and Collections Manager";ESM=" Director de cr‚dito y cobro";FRC=" Gestionnaire des cr‚dits et des ensembles";ENC=" Credit and Collections Manager"';
+      Text046@1045 : TextConst 'ENU=RapidStart Services;ESM=Servicios de RapidStart;FRC=Services RapidStart;ENC=RapidStart Services';
+      Text047@1046 : TextConst 'ENU=RapidStart Services;ESM=Servicios de RapidStart;FRC=Services RapidStart;ENC=RapidStart Services';
+
+    PROCEDURE InitializeProfiles@20();
+    VAR
+      Profile@1100 : Record 2000000072;
+    BEGIN
+      Profile.LOCKTABLE;
+      IF Profile.FINDFIRST THEN
+        EXIT;
+      InsertProfile(Text004,Text005,9001);
+      InsertProfile(Text006,Text007,9002);
+      InsertProfile(Text008,Text009,9003);
+      InsertProfile(Text010,Text011,9004);
+      InsertProfile(Text012,Text013,9005);
+      InsertProfile(Text014,Text015,9006);
+      InsertProfile(Text016,Text017,9007);
+      InsertProfile(Text018,Text019,9000);
+      InsertProfile(Text020,Text021,9008);
+      InsertProfile(Text022,Text023,9009);
+      InsertProfile(Text024,Text025,9010);
+      InsertProfile(Text026,Text027,9012);
+      InsertProfile(Text028,Text029,9011);
+      InsertProfile(Text030,Text031,9013);
+      InsertProfile(Text032,Text033,9014);
+      InsertProfile(Text034,Text035,9015);
+      InsertProfile(Text036,Text037,9016);
+      InsertProfile(Text038,Text039,9017);
+      InsertProfile(Text040,Text041,9018);
+      InsertProfile(Text042,Text043,9019);
+      InsertProfile(Text044,Text045,9020);
+      InsertProfile(Text046,Text047,9021);
+      InsertProfile(Text1480000,Text1480001,36600);
+      InsertProfile(Text1480002,Text1480003,36601);
+      InsertProfile(Text1480004,Text1480005,36603);
+      COMMIT;
+    END;
+
+    PROCEDURE InsertProfile@21(ProfileID@1000 : Code[30];Description@1001 : Text[250];RoleCenterID@1002 : Integer);
+    VAR
+      Profile@1101 : Record 2000000072;
+      Object@1102 : Record 2000000001;
+    BEGIN
+      Object.SETRANGE(Type,Object.Type::Page);
+      Object.SETRANGE(ID,RoleCenterID);
+      IF Object.ISEMPTY THEN
+        EXIT;
+
+      Profile.INIT;
+      Profile."Profile ID" := ProfileID;
+      Profile.Description := Description;
+      Profile."Role Center ID" := RoleCenterID;
+      Profile."Default Role Center" := (RoleCenterID = DefaultRoleCenterID);
+      Profile.INSERT;
+    END;
+
+    PROCEDURE DefaultRoleCenterID@22() : Integer;
+    BEGIN
+      EXIT(9006);
+    END;
+
+    PROCEDURE CopyProfile@45(Profile@1035 : Record 2000000072;NewProfileID@1036 : Code[30]);
+    VAR
+      NewProfile@1037 : Record 2000000072;
+      ProfileMetadata@1040 : Record 2000000074;
+      NewProfileMetadata@1038 : Record 2000000074;
+    BEGIN
+      NewProfile.INIT;
+      NewProfile.VALIDATE("Profile ID",NewProfileID);
+      NewProfile.TESTFIELD("Profile ID");
+      NewProfile.VALIDATE(Description,Profile.Description);
+      NewProfile.VALIDATE("Role Center ID",Profile."Role Center ID");
+      NewProfile.INSERT;
+
+      ProfileMetadata.SETRANGE("Profile ID",Profile."Profile ID");
+      IF ProfileMetadata.FINDSET THEN
+        REPEAT
+          ProfileMetadata.CALCFIELDS("Page Metadata Delta");
+
+          NewProfileMetadata.INIT;
+          NewProfileMetadata.COPY(ProfileMetadata);
+          NewProfileMetadata."Profile ID" := NewProfileID;
+          NewProfileMetadata.INSERT;
+        UNTIL ProfileMetadata.NEXT = 0;
+    END;
+
+    PROCEDURE ClearProfileConfiguration@1(Profile@1000 : Record 2000000072);
+    VAR
+      ProfileMetadata@1001 : Record 2000000074;
+    BEGIN
+      IF NOT CONFIRM(Text001) THEN
+        EXIT;
+
+      ProfileMetadata.SETRANGE("Profile ID",Profile."Profile ID");
+      ProfileMetadata.DELETEALL(TRUE);
+    END;
+
+    PROCEDURE ClearUserPersonalization@2(User@1000 : Record 2000000073);
+    VAR
+      UserMetadata@1001 : Record 2000000075;
+    BEGIN
+      IF NOT CONFIRM(Text002) THEN
+        EXIT;
+
+      UserMetadata.SETRANGE("User SID",User."User SID");
+      UserMetadata.DELETEALL(TRUE);
+    END;
+
+    PROCEDURE ExportProfiles@3(FileName@1000 : Text;VAR Profile@1001 : Record 2000000072);
+    VAR
+      FileOutStream@1002 : OutStream;
+      ProfileFile@1003 : File;
+    BEGIN
+      ProfileFile.CREATE(FileName);
+      ProfileFile.CREATEOUTSTREAM(FileOutStream);
+      XMLPORT.EXPORT(XMLPORT::"Profile Import/Export",FileOutStream,Profile);
+      ProfileFile.CLOSE;
+    END;
+
+    PROCEDURE ImportProfiles@4(FileName@1000 : Text);
+    VAR
+      FileInStream@1001 : InStream;
+      ProfileFile@1002 : File;
+    BEGIN
+      ProfileFile.OPEN(FileName);
+      ProfileFile.CREATEINSTREAM(FileInStream);
+      XMLPORT.IMPORT(XMLPORT::"Profile Import/Export",FileInStream);
+      ProfileFile.CLOSE;
+    END;
+
+    PROCEDURE ChangeDefaultRoleCenter@24(ProfileID@1110 : Code[30]);
+    VAR
+      Profile@1111 : Record 2000000072;
+    BEGIN
+      Profile.SETRANGE("Default Role Center",TRUE);
+      Profile.SETFILTER("Profile ID",'<> %1',ProfileID);
+      IF Profile.FINDFIRST THEN BEGIN
+        Profile."Default Role Center" := FALSE;
+        Profile.MODIFY;
+      END;
+    END;
+
+    PROCEDURE DeleteProfile@25(Profile@1112 : Record 2000000072);
+    BEGIN
+      IF Profile."Default Role Center" THEN
+        ERROR(Text003);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

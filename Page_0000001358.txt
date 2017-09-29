@@ -1,0 +1,212 @@
+OBJECT Page 1358 Mini Posted Purch. Inv. Subfrm
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Lines;
+               ESM=L¡neas;
+               FRC=Lignes;
+               ENC=Lines];
+    LinksAllowed=No;
+    SourceTable=Table123;
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    OnAfterGetCurrRecord=BEGIN
+                           TotalsOnLinesSubforms.CalculatePostedPurchInvoiceTotals(TotalPurchInvHeader,VATAmount,Rec);
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Item No.;
+                           ESM=N§ producto;
+                           FRC=Nø d'article;
+                           ENC=Item No.];
+                ToolTipML=[ENU=Specifies an item number that identifies the item or a general ledger account number that identifies the general ledger account used when posting the line.;
+                           ESM=Especifica un n£mero de cuenta de contabilidad o el n£mero de producto que identifica la cuenta de contabilidad que se utiliz¢ al registrar la l¡nea.;
+                           FRC=Sp‚cifie un num‚ro d'article qui d‚finit un num‚ro de compte g‚n‚ral ou d'article qui identifie le compte g‚n‚ral utilis‚ lors de la validation de la ligne.;
+                           ENC=Specifies an item number that identifies the item or a general ledger account number that identifies the general ledger account used when posting the line.];
+                SourceExpr="No." }
+
+    { 62  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the cross-reference number related to this item.;
+                           ESM=Especifica el n£mero de referencia cruzada relacionado con este producto.;
+                           FRC=Affiche le num‚ro de r‚f‚rence externe li‚e … cet article.;
+                           ENC=Specifies the cross-reference number related to this item.];
+                SourceExpr="Cross-Reference No.";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Description/Comment;
+                           ESM=Descripci¢n o comentario;
+                           FRC=Description/Commentaire;
+                           ENC=Description/Comment];
+                ToolTipML=[ENU=Specifies either the name of or a description of the item or general ledger account.;
+                           ESM=Especifica el nombre o una descripci¢n del producto o la cuenta de contabilidad.;
+                           FRC=Affiche le nom ou la d‚signation de l'article ou du compte g‚n‚ral.;
+                           ENC=Specifies either the name of or a description of the item or general ledger account.];
+                SourceExpr=Description }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the quantity posted from the line.;
+                           ESM=Especifica la cantidad registrada de la l¡nea.;
+                           FRC=Sp‚cifie la quantit‚ valid‚e … partir de la ligne.;
+                           ENC=Specifies the quantity posted from the line.];
+                BlankZero=Yes;
+                SourceExpr=Quantity }
+
+    { 30  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit of measure code for the item.;
+                           ESM=Especifica el c¢digo de unidad de medida de la l¡nea.;
+                           FRC=Sp‚cifie le code unit‚ de l'article.;
+                           ENC=Specifies the unit of measure code for the item.];
+                SourceExpr="Unit of Measure Code" }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the direct unit cost of one unit of the item.;
+                           ESM=Especifica el costo unitario directo de una unidad del producto.;
+                           FRC=Indique le co–t unitaire direct d'une unit‚ de l'article.;
+                           ENC=Specifies the direct unit cost of one unit of the item.];
+                BlankZero=Yes;
+                SourceExpr="Direct Unit Cost" }
+
+    { 16  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the line discount percentage granted on items on each individual line.;
+                           ESM=Especifica el porcentaje de descuento por l¡nea concedido a los productos de cada l¡nea en particular.;
+                           FRC=Indique le pourcentage de remise ligne attribu‚ aux articles pour chaque ligne individuelle.;
+                           ENC=Specifies the line discount percentage granted on items on each individual line.];
+                BlankZero=Yes;
+                SourceExpr="Line Discount %" }
+
+    { 64  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the net amount (before subtracting the invoice discount amount) that must be paid for the items. If you have placed a check mark in the Prices Including VAT field, the amount displayed will include VAT.;
+                           ESM=Especifica el importe neto (antes de restar el importe de descuento en factura) que se debe pagar por los productos. Si activ¢ el campo Precios IVA incluido, el importe que se muestre incluir  el IVA.;
+                           FRC=Affiche le montant net (avant soustraction du montant remise facture) … payer pour les articles. Si vous avez activ‚ le champ Prix incluant la TVA, le montant affich‚ inclut la TVA.;
+                           ENC=Specifies the net amount (before subtracting the invoice discount amount) that must be paid for the items. If you have placed a check mark in the Prices Including VAT field, the amount displayed will include VAT.];
+                BlankZero=Yes;
+                SourceExpr="Line Amount" }
+
+    { 24  ;1   ;Group     ;
+                GroupType=FixedLayout }
+
+    { 23  ;2   ;Group     ;
+                GroupType=Group }
+
+    { 22  ;3   ;Field     ;
+                SourceExpr='';
+                Enabled=FALSE;
+                Editable=FALSE }
+
+    { 21  ;1   ;Group     ;
+                GroupType=Group }
+
+    { 20  ;2   ;Group     ;
+                GroupType=GridLayout;
+                Layout=Columns }
+
+    { 19  ;3   ;Group     ;
+                GroupType=Group }
+
+    { 18  ;4   ;Group     ;
+                GroupType=Group }
+
+    { 17  ;5   ;Field     ;
+                Name=Invoice Discount Amount;
+                CaptionML=[ENU=Invoice Discount Amount;
+                           ESM=Importe descuento factura;
+                           FRC=Montant d'escompte de la facture;
+                           ENC=Invoice Discount Amount];
+                ToolTipML=[ENU=Specifies the amount that is deducted from the value shown in the Total Amount Incl. VAT field.;
+                           ESM=Especifica el importe que se deduce de valor que aparece en el campo Total Amount Incl. VAT.;
+                           FRC=Indique le montant d‚duit de la valeur indiqu‚e dans le champ Total Amount Incl. VAT.;
+                           ENC=Specifies the amount that is deducted from the value shown in the Total Amount Incl. VAT field.];
+                SourceExpr=TotalPurchInvHeader."Invoice Discount Amount";
+                Editable=FALSE }
+
+    { 14  ;3   ;Group     ;
+                GroupType=Group }
+
+    { 15  ;4   ;Group     ;
+                GroupType=Group }
+
+    { 11  ;5   ;Group     ;
+                GroupType=FixedLayout }
+
+    { 13  ;6   ;Group     ;
+                GroupType=Group }
+
+    { 9   ;7   ;Field     ;
+                SourceExpr='';
+                Enabled=FALSE;
+                Editable=FALSE }
+
+    { 10  ;3   ;Group     ;
+                GroupType=Group }
+
+    { 5   ;4   ;Group     ;
+                GroupType=Group }
+
+    { 7   ;5   ;Field     ;
+                Name=Total Amount Excl. VAT;
+                DrillDown=No;
+                ToolTipML=[ENU=Specifies the sum of the value in the Line Amount Excl. VAT field on all lines on the posted purchase invoice minus any discount amount in the Invoice Discount Amount field.;
+                           ESM=Especifica la suma del valor del campo Line Amount Excl. VAT en todas las l¡neas de la factura de compra registrada menos cualquier importe de descuento en el campo Invoice Discount Amount.;
+                           FRC=Sp‚cifie la somme de la valeur du champ Line Amount Excl. VAT sur toutes les lignes de la facture achat valid‚e moins l'‚ventuel montant remise indiqu‚ dans le champ Invoice Discount Amount.;
+                           ENC=Specifies the sum of the value in the Line Amount Excl. VAT field on all lines on the posted purchase invoice minus any discount amount in the Invoice Discount Amount field.];
+                SourceExpr=TotalPurchInvHeader.Amount;
+                CaptionClass=TotalsOnLinesSubforms.GetTotalExclVATCaption(TotalPurchInvHeader."Currency Code");
+                Editable=FALSE }
+
+    { 2   ;5   ;Field     ;
+                Name=Total VAT Amount;
+                ToolTipML=[ENU=Specifies the sum of VAT amounts on all lines on the posted purchase invoice.;
+                           ESM=Especifica la suma de los importes de IVA en todas las l¡neas de la factura de compra registrada.;
+                           FRC=Sp‚cifie la somme des montants de TVA sur toutes les lignes de la facture achat valid‚e.;
+                           ENC=Specifies the sum of tax amounts on all lines on the posted purchase invoice.];
+                SourceExpr=VATAmount;
+                CaptionClass=TotalsOnLinesSubforms.GetTotalVATCaption(TotalPurchInvHeader."Currency Code");
+                Editable=FALSE }
+
+    { 3   ;5   ;Field     ;
+                Name=Total Amount Incl. VAT;
+                ToolTipML=[ENU=Specifies the sum of the value in the Line Amount field on all lines on the posted purchase invoice minus any discount amount in the Invoice Discount Amount field.;
+                           ESM=Especifica la suma del valor del campo Importe l¡nea en todas las l¡neas de la factura de compra registrada menos cualquier importe de descuento en el campo Importe descuento factura.;
+                           FRC=Sp‚cifie la somme de la valeur du champ Montant ligne sur toutes les lignes de la facture achat valid‚e moins l'‚ventuel montant remise indiqu‚ dans le champ Montant d'escompte de la facture.;
+                           ENC=Specifies the sum of the value in the Line Amount field on all lines on the posted purchase invoice minus any discount amount in the Invoice Discount Amount field.];
+                SourceExpr=TotalPurchInvHeader."Amount Including VAT";
+                CaptionClass=TotalsOnLinesSubforms.GetTotalInclVATCaption(TotalPurchInvHeader."Currency Code");
+                Editable=FALSE;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+  }
+  CODE
+  {
+    VAR
+      TotalPurchInvHeader@1002 : Record 122;
+      TotalsOnLinesSubforms@1001 : Codeunit 1301;
+      VATAmount@1000 : Decimal;
+
+    BEGIN
+    END.
+  }
+}
+

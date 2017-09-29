@@ -1,0 +1,101 @@
+OBJECT Table 1205 Credit Transfer Register
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=Identifier,Created Date-Time;
+    CaptionML=[ENU=Credit Transfer Register;
+               ESM=Registro de transferencia de crÇdito;
+               FRC=Registre virement;
+               ENC=Credit Transfer Register];
+    LookupPageID=Page1205;
+    DrillDownPageID=Page1205;
+  }
+  FIELDS
+  {
+    { 1   ;   ;No.                 ;Integer       ;CaptionML=[ENU=No.;
+                                                              ESM=Nß;
+                                                              FRC=N¯;
+                                                              ENC=No.] }
+    { 2   ;   ;Identifier          ;Code20        ;CaptionML=[ENU=Identifier;
+                                                              ESM=Identificador;
+                                                              FRC=Identificateur;
+                                                              ENC=Identifier] }
+    { 3   ;   ;Created Date-Time   ;DateTime      ;CaptionML=[ENU=Created Date-Time;
+                                                              ESM=Fecha / hora creaci¢n;
+                                                              FRC=Date/heure crÇation;
+                                                              ENC=Created Date-Time] }
+    { 4   ;   ;Created by User     ;Code50        ;TableRelation=User."User Name";
+                                                   CaptionML=[ENU=Created by User;
+                                                              ESM=Creado por usuario;
+                                                              FRC=CrÇÇ par l'utilisateur;
+                                                              ENC=Created by User] }
+    { 5   ;   ;Status              ;Option        ;CaptionML=[ENU=Status;
+                                                              ESM=Estado;
+                                                              FRC=êtat;
+                                                              ENC=Status];
+                                                   OptionCaptionML=[ENU=Canceled,File Created;
+                                                                    ESM=Cancelado,Archivo creado;
+                                                                    FRC=AnnulÇ,Fichier crÇÇ;
+                                                                    ENC=Cancelled,File Created];
+                                                   OptionString=Cancelled,File Created }
+    { 6   ;   ;No. of Transfers    ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Credit Transfer Entry" WHERE (Credit Transfer Register No.=FIELD(No.)));
+                                                   CaptionML=[ENU=No. of Transfers;
+                                                              ESM=Nß de transferencias;
+                                                              FRC=Nbre de transferts;
+                                                              ENC=No. of Transfers] }
+    { 7   ;   ;From Bank Account No.;Code20       ;TableRelation="Bank Account";
+                                                   CaptionML=[ENU=From Bank Account No.;
+                                                              ESM=Del nß de cuenta bancaria;
+                                                              FRC=N¯ compte bancaire origine;
+                                                              ENC=From Bank Account No.] }
+    { 8   ;   ;From Bank Account Name;Text50      ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("Bank Account".Name WHERE (No.=FIELD(From Bank Account No.)));
+                                                   CaptionML=[ENU=From Bank Account Name;
+                                                              ESM=Del nombre de cuenta bancaria;
+                                                              FRC=Nom compte bancaire origine;
+                                                              ENC=From Bank Account Name] }
+  }
+  KEYS
+  {
+    {    ;No.                                     ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE CreateNew@1(NewIdentifier@1000 : Code[20];NewBankAccountNo@1001 : Code[20]);
+    BEGIN
+      RESET;
+      LOCKTABLE;
+      IF FINDLAST THEN;
+      INIT;
+      "No." += 1;
+      Identifier := NewIdentifier;
+      "Created Date-Time" := CURRENTDATETIME;
+      "Created by User" := USERID;
+      "From Bank Account No." := NewBankAccountNo;
+      INSERT;
+    END;
+
+    PROCEDURE SetStatus@3(NewStatus@1000 : Option);
+    BEGIN
+      LOCKTABLE;
+      FIND;
+      Status := NewStatus;
+      MODIFY;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

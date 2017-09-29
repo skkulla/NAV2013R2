@@ -1,0 +1,62 @@
+OBJECT Page 535 Windows Languages
+{
+  OBJECT-PROPERTIES
+  {
+    Date=05/21/03;
+    Time=12:00:00 PM;
+    Version List=NAVW13.70;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Windows Languages;
+               ESM=Idiomas Windows;
+               FRC=Langages Windows;
+               ENC=Windows Languages];
+    SourceTable=Table2000000045;
+    PageType=List;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 9   ;2   ;Field     ;
+                CaptionML=[ENU=ID;
+                           ESM=ID;
+                           FRC=Code;
+                           ENC=ID];
+                SourceExpr="Language ID" }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Name;
+                           ESM=Nombre;
+                           FRC=Nom;
+                           ENC=Name];
+                SourceExpr=Name }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

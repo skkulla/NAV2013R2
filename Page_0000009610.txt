@@ -1,0 +1,271 @@
+OBJECT Page 9610 SEPA Schema Viewer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=SEPA Schema Viewer;
+               ESM=Visor de esquema SEPA;
+               FRC=Visionneuse de sch‚ma SEPA;
+               ENC=SEPA Schema Viewer];
+    SaveValues=Yes;
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table9610;
+    SourceTableView=SORTING(XML Schema Code,Sort Key);
+    PageType=List;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,View,Selection;
+                                ESM=Nuevo,Proceso,Informe,Ver,Selecci¢n;
+                                FRC=Nouveau,Traitement,Rapport,Afficher,S‚lection;
+                                ENC=New,Process,Report,View,Selection];
+    OnOpenPage=BEGIN
+                 IF XMLSchemaCodeInternal <> '' THEN
+                   XMLSchemaCode := XMLSchemaCodeInternal;
+                 XMLSchema.Code := XMLSchemaCode;
+                 IF XMLSchema.FIND('=<>') THEN;
+                 XMLSchemaCode := XMLSchema.Code;
+                 SETRANGE("XML Schema Code",XMLSchema.Code);
+                 SetInternalVariables;
+               END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           NewObjectNo := NewObjectNoInternal;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 12      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 16      ;1   ;Action    ;
+                      Name=GenerateXMLPort;
+                      CaptionML=[ENU=Generate XMLPort;
+                                 ESM=Generar XMLPort;
+                                 FRC=G‚n‚rer XMLPort;
+                                 ENC=Generate XMLPort];
+                      Promoted=Yes;
+                      Image=Export;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 SEPAXMLSchemaManagement@1000 : Codeunit 9610;
+                               BEGIN
+                                 IF NewObjectNo = 0 THEN
+                                   ERROR(NoObjectIDErr);
+
+                                 SEPAXMLSchemaManagement.CreateXMLPortFile(Rec,NewObjectNo,"XML Schema Code",TRUE,FALSE);
+                               END;
+                                }
+      { 6       ;1   ;Action    ;
+                      Name=GenerateDataExchSetup;
+                      CaptionML=[ENU=Generate Data Exchange Setup;
+                                 ESM=Generar configuraci¢n de intercambio de datos;
+                                 FRC=G‚n‚rer la configuration d'‚change de donn‚es;
+                                 ENC=Generate Data Exchange Setup];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Export;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 SEPAXMLSchemaManagement@1000 : Codeunit 9610;
+                               BEGIN
+                                 SEPAXMLSchemaManagement.CreatePostExchDefForCAMT(Rec);
+                               END;
+                                }
+      { 19      ;1   ;Action    ;
+                      Name=ShowAll;
+                      CaptionML=[ENU=Show All;
+                                 ESM=Mostrar todos;
+                                 FRC=Afficher tout;
+                                 ENC=Show All];
+                      Promoted=Yes;
+                      Image=AllLines;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 SEPAXMLSchemaManagement@1000 : Codeunit 9610;
+                               BEGIN
+                                 SEPAXMLSchemaManagement.ShowAll(Rec);
+                               END;
+                                }
+      { 20      ;1   ;Action    ;
+                      Name=HideNonMandatory;
+                      CaptionML=[ENU=Hide Non-Mandatory;
+                                 ESM=Ocultar elementos opcionales;
+                                 FRC=Masquer non obligatoire;
+                                 ENC=Hide Non-Mandatory];
+                      Promoted=Yes;
+                      Image=ShowSelected;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 SEPAXMLSchemaManagement@1000 : Codeunit 9610;
+                               BEGIN
+                                 SEPAXMLSchemaManagement.HideNotMandatory(Rec);
+                               END;
+                                }
+      { 22      ;1   ;Action    ;
+                      Name=HideNonSelected;
+                      CaptionML=[ENU=Hide Non-Selected;
+                                 ESM=Ocultar elementos no seleccionados;
+                                 FRC=Masquer non s‚lectionn‚;
+                                 ENC=Hide Non-Selected];
+                      Promoted=Yes;
+                      Image=ShowSelected;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 SEPAXMLSchemaManagement@1000 : Codeunit 9610;
+                               BEGIN
+                                 SEPAXMLSchemaManagement.HideNotSelected(Rec);
+                               END;
+                                }
+      { 9       ;1   ;Action    ;
+                      Name=SelectAll;
+                      CaptionML=[ENU=Select All Mandatory Elements;
+                                 ESM=Seleccionar todos los elementos obligatorios;
+                                 FRC=S‚lectionner tous les ‚l‚ments obligatoires;
+                                 ENC=Select All Mandatory Elements];
+                      Promoted=Yes;
+                      Image=SelectEntries;
+                      PromotedCategory=Category5;
+                      OnAction=VAR
+                                 SEPAXMLSchemaManagement@1001 : Codeunit 9610;
+                               BEGIN
+                                 SEPAXMLSchemaManagement.SelectMandatory(Rec);
+                               END;
+                                }
+      { 13      ;1   ;Action    ;
+                      Name=DeselectAll;
+                      CaptionML=[ENU=Deselect All;
+                                 ESM=Anular selecci¢n;
+                                 FRC=D‚s‚lectionner tout;
+                                 ENC=Deselect All];
+                      Promoted=Yes;
+                      Image=SelectEntries;
+                      PromotedCategory=Category5;
+                      OnAction=VAR
+                                 SEPAXMLSchemaManagement@1000 : Codeunit 9610;
+                               BEGIN
+                                 IF CONFIRM(DeselectQst) THEN
+                                   SEPAXMLSchemaManagement.DeselectAll(Rec);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 11  ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 10  ;1   ;Group     ;
+                GroupType=Group }
+
+    { 23  ;2   ;Field     ;
+                CaptionML=[ENU=XML Schema Code;
+                           ESM=C¢digo de esquema XML;
+                           FRC=Code sch‚ma XML;
+                           ENC=XML Schema Code];
+                SourceExpr=XMLSchemaCode;
+                TableRelation="XML Schema";
+                OnValidate=BEGIN
+                             IF XMLSchemaCode = '' THEN
+                               CLEAR(XMLSchema)
+                             ELSE
+                               XMLSchema.GET(XMLSchemaCode);
+                             SETRANGE("XML Schema Code",XMLSchemaCode);
+                             CurrPage.UPDATE;
+                           END;
+                            }
+
+    { 25  ;2   ;Group     ;
+                GroupType=Group }
+
+    { 18  ;3   ;Field     ;
+                CaptionML=[ENU=New XMLport No.;
+                           ESM=N.§ XMLport nuevo;
+                           FRC=Nouveau nø de XMLport;
+                           ENC=New XMLport No.];
+                SourceExpr=NewObjectNo;
+                OnValidate=BEGIN
+                             SetInternalVariables;
+                           END;
+                            }
+
+    { 8   ;1   ;Group     ;
+                Name=Group;
+                IndentationColumnName=Indentation;
+                IndentationControls=Node Name;
+                ShowAsTree=Yes;
+                GroupType=Repeater }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Node Name";
+                Editable=FALSE }
+
+    { 21  ;2   ;Field     ;
+                SourceExpr=Selected }
+
+    { 17  ;2   ;Field     ;
+                SourceExpr=Choice;
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Node Type";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Data Type";
+                Editable=FALSE }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=MinOccurs;
+                Editable=FALSE }
+
+    { 1   ;2   ;Field     ;
+                SourceExpr=MaxOccurs;
+                Editable=FALSE }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Simple Data Type" }
+
+    { 14  ;0   ;Container ;
+                ContainerType=FactBoxArea }
+
+    { 15  ;1   ;Part      ;
+                CaptionML=[ENU=Allowed Values;
+                           ESM=Valores permitidos;
+                           FRC=Valeurs autoris‚es;
+                           ENC=Allowed Values];
+                SubPageLink=XML Schema Code=FIELD(XML Schema Code),
+                            Element ID=FIELD(ID);
+                PagePartID=Page9611;
+                PartType=Page }
+
+  }
+  CODE
+  {
+    VAR
+      XMLSchema@1003 : Record 9600;
+      XMLSchemaCode@1004 : Code[20];
+      XMLSchemaCodeInternal@1010 : Code[20];
+      NewObjectNo@1001 : Integer;
+      NoObjectIDErr@1000 : TextConst 'ENU=You must provide an object number.;ESM=Debe indicar un n£mero de objeto.;FRC=Vous devez renseigner un num‚ro d''objet.;ENC=You must provide an object number.';
+      NewObjectNoInternal@1008 : Integer;
+      DeselectQst@1007 : TextConst 'ENU=Do you want to deselect all elements?;ESM=¨Desea anular la selecci¢n de todos los elementos?;FRC=Voulez-vous d‚s‚lectionner tous les ‚l‚ments?;ENC=Do you want to deselect all elements?';
+
+    PROCEDURE SetXMLSchemaCode@1(NewXMLSchemaCode@1000 : Code[20]);
+    BEGIN
+      XMLSchemaCodeInternal := NewXMLSchemaCode;
+    END;
+
+    LOCAL PROCEDURE SetInternalVariables@9();
+    BEGIN
+      NewObjectNoInternal := NewObjectNo;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

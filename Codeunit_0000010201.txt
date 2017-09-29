@@ -1,0 +1,94 @@
+OBJECT Codeunit 10201 Transfer Custom Fields
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE GenJnlLineTOGenLedgEntry@1020000(VAR GenJnlLine@1020000 : Record 81;VAR GenLedgEntry@1020001 : Record 17);
+    BEGIN
+    END;
+
+    PROCEDURE GenJnlLineTOTaxEntry@1020001(VAR GenJnlLine@1020000 : Record 81;VAR TaxEntry@1020001 : Record 254);
+    BEGIN
+    END;
+
+    PROCEDURE GenJnlLineTOCustLedgEntry@1020002(VAR GenJnlLine@1020000 : Record 81;VAR CustLedgEntry@1020001 : Record 21);
+    BEGIN
+    END;
+
+    PROCEDURE GenJnlLineTOVendLedgEntry@1020003(VAR GenJnlLine@1020000 : Record 81;VAR VendLedgEntry@1020001 : Record 25);
+    BEGIN
+    END;
+
+    PROCEDURE GenJnlLineTOBankAccLedgEntry@1020004(VAR GenJnlLine@1020000 : Record 81;VAR BankAccLedgEntry@1020001 : Record 271);
+    BEGIN
+    END;
+
+    PROCEDURE BankAccLedgEntryTOChkLedgEntry@1020006(VAR BankAccLedgEntry@1020000 : Record 271;VAR CheckLedgEntry@1020001 : Record 272);
+    BEGIN
+    END;
+
+    PROCEDURE VendLedgEntryTOCVLedgEntryBuf@1020008(VAR VendLedgEntry@1020000 : Record 25;VAR CVLedgEntryBuf@1020001 : Record 382);
+    BEGIN
+    END;
+
+    PROCEDURE CVLedgEntryBufTOVendLedgEntry@1020009(VAR CVLedgEntryBuf@1020000 : Record 382;VAR VendLedgEntry@1020001 : Record 25);
+    BEGIN
+    END;
+
+    PROCEDURE CustLedgEntryTOCVLedgEntryBuf@1020010(VAR CustLedgEntry@1020001 : Record 21;VAR CVLedgEntryBuf@1020000 : Record 382);
+    BEGIN
+    END;
+
+    PROCEDURE CVLedgEntryBufTOCustLedgEntry@1020011(VAR CVLedgEntryBuf@1020001 : Record 382;VAR CustLedgEntry@1020000 : Record 21);
+    BEGIN
+    END;
+
+    PROCEDURE ItemJnlLineTOItemLedgEntry@1020014(VAR ItemJnlLine@1020000 : Record 83;VAR ItemLedgEntry@1020001 : Record 32);
+    BEGIN
+    END;
+
+    PROCEDURE ItemJnlLineTOPhysInvtLedgEntry@1020015(VAR ItemJnlLine@1020001 : Record 83;VAR PhysInvtLedgEntry@1020000 : Record 281);
+    BEGIN
+    END;
+
+    PROCEDURE ItemJnlLineTOValueEntry@1020016(VAR ItemJnlLine@1020001 : Record 83;VAR ValueEntry@1020000 : Record 5802);
+    BEGIN
+    END;
+
+    PROCEDURE JobJnlLineTOResJnlLine@1020020(VAR JobJnlLine@1020000 : Record 210;VAR ResJnlLine@1020001 : Record 207);
+    BEGIN
+    END;
+
+    PROCEDURE JobJnlLineTOItemJnlLine@1020021(VAR JobJnlLine@1020000 : Record 210;VAR ItemJnlLine@1020001 : Record 83);
+    BEGIN
+    END;
+
+    PROCEDURE JobJnlLineTOGenJnlLine@1020022(VAR JobJnlLine@1020000 : Record 210;VAR GenJnlLine@1020001 : Record 81);
+    BEGIN
+    END;
+
+    PROCEDURE JobJnlLineTOJobLedgEntry@1020023(VAR JobJnlLine@1020000 : Record 210;VAR JobLedgEntry@1020001 : Record 169);
+    BEGIN
+    END;
+
+    PROCEDURE ResJnlLineTOResLedgEntry@1020025(VAR ResJnlLine@1020000 : Record 207;VAR ResLedgEntry@1020001 : Record 203);
+    BEGIN
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

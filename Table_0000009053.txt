@@ -1,0 +1,138 @@
+OBJECT Table 9053 Sales Cue
+{
+  OBJECT-PROPERTIES
+  {
+    Date=03/13/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36281;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sales Cue;
+               ESM=Pila ventas;
+               FRC=Pile vente;
+               ENC=Sales Cue];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              ESM=Clave primaria;
+                                                              FRC=Cl‚ primaire;
+                                                              ENC=Primary Key] }
+    { 2   ;   ;Sales Quotes - Open ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Sales Header" WHERE (Document Type=FILTER(Quote),
+                                                                                           Status=FILTER(Open),
+                                                                                           Responsibility Center=FIELD(Responsibility Center Filter)));
+                                                   CaptionML=[ENU=Sales Quotes - Open;
+                                                              ESM=Cotizaciones venta - Abiertas;
+                                                              FRC=Devis - Ouverts;
+                                                              ENC=Sales Quotes - Open];
+                                                   Editable=No }
+    { 3   ;   ;Sales Orders - Open ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Sales Header" WHERE (Document Type=FILTER(Order),
+                                                                                           Status=FILTER(Open),
+                                                                                           Responsibility Center=FIELD(Responsibility Center Filter)));
+                                                   CaptionML=[ENU=Sales Orders - Open;
+                                                              ESM=Pedidos venta - Abiertos;
+                                                              FRC=Documents de vente - Ouverts;
+                                                              ENC=Sales Orders - Open];
+                                                   Editable=No }
+    { 4   ;   ;Ready to Ship       ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Sales Header" WHERE (Document Type=FILTER(Order),
+                                                                                           Status=FILTER(Released),
+                                                                                           Completely Shipped=CONST(No),
+                                                                                           Shipment Date=FIELD(Date Filter2),
+                                                                                           Responsibility Center=FIELD(Responsibility Center Filter)));
+                                                   CaptionML=[ENU=Ready to Ship;
+                                                              ESM=Listos para enviar;
+                                                              FRC=Prˆt … livrer;
+                                                              ENC=Ready to Ship];
+                                                   Editable=No }
+    { 5   ;   ;Delayed             ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Sales Header" WHERE (Document Type=FILTER(Order),
+                                                                                           Status=FILTER(Released),
+                                                                                           Completely Shipped=CONST(No),
+                                                                                           Shipment Date=FIELD(Date Filter),
+                                                                                           Responsibility Center=FIELD(Responsibility Center Filter)));
+                                                   CaptionML=[ENU=Delayed;
+                                                              ESM=Retrasados;
+                                                              FRC=En retard;
+                                                              ENC=Delayed];
+                                                   Editable=No }
+    { 6   ;   ;Sales Return Orders - Open;Integer ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Sales Header" WHERE (Document Type=FILTER(Return Order),
+                                                                                           Status=FILTER(Open),
+                                                                                           Responsibility Center=FIELD(Responsibility Center Filter)));
+                                                   CaptionML=[ENU=Sales Return Orders - Open;
+                                                              ESM=Devoluciones ventas - Abiertas;
+                                                              FRC=Retours vente - Ouverts;
+                                                              ENC=Sales Return Orders - Open];
+                                                   Editable=No }
+    { 7   ;   ;Sales Credit Memos - Open;Integer  ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Sales Header" WHERE (Document Type=FILTER(Credit Memo),
+                                                                                           Status=FILTER(Open),
+                                                                                           Responsibility Center=FIELD(Responsibility Center Filter)));
+                                                   CaptionML=[ENU=Sales Credit Memos - Open;
+                                                              ESM=Notas de cr‚dito de venta - Abiertas;
+                                                              FRC=Notes de cr‚dit de vente - Ouvertes;
+                                                              ENC=Sales Credit Memos - Open];
+                                                   Editable=No }
+    { 8   ;   ;Partially Shipped   ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Sales Header" WHERE (Document Type=FILTER(Order),
+                                                                                           Status=FILTER(Released),
+                                                                                           Ship=FILTER(Yes),
+                                                                                           Completely Shipped=FILTER(No),
+                                                                                           Shipment Date=FIELD(Date Filter2),
+                                                                                           Responsibility Center=FIELD(Responsibility Center Filter)));
+                                                   CaptionML=[ENU=Partially Shipped;
+                                                              ESM=Enviados parcialmente;
+                                                              FRC=Partiellement livr‚;
+                                                              ENC=Partially Shipped];
+                                                   Editable=No }
+    { 20  ;   ;Date Filter         ;Date          ;FieldClass=FlowFilter;
+                                                   CaptionML=[ENU=Date Filter;
+                                                              ESM=Filtro fecha;
+                                                              FRC=Filtre date;
+                                                              ENC=Date Filter];
+                                                   Editable=No }
+    { 21  ;   ;Date Filter2        ;Date          ;FieldClass=FlowFilter;
+                                                   CaptionML=[ENU=Date Filter2;
+                                                              ESM=Filtro fecha2;
+                                                              FRC=Filtre2 de date;
+                                                              ENC=Date Filter2];
+                                                   Editable=No }
+    { 22  ;   ;Responsibility Center Filter;Code10;FieldClass=FlowFilter;
+                                                   CaptionML=[ENU=Responsibility Center Filter;
+                                                              ESM=Filtro de centro de responsabilidad;
+                                                              FRC=Filtre centre de gestion;
+                                                              ENC=Responsibility Centre Filter];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE SetRespCenterFilter@1();
+    VAR
+      UserSetupMgt@1000 : Codeunit 5700;
+      RespCenterCode@1001 : Code[10];
+    BEGIN
+      RespCenterCode := UserSetupMgt.GetSalesFilter;
+      IF RespCenterCode <> '' THEN BEGIN
+        FILTERGROUP(2);
+        SETRANGE("Responsibility Center Filter",RespCenterCode);
+        FILTERGROUP(0);
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

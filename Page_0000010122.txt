@@ -1,0 +1,293 @@
+OBJECT Page 10122 Bank Rec. Dep. Lines Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Bank Rec. Dep. Lines Subform;
+               ESM=Subform. l¡ns. dep. concil.;
+               FRC=Sous-formulaire lignes d‚p“t rapprochement bancaire;
+               ENC=Bank Rec. Dep. Lines Subform];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table10121;
+    SourceTableView=SORTING(Bank Account No.,Statement No.,Record Type,Line No.)
+                    WHERE(Record Type=CONST(Deposit));
+    PageType=ListPart;
+    OnAfterGetRecord=BEGIN
+                       OnActivateForm;
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1907935204;1 ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 ESM=&L¡nea;
+                                 FRC=&Ligne;
+                                 ENC=&Line];
+                      Image=Line }
+      { 1906302804;2 ;Action    ;
+                      CaptionML=[ENU=&Deposit/Transfers Dimensions;
+                                 ESM=&Dimensiones de Dep¢sito/Transfer.;
+                                 FRC=Dimensions &d‚p“t/transferts;
+                                 ENC=&Deposit/Transfers Dimensions];
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10120. Unsupported part was commented. Please check it.
+                                 {CurrPage.DepositsSubForm.PAGE.}
+                                 LookupLineDimensions;
+                               END;
+                                }
+      { 1902523204;2 ;Action    ;
+                      CaptionML=[ENU=E&xpand Deposit Line;
+                                 ESM=A&mpliar l¡nea de dep¢sito;
+                                 FRC=&D‚velopper ligne de d‚p“t;
+                                 ENC=E&xpand Deposit Line];
+                      Image=ExpandDepositLine;
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10120. Unsupported part was commented. Please check it.
+                                 {CurrPage.DepositsSubForm.PAGE.}
+                                 ExpandCurrLine;
+                               END;
+                                }
+      { 1902975904;2 ;Action    ;
+                      ShortCutKey=Shift+Ctrl+X;
+                      CaptionML=[ENU=Collapse Deposit Lines;
+                                 ESM=Contraer l¡neas de dep¢sito;
+                                 FRC=R‚duire lignes de d‚p“t;
+                                 ENC=Collapse Deposit Lines];
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #10120. Unsupported part was commented. Please check it.
+                                 {CurrPage.DepositsSubForm.PAGE.}
+                                 CollapseCurrLine;
+                               END;
+                                }
+      { 1906587504;1 ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 1908000204;2 ;Action    ;
+                      CaptionML=[ENU=E&xpand Deposit Line;
+                                 ESM=A&mpliar l¡nea de dep¢sito;
+                                 FRC=&D‚velopper ligne de d‚p“t;
+                                 ENC=E&xpand Deposit Line];
+                      Image=ExpandDepositLine;
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #36720. Unsupported part was commented. Please check it.
+                                 {CurrPage.DepositsSubForm.PAGE.}
+                                 ExpandCurrLine;
+                               END;
+                                }
+      { 1908000304;2 ;Action    ;
+                      CaptionML=[ENU=Collapse Deposit Lines;
+                                 ESM=Contraer l¡neas de dep¢sito;
+                                 FRC=R‚duire lignes de d‚p“t;
+                                 ENC=Collapse Deposit Lines];
+                      OnAction=BEGIN
+                                 // This functionality was copied from page #36720. Unsupported part was commented. Please check it.
+                                 {CurrPage.DepositsSubForm.PAGE.}
+                                 CollapseCurrLine;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1020022;1;Field     ;
+                CaptionML=[ENU=Bank Account No.;
+                           ESM=C¢d. cuenta banco;
+                           FRC=Nø de compte bancaire;
+                           ENC=Bank Account No.];
+                SourceExpr=BankRecHdr."Bank Account No.";
+                Editable=FALSE }
+
+    { 1020023;1;Field     ;
+                CaptionML=[ENU=Statement No.;
+                           ESM=N§ estado de cta. banco;
+                           FRC=Nø de relev‚;
+                           ENC=Statement No.];
+                SourceExpr=BankRecHdr."Statement No.";
+                Editable=FALSE }
+
+    { 1020020;1;Field     ;
+                CaptionML=[ENU=Statement Date;
+                           ESM=Fecha estado de cuenta banco;
+                           FRC=Date du relev‚;
+                           ENC=Statement Date];
+                SourceExpr=BankRecHdr."Statement Date";
+                Editable=FALSE }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 1480000;2;Field     ;
+                SourceExpr="Collapse Status";
+                Editable=FALSE }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Posting Date";
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Document Type";
+                Editable=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Document No.";
+                Editable=FALSE }
+
+    { 1020018;2;Field     ;
+                SourceExpr="External Document No.";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Account Type";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Account No.";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr=Description;
+                Editable=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr=Amount;
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr=Cleared;
+                OnValidate=BEGIN
+                             ClearedOnAfterValidate;
+                           END;
+                            }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Cleared Amount";
+                OnValidate=BEGIN
+                             ClearedAmountOnAfterValidate;
+                           END;
+                            }
+
+    { 1020012;2;Field     ;
+                CaptionML=[ENU=Difference;
+                           ESM=Diferencia;
+                           FRC=Diff‚rence;
+                           ENC=Difference];
+                SourceExpr="Cleared Amount" - Amount;
+                Editable=FALSE }
+
+    { 1020004;2;Field     ;
+                SourceExpr="Bal. Account Type";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Bal. Account No.";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020008;2;Field     ;
+                SourceExpr="Currency Code";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020010;2;Field     ;
+                SourceExpr="Currency Factor";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020015;1;Field     ;
+                Name=BankStatementCleared;
+                CaptionML=[ENU=Statement;
+                           ESM=Estado de cuenta;
+                           FRC=Relev‚;
+                           ENC=Statement];
+                SourceExpr=BankRecHdr."Cleared Inc./Dpsts. Per Stmnt.";
+                Editable=FALSE }
+
+    { 1020017;1;Field     ;
+                Name=TotalCleared;
+                CaptionML=[ENU=Total Cleared;
+                           ESM=Total compensados;
+                           FRC=Total rapproch‚;
+                           ENC=Total Cleared];
+                SourceExpr=BankRecHdr."Total Cleared Deposits";
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      BankRecHdr@1020000 : Record 10120;
+
+    PROCEDURE SetupTotals@1020002();
+    BEGIN
+      IF BankRecHdr.GET("Bank Account No.","Statement No.") THEN
+        BankRecHdr.CALCFIELDS("Total Cleared Deposits");
+    END;
+
+    PROCEDURE LookupLineDimensions@1020000();
+    BEGIN
+      ShowDimensions;
+      CurrPage.SAVERECORD;
+    END;
+
+    PROCEDURE GetTableID@1020001() : Integer;
+    VAR
+      Object@1020001 : Record 2000000001;
+    BEGIN
+      Object.SETRANGE(Type,Object.Type::Table);
+      Object.SETRANGE(Name,TABLENAME);
+      Object.FINDFIRST;
+      EXIT(Object.ID);
+    END;
+
+    PROCEDURE ExpandCurrLine@1480000();
+    BEGIN
+      ExpandLine(Rec);
+      CurrPage.UPDATE(FALSE);
+    END;
+
+    PROCEDURE CollapseCurrLine@1480001();
+    BEGIN
+      CollapseLines(Rec);
+      CurrPage.UPDATE(FALSE);
+    END;
+
+    LOCAL PROCEDURE ClearedOnAfterValidate@19021297();
+    BEGIN
+      CurrPage.UPDATE;
+      SetupTotals;
+    END;
+
+    LOCAL PROCEDURE ClearedAmountOnAfterValidate@19016797();
+    BEGIN
+      CurrPage.UPDATE;
+      SetupTotals;
+    END;
+
+    LOCAL PROCEDURE OnActivateForm@19002417();
+    BEGIN
+      SetupTotals;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

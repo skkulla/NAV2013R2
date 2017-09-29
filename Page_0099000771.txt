@@ -1,0 +1,161 @@
+OBJECT Page 99000771 Work Ctr. Group Calendar
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Work Ctr. Group Calendar;
+               ESM=Calend. grupo centro trabajo;
+               FRC=Calendrier groupe ateliers;
+               ENC=Work Ctr. Group Calendar];
+    SaveValues=Yes;
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table99000756;
+    DataCaptionExpr='';
+    PageType=Card;
+    OnOpenPage=BEGIN
+                 MATRIX_GenerateColumnCaptions(SetWanted::Initial);
+                 MATRIX_UseNameForCaption := FALSE;
+                 MATRIX_CurrentSetLenght := ARRAYLEN(MATRIX_CaptionSet);
+                 MfgSetup.GET;
+                 MfgSetup.TESTFIELD("Show Capacity In");
+                 CapacityUoM := MfgSetup."Show Capacity In";
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 77      ;1   ;Action    ;
+                      Name=ShowMatrix;
+                      CaptionML=[ENU=&Show Matrix;
+                                 ESM=&Mostrar matriz;
+                                 FRC=&Afficher matrice;
+                                 ENC=&Show Matrix];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ShowMatrix;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 MatrixForm@1090 : Page 9295;
+                               BEGIN
+                                 CLEAR(MatrixForm);
+                                 MatrixForm.Load(MATRIX_CaptionSet,MATRIX_MatrixRecords,MATRIX_CurrentSetLenght,CapacityUoM);
+                                 MatrixForm.SETTABLEVIEW(Rec);
+                                 MatrixForm.RUNMODAL;
+                               END;
+                                }
+      { 1104    ;1   ;Action    ;
+                      CaptionML=[ENU=Next Set;
+                                 ESM=Conjunto siguiente;
+                                 FRC=Jeu suivant;
+                                 ENC=Next Set];
+                      ToolTipML=[ENU=Next Set;
+                                 ESM=Conjunto siguiente;
+                                 FRC=Jeu suivant;
+                                 ENC=Next Set];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=NextSet;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 MATRIX_GenerateColumnCaptions(MATRIX_SerWanted::Next);
+                               END;
+                                }
+      { 1102    ;1   ;Action    ;
+                      CaptionML=[ENU=Previous Set;
+                                 ESM=Conjunto anterior;
+                                 FRC=Jeu pr‚c‚dent;
+                                 ENC=Previous Set];
+                      ToolTipML=[ENU=Previous Set;
+                                 ESM=Conjunto anterior;
+                                 FRC=Jeu pr‚c‚dent;
+                                 ENC=Previous Set];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PreviousSet;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 MATRIX_GenerateColumnCaptions(MATRIX_SerWanted::Previus);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 13  ;1   ;Group     ;
+                CaptionML=[ENU=Matrix Options;
+                           ESM=Opciones matriz;
+                           FRC=Options de matrice;
+                           ENC=Matrix Options] }
+
+    { 1099;2   ;Field     ;
+                CaptionML=[ENU=View by;
+                           ESM=Ver por;
+                           FRC=Afficher par;
+                           ENC=View by];
+                OptionCaptionML=[ENU=Day,Week,Month,Quarter,Year,Accounting Period;
+                                 ESM=D¡a,Semana,Mes,Trimestre,A¤o,Periodo contable;
+                                 FRC=Jour,Semaine,Mois,Trimestre,Ann‚e,P‚riode comptable;
+                                 ENC=Day,Week,Month,Quarter,Year,Accounting Period];
+                SourceExpr=PeriodType;
+                OnValidate=BEGIN
+                             MATRIX_GenerateColumnCaptions(SetWanted::Initial);
+                           END;
+                            }
+
+    { 3   ;2   ;Field     ;
+                CaptionML=[ENU=Capacity Shown In;
+                           ESM=Capacidad Mostrar en;
+                           FRC=Capacit‚ affich‚e dans;
+                           ENC=Capacity Shown In];
+                SourceExpr=CapacityUoM;
+                TableRelation="Capacity Unit of Measure".Code }
+
+    { 1101;2   ;Field     ;
+                CaptionML=[ENU=Column Set;
+                           ESM=Conjunto de columnas;
+                           FRC=Jeu de colonnes;
+                           ENC=Column Set];
+                SourceExpr=MATRIX_CaptionRange;
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      MATRIX_MatrixRecords@1091 : ARRAY [32] OF Record 2000000007;
+      MfgSetup@1007 : Record 99000765;
+      MATRIX_CaptionSet@1092 : ARRAY [32] OF Text[1024];
+      MATRIX_CaptionRange@1093 : Text[1024];
+      MATRIX_SerWanted@1005 : 'Initial,Previus,Same,Next';
+      MATRIX_PrimKeyFirstCaptionInCu@1097 : Text[1024];
+      MATRIX_CurrentSetLenght@1098 : Integer;
+      MATRIX_UseNameForCaption@1003 : Boolean;
+      MATRIX_DateFilter@1004 : Text[1024];
+      PeriodType@1001 : 'Day,Week,Month,Quarter,Year,Accounting Period';
+      MatrixMgt@1002 : Codeunit 9200;
+      SetWanted@1006 : 'Initial,Previus,Same,Next';
+      CapacityUoM@1008 : Code[10];
+
+    PROCEDURE MATRIX_GenerateColumnCaptions@1106(SetWanted@1002 : 'Initial,Previus,Same,Next');
+    BEGIN
+      MatrixMgt.GeneratePeriodMatrixData(SetWanted,ARRAYLEN(MATRIX_CaptionSet),MATRIX_UseNameForCaption,PeriodType,MATRIX_DateFilter,
+        MATRIX_PrimKeyFirstCaptionInCu,MATRIX_CaptionSet,MATRIX_CaptionRange,MATRIX_CurrentSetLenght,MATRIX_MatrixRecords
+        );
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

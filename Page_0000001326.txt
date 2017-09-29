@@ -1,0 +1,227 @@
+OBJECT Page 1326 Mini Sales Quotes List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Sales Quote;
+               ESM=Cotizaci¢n venta;
+               FRC=Devis;
+               ENC=Sales Quote];
+    SourceTable=Table36;
+    SourceTableView=WHERE(Document Type=CONST(Quote));
+    PageType=List;
+    CardPageID=Mini Sales Quote;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Quote,Posting;
+                                ESM=Nuevo,Proceso,Informe,Cotizaci¢n,Registro;
+                                FRC=Nouveau,Traitement,Rapport,Devis,Report;
+                                ENC=New,Process,Report,Quote,Posting];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 10      ;1   ;ActionGroup;
+                      Name=Process;
+                      CaptionML=[ENU=Process;
+                                 ESM=Proceso;
+                                 FRC=Processus;
+                                 ENC=Process] }
+      { 23      ;2   ;Action    ;
+                      Name=MakeInvoice;
+                      CaptionML=[ENU=Make Invoice;
+                                 ESM=Generar factura;
+                                 FRC=êtablir facture;
+                                 ENC=Make Invoice];
+                      ToolTipML=[ENU=Convert the selected sales quote to a sales invoice.;
+                                 ESM=Convierta la cotizaci¢n de venta seleccionada en una factura de venta.;
+                                 FRC=Convertissez le devis sÇlectionnÇ en facture vente.;
+                                 ENC=Convert the selected sales quote to a sales invoice.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=MakeOrder;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 MiniLinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
+                                 CODEUNIT.RUN(CODEUNIT::"Sales-Quote to Invoice Yes/No",Rec);
+                               END;
+                                }
+      { 20      ;2   ;Action    ;
+                      Name=Print;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=Im&primir;
+                                 FRC=Im&primer;
+                                 ENC=&Print];
+                      ToolTipML=[ENU=Print the selected sales quote.;
+                                 ESM=Imprimir la cotizaci¢n de venta seleccionada.;
+                                 FRC=Imprimez le devis sÇlectionnÇ.;
+                                 ENC=Print the selected sales quote.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 MiniLinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
+                                 DocPrint.PrintSalesHeader(Rec);
+                               END;
+                                }
+      { 21      ;2   ;Action    ;
+                      Name=EmailasPDF;
+                      CaptionML=[ENU=&Email as PDF;
+                                 ESM=&Correo electr¢nico como PDF;
+                                 FRC=&Envoyer par courriel au format PDF;
+                                 ENC=&Email as PDF];
+                      ToolTipML=[ENU=Attach the selected sales quote to an email to the customer.;
+                                 ESM=Adjuntar la cotizaci¢n de venta seleccionada a un mensaje de correo electr¢nico para el cliente.;
+                                 FRC=Joignez le devis sÇlectionnÇ Ö un courriel adressÇ au client.;
+                                 ENC=Attach the selected sales quote to an email to the customer.];
+                      Promoted=Yes;
+                      Visible=AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=SendEmailPDF;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ReportDistributionManagement@1000 : Codeunit 452;
+                               BEGIN
+                                 MiniLinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
+                                 ReportDistributionManagement.EmailDocumentReport(Rec);
+                               END;
+                                }
+      { 17      ;2   ;Action    ;
+                      Name=SaveCopy;
+                      CaptionML=[ENU=&Save PDF Document;
+                                 ESM=&Guardar documento PDF;
+                                 FRC=&Enregistrer document PDF;
+                                 ENC=&Save PDF Document];
+                      ToolTipML=[ENU=Save the selected sales quote to your computer. You can then attach it to the email that you send to the customer.;
+                                 ESM=Guarde la cotizaci¢n de venta seleccionada en el equipo. A continuaci¢n, podr† adjuntarla al mensaje de correo electr¢nico que env°e al cliente.;
+                                 FRC=Enregistrez le devis sÇlectionnÇ sur votre ordinateur. Vous pouvez ensuite le joindre au courriel adressÇ au client.;
+                                 ENC=Save the selected sales quote to your computer. You can then attach it to the email that you send to the customer.];
+                      Promoted=Yes;
+                      Visible=NOT AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ReportDistributionManagement@1000 : Codeunit 452;
+                               BEGIN
+                                 MiniLinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
+                                 ReportDistributionManagement.SaveDocumentReport(Rec);
+                               END;
+                                }
+      { 1102601019;1 ;ActionGroup;
+                      Name=Quote;
+                      CaptionML=[ENU=&Quote;
+                                 ESM=&Cotizaci¢n;
+                                 FRC=&Devis;
+                                 ENC=&Quote];
+                      Image=Invoice }
+      { 4       ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Customer;
+                                 ESM=Cliente;
+                                 FRC=Client;
+                                 ENC=Customer];
+                      ToolTipML=[ENU=View or edit detailed information about the customer on the selected sales document.;
+                                 ESM=Vea o edite la informaci¢n detallada sobre el cliente en el documento de venta seleccionado.;
+                                 FRC=Affichez ou modifiez des informations dÇtaillÇes concernant le client sur le document vente sÇlectionnÇ.;
+                                 ENC=View or edit detailed information about the customer on the selected sales document.];
+                      RunObject=Page 1300;
+                      RunPageLink=No.=FIELD(Sell-to Customer No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Customer;
+                      PromotedCategory=Category4 }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the sales header you are setting up: a quote, order, invoice, or credit memo.;
+                           ESM=Especifica el n£mero de la cabecera de ventas que est† configurando: cotizaci¢n, pedido, factura o nota de crÇdito.;
+                           FRC=Indique le numÇro de l'en-tàte vente que vous crÇezˇ: un devis, une commande, une facture ou un avoir.;
+                           ENC=Specifies the number of the sales header you are setting up: a quote, order, invoice, or credit memo.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Customer Name;
+                           ESM=Nombre cliente;
+                           FRC=Nom client;
+                           ENC=Customer Name];
+                ToolTipML=[ENU=Specifies the name of the customer that the items on the invoice will be shipped to.;
+                           ESM=Especifica el nombre de del cliente al que se enviar†n los productos del la factura.;
+                           FRC=SpÇcifie le nom du client Ö qui les articles de la facture seront expÇdiÇs.;
+                           ENC=Specifies the name of the customer that the items on the invoice will be shipped to.];
+                SourceExpr="Sell-to Customer Name" }
+
+    { 11  ;2   ;Field     ;
+                CaptionML=[ENU=Contact;
+                           ESM=Contacto;
+                           FRC=Contact;
+                           ENC=Contact];
+                ToolTipML=[ENU=Specifies the name of the person to contact at the customer that the items on the invoice will be shipped to.;
+                           ESM=Especifica el nombre de la persona que representa al cliente al que env°a los productos de la factura y con la que debe ponerse en contacto.;
+                           FRC=Indique le nom de la personne Ö contacter chez le donneur d'ordre.;
+                           ENC=Specifies the name of the person to contact at the customer that the items on the invoice will be shipped to.];
+                SourceExpr="Sell-to Contact" }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date when the posting of the sales document will be recorded. By default, today's date is entered.;
+                           ESM=Especifica la fecha en que se registrar† el registro del documento de venta. De manera predeterminada, se introduce la fecha actual.;
+                           FRC=Indique la date Ö laquelle la validation du document vente sera validÇe. Par dÇfaut, la date du jour est indiquÇe.;
+                           ENC=Specifies the date when the posting of the sales document will be recorded. By default, today's date is entered.];
+                SourceExpr="Posting Date" }
+
+    { 1102601009;2;Field  ;
+                ToolTipML=[ENU=Specifies when the sales invoice must be paid. By default, the field is calculated as the date in the Shipment Date field plus the period defined in the Payment Terms Code field.;
+                           ESM=Especifica cu†ndo la factura de venta se debe pagar. De manera predeterminada, el campo se calcula como la fecha del campo Fecha env°o m†s el periodo definido en el campo C¢d. tÇrminos pago.;
+                           FRC=SpÇcifie la date Ö laquelle la facture vente doit àtre payÇe. Par dÇfaut, le champ est calculÇ comme la date dans le champ Date de livraison plus la pÇriode dÇfinie dans le champ Code modalitÇs de paiement.;
+                           ENC=Specifies when the sales invoice must be paid. By default, the field is calculated as the date in the Shipment Date field plus the period defined in the Payment Terms Code field.];
+                SourceExpr="Due Date" }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date that your customer has asked for the order to be delivered.;
+                           ESM=Especifica la fecha en la que el cliente solicit¢ que se entregase el pedido.;
+                           FRC=Indique la date Ö laquelle le client a demandÇ Ö àtre livrÇ.;
+                           ENC=Specifies the date that your customer has asked for the order to be delivered.];
+                SourceExpr="Requested Delivery Date" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the sum of amounts in the Line Amount field on the sales order lines. It is used to calculate the invoice discount of the sales order.;
+                           ESM=Especifica la suma de los importes en el Importe l°nea campo de las l°neas de pedido de venta. Se utiliza para calcular el descuento en factura del pedido de venta.;
+                           FRC=SpÇcifie la somme des montants du champ Montant ligne sur les lignes commande vente. Il permet de calculer la remise facture de la commande vente.;
+                           ENC=Specifies the sum of amounts in the Line Amount field on the sales order lines. It is used to calculate the invoice discount of the sales order.];
+                SourceExpr=Amount }
+
+  }
+  CODE
+  {
+    VAR
+      DocPrint@1000 : Codeunit 229;
+      MiniLinesInstructionMgt@1002 : Codeunit 1320;
+      AllowDotNetAddIn@1001 : Boolean;
+
+    BEGIN
+    END.
+  }
+}
+

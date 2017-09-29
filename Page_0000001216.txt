@@ -1,0 +1,88 @@
+OBJECT Page 1216 Post Exch Col Def Part
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posting Exchange Column Definition;
+               ESM=Definici¢n de columna de intercambio de registro;
+               FRC=D‚finition de colonne d'‚change de report;
+               ENC=Posting Exchange Column Definition];
+    SourceTable=Table1223;
+    DelayedInsert=Yes;
+    PageType=ListPart;
+    ActionList=ACTIONS
+    {
+      { 12      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Insert Default Definitions;
+                                 ESM=Insertar definiciones predeterminadas;
+                                 FRC=Ins‚rer les d‚finitions par d‚faut;
+                                 ENC=Insert Default Definitions];
+                      Image=CreateDocument;
+                      OnAction=VAR
+                                 PostExchLineDefPart@1000 : Page 1215;
+                               BEGIN
+                                 CreateColumnDefinitions("Posting Exch. Def Code","Posting Exch. Line Def Code",TRUE,
+                                   PostExchLineDefPart.GetCreateDefaultFieldMappingQst);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Column No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Data Type" }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Data Format" }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Data Formatting Culture" }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr=Length }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 15  ;2   ;Field     ;
+                SourceExpr=Path }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Negative-Sign Identifier" }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr=Constant }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr=Show;
+                Visible=false }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

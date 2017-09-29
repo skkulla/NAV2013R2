@@ -1,0 +1,64 @@
+OBJECT Page 10017 GIFI Codes
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=GIFI Codes;
+               ESM=C¢d. GIFI;
+               FRC=Codes IGRF;
+               ENC=GIFI Codes];
+    SourceTable=Table10015;
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1904842104;1 ;Action    ;
+                      CaptionML=[ENU=Export GIFI Info. to Excel;
+                                 ESM=Exportar info. GIFI a Excel;
+                                 FRC=Exporter donn‚es IGRF vers fichier Excel;
+                                 ENC=Export GIFI Info. to Excel];
+                      RunObject=Report 10005;
+                      Promoted=Yes;
+                      PromotedCategory=Process }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1906302006;1 ;Action    ;
+                      CaptionML=[ENU=Account Balances by GIFI Code;
+                                 ESM=Contrapartidas por c¢d. GIFI;
+                                 FRC=Solde des comptes par code IGRF;
+                                 ENC=Account Balances by GIFI Code];
+                      RunObject=Report 10004;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1020000;1;Group     ;
+                GroupType=Repeater }
+
+    { 1020001;2;Field     ;
+                SourceExpr=Code }
+
+    { 1020003;2;Field     ;
+                SourceExpr=Name }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

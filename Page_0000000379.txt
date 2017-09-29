@@ -1,0 +1,304 @@
+OBJECT Page 379 Bank Acc. Reconciliation
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Bank Acc. Reconciliation;
+               ESM=Conciliaci¢n banco;
+               FRC=Rapprochement compte bancaire;
+               ENC=Bank Acc. Reconciliation];
+    SaveValues=No;
+    SourceTable=Table273;
+    PageType=Document;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Bank,Matching;
+                                ESM=Nuevo,Proceso,Informe,Banco,Conciliaci¢n;
+                                FRC=Nouveau,Traitement,Rapport,Banque,Correspondance;
+                                ENC=New,Process,Report,Bank,Matching];
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 23      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Recon.;
+                                 ESM=&Conciliaci¢n;
+                                 FRC=&Rappr.;
+                                 ENC=&Recon.];
+                      Image=BankAccountRec }
+      { 26      ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=&Card;
+                                 ESM=&Ficha;
+                                 FRC=&Fiche;
+                                 ENC=&Card];
+                      RunObject=Page 370;
+                      RunPageLink=No.=FIELD(Bank Account No.);
+                      Image=EditLines }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 14      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 16      ;2   ;Action    ;
+                      Name=SuggestLines;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Suggest Lines;
+                                 ESM=Proponer l°neas;
+                                 FRC=SuggÇrer les lignes;
+                                 ENC=Suggest Lines];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=SuggestLines;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 SuggestBankAccStatement.SetStmt(Rec);
+                                 SuggestBankAccStatement.RUNMODAL;
+                                 CLEAR(SuggestBankAccStatement);
+                               END;
+                                }
+      { 24      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Transfer to General Journal;
+                                 ESM=Transferir al diario general;
+                                 FRC=TransfÇrer au journal gÇnÇral;
+                                 ENC=Transfer to General Journal];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=TransferToGeneralJournal;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 TransferToGLJnl.SetBankAccRecon(Rec);
+                                 TransferToGLJnl.RUN;
+                               END;
+                                }
+      { 19      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Ba&nk;
+                                 ESM=Ba&nco;
+                                 FRC=Ba&nque;
+                                 ENC=Ba&nk];
+                      ActionContainerType=NewDocumentItems }
+      { 3       ;2   ;Action    ;
+                      Name=ImportBankStatement;
+                      CaptionML=[ENU=Import Bank Statement;
+                                 ESM=Importar estado de cuenta banco;
+                                 FRC=Importer le relevÇ bancaire;
+                                 ENC=Import Bank Statement];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Import;
+                      PromotedCategory=Category4;
+                      OnAction=BEGIN
+                                 ImportBankStatement;
+                               END;
+                                }
+      { 12      ;1   ;ActionGroup;
+                      CaptionML=[ENU=M&atching;
+                                 ESM=&Conciliaci¢n;
+                                 FRC=C&orrespondance;
+                                 ENC=M&atching] }
+      { 4       ;2   ;Action    ;
+                      Name=MatchAutomatically;
+                      CaptionML=[ENU=Match Automatically;
+                                 ESM=Conciliar autom†ticamente;
+                                 FRC=Faire correspondre automatiquement;
+                                 ENC=Match Automatically];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=MapAccounts;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 SETRANGE("Bank Account No.","Bank Account No.");
+                                 SETRANGE("Statement No.","Statement No.");
+                                 REPORT.RUN(REPORT::"Match Bank Entries",TRUE,TRUE,Rec);
+                               END;
+                                }
+      { 18      ;2   ;Action    ;
+                      Name=MatchManually;
+                      CaptionML=[ENU=Match Manually;
+                                 ESM=Conciliar manualmente;
+                                 FRC=Faire correspondre manuellement;
+                                 ENC=Match Manually];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CheckRulesSyntax;
+                      PromotedCategory=Category5;
+                      OnAction=VAR
+                                 TempBankAccReconciliationLine@1001 : TEMPORARY Record 274;
+                                 TempBankAccountLedgerEntry@1000 : TEMPORARY Record 271;
+                                 MatchBankRecLines@1002 : Codeunit 1252;
+                               BEGIN
+                                 CurrPage.StmtLine.PAGE.GetSelectedRecords(TempBankAccReconciliationLine);
+                                 CurrPage.ApplyBankLedgerEntries.PAGE.GetSelectedRecords(TempBankAccountLedgerEntry);
+                                 MatchBankRecLines.MatchManually(TempBankAccReconciliationLine,TempBankAccountLedgerEntry);
+                               END;
+                                }
+      { 13      ;2   ;Action    ;
+                      Name=RemoveMatch;
+                      CaptionML=[ENU=Remove Match;
+                                 ESM=Eliminar conciliaci¢n;
+                                 FRC=Supprimer correspondance;
+                                 ENC=Remove Match];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=RemoveContacts;
+                      PromotedCategory=Category5;
+                      OnAction=VAR
+                                 TempBankAccReconciliationLine@1002 : TEMPORARY Record 274;
+                                 TempBankAccountLedgerEntry@1001 : TEMPORARY Record 271;
+                                 MatchBankRecLines@1000 : Codeunit 1252;
+                               BEGIN
+                                 CurrPage.StmtLine.PAGE.GetSelectedRecords(TempBankAccReconciliationLine);
+                                 CurrPage.ApplyBankLedgerEntries.PAGE.GetSelectedRecords(TempBankAccountLedgerEntry);
+                                 MatchBankRecLines.RemoveMatch(TempBankAccReconciliationLine,TempBankAccountLedgerEntry);
+                               END;
+                                }
+      { 10      ;2   ;Action    ;
+                      Name=All;
+                      CaptionML=[ENU=Show All;
+                                 ESM=Mostrar todos;
+                                 FRC=Afficher tout;
+                                 ENC=Show All];
+                      Image=AddWatch;
+                      OnAction=BEGIN
+                                 CurrPage.StmtLine.PAGE.ToggleMatchedFilter(FALSE);
+                                 CurrPage.ApplyBankLedgerEntries.PAGE.ToggleMatchedFilter(FALSE);
+                               END;
+                                }
+      { 7       ;2   ;Action    ;
+                      Name=NotMatched;
+                      CaptionML=[ENU=Show Non-matched;
+                                 ESM=Mostrar no conciliados;
+                                 FRC=Afficher non-correspondances;
+                                 ENC=Show Non-matched];
+                      Image=AddWatch;
+                      OnAction=BEGIN
+                                 CurrPage.StmtLine.PAGE.ToggleMatchedFilter(TRUE);
+                                 CurrPage.ApplyBankLedgerEntries.PAGE.ToggleMatchedFilter(TRUE);
+                               END;
+                                }
+      { 1       ;1   ;ActionGroup;
+                      CaptionML=[ENU=P&osting;
+                                 ESM=&Registro;
+                                 FRC=Rep&ort;
+                                 ENC=P&osting];
+                      Image=Post }
+      { 15      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Test Report;
+                                 ESM=Informe prue&ba;
+                                 FRC=&Tester le report;
+                                 ENC=&Test Report];
+                      Image=TestReport;
+                      OnAction=BEGIN
+                                 ReportPrint.PrintBankAccRecon(Rec);
+                               END;
+                                }
+      { 17      ;2   ;Action    ;
+                      ShortCutKey=F9;
+                      CaptionML=[ENU=P&ost;
+                                 ESM=&Registrar;
+                                 FRC=Rep&orter;
+                                 ENC=P&ost];
+                      RunObject=Codeunit 371;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostOrder;
+                      PromotedCategory=Process }
+      { 9       ;2   ;Action    ;
+                      ShortCutKey=Shift+F9;
+                      CaptionML=[ENU=Post and &Print;
+                                 ESM=Registrar e &imprimir;
+                                 FRC=Reporter et im&primer;
+                                 ENC=Post and &Print];
+                      RunObject=Codeunit 372;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostPrint;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Bank Account No." }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Statement No." }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Statement Date" }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Balance Last Statement" }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Statement Ending Balance" }
+
+    { 8   ;1   ;Group     ;
+                GroupType=Group }
+
+    { 11  ;2   ;Part      ;
+                Name=StmtLine;
+                CaptionML=[ENU=Bank Statement Lines;
+                           ESM=L°neas de estado de cuenta banco;
+                           FRC=Lignes relevÇ bancaire;
+                           ENC=Bank Statement Lines];
+                SubPageLink=Bank Account No.=FIELD(Bank Account No.),
+                            Statement No.=FIELD(Statement No.);
+                PagePartID=Page380;
+                PartType=Page }
+
+    { 6   ;2   ;Part      ;
+                Name=ApplyBankLedgerEntries;
+                CaptionML=[ENU=Bank Account Ledger Entries;
+                           ESM=Movs. bancos;
+                           FRC=êcritures du grand livre de compte bancaire;
+                           ENC=Bank Account Ledger Entries];
+                SubPageLink=Bank Account No.=FIELD(Bank Account No.),
+                            Open=CONST(Yes),
+                            Statement Status=FILTER(Open|Bank Acc. Entry Applied|Check Entry Applied);
+                PagePartID=Page381;
+                PartType=Page }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      SuggestBankAccStatement@1000 : Report 1496;
+      TransferToGLJnl@1001 : Report 1497;
+      ReportPrint@1002 : Codeunit 228;
+
+    BEGIN
+    END.
+  }
+}
+

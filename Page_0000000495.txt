@@ -1,0 +1,229 @@
+OBJECT Page 495 Currency Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Currency Card;
+               ESM=Ficha divisa;
+               FRC=Fiche devise;
+               ENC=Currency Card];
+    SourceTable=Table4;
+    PageType=Card;
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 56      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 58      ;2   ;Action    ;
+                      CaptionML=[ENU=Change Payment &Tolerance;
+                                 ESM=Cambiar &tolerancia pagos;
+                                 FRC=Modifier la &tolÇrance de paiement;
+                                 ENC=Change Payment &Tolerance];
+                      Promoted=Yes;
+                      Image=ChangePaymentTolerance;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ChangePmtTol@1001 : Report 34;
+                               BEGIN
+                                 ChangePmtTol.SetCurrency(Rec);
+                                 ChangePmtTol.RUNMODAL;
+                               END;
+                                }
+      { 39      ;1   ;Action    ;
+                      CaptionML=[ENU=Exch. &Rates;
+                                 ESM=Tipo &cambio;
+                                 FRC=&Taux de change;
+                                 ENC=Exch. &Rates];
+                      RunObject=Page 483;
+                      RunPageLink=Currency Code=FIELD(Code);
+                      Promoted=Yes;
+                      Image=CurrencyExchangeRates;
+                      PromotedCategory=Process }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1901143306;1 ;Action    ;
+                      CaptionML=[ENU=Foreign Currency Balance;
+                                 ESM=Saldo divisas extranjeras;
+                                 FRC=Solde en devises;
+                                 ENC=Foreign Currency Balance];
+                      RunObject=Report 503;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900711606;1 ;Action    ;
+                      CaptionML=[ENU=Aged Accounts Receivable;
+                                 ESM=AntigÅedad cobros;
+                                 FRC=Comptes clients classÇs chronologiquement;
+                                 ENC=Aged Accounts Receivable];
+                      RunObject=Report 10040;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1905388206;1 ;Action    ;
+                      CaptionML=[ENU=Aged Accounts Payable;
+                                 ESM=AntigÅedad pagos;
+                                 FRC=Comptes fournisseurs classÇs chronologiquement;
+                                 ENC=Aged Accounts Payable];
+                      RunObject=Report 10085;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904082706;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance;
+                                 ESM=Balance comprobaci¢n;
+                                 FRC=Balance de vÇrification;
+                                 ENC=Trial Balance];
+                      RunObject=Report 10022;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=GÇnÇral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code;
+                Importance=Promoted }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description;
+                Importance=Promoted }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Unrealized Gains Acc." }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Realized Gains Acc." }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Unrealized Losses Acc." }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Realized Losses Acc." }
+
+    { 31  ;2   ;Field     ;
+                SourceExpr="EMU Currency";
+                Importance=Promoted }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Last Date Modified" }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Last Date Adjusted";
+                Importance=Promoted }
+
+    { 44  ;2   ;Field     ;
+                SourceExpr="Payment Tolerance %" }
+
+    { 54  ;2   ;Field     ;
+                SourceExpr="Max. Payment Tolerance Amount" }
+
+    { 1907140501;1;Group  ;
+                CaptionML=[ENU=Rounding;
+                           ESM=Redondeo;
+                           FRC=Arrondissement;
+                           ENC=Rounding] }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Invoice Rounding Precision";
+                Importance=Promoted }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Invoice Rounding Type";
+                Importance=Promoted }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Amount Rounding Precision" }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr="Amount Decimal Places" }
+
+    { 41  ;2   ;Field     ;
+                SourceExpr="Unit-Amount Rounding Precision" }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr="Unit-Amount Decimal Places" }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr="Appln. Rounding Precision" }
+
+    { 46  ;2   ;Field     ;
+                SourceExpr="Conv. LCY Rndg. Debit Acc." }
+
+    { 48  ;2   ;Field     ;
+                SourceExpr="Conv. LCY Rndg. Credit Acc." }
+
+    { 50  ;2   ;Field     ;
+                SourceExpr="Max. VAT Difference Allowed";
+                Importance=Promoted }
+
+    { 52  ;2   ;Field     ;
+                SourceExpr="VAT Rounding Type";
+                Importance=Promoted }
+
+    { 1904488501;1;Group  ;
+                CaptionML=[ENU=Reporting;
+                           ESM=Notificaci¢n;
+                           FRC=Rapport;
+                           ENC=Reporting] }
+
+    { 33  ;2   ;Field     ;
+                SourceExpr="Realized G/L Gains Account";
+                Importance=Promoted }
+
+    { 35  ;2   ;Field     ;
+                SourceExpr="Realized G/L Losses Account";
+                Importance=Promoted }
+
+    { 37  ;2   ;Field     ;
+                SourceExpr="Residual Gains Account";
+                Importance=Promoted }
+
+    { 40  ;2   ;Field     ;
+                SourceExpr="Residual Losses Account";
+                Importance=Promoted }
+
+    { 1400000;2;Field     ;
+                SourceExpr=Symbol }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

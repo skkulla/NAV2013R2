@@ -1,0 +1,194 @@
+OBJECT Table 1224 Posting Exch. Mapping
+{
+  OBJECT-PROPERTIES
+  {
+    Date=03/13/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36281;
+  }
+  PROPERTIES
+  {
+    OnDelete=BEGIN
+               PostExchFieldMapping.SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+               PostExchFieldMapping.DELETEALL;
+             END;
+
+    OnRename=BEGIN
+               IF HasFieldMappings THEN
+                 ERROR(RenameErr);
+             END;
+
+    CaptionML=[ENU=Posting Exch. Mapping;
+               ESM=Mapeo intercambio registro;
+               FRC=Correspondance ‚chge report;
+               ENC=Posting Exch. Mapping];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Posting Exch. Def Code;Code20      ;TableRelation="Posting Exch. Def";
+                                                   CaptionML=[ENU=Posting Exch. Def Code;
+                                                              ESM=C¢digo def. intercambio registro;
+                                                              FRC=Code appellation ‚chge report;
+                                                              ENC=Posting Exch. Def Code] }
+    { 2   ;   ;Table ID            ;Integer       ;TableRelation=AllObjWithCaption."Object ID" WHERE (Object Type=CONST(Table));
+                                                   CaptionML=[ENU=Table ID;
+                                                              ESM=Id. tabla;
+                                                              FRC=Code table;
+                                                              ENC=Table ID] }
+    { 3   ;   ;Name                ;Text50        ;CaptionML=[ENU=Name;
+                                                              ESM=Nombre;
+                                                              FRC=Nom;
+                                                              ENC=Name] }
+    { 4   ;   ;Mapping Codeunit    ;Integer       ;TableRelation=AllObjWithCaption."Object ID" WHERE (Object Type=CONST(Codeunit));
+                                                   CaptionML=[ENU=Mapping Codeunit;
+                                                              ESM=Codeunit de mapeo;
+                                                              FRC=Correspondance du Codeunit;
+                                                              ENC=Mapping Codeunit] }
+    { 6   ;   ;Posting Exch. No. Field ID;Integer ;TableRelation=Field.No. WHERE (TableNo=FIELD(Table ID));
+                                                   CaptionML=[ENU=Posting Exch. No. Field ID;
+                                                              ESM=Id. campo n.§ intercambio registro;
+                                                              FRC=ID champ Nø ‚chge compta.;
+                                                              ENC=Posting Exch. No. Field ID];
+                                                   Description=The ID of the field in the target table that contains the Posting Exchange No.. }
+    { 7   ;   ;Posting Exch. Line Field ID;Integer;TableRelation=Field.No. WHERE (TableNo=FIELD(Table ID));
+                                                   CaptionML=[ENU=Posting Exch. Line Field ID;
+                                                              ESM=Id. campo l¡nea intercambio registro;
+                                                              FRC=ID champ Ligne ‚chge compta.;
+                                                              ENC=Posting Exch. Line Field ID];
+                                                   Description=The ID of the field in the target table that contains the Posting Exchange Line No.. }
+    { 8   ;   ;Posting Exch. Line Def Code;Code20 ;TableRelation="Posting Exch. Line Def".Code WHERE (Posting Exch. Def Code=FIELD(Posting Exch. Def Code));
+                                                   CaptionML=[ENU=Posting Exch. Line Def Code;
+                                                              ESM=C¢digo def. l¡nea intercambio registro;
+                                                              FRC=Code appellation ligne ‚chge report;
+                                                              ENC=Posting Exch. Line Def Code] }
+  }
+  KEYS
+  {
+    {    ;Posting Exch. Def Code,Posting Exch. Line Def Code,Table ID;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      PostExchFieldMapping@1000 : Record 1225;
+      RecordNameFormatTok@1003 : TextConst 'ENU=%1 to %2;ESM=%1 hasta %2;FRC=%1 au %2;ENC=%1 to %2';
+      RenameErr@1004 : TextConst 'ENU=You cannot rename the record if one or more field mapping line exists.;ESM=No se puede cambiar el nombre del registro si existen una o m s l¡neas de mapeo de campos.;FRC=Vous ne pouvez pas renommer l''enregistrement s''il existe une ou plusieurs lignes de correspondance de champ.;ENC=You cannot rename the record if one or more field mapping line exists.';
+
+    PROCEDURE InsertRec@1(PostExchDefCode@1002 : Code[20];PostExchLineDefCode@1006 : Code[20];TableId@1003 : Integer;Name@1001 : Text[50];MappingCodeunit@1004 : Integer;PostExchNoFieldId@1000 : Integer;PostExchLineFieldId@1005 : Integer);
+    BEGIN
+      INIT;
+      VALIDATE("Posting Exch. Def Code",PostExchDefCode);
+      VALIDATE("Posting Exch. Line Def Code",PostExchLineDefCode);
+      VALIDATE("Table ID",TableId);
+      VALIDATE(Name,Name);
+      VALIDATE("Mapping Codeunit",MappingCodeunit);
+      VALIDATE("Posting Exch. No. Field ID",PostExchNoFieldId);
+      VALIDATE("Posting Exch. Line Field ID",PostExchLineFieldId);
+      INSERT;
+    END;
+
+    PROCEDURE InsertRecForExport@2(PostExchDefCode@1002 : Code[20];PostExchLineDefCode@1006 : Code[20];TableId@1003 : Integer;Name@1001 : Text[50];ProcessingCodeunit@1004 : Integer);
+    BEGIN
+      INIT;
+      VALIDATE("Posting Exch. Def Code",PostExchDefCode);
+      VALIDATE("Posting Exch. Line Def Code",PostExchLineDefCode);
+      VALIDATE("Table ID",TableId);
+      VALIDATE(Name,Name);
+      VALIDATE("Mapping Codeunit",ProcessingCodeunit);
+      INSERT;
+    END;
+
+    PROCEDURE InsertRecForImport@3(PostExchDefCode@1002 : Code[20];PostExchLineDefCode@1006 : Code[20];TableId@1003 : Integer;Name@1001 : Text[50];PostExchNoFieldId@1000 : Integer;PostExchLineFieldId@1005 : Integer);
+    BEGIN
+      INIT;
+      VALIDATE("Posting Exch. Def Code",PostExchDefCode);
+      VALIDATE("Posting Exch. Line Def Code",PostExchLineDefCode);
+      VALIDATE("Table ID",TableId);
+      VALIDATE(Name,Name);
+      VALIDATE("Posting Exch. No. Field ID",PostExchNoFieldId);
+      VALIDATE("Posting Exch. Line Field ID",PostExchLineFieldId);
+      INSERT;
+    END;
+
+    PROCEDURE SetupMappingDefaults@4(PostingExchDefCode@1003 : Code[20];PostingExchLineDefCode@1004 : Code[20]) : Boolean;
+    VAR
+      GenJournalLine@1005 : Record 81;
+      BankAccReconciliationLine@1006 : Record 274;
+      PostingExchDef@1000 : Record 1222;
+      GenJnlLineMappingCodeunit@1001 : Integer;
+      BankRecLineMappingCodeunit@1002 : Integer;
+    BEGIN
+      "Posting Exch. Def Code" := PostingExchDefCode;
+      "Posting Exch. Line Def Code" := PostingExchLineDefCode;
+      SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+      SETRANGE("Posting Exch. Line Def Code","Posting Exch. Line Def Code");
+
+      PostingExchDef.GET("Posting Exch. Def Code");
+
+      IF NOT ISEMPTY THEN
+        EXIT(FALSE);
+      CASE PostingExchDef.Type OF
+        PostingExchDef.Type::"Payment Export":
+          CreatePostingExchMapping(DATABASE::"Payment Export Data",CODEUNIT::"Payment Export Mgt",0,0);
+        PostingExchDef.Type::"Payroll Import":
+          CreatePostingExchMapping(DATABASE::"Gen. Journal Line",CODEUNIT::"Process Gen. Journal  Lines",
+            GenJournalLine.FIELDNO("Posting Exch. Entry No."),
+            GenJournalLine.FIELDNO("Posting Exch. Line No."));
+        PostingExchDef.Type::"Bank Statement Import":
+          BEGIN
+            CASE PostingExchDef."File Type" OF
+              PostingExchDef."File Type"::Xml:
+                BEGIN
+                  GenJnlLineMappingCodeunit := CODEUNIT::"Process XML Gen. Jnl.  Lines";
+                  BankRecLineMappingCodeunit := CODEUNIT::"Process XML Bank Rec. Lines";
+                END
+              ELSE BEGIN
+                GenJnlLineMappingCodeunit := CODEUNIT::"Process Gen. Journal  Lines";
+                BankRecLineMappingCodeunit := CODEUNIT::"Process Bank Acc. Rec Lines";
+              END;
+            END;
+
+            CreatePostingExchMapping(DATABASE::"Gen. Journal Line",GenJnlLineMappingCodeunit,
+              GenJournalLine.FIELDNO("Posting Exch. Entry No."),
+              GenJournalLine.FIELDNO("Posting Exch. Line No."));
+            CreatePostingExchMapping(DATABASE::"Bank Acc. Reconciliation Line",BankRecLineMappingCodeunit,
+              BankAccReconciliationLine.FIELDNO("Posting Exch. Entry No."),
+              BankAccReconciliationLine.FIELDNO("Posting Exch. Line No."));
+          END;
+      END;
+      EXIT(TRUE);
+    END;
+
+    PROCEDURE CreatePostingExchMapping@8(TableID@1000 : Integer;CodeunitID@1001 : Integer;PostingExchNoFieldID@1002 : Integer;PostExchLineFieldID@1003 : Integer);
+    BEGIN
+      InsertRec("Posting Exch. Def Code","Posting Exch. Line Def Code",TableID,
+        CreateName(TableID,"Posting Exch. Def Code"),CodeunitID,PostingExchNoFieldID,PostExchLineFieldID);
+    END;
+
+    LOCAL PROCEDURE CreateName@5(TableID@1000 : Integer;Code@1002 : Code[20]) : Text[50];
+    VAR
+      recRef@1001 : RecordRef;
+    BEGIN
+      recRef.OPEN(TableID);
+      EXIT(STRSUBSTNO(RecordNameFormatTok,Code,recRef.CAPTION));
+    END;
+
+    LOCAL PROCEDURE HasFieldMappings@6() : Boolean;
+    VAR
+      PostingExchFieldMapping@1000 : Record 1225;
+    BEGIN
+      PostingExchFieldMapping.SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+      PostingExchFieldMapping.SETRANGE("Posting Exch. Line Def Code","Posting Exch. Line Def Code");
+      PostingExchFieldMapping.SETRANGE("Table ID",xRec."Table ID");
+      PostingExchFieldMapping.SETFILTER("Column No.",'<>%1',0);
+      EXIT(NOT PostingExchFieldMapping.ISEMPTY);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

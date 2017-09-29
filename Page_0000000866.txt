@@ -1,0 +1,240 @@
+OBJECT Page 866 Cash Flow Availability Lines
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Lines;
+               ESM=L¡neas;
+               FRC=Lignes;
+               ENC=Lines];
+    SourceTable=Table2000000007;
+    PageType=ListPart;
+    OnOpenPage=BEGIN
+                 RESET;
+               END;
+
+    OnFindRecord=BEGIN
+                   EXIT(PeriodFormManagement.FindDate(Which,Rec,CFPeriodLength));
+                 END;
+
+    OnNextRecord=BEGIN
+                   EXIT(PeriodFormManagement.NextDate(Steps,Rec,CFPeriodLength));
+                 END;
+
+    OnAfterGetRecord=VAR
+                       SourceType@1002 : Option;
+                     BEGIN
+                       CASE AmountType OF
+                         AmountType::"Net Change":
+                           CashFlowForecast.CalculateAllAmounts("Period Start","Period End",Amounts,CashFlowSum);
+                         AmountType::"Balance at Date":
+                           CashFlowForecast.CalculateAllAmounts(0D,"Period End",Amounts,CashFlowSum)
+                       END;
+
+                       FOR SourceType := 1 TO ARRAYLEN(Amounts) DO
+                         Amounts[SourceType] := RoundAmount(Amounts[SourceType]);
+
+                       CashFlowSum := RoundAmount(CashFlowSum);
+                     END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           CashFlowForecast.SetCashFlowDateFilter("Period Start","Period End");
+                         END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1000;1   ;Group     ;
+                Editable=FALSE;
+                GroupType=Repeater }
+
+    { 1001;2   ;Field     ;
+                SourceExpr="Period Start" }
+
+    { 1003;2   ;Field     ;
+                SourceExpr="Period Name" }
+
+    { 1005;2   ;Field     ;
+                Name=Receivables;
+                CaptionML=[ENU=Receivables;
+                           ESM=Cobros;
+                           FRC=Comptes … recevoir;
+                           ENC=Receivables];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::Receivables];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::Receivables);
+                            END;
+                             }
+
+    { 1007;2   ;Field     ;
+                Name=SalesOrders;
+                CaptionML=[ENU=Sales Orders;
+                           ESM=Pedidos venta;
+                           FRC=Documents de vente;
+                           ENC=Sales Orders];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::"Sales Order"];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::"Sales Order");
+                            END;
+                             }
+
+    { 1   ;2   ;Field     ;
+                Name=ServiceOrders;
+                CaptionML=[ENU=Service Orders;
+                           ESM=Pedidos servicio;
+                           FRC=Commandes de service;
+                           ENC=Service Orders];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::"Service Orders"];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::"Service Orders");
+                            END;
+                             }
+
+    { 1009;2   ;Field     ;
+                Name=SalesofFixedAssets;
+                CaptionML=[ENU=Fixed Assets Disposal;
+                           ESM=Venta/baja de activos fijos;
+                           FRC=Cession d'immobilisations;
+                           ENC=Fixed Assets Disposal];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::"Fixed Assets Disposal"];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::"Fixed Assets Disposal");
+                            END;
+                             }
+
+    { 1011;2   ;Field     ;
+                Name=ManualRevenues;
+                CaptionML=[ENU=Cash Flow Manual Expenses;
+                           ESM=Gastos manuales de flujo de caja;
+                           FRC=Op‚rations diverses n‚gatives de tr‚sorerie;
+                           ENC=Cash Flow Manual Expenses];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::"Cash Flow Manual Revenue"];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::"Cash Flow Manual Revenue");
+                            END;
+                             }
+
+    { 1013;2   ;Field     ;
+                Name=Payables;
+                CaptionML=[ENU=Payables;
+                           ESM=Pagos;
+                           FRC=Comptes … payer;
+                           ENC=Payables];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::Payables];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::Payables);
+                            END;
+                             }
+
+    { 1015;2   ;Field     ;
+                Name=PurchaseOrders;
+                CaptionML=[ENU=Purchase Orders;
+                           ESM=Pedidos compra;
+                           FRC=Bons de commande;
+                           ENC=Purchase Orders];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::"Purchase Order"];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::"Purchase Order");
+                            END;
+                             }
+
+    { 1017;2   ;Field     ;
+                Name=BudgetedFixedAssets;
+                CaptionML=[ENU=Fixed Assets Budget;
+                           ESM=Presupuesto de activos fijos;
+                           FRC=Budget immobilisations;
+                           ENC=Fixed Assets Budget];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::"Fixed Assets Budget"];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::"Fixed Assets Budget");
+                            END;
+                             }
+
+    { 1019;2   ;Field     ;
+                Name=ManualExpenses;
+                CaptionML=[ENU=Cash Flow Manual Expenses;
+                           ESM=Gastos manuales de flujo de caja;
+                           FRC=Op‚rations diverses n‚gatives de tr‚sorerie;
+                           ENC=Cash Flow Manual Expenses];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::"Cash Flow Manual Expense"];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::"Cash Flow Manual Expense");
+                            END;
+                             }
+
+    { 3   ;2   ;Field     ;
+                Name=Budget;
+                CaptionML=[ENU=G/L Budget;
+                           ESM=Ppto. contable;
+                           FRC=Budget;
+                           ENC=G/L Budget];
+                SourceExpr=Amounts[CFForecastEntry."Source Type"::"G/L Budget"];
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::"G/L Budget");
+                            END;
+                             }
+
+    { 1021;2   ;Field     ;
+                Name=Total;
+                CaptionML=[ENU=Total;
+                           ESM=Total;
+                           FRC=Total;
+                           ENC=Total];
+                SourceExpr=CashFlowSum;
+                Style=Strong;
+                StyleExpr=TRUE;
+                OnDrillDown=BEGIN
+                              CashFlowForecast.DrillDownEntriesFromSource(CashFlowForecast."Source Type Filter"::" ");
+                            END;
+                             }
+
+  }
+  CODE
+  {
+    VAR
+      CashFlowForecast@1001 : Record 840;
+      CashFlowForecast2@1002 : Record 840;
+      CFForecastEntry@1000 : Record 847;
+      PeriodFormManagement@1008 : Codeunit 359;
+      CFPeriodLength@1010 : 'Day,Week,Month,Quarter,Year,Period';
+      AmountType@1011 : 'Net Change,Balance at Date';
+      RoundingFactor@1012 : 'None,1,1000,1000000';
+      CashFlowSum@1022 : Decimal;
+      Amounts@1004 : ARRAY [11] OF Decimal;
+
+    PROCEDURE Set@1000(VAR NewCashFlowForecast@1000 : Record 840;NewCashFlowPeriodLength@1001 : Integer;NewAmountType@1002 : 'Net Change,Balance at Date';RoundingFactor2@1003 : 'None,1,1000,1000000');
+    BEGIN
+      CashFlowForecast.COPY(NewCashFlowForecast);
+      CashFlowForecast2.COPY(NewCashFlowForecast);
+      CFPeriodLength := NewCashFlowPeriodLength;
+      AmountType := NewAmountType;
+      CurrPage.UPDATE(FALSE);
+      RoundingFactor := RoundingFactor2;
+    END;
+
+    PROCEDURE RoundAmount@1002(AmountToRound@1000 : Decimal) : Decimal;
+    BEGIN
+      CASE RoundingFactor OF
+        RoundingFactor::"1":
+          AmountToRound := ROUND(AmountToRound,1);
+        RoundingFactor::"1000":
+          AmountToRound := ROUND(AmountToRound / 1000,0.1);
+        RoundingFactor::"1000000":
+          AmountToRound := ROUND(AmountToRound / 1000000,0.1);
+      END;
+      EXIT(AmountToRound);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

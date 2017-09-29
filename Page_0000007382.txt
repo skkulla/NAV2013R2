@@ -1,0 +1,339 @@
+OBJECT Page 7382 Inventory Movement
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Inventory Movement;
+               ESM=Movimiento inventario;
+               FRC=Mouvement d'inventaire;
+               ENC=Inventory Movement];
+    SaveValues=Yes;
+    SourceTable=Table5766;
+    SourceTableView=WHERE(Type=CONST(Invt. Movement));
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    OnOpenPage=BEGIN
+                 ErrorIfUserIsNotWhseEmployee;
+               END;
+
+    OnFindRecord=BEGIN
+                   EXIT(FindFirstAllowedRec(Which));
+                 END;
+
+    OnNextRecord=BEGIN
+                   EXIT(FindNextAllowedRec(Steps));
+                 END;
+
+    OnNewRecord=BEGIN
+                  "Location Code" := xRec."Location Code";
+                END;
+
+    OnDeleteRecord=BEGIN
+                     CurrPage.UPDATE;
+                   END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 100     ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Movement;
+                                 ESM=&Movimiento;
+                                 FRC=&Mouvement;
+                                 ENC=&Movement];
+                      Image=CreateMovement }
+      { 101     ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+L;
+                      CaptionML=[ENU=List;
+                                 ESM=Lista;
+                                 FRC=Liste;
+                                 ENC=List];
+                      Image=OpportunitiesList;
+                      OnAction=BEGIN
+                                 LookupActivityHeader("Location Code",Rec);
+                               END;
+                                }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 5776;
+                      RunPageLink=Table Name=CONST(Whse. Activity Header),
+                                  Type=FIELD(Type),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 31      ;2   ;Action    ;
+                      CaptionML=[ENU=Registered Invt. Movements;
+                                 ESM=Movimientos invent. registrados;
+                                 FRC=Mouvements d'inventaire enregistr‚s;
+                                 ENC=Registered Invt. Movements];
+                      RunObject=Page 7386;
+                      RunPageView=SORTING(Invt. Movement No.);
+                      RunPageLink=Invt. Movement No.=FIELD(No.);
+                      Image=RegisteredDocs }
+      { 40      ;2   ;Action    ;
+                      CaptionML=[ENU=Source Document;
+                                 ESM=Documento origen;
+                                 FRC=Document origine;
+                                 ENC=Source Document];
+                      Image=Order;
+                      OnAction=VAR
+                                 WMSMgt@1000 : Codeunit 7302;
+                               BEGIN
+                                 WMSMgt.ShowSourceDocCard("Source Type","Source Subtype","Source No.");
+                               END;
+                                }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 9       ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=F&unciones;
+                                 FRC=Fonction&s;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 13      ;2   ;Action    ;
+                      Name=GetSourceDocument;
+                      ShortCutKey=Ctrl+F7;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Get Source Document;
+                                 ESM=&Tomar documento origen;
+                                 FRC=&Obtenir le document source;
+                                 ENC=&Get Source Document];
+                      Promoted=Yes;
+                      Image=GetSourceDoc;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 CreateInvtPickMovement@1001 : Codeunit 7322;
+                               BEGIN
+                                 IF LineExist THEN
+                                   ERROR(Text001);
+                                 CreateInvtPickMovement.SetInvtMovement(TRUE);
+                                 CreateInvtPickMovement.RUN(Rec);
+                               END;
+                                }
+      { 38      ;2   ;Action    ;
+                      CaptionML=[ENU=Autofill Qty. to Handle;
+                                 ESM=Rellenar cdad. manip. autom.;
+                                 FRC=Remplir automatiquement la quantit‚ … traiter;
+                                 ENC=Autofill Qty. to Handle];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=AutofillQtyToHandle;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 AutofillQtyToHandle;
+                               END;
+                                }
+      { 39      ;2   ;Action    ;
+                      CaptionML=[ENU=Delete Qty. to Handle;
+                                 ESM=Eliminar cdad. a manip.;
+                                 FRC=Supprimer la quantit‚ … traiter;
+                                 ENC=Delete Qty. to Handle];
+                      Image=DeleteQtyToHandle;
+                      OnAction=BEGIN
+                                 DeleteQtyToHandle;
+                               END;
+                                }
+      { 24      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Registering;
+                                 ESM=&Registro;
+                                 FRC=&Enregistrement;
+                                 ENC=&Registering];
+                      Image=PostOrder }
+      { 28      ;2   ;Action    ;
+                      ShortCutKey=F9;
+                      CaptionML=[ENU=&Register Invt. Movement;
+                                 ESM=Re&gistrar movimiento invent.;
+                                 FRC=&Enregistrer le mouvement d'inventaire;
+                                 ENC=&Register Invt. Movement];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=RegisterPutAway;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 RegisterActivityYesNo;
+                               END;
+                                }
+      { 6       ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=&Imprimir;
+                                 FRC=&Imprimer;
+                                 ENC=&Print];
+                      Promoted=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 WhseDocPrint.PrintInvtMovementHeader(Rec,FALSE);
+                               END;
+                                }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1903694506;1 ;Action    ;
+                      CaptionML=[ENU=Movement List;
+                                 ESM=Lista movimiento;
+                                 FRC=Liste de mouvements;
+                                 ENC=Movement List];
+                      RunObject=Report 7301;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No.";
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Location Code" }
+
+    { 15  ;2   ;Field     ;
+                Lookup=No;
+                DrillDown=No;
+                OptionCaptionML=[ENU="  ,,,,,,,,,,,Prod. Consumption,,,,,,,,,Assembly Consumption";
+                                 ESM="  ,,,,,,,,,,,Consumo prod.,,,,,,,,,Consumo ensamblado";
+                                 FRC="  ,,,,,,,,,,,Consommation Bon de production,,,,,,,,,Consommation d'assemblage";
+                                 ENC="  ,,,,,,,,,,,Prod. Consumption,,,,,,,,,Assembly Consumption"];
+                SourceExpr="Source Document" }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Source No.";
+                OnValidate=BEGIN
+                             SourceNoOnAfterValidate;
+                           END;
+
+                OnLookup=VAR
+                           CreateInvtPickMovement@1002 : Codeunit 7322;
+                         BEGIN
+                           IF LineExist THEN
+                             ERROR(Text001);
+
+                           CreateInvtPickMovement.SetInvtMovement(TRUE);
+                           CreateInvtPickMovement.RUN(Rec);
+                           CurrPage.UPDATE;
+                           CurrPage.WhseActivityLines.PAGE.UpdateForm;
+                         END;
+                          }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Destination No.";
+                CaptionClass=FORMAT(WMSMgt.GetCaption("Destination Type","Source Document",0));
+                Editable=FALSE }
+
+    { 17  ;2   ;Field     ;
+                CaptionML=[ENU=Name;
+                           ESM=Nombre;
+                           FRC=Nom;
+                           ENC=Name];
+                SourceExpr=WMSMgt.GetDestinationName("Destination Type","Destination No.");
+                CaptionClass=FORMAT(WMSMgt.GetCaption("Destination Type","Source Document",1));
+                Editable=FALSE }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr="Posting Date" }
+
+    { 44  ;2   ;Field     ;
+                SourceExpr="External Document No.";
+                CaptionClass=FORMAT(WMSMgt.GetCaption("Destination Type","Source Document",2)) }
+
+    { 21  ;2   ;Field     ;
+                SourceExpr="External Document No.2";
+                CaptionClass=FORMAT(WMSMgt.GetCaption("Destination Type","Source Document",3)) }
+
+    { 42  ;2   ;Field     ;
+                SourceExpr="Sorting Method";
+                OnValidate=BEGIN
+                             SortingMethodOnAfterValidate;
+                           END;
+                            }
+
+    { 97  ;1   ;Part      ;
+                Name=WhseActivityLines;
+                SubPageView=SORTING(Activity Type,No.,Sorting Sequence No.)
+                            WHERE(Breakbulk=CONST(No));
+                SubPageLink=Activity Type=FIELD(Type),
+                            No.=FIELD(No.);
+                PagePartID=Page7383 }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 3   ;1   ;Part      ;
+                SubPageLink=Item No.=FIELD(Item No.),
+                            Variant Code=FIELD(Variant Code),
+                            Location Code=FIELD(Location Code);
+                PagePartID=Page9126;
+                ProviderID=97;
+                Visible=False;
+                PartType=Page }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      WhseDocPrint@1000 : Codeunit 5776;
+      WMSMgt@1001 : Codeunit 7302;
+      Text001@1002 : TextConst 'ENU=You cannot use this function if the lines already exist.;ESM=No puede usar esta funci¢n si las l¡neas ya existen.;FRC=Vous ne pouvez pas utiliser cette fonction si les lignes existent d‚j….;ENC=You cannot use this function if the lines already exist.';
+
+    LOCAL PROCEDURE AutofillQtyToHandle@1();
+    BEGIN
+      CurrPage.WhseActivityLines.PAGE.AutofillQtyToHandle;
+    END;
+
+    LOCAL PROCEDURE DeleteQtyToHandle@2();
+    BEGIN
+      CurrPage.WhseActivityLines.PAGE.DeleteQtyToHandle;
+    END;
+
+    LOCAL PROCEDURE RegisterActivityYesNo@3();
+    BEGIN
+      CurrPage.WhseActivityLines.PAGE.RegisterActivityYesNo;
+    END;
+
+    LOCAL PROCEDURE SourceNoOnAfterValidate@19036011();
+    BEGIN
+      CurrPage.UPDATE;
+      CurrPage.WhseActivityLines.PAGE.UpdateForm;
+    END;
+
+    LOCAL PROCEDURE SortingMethodOnAfterValidate@19063061();
+    BEGIN
+      CurrPage.UPDATE;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

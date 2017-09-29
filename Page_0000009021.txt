@@ -1,0 +1,139 @@
+OBJECT Page 9021 RapidStart Services RC
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               ESM=µrea de tareas;
+               FRC=Tableau de bord;
+               ENC=Role Centre];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 6       ;    ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 11      ;1   ;ActionGroup;
+                      CaptionML=[ENU=RapidStart Services;
+                                 ESM=Servicios de RapidStart;
+                                 FRC=Services RapidStart;
+                                 ENC=RapidStart Services] }
+      { 9       ;2   ;Action    ;
+                      CaptionML=[ENU=Worksheet;
+                                 ESM=Hoja trabajo;
+                                 FRC=Feuille activit‚;
+                                 ENC=Worksheet];
+                      RunObject=Page 8632 }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Packages;
+                                 ESM=Paquetes;
+                                 FRC=Packages;
+                                 ENC=Packages];
+                      RunObject=Page 8615 }
+      { 19      ;2   ;Action    ;
+                      CaptionML=[ENU=Tables;
+                                 ESM=Tablas;
+                                 FRC=Tables;
+                                 ENC=Tables];
+                      RunObject=Page 8630 }
+      { 4       ;2   ;Action    ;
+                      CaptionML=[ENU=Questionnaires;
+                                 ESM=Cuestionarios;
+                                 FRC=Questionnaires;
+                                 ENC=Questionnaires];
+                      RunObject=Page 8610 }
+      { 7       ;2   ;Action    ;
+                      CaptionML=[ENU=Templates;
+                                 ESM=Plantillas;
+                                 FRC=ModŠles;
+                                 ENC=Templates];
+                      RunObject=Page 8620 }
+      { 12      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 20      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Actions;
+                                 ESM=Acciones;
+                                 FRC=Actions;
+                                 ENC=Actions] }
+      { 13      ;2   ;Action    ;
+                      CaptionML=[ENU=RapidStart Services Wizard;
+                                 ESM=Asistente de RapidStart;
+                                 FRC=Assistant services RapidStart;
+                                 ENC=RapidStart Services Wizard];
+                      RunObject=Page 8629;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Questionaire;
+                      PromotedCategory=Process }
+      { 15      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Configuration Worksheet;
+                                 ESM=Hoja de configuraci¢n;
+                                 FRC=Feuille configuration;
+                                 ENC=Configuration Worksheet];
+                      RunObject=Page 8632;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=SetupLines;
+                      PromotedCategory=Process }
+      { 24      ;2   ;Action    ;
+                      CaptionML=[ENU=Complete Setup;
+                                 ESM=Completar configuraci¢n;
+                                 FRC=Terminer installation;
+                                 ENC=Complete Setup];
+                      RunObject=Page 8638;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Completed;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=RoleCenterArea }
+
+    { 2   ;1   ;Group     ;
+                GroupType=Group }
+
+    { 3   ;2   ;Part      ;
+                CaptionML=[ENU=Activities;
+                           ESM=Actividades;
+                           FRC=Activit‚s;
+                           ENC=Activities];
+                PagePartID=Page9075;
+                PartType=Page }
+
+    { 8   ;2   ;Part      ;
+                CaptionML=[ENU=Configuration Areas;
+                           ESM=µreas de configuraci¢n;
+                           FRC=Zones configuration;
+                           ENC=Configuration Areas];
+                SubPageView=SORTING(Vertical Sorting);
+                PagePartID=Page8631;
+                PartType=Page }
+
+    { 5   ;1   ;Group     ;
+                GroupType=Group }
+
+    { 10  ;2   ;Part      ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+    { 14  ;2   ;Part      ;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

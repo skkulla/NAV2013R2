@@ -1,0 +1,123 @@
+OBJECT Page 1332 Mini Ven. Hist. Buy-from FactB
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Buy-from Vendor History;
+               ESM=Hist¢rico de proveedores de compra;
+               FRC=Historique fournisseur;
+               ENC=Buy-from Vendor History];
+    SourceTable=Table23;
+    PageType=CardPart;
+    OnOpenPage=BEGIN
+                 CalcNoOfBuyRecords;
+               END;
+
+    OnFindRecord=BEGIN
+                   NoOfInvoices := 0;
+                   NoOfCreditMemos := 0;
+                   NoOfPostedInvoices := 0;
+                   NoOfPostedCreditMemos := 0;
+
+                   EXIT(FIND(Which));
+                 END;
+
+    OnAfterGetRecord=BEGIN
+                       CalcNoOfBuyRecords;
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 8   ;1   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Open Purchase Invoices;
+                           ESM=Facturas compra pendientes;
+                           FRC=Factures achat ouvertes;
+                           ENC=Open Purchase Invoices];
+                SourceExpr=NoOfInvoices;
+                Editable=TRUE;
+                DrillDownPageID=Purchase Invoices }
+
+    { 12  ;1   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Open Purchase Credit Memos;
+                           ESM=Notas de cr‚dito de compra abiertas;
+                           FRC=Notes de cr‚dit d'achat ouvertes;
+                           ENC=Open Purchase Credit Memos];
+                SourceExpr=NoOfCreditMemos;
+                Editable=TRUE;
+                DrillDownPageID=Purchase Credit Memos }
+
+    { 18  ;1   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Posted Purchase Invoices;
+                           ESM=Hist¢rico facturas compra;
+                           FRC=Factures d'achat report‚es;
+                           ENC=Posted Purchase Invoices];
+                SourceExpr=NoOfPostedInvoices;
+                Editable=TRUE;
+                DrillDownPageID=Posted Purchase Invoices }
+
+    { 20  ;1   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Posted Purchase Credit Memos;
+                           ESM=Hist¢rico abono compra;
+                           FRC=Notes de cr‚dit achat report‚es;
+                           ENC=Posted Purchase Credit Memos];
+                SourceExpr=NoOfPostedCreditMemos;
+                Editable=TRUE;
+                DrillDownPageID=Posted Purchase Credit Memos }
+
+  }
+  CODE
+  {
+    VAR
+      NoOfInvoices@1004 : Integer;
+      NoOfCreditMemos@1003 : Integer;
+      NoOfPostedInvoices@1001 : Integer;
+      NoOfPostedCreditMemos@1000 : Integer;
+
+    PROCEDURE ShowDetails@1102601000();
+    BEGIN
+      PAGE.RUN(PAGE::"Vendor Card",Rec);
+    END;
+
+    LOCAL PROCEDURE CalcNoOfBuyRecords@3();
+    VAR
+      PurchHeader@1000 : Record 38;
+      PurchInvHeader@1001 : Record 122;
+      PurchCrMemoHdr@1002 : Record 124;
+    BEGIN
+      PurchHeader.RESET;
+      PurchHeader.SETRANGE("Document Type",PurchHeader."Document Type"::Invoice);
+      PurchHeader.SETRANGE("Buy-from Vendor No.","No.");
+      NoOfInvoices := PurchHeader.COUNT;
+
+      PurchHeader.RESET;
+      PurchHeader.SETRANGE("Document Type",PurchHeader."Document Type"::"Credit Memo");
+      PurchHeader.SETRANGE("Buy-from Vendor No.","No.");
+      NoOfCreditMemos := PurchHeader.COUNT;
+
+      PurchInvHeader.RESET;
+      PurchInvHeader.SETRANGE("Buy-from Vendor No.","No.");
+      NoOfPostedInvoices := PurchInvHeader.COUNT;
+
+      PurchCrMemoHdr.RESET;
+      PurchCrMemoHdr.SETRANGE("Buy-from Vendor No.","No.");
+      NoOfPostedCreditMemos := PurchCrMemoHdr.COUNT;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

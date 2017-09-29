@@ -1,0 +1,114 @@
+OBJECT Table 1220 Posting Exch.
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    OnDelete=VAR
+               PostExchField@1000 : Record 1221;
+             BEGIN
+               PostExchField.SETRANGE("Posting Exch. No.","Entry No.");
+               PostExchField.DELETEALL;
+             END;
+
+    CaptionML=[ENU=Posting Exch.;
+               ESM=Intercambio registro;
+               FRC=chge report;
+               ENC=Posting Exch.];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Entry No.           ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Entry No.;
+                                                              ESM=N§ mov.;
+                                                              FRC=Nø s‚quence;
+                                                              ENC=Entry No.] }
+    { 2   ;   ;File Name           ;Text250       ;CaptionML=[ENU=File Name;
+                                                              ESM=Nombre archivo;
+                                                              FRC=Nom de fichier;
+                                                              ENC=File Name] }
+    { 3   ;   ;File Content        ;BLOB          ;CaptionML=[ENU=File Content;
+                                                              ESM=Contenido del archivo;
+                                                              FRC=Contenu fichier;
+                                                              ENC=File Content] }
+    { 4   ;   ;Posting Exch. Def Code;Code20      ;TableRelation="Posting Exch. Def";
+                                                   CaptionML=[ENU=Posting Exch. Def Code;
+                                                              ESM=C¢digo def. intercambio registro;
+                                                              FRC=Code appellation ‚chge report;
+                                                              ENC=Posting Exch. Def Code] }
+    { 5   ;   ;Posting Exch. Line Def Code;Code20 ;TableRelation="Posting Exch. Line Def".Code WHERE (Posting Exch. Def Code=FIELD(Posting Exch. Def Code));
+                                                   CaptionML=[ENU=Posting Exch. Line Def Code;
+                                                              ESM=C¢digo def. l¡nea intercambio registro;
+                                                              FRC=Code appellation ligne ‚chge report;
+                                                              ENC=Posting Exch. Line Def Code] }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      ProgressWindowMsg@1000 : TextConst 'ENU=Wait while the operation is being completed.;ESM=Espere mientras se completa la operaci¢n.;FRC=Patientez pendant l''ex‚cution de l''op‚ration.;ENC=Wait while the operation is being completed.';
+
+    PROCEDURE InsertRec@1(FileName@1001 : Text[250];VAR FileContent@1002 : InStream;PostExchDefCode@1003 : Code[20]);
+    VAR
+      OutStream@1005 : OutStream;
+    BEGIN
+      INIT;
+      VALIDATE("File Name",FileName);
+      "File Content".CREATEOUTSTREAM(OutStream);
+      COPYSTREAM(OutStream,FileContent);
+      VALIDATE("Posting Exch. Def Code",PostExchDefCode);
+      INSERT;
+    END;
+
+    PROCEDURE ImportToPostExch@2(PostExchDef@1000 : Record 1222) : Boolean;
+    VAR
+      PostExchLineDef@1003 : Record 1227;
+      Source@1001 : InStream;
+      ProgressWindow@1002 : Dialog;
+    BEGIN
+      CODEUNIT.RUN(PostExchDef."Importing Codeunit",Rec);
+      IF NOT "File Content".HASVALUE THEN
+        EXIT(FALSE);
+      PostExchLineDef.SETRANGE("Posting Exch. Def Code",PostExchDef.Code);
+      PostExchLineDef.FINDFIRST;
+      "Posting Exch. Def Code" := PostExchDef.Code;
+      "Posting Exch. Line Def Code" := PostExchLineDef.Code;
+      INSERT;
+
+      ProgressWindow.OPEN(ProgressWindowMsg);
+
+      "File Content".CREATEINSTREAM(Source);
+      SETRANGE("Entry No.","Entry No.");
+      IF PostExchDef."Processing Codeunit" > 0 THEN
+        CODEUNIT.RUN(PostExchDef."Processing Codeunit",Rec)
+      ELSE
+        XMLPORT.IMPORT(PostExchDef."Processing XMLport",Source,Rec);
+
+      ProgressWindow.CLOSE;
+
+      EXIT(TRUE);
+    END;
+
+    PROCEDURE GetStmtPostingExchField@4(VAR PostingExchField@1000 : Record 1221;ColumnNo@1001 : Integer);
+    BEGIN
+      PostingExchField.RESET;
+      PostingExchField.SETRANGE("Posting Exch. No.","Entry No.");
+      PostingExchField.SETRANGE("Line No.",0);
+      PostingExchField.SETRANGE("Column No.",ColumnNo);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

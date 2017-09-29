@@ -1,0 +1,81 @@
+OBJECT Page 9173 User Personalization List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=User Personalization List;
+               ESM=Lista personalizaci¢n usuario;
+               FRC=Liste de personnalisation utilisateur;
+               ENC=User Personalization List];
+    SourceTable=Table2000000073;
+    PageType=List;
+    CardPageID=User Personalization Card;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                DrillDown=No;
+                CaptionML=[ENU=User ID;
+                           ESM=Id. de usuario;
+                           FRC=Code utilisateur;
+                           ENC=User ID];
+                SourceExpr="User ID" }
+
+    { 6   ;2   ;Field     ;
+                Lookup=No;
+                CaptionML=[ENU=Profile ID;
+                           ESM=Id. perfil;
+                           FRC=Code profil;
+                           ENC=Profile ID];
+                SourceExpr="Profile ID" }
+
+    { 8   ;2   ;Field     ;
+                CaptionML=[ENU=Language ID;
+                           ESM=Id. idioma;
+                           FRC=Code de langue;
+                           ENC=Language ID];
+                BlankZero=Yes;
+                SourceExpr="Language ID" }
+
+    { 10  ;2   ;Field     ;
+                Lookup=No;
+                CaptionML=[ENU=Company;
+                           ESM=Empresa;
+                           FRC=Compagnie;
+                           ENC=Company];
+                SourceExpr=Company }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

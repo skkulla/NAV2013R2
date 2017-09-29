@@ -1,0 +1,251 @@
+OBJECT Page 5087 Campaign List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Campaign List;
+               ESM=Lista campa§as;
+               FRC=Liste des promotions;
+               ENC=Campaign List];
+    SourceTable=Table5071;
+    PageType=List;
+    CardPageID=Campaign Card;
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 22      ;1   ;ActionGroup;
+                      CaptionML=[ENU=C&ampaign;
+                                 ESM=&Campa§a;
+                                 FRC=Pro&motion;
+                                 ENC=C&ampaign];
+                      Image=Campaign }
+      { 24      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=E&ntries;
+                                 ESM=&Movimientos;
+                                 FRC=ê&critures;
+                                 ENC=E&ntries];
+                      RunObject=Page 5089;
+                      RunPageView=SORTING(Campaign No.);
+                      RunPageLink=Campaign No.=FIELD(No.);
+                      Image=Entries }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 5072;
+                      RunPageLink=Table Name=CONST(Campaign),
+                                  No.=FIELD(No.),
+                                  Sub No.=CONST(0);
+                      Image=ViewComments }
+      { 26      ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad°sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      RunObject=Page 5088;
+                      RunPageLink=No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process }
+      { 17      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      Image=Dimensions }
+      { 27      ;3   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions-Single;
+                                 ESM=Dimensiones-Individual;
+                                 FRC=Dimensions - Simples;
+                                 ENC=Dimensions-Single];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(5071),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 18      ;3   ;Action    ;
+                      CaptionML=[ENU=Dimensions-&Multiple;
+                                 ESM=Dimensiones-&M£ltiple;
+                                 FRC=Dimensions - &Multiples;
+                                 ENC=Dimensions-&Multiple];
+                      Image=DimensionSets;
+                      OnAction=VAR
+                                 Campaign@1001 : Record 5071;
+                                 DefaultDimMultiple@1002 : Page 542;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(Campaign);
+                                 DefaultDimMultiple.SetMultiCampaign(Campaign);
+                                 DefaultDimMultiple.RUNMODAL;
+                               END;
+                                }
+      { 28      ;2   ;Action    ;
+                      CaptionML=[ENU=T&o-dos;
+                                 ESM=&Tareas;
+                                 FRC=&TÉches;
+                                 ENC=T&o-dos];
+                      RunObject=Page 5096;
+                      RunPageView=SORTING(Campaign No.);
+                      RunPageLink=Campaign No.=FIELD(No.),
+                                  System To-do Type=FILTER(Organizer);
+                      Image=TaskList }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=S&egments;
+                                 ESM=&Segmentos;
+                                 FRC=Se&gments;
+                                 ENC=S&egments];
+                      RunObject=Page 5093;
+                      RunPageView=SORTING(Campaign No.);
+                      RunPageLink=Campaign No.=FIELD(No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Segment;
+                      PromotedCategory=Process }
+      { 34      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Oppo&rtunities;
+                                 ESM=Opo&rtunidades;
+                                 FRC=Oppo&rtunitÇs;
+                                 ENC=Oppo&rtunities];
+                      Image=OpportunityList }
+      { 30      ;3   ;Action    ;
+                      CaptionML=[ENU=List;
+                                 ESM=Lista;
+                                 FRC=Liste;
+                                 ENC=List];
+                      RunObject=Page 5123;
+                      RunPageView=SORTING(Campaign No.);
+                      RunPageLink=Campaign No.=FIELD(No.);
+                      Image=OpportunitiesList }
+      { 19      ;2   ;Action    ;
+                      CaptionML=[ENU=Sales &Prices;
+                                 ESM=&Precios venta;
+                                 FRC=&Prix de vente;
+                                 ENC=Sales &Prices];
+                      RunObject=Page 7002;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Campaign),
+                                  Sales Code=FIELD(No.);
+                      Image=SalesPrices }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=Sales &Line Discounts;
+                                 ESM=Descuentos &l°nea ventas;
+                                 FRC=Esco&mptes de ligne de vente;
+                                 ENC=Sales &Line Discounts];
+                      RunObject=Page 7004;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Campaign),
+                                  Sales Code=FIELD(No.);
+                      Image=SalesLineDisc }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 21      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=Acci&ones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 31      ;2   ;Action    ;
+                      CaptionML=[ENU=&Activate Sales Prices/Line Discounts;
+                                 ESM=&Activar precios vtas/dtos. l°nea;
+                                 FRC=&Activer les escomptes de prix/ligne de vente;
+                                 ENC=&Activate Sales Prices/Line Discounts];
+                      Promoted=Yes;
+                      Image=ActivateDiscounts;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 CampaignMgmt.ActivateCampaign(Rec);
+                               END;
+                                }
+      { 32      ;2   ;Action    ;
+                      CaptionML=[ENU=&Deactivate Sales Prices/Line Discounts;
+                                 ESM=&Desactivar Precios venta/Dtos. en l°nea;
+                                 FRC=&DÇsactiver les escomptes de prix/ligne de vente;
+                                 ENC=&Deactivate Sales Prices/Line Discounts];
+                      Promoted=Yes;
+                      Image=DeactivateDiscounts;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 CampaignMgmt.DeactivateCampaign(Rec,TRUE);
+                               END;
+                                }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1904094006;1 ;Action    ;
+                      CaptionML=[ENU=Campaign Details;
+                                 ESM=Detalles campa§a;
+                                 FRC=DÇtails de la promotion;
+                                 ENC=Campaign Details];
+                      RunObject=Report 5060;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Salesperson Code" }
+
+    { 15  ;2   ;Field     ;
+                SourceExpr="Status Code" }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Starting Date" }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Ending Date" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      CampaignMgmt@1000 : Codeunit 7030;
+
+    PROCEDURE GetSelectionFilter@2() : Text;
+    VAR
+      Campaign@1001 : Record 5071;
+      SelectionFilterManagement@1002 : Codeunit 46;
+    BEGIN
+      CurrPage.SETSELECTIONFILTER(Campaign);
+      EXIT(SelectionFilterManagement.GetSelectionFilterForCampaign(Campaign));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

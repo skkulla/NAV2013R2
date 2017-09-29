@@ -1,0 +1,421 @@
+OBJECT Page 9002 Acc. Payables Coordinator RC
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               ESM=µrea de tareas;
+               FRC=Tableau de bord;
+               ENC=Role Centre];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 45      ;1   ;Action    ;
+                      CaptionML=[ENU=&Vendor - List;
+                                 ESM=Pro&veedor - Listado;
+                                 FRC=Four&nisseur - Liste;
+                                 ENC=&Vendor - List];
+                      RunObject=Report 301;
+                      Image=Report }
+      { 19      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor - Listing;
+                                 ESM=Proveedor - Listado;
+                                 FRC=Fournisseurs - Liste;
+                                 ENC=Vendor - Listing];
+                      RunObject=Report 10106;
+                      Image=Report }
+      { 46      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor - &Balance to date;
+                                 ESM=Proveedor - &Saldo por fechas;
+                                 FRC=Fournisseur - Solde Ö &ce jour;
+                                 ENC=Vendor - &Balance to date];
+                      RunObject=Report 321;
+                      Image=Report }
+      { 51      ;1   ;Action    ;
+                      CaptionML=[ENU=Aged Accounts Payable;
+                                 ESM=AntigÅedad pagos;
+                                 FRC=Comptes fournisseurs classÇs chronologiquement;
+                                 ENC=Aged Accounts Payable];
+                      RunObject=Report 10085;
+                      Image=Report }
+      { 27      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor Account Detail;
+                                 ESM=Detalle cta. prov.;
+                                 FRC=DÇtail du compte fournisseur;
+                                 ENC=Vendor Account Detail];
+                      RunObject=Report 10103;
+                      Image=Report }
+      { 28      ;1   ;Action    ;
+                      CaptionML=[ENU=Open Vendor Entries;
+                                 ESM=Movs. pendientes de proveedor;
+                                 FRC=êcritures fournisseurs ouvertes;
+                                 ENC=Open Vendor Entries];
+                      RunObject=Report 10093;
+                      Image=Report }
+      { 48      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor - &Purchase List;
+                                 ESM=P&roveedor - Lista compras;
+                                 FRC=Fournisseur - &Liste d'achats;
+                                 ENC=Vendor - &Purchase List];
+                      RunObject=Report 309;
+                      Image=Report }
+      { 49      ;1   ;Action    ;
+                      CaptionML=[ENU=Pa&yments on Hold;
+                                 ESM=Pagos re&tenidos;
+                                 FRC=Pa&iements en attente;
+                                 ENC=Pa&yments on Hold];
+                      RunObject=Report 319;
+                      Image=Report }
+      { 50      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor Purchase Statistics;
+                                 ESM=Estad. compras proveedor;
+                                 FRC=Statistiques d'achat par fournisseur;
+                                 ENC=Vendor Purchase Statistics];
+                      RunObject=Report 10107;
+                      Image=Report }
+      { 1020000 ;1   ;Action    ;
+                      CaptionML=[ENU=Cash Requirem. by Due Date;
+                                 ESM=Req. efectivo por fecha venc.;
+                                 FRC=Besoin d'encaisse par date d'ÇchÇance;
+                                 ENC=Cash Requirem. by Due Date];
+                      RunObject=Report 10088;
+                      Image=Report }
+      { 63      ;1   ;Separator  }
+      { 64      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor &Document Nos.;
+                                 ESM=&Nß documento proveedor;
+                                 FRC=NumÇros de &documents du fournisseur;
+                                 ENC=Vendor &Document Nos.];
+                      RunObject=Report 328;
+                      Image=Report }
+      { 65      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase &Invoice Nos.;
+                                 ESM=Nß ser&ie fra. compra;
+                                 FRC=NumÇros de &factures d'achat;
+                                 ENC=Purchase &Invoice Nos.];
+                      RunObject=Report 324;
+                      Image=Report }
+      { 66      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase &Credit Memo Nos.;
+                                 ESM=Nß serie nota crÇdito &compra;
+                                 FRC=NumÇros de notes de crÇdit d'ac&hat;
+                                 ENC=Purchase &Credit Memo Nos.];
+                      RunObject=Report 325;
+                      Image=Report }
+      { 29      ;1   ;Separator  }
+      { 30      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Div;
+                                 ESM=Form. prov. 1099 Div;
+                                 FRC=Fournisseur div 1099;
+                                 ENC=Vendor 1099 Div];
+                      RunObject=Report 10109;
+                      Image=Report }
+      { 32      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Information;
+                                 ESM=Inf. form. prov. 1099;
+                                 FRC=Fournisseur information 1099;
+                                 ENC=Vendor 1099 Information];
+                      RunObject=Report 10110;
+                      Image=Report }
+      { 33      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Int;
+                                 ESM=Form. prov. 1099 Int;
+                                 FRC=Fournisseur int 1099;
+                                 ENC=Vendor 1099 Int];
+                      RunObject=Report 10111;
+                      Image=Report }
+      { 34      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor 1099 Misc;
+                                 ESM=Form. prov. 1099 Misc;
+                                 FRC=Fournisseur divers 1099;
+                                 ENC=Vendor 1099 Misc];
+                      RunObject=Report 10112;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Vendors;
+                                 ESM=Proveedores;
+                                 FRC=Fournisseurs;
+                                 ENC=Vendors];
+                      RunObject=Page 27;
+                      Image=Vendor }
+      { 5       ;1   ;Action    ;
+                      CaptionML=[ENU=Balance;
+                                 ESM=Saldo;
+                                 FRC=Solde;
+                                 ENC=Balance];
+                      RunObject=Page 27;
+                      RunPageView=WHERE(Balance (LCY)=FILTER(<>0));
+                      Image=Balance }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Orders;
+                                 ESM=Pedidos compra;
+                                 FRC=Bons de commande;
+                                 ENC=Purchase Orders];
+                      RunObject=Page 9307 }
+      { 94      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Invoices;
+                                 ESM=Facturas compra;
+                                 FRC=Factures d'achat;
+                                 ENC=Purchase Invoices];
+                      RunObject=Page 9308 }
+      { 96      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Return Orders;
+                                 ESM=Devoluciones compra;
+                                 FRC=Retours achat;
+                                 ENC=Purchase Return Orders];
+                      RunObject=Page 9311 }
+      { 17      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Credit Memos;
+                                 ESM=Notas de CrÇdito de compra;
+                                 FRC=Notes de crÇdit d'achat;
+                                 ENC=Purchase Credit Memos];
+                      RunObject=Page 9309 }
+      { 95      ;1   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 ESM=Bancos;
+                                 FRC=Comptes bancaires;
+                                 ENC=Bank Accounts];
+                      RunObject=Page 371;
+                      Image=BankAccount }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 ESM=Productos;
+                                 FRC=Articles;
+                                 ENC=Items];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 22      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Journals;
+                                 ESM=Diarios de compras;
+                                 FRC=Journaux d'achat;
+                                 ENC=Purchase Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Purchases),
+                                        Recurring=CONST(No)) }
+      { 23      ;1   ;Action    ;
+                      CaptionML=[ENU=Payment Journals;
+                                 ESM=Diarios de pagos;
+                                 FRC=Journaux des paiements;
+                                 ENC=Payment Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Payments),
+                                        Recurring=CONST(No));
+                      Image=Journals }
+      { 24      ;1   ;Action    ;
+                      CaptionML=[ENU=General Journals;
+                                 ESM=Diarios generales;
+                                 FRC=Journaux gÇnÇraux;
+                                 ENC=General Journals];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(General),
+                                        Recurring=CONST(No));
+                      Image=Journal }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 97      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posted Documents;
+                                 ESM=Documentos hist¢ricos;
+                                 FRC=Documents reportÇs;
+                                 ENC=Posted Documents];
+                      Image=FiledPosted }
+      { 102     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase  Receipts;
+                                 ESM=Hist¢rico recepciones de compra;
+                                 FRC=Bons de rÇception d'achat reportÇs;
+                                 ENC=Posted Purchase  Receipts];
+                      RunObject=Page 145 }
+      { 103     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Invoices;
+                                 ESM=Hist¢rico facturas compra;
+                                 FRC=Factures d'achat reportÇes;
+                                 ENC=Posted Purchase Invoices];
+                      RunObject=Page 146 }
+      { 105     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Credit Memos;
+                                 ESM=Notas de crÇdito compras registradas;
+                                 FRC=Notes de crÇdit achat reportÇes;
+                                 ENC=Posted Purchase Credit Memos];
+                      RunObject=Page 147 }
+      { 9       ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Return Shipments;
+                                 ESM=Hist¢rico env°os devoluci¢n;
+                                 FRC=Livraisons de retour reportÇes;
+                                 ENC=Posted Return Shipments];
+                      RunObject=Page 6652 }
+      { 108     ;2   ;Action    ;
+                      CaptionML=[ENU=G/L Registers;
+                                 ESM=Registro movs. contabilidad;
+                                 FRC=Registres GL;
+                                 ENC=G/L Registers];
+                      RunObject=Page 116;
+                      Image=GLRegisters }
+      { 1       ;0   ;ActionContainer;
+                      ActionContainerType=NewDocumentItems }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=&Vendor;
+                                 ESM=Pro&veedor;
+                                 FRC=&Fournisseur;
+                                 ENC=&Vendor];
+                      RunObject=Page 26;
+                      Promoted=No;
+                      Image=Vendor;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 25      ;1   ;Action    ;
+                      CaptionML=[ENU=&Purchase Order;
+                                 ESM=&Pedido compra;
+                                 FRC=&Bon de commande;
+                                 ENC=&Purchase Order];
+                      RunObject=Page 50;
+                      Promoted=No;
+                      Image=Document;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 4       ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase &Invoice;
+                                 ESM=&Factura compra;
+                                 FRC=Facture &achat;
+                                 ENC=Purchase &Invoice];
+                      RunObject=Page 51;
+                      Promoted=No;
+                      Image=Invoice;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Credit &Memo;
+                                 ESM=Nota crÇdito co&mpra;
+                                 FRC=Note de crÇdit d'&achat;
+                                 ENC=Purchase Credit &Memo];
+                      RunObject=Page 52;
+                      Promoted=No;
+                      Image=CreditMemo;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 18      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 ESM=Tareas;
+                                 FRC=TÉches;
+                                 ENC=Tasks];
+                      IsHeader=Yes }
+      { 16      ;1   ;Action    ;
+                      CaptionML=[ENU=Payment &Journal;
+                                 ESM=&Diario pagos;
+                                 FRC=&Journal des paiements;
+                                 ENC=Payment &Journal];
+                      RunObject=Page 256;
+                      Image=PaymentJournal }
+      { 26      ;1   ;Action    ;
+                      CaptionML=[ENU=P&urchase Journal;
+                                 ESM=Diario &compras;
+                                 FRC=Jo&urnal des achats;
+                                 ENC=P&urchase Journal];
+                      RunObject=Page 254;
+                      Image=Journals }
+      { 35      ;1   ;Action    ;
+                      CaptionML=[ENU=Reconcile AP to GL;
+                                 ESM=Conciliar ctas. pdtes. con cont.;
+                                 FRC=Rapprocher CF au GL;
+                                 ENC=Reconcile AP to GL];
+                      RunObject=Report 10101;
+                      Image=Report }
+      { 31      ;1   ;Separator ;
+                      CaptionML=[ENU=Administration;
+                                 ESM=Administraci¢n;
+                                 FRC=Administration;
+                                 ENC=Administration];
+                      IsHeader=Yes }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchases && Payables &Setup;
+                                 ESM=Confi&guraci¢n compras y pagos;
+                                 FRC=Configuration des achats && des compte&s Ö payer;
+                                 ENC=Purchases && Payables &Setup];
+                      RunObject=Page 460;
+                      Image=Setup }
+      { 40      ;1   ;Separator ;
+                      CaptionML=[ENU=History;
+                                 ESM=Historial;
+                                 FRC=Historique;
+                                 ENC=History];
+                      IsHeader=Yes }
+      { 41      ;1   ;Action    ;
+                      CaptionML=[ENU=Navi&gate;
+                                 ESM=&Navegar;
+                                 FRC=Navi&guer;
+                                 ENC=Navi&gate];
+                      RunObject=Page 344;
+                      Image=Navigate }
+      { 1020001 ;1   ;Separator ;
+                      CaptionML=[ENU=Customer;
+                                 ESM=Cliente;
+                                 FRC=Client;
+                                 ENC=Customer];
+                      IsHeader=Yes }
+      { 1020002 ;1   ;Action    ;
+                      CaptionML=[ENU=Credit Management;
+                                 ESM=Gesti¢n crÇdito;
+                                 FRC=Gestion de crÇdit;
+                                 ENC=Credit Management];
+                      RunObject=Page 36630 }
+      { 1020003 ;1   ;Action    ;
+                      CaptionML=[ENU=Order Status;
+                                 ESM=Estado pedido;
+                                 FRC=êtat commande;
+                                 ENC=Order Status];
+                      RunObject=Page 36631 }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1900601808;2;Part   ;
+                PagePartID=Page9032;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 1902476008;2;Part   ;
+                PagePartID=Page9151;
+                PartType=Page }
+
+    { 1905989608;2;Part   ;
+                PagePartID=Page9152;
+                PartType=Page }
+
+    { 12  ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1903012608;2;Part   ;
+                PagePartID=Page9175;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1901377608;2;Part   ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

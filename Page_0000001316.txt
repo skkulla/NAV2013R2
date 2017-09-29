@@ -1,0 +1,72 @@
+OBJECT Page 1316 Mini Extended Text List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Extended Text List;
+               ESM=Lista de textos adicionales;
+               FRC=Liste des textes ‚tendus;
+               ENC=Extended Text List];
+    SourceTable=Table279;
+    DataCaptionFields=No.;
+    PageType=List;
+    CardPageID=Mini Extended Text;
+  }
+  CONTROLS
+  {
+    { 7   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 5   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the content of the extended item description.;
+                           ESM=Especifica el contenido de la descripci¢n ampliada del producto.;
+                           FRC=Sp‚cifie le contenu de la d‚signation ‚tendue de l'article.;
+                           ENC=Specifies the content of the extended item description.];
+                SourceExpr=Description }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the language code of the extended text.;
+                           ESM=Especifica el c¢digo de idioma del texto adicional.;
+                           FRC=Indique le code langue du texte ‚tendu.;
+                           ENC=Specifies the language code of the extended text.];
+                SourceExpr="Language Code" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies whether the text should be used for all language codes. If a language code has been chosen in the Language Code field, it will be overruled by this function.;
+                           ESM=Especifica si el texto se utilizar  con todos los c¢digos de idioma. Si ha elegido un c¢digo de idioma en el campo C¢d. idioma, esta funci¢n lo anular .;
+                           FRC=Indique si le texte doit ˆtre utilis‚ pour tous les codes langue. Si un code langue a ‚t‚ choisi dans le champ Code langue, cette fonction pr‚vaut.;
+                           ENC=Specifies whether the text should be used for all language codes. If a language code has been chosen in the Language Code field, it will be overruled by this function.];
+                SourceExpr="All Language Codes" }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a date from which the text will be used on the item, account, resource or standard text.;
+                           ESM=Especifica la fecha a partir de la que el texto se utilizar  en el producto, cuenta, recurso o concepto est ndar.;
+                           FRC=Indique une date … partir de laquelle le texte est utilis‚ pour l'article, le compte, la ressource ou le texte standard.;
+                           ENC=Specifies a date from which the text will be used on the item, account, resource or standard text.];
+                SourceExpr="Starting Date" }
+
+    { 1   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a date on which the text will no longer be used on the item, account, resource or standard text.;
+                           ESM=Especifica la fecha en la que el texto dejar  de utilizarse en el producto, cuenta, recurso o concepto est ndar.;
+                           FRC=Sp‚cifie une date … partir de laquelle le texte n'est plus utilis‚ pour l'article, le compte, la ressource ou le texte standard.;
+                           ENC=Specifies a date on which the text will no longer be used on the item, account, resource or standard text.];
+                SourceExpr="Ending Date" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

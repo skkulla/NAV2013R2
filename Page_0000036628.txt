@@ -1,0 +1,56 @@
+OBJECT Page 36628 Sales Order Invoice List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Sales Order Invoice List;
+               ESM=Lista facturas pedido venta;
+               FRC=Liste des factures document de vente;
+               ENC=Sales Order Invoice List];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table36;
+    SourceTableView=WHERE(Document Type=CONST(Order));
+    DataCaptionFields=Document Type;
+    PageType=List;
+    CardPageID=Sales Order Invoice;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Sell-to Customer No." }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Sell-to Customer Name" }
+
+    { 17  ;2   ;Field     ;
+                SourceExpr="External Document No." }
+
+    { 123 ;2   ;Field     ;
+                SourceExpr="Location Code";
+                Visible=TRUE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

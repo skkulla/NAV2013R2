@@ -1,0 +1,255 @@
+OBJECT Page 5186 Interaction Template Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=03/13/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36281;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Interaction Template Setup;
+               ESM=Configuraci¢n plantilla interacci¢n;
+               FRC=Configuration du modŠle d'interaction;
+               ENC=Interaction Template Setup];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table5122;
+    PageType=Card;
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="E-Mails" }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Cover Sheets" }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Outgoing Calls;
+                           ESM=Llamadas salientes;
+                           FRC=Appels sortants;
+                           ENC=Outgoing Calls];
+                SourceExpr="Outg. Calls" }
+
+    { 41  ;2   ;Field     ;
+                SourceExpr="Meeting Invitation" }
+
+    { 1904305601;1;Group  ;
+                CaptionML=[ENU=Sales;
+                           ESM=Ventas;
+                           FRC=Ventes;
+                           ENC=Sales] }
+
+    { 8   ;2   ;Field     ;
+                CaptionML=[ENU=Invoices;
+                           ESM=Facturas;
+                           FRC=Factures;
+                           ENC=Invoices];
+                SourceExpr="Sales Invoices" }
+
+    { 10  ;2   ;Field     ;
+                CaptionML=[ENU=Credit Memos;
+                           ESM=Notas de Cr‚dito;
+                           FRC=Notes de cr‚dit;
+                           ENC=Credit Memos];
+                SourceExpr="Sales Cr. Memo" }
+
+    { 12  ;2   ;Field     ;
+                CaptionML=[ENU=Order Confirmations;
+                           ESM=Confirmaciones pedido;
+                           FRC=Confirmations de commandes;
+                           ENC=Order Confirmations];
+                SourceExpr="Sales Ord. Cnfrmn." }
+
+    { 14  ;2   ;Field     ;
+                CaptionML=[ENU=Quotes;
+                           ESM=Cotizaciones;
+                           FRC=Devis;
+                           ENC=Quotes];
+                SourceExpr="Sales Quotes" }
+
+    { 16  ;2   ;Field     ;
+                CaptionML=[ENU=Blanket Orders;
+                           ESM=Pedidos abiertos;
+                           FRC=Commandes permanentes;
+                           ENC=Blanket Orders];
+                SourceExpr="Sales Blnkt. Ord" }
+
+    { 18  ;2   ;Field     ;
+                CaptionML=[ENU=Shipment Notes;
+                           ESM=Notas env¡o;
+                           FRC=Notes de livraison;
+                           ENC=Shipment Notes];
+                SourceExpr="Sales Shpt. Note" }
+
+    { 20  ;2   ;Field     ;
+                CaptionML=[ENU=Statements;
+                           ESM=Estados de cuenta;
+                           FRC=Relev‚s;
+                           ENC=Statements];
+                SourceExpr="Sales Statmnt" }
+
+    { 22  ;2   ;Field     ;
+                CaptionML=[ENU=Reminders;
+                           ESM=Recordatorios;
+                           FRC=Rappels;
+                           ENC=Reminders];
+                SourceExpr="Sales Rmdr." }
+
+    { 53  ;2   ;Field     ;
+                CaptionML=[ENU=Return Orders;
+                           ESM=Devoluciones;
+                           FRC=Retours;
+                           ENC=Return Orders];
+                SourceExpr="Sales Return Order" }
+
+    { 55  ;2   ;Field     ;
+                CaptionML=[ENU=Return Receipts;
+                           ESM=Recep. devoluci¢n;
+                           FRC=R‚ceptions retour;
+                           ENC=Return Receipts];
+                SourceExpr="Sales Return Receipt" }
+
+    { 57  ;2   ;Field     ;
+                CaptionML=[ENU=Finance Charge Memos;
+                           ESM=Docs. inter‚s;
+                           FRC=Notes de frais financiers;
+                           ENC=Finance Charge Memos];
+                SourceExpr="Sales Finance Charge Memo" }
+
+    { 1907458401;1;Group  ;
+                CaptionML=[ENU=Purchases;
+                           ESM=Compras;
+                           FRC=Achats;
+                           ENC=Purchases] }
+
+    { 24  ;2   ;Field     ;
+                CaptionML=[ENU=Invoices;
+                           ESM=Facturas;
+                           FRC=Factures;
+                           ENC=Invoices];
+                SourceExpr="Purch Invoices" }
+
+    { 26  ;2   ;Field     ;
+                CaptionML=[ENU=Credit Memos;
+                           ESM=Notas de Cr‚dito;
+                           FRC=Notes de cr‚dit;
+                           ENC=Credit Memos];
+                SourceExpr="Purch Cr Memos" }
+
+    { 28  ;2   ;Field     ;
+                CaptionML=[ENU=Orders;
+                           ESM=Pedidos;
+                           FRC=Commandes;
+                           ENC=Orders];
+                SourceExpr="Purch. Orders" }
+
+    { 30  ;2   ;Field     ;
+                CaptionML=[ENU=Quotes;
+                           ESM=Cotizaciones;
+                           FRC=Devis;
+                           ENC=Quotes];
+                SourceExpr="Purch. Quotes" }
+
+    { 32  ;2   ;Field     ;
+                CaptionML=[ENU=Blanket Orders;
+                           ESM=Pedidos abiertos;
+                           FRC=Commandes permanentes;
+                           ENC=Blanket Orders];
+                SourceExpr="Purch Blnkt Ord" }
+
+    { 34  ;2   ;Field     ;
+                CaptionML=[ENU=Receipts;
+                           ESM=Recepciones;
+                           FRC=Re‡us;
+                           ENC=Receipts];
+                SourceExpr="Purch. Rcpt." }
+
+    { 49  ;2   ;Field     ;
+                CaptionML=[ENU=Return Shipments;
+                           ESM=Env¡os devoluci¢n;
+                           FRC=Livraisons retour;
+                           ENC=Return Shipments];
+                SourceExpr="Purch. Return Shipment" }
+
+    { 51  ;2   ;Field     ;
+                CaptionML=[ENU=Return Order Confirmations;
+                           ESM=Confirmaciones devoluci¢n;
+                           FRC=Confirmations de commande de retour;
+                           ENC=Return Order Confirmations];
+                SourceExpr="Purch. Return Ord. Cnfrmn." }
+
+    { 1902138501;1;Group  ;
+                CaptionML=[ENU=Service;
+                           ESM=Servicio;
+                           FRC=Service;
+                           ENC=Service] }
+
+    { 38  ;2   ;Field     ;
+                CaptionML=[ENU=Service Order Create;
+                           ESM=Creaci¢n ped. servicio;
+                           FRC=Cr‚ation de la commande de service;
+                           ENC=Service Order Create];
+                SourceExpr="Serv Ord Create" }
+
+    { 43  ;2   ;Field     ;
+                CaptionML=[ENU=Contracts;
+                           ESM=Contratos;
+                           FRC=Contrats;
+                           ENC=Contracts];
+                SourceExpr="Service Contract" }
+
+    { 45  ;2   ;Field     ;
+                CaptionML=[ENU=Contract Quotes;
+                           ESM=Cotizaciones contrato;
+                           FRC=Devis de contrat;
+                           ENC=Contract Quotes];
+                SourceExpr="Service Contract Quote" }
+
+    { 47  ;2   ;Field     ;
+                CaptionML=[ENU=Quotes;
+                           ESM=Cotizaciones;
+                           FRC=Devis;
+                           ENC=Quotes];
+                SourceExpr="Service Quote" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

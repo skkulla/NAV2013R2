@@ -1,0 +1,141 @@
+OBJECT Page 7177 Available Credit
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Available Credit;
+               ESM=Cr‚dito disponible;
+               FRC=Cr‚dit disponible;
+               ENC=Available Credit];
+    SourceTable=Table18;
+    PageType=Card;
+    OnAfterGetRecord=BEGIN
+                       SETRANGE("Date Filter",0D,WORKDATE);
+                       StyleTxt := SetStyle;
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Balance (LCY)";
+                OnDrillDown=VAR
+                              DtldCustLedgEntry@1000 : Record 379;
+                              CustLedgEntry@1001 : Record 21;
+                            BEGIN
+                              DtldCustLedgEntry.SETRANGE("Customer No.","No.");
+                              COPYFILTER("Global Dimension 1 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                              COPYFILTER("Global Dimension 2 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                              COPYFILTER("Currency Filter",DtldCustLedgEntry."Currency Code");
+                              CustLedgEntry.DrillDownOnEntries(DtldCustLedgEntry);
+                            END;
+                             }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Outstanding Orders (LCY)" }
+
+    { 9   ;2   ;Field     ;
+                CaptionML=[ENU=Shipped Not Invd. ($);
+                           ESM=Enviado no factur. ($);
+                           FRC=Livr‚ non factur‚ ($);
+                           ENC=Shipped Not Invd. ($)];
+                SourceExpr="Shipped Not Invoiced (LCY)" }
+
+    { 2   ;2   ;Field     ;
+                CaptionML=[ENU=Outstanding Invoices ($);
+                           ESM=Facturas pendientes ($);
+                           FRC=Factures en suspens ($);
+                           ENC=Outstanding Invoices ($)];
+                SourceExpr="Outstanding Invoices (LCY)" }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Outstanding Serv. Orders (LCY)" }
+
+    { 23  ;2   ;Field     ;
+                SourceExpr="Serv Shipped Not Invoiced(LCY)" }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Outstanding Serv.Invoices(LCY)" }
+
+    { 5   ;2   ;Field     ;
+                CaptionML=[ENU=Total ($);
+                           ESM=Total ($);
+                           FRC=Total ($);
+                           ENC=Total ($)];
+                SourceExpr=GetTotalAmountLCYUI;
+                AutoFormatType=1 }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Credit Limit (LCY)";
+                StyleExpr=StyleTxt }
+
+    { 17  ;2   ;Field     ;
+                CaptionML=[ENU=Available Credit ($);
+                           ESM=Cr‚dito disponible ($);
+                           FRC=Cr‚dit disponible ($);
+                           ENC=Available Credit ($)];
+                SourceExpr=CalcAvailableCreditUI }
+
+    { 3   ;2   ;Field     ;
+                Name=Balance Due (LCY);
+                SourceExpr=CalcOverdueBalance;
+                CaptionClass=FORMAT(STRSUBSTNO(Text000,FORMAT(WORKDATE)));
+                OnDrillDown=VAR
+                              DtldCustLedgEntry@1000 : Record 379;
+                              CustLedgEntry@1001 : Record 21;
+                            BEGIN
+                              DtldCustLedgEntry.SETFILTER("Customer No.","No.");
+                              COPYFILTER("Global Dimension 1 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                              COPYFILTER("Global Dimension 2 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                              COPYFILTER("Currency Filter",DtldCustLedgEntry."Currency Code");
+                              CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
+                            END;
+                             }
+
+    { 7   ;2   ;Field     ;
+                CaptionML=[ENU=Invoiced Prepayment Amount ($);
+                           ESM=Importe anticipo facturado ($);
+                           FRC=Montant du paiement anticip‚ factur‚ ($);
+                           ENC=Invoiced Prepayment Amount ($)];
+                SourceExpr=GetInvoicedPrepmtAmountLCY }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=Overdue Amounts ($) as of %1;ESM=Importes vencidos ($) a %1;FRC=Montants en souffrance ($) en date %1;ENC=Overdue Amounts ($) as of %1';
+      StyleTxt@1001 : Text;
+
+    BEGIN
+    END.
+  }
+}
+

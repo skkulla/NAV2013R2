@@ -1,0 +1,167 @@
+OBJECT Table 458 Overdue Notification Entry
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36040;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Overdue Notification Entry;
+               ESM=Mov. notificaci¢n vencidos;
+               FRC=êcriture de notification de retard;
+               ENC=Overdue Notification Entry];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Table ID            ;Integer       ;CaptionML=[ENU=Table ID;
+                                                              ESM=Id. tabla;
+                                                              FRC=Code table;
+                                                              ENC=Table ID] }
+    { 2   ;   ;Document Type       ;Option        ;CaptionML=[ENU=Document Type;
+                                                              ESM=Tipo documento;
+                                                              FRC=Type de document;
+                                                              ENC=Document Type];
+                                                   OptionCaptionML=[ENU=Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order;
+                                                                    ESM=Cotizaci¢n,Pedido,Factura,Nota crÇdito,Pedido abierto,Devoluci¢n;
+                                                                    FRC=Devis,Commande,Facture,Note de crÇdit,Commande permanente,Retour;
+                                                                    ENC=Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order];
+                                                   OptionString=Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order }
+    { 3   ;   ;Document No.        ;Code20        ;TableRelation=IF (Table ID=CONST(36)) "Sales Header".No. WHERE (Document Type=FIELD(Document Type))
+                                                                 ELSE IF (Table ID=CONST(38)) "Purchase Header".No. WHERE (Document Type=FIELD(Document Type));
+                                                   CaptionML=[ENU=Document No.;
+                                                              ESM=Nß documento;
+                                                              FRC=N¯ de document;
+                                                              ENC=Document No.] }
+    { 4   ;   ;Sent to ID          ;Code50        ;TableRelation="User Setup";
+                                                   CaptionML=[ENU=Sent to ID;
+                                                              ESM=Enviado a Id.;
+                                                              FRC=Code destinataire;
+                                                              ENC=Sent to ID] }
+    { 5   ;   ;Sent Time           ;Time          ;CaptionML=[ENU=Sent Time;
+                                                              ESM=Hora env°o;
+                                                              FRC=Heure envoi;
+                                                              ENC=Sent Time] }
+    { 6   ;   ;Sent Date           ;Date          ;CaptionML=[ENU=Sent Date;
+                                                              ESM=Fecha env°o;
+                                                              FRC=Date envoi;
+                                                              ENC=Sent Date] }
+    { 7   ;   ;E-Mail              ;Text100       ;ExtendedDatatype=E-Mail;
+                                                   CaptionML=[ENU=E-Mail;
+                                                              ESM=Correo electr¢nico;
+                                                              FRC=Courriel;
+                                                              ENC=E-Mail] }
+    { 8   ;   ;Sent to Name        ;Text30        ;CaptionML=[ENU=Sent to Name;
+                                                              ESM=Enviado a nombre;
+                                                              FRC=Nom destinataire;
+                                                              ENC=Sent to Name] }
+    { 9   ;   ;Sequence No.        ;Integer       ;CaptionML=[ENU=Sequence No.;
+                                                              ESM=Nß secuencia;
+                                                              FRC=Nß sÇquence;
+                                                              ENC=Sequence No.] }
+    { 10  ;   ;Due Date            ;Date          ;CaptionML=[ENU=Due Date;
+                                                              ESM=Fecha vencimiento;
+                                                              FRC=Date d'ÇchÇance;
+                                                              ENC=Due Date] }
+    { 11  ;   ;Approver ID         ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=VAR
+                                                              UserMgt@1000 : Codeunit 418;
+                                                            BEGIN
+                                                              UserMgt.LookupUserID("Approver ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Approver ID;
+                                                              ESM=Id. aprobador;
+                                                              FRC=Code approbateur;
+                                                              ENC=Approver ID] }
+    { 12  ;   ;Approval Code       ;Code20        ;CaptionML=[ENU=Approval Code;
+                                                              ESM=C¢digo aprobaci¢n;
+                                                              FRC=Code d'approbation;
+                                                              ENC=Approval Code] }
+    { 13  ;   ;Approval Type       ;Option        ;CaptionML=[ENU=Approval Type;
+                                                              ESM=Tipo aprobaci¢n;
+                                                              FRC=Type d'approbation;
+                                                              ENC=Approval Type];
+                                                   OptionCaptionML=[ENU=" ,Sales Pers./Purchaser,Approver";
+                                                                    ESM=" ,Vendedor/Comprador,Aprobador";
+                                                                    FRC=" ,Vendeur/Acheteur,Approbateur";
+                                                                    ENC=" ,Sales Pers./Purchaser,Approver"];
+                                                   OptionString=[ ,Sales Pers./Purchaser,Approver] }
+    { 14  ;   ;Limit Type          ;Option        ;CaptionML=[ENU=Limit Type;
+                                                              ESM=Tipo l°mite;
+                                                              FRC=Type de limite;
+                                                              ENC=Limit Type];
+                                                   OptionCaptionML=[ENU=Approval Limits,Credit Limits,Request Limits,No Limits;
+                                                                    ESM=L°mites aprobaci¢n,L°mites crÇdito,L°mites solicitud,Sin l°mites;
+                                                                    FRC=Limites d'approbation,Limites de crÇdit,Limites de demande,Aucune limite;
+                                                                    ENC=Approval Limits,Credit Limits,Request Limits,No Limits];
+                                                   OptionString=Approval Limits,Credit Limits,Request Limits,No Limits }
+  }
+  KEYS
+  {
+    {    ;Table ID,Document Type,Document No.,Sequence No.,Sent Date,Sent Time;
+                                                   Clustered=Yes }
+    {    ;Approver ID                              }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE ShowDocument@1();
+    VAR
+      SalesHeader@1001 : Record 36;
+      PurchHeader@1000 : Record 38;
+    BEGIN
+      CASE "Table ID" OF
+        DATABASE::"Sales Header":
+          BEGIN
+            IF NOT SalesHeader.GET("Document Type","Document No.") THEN
+              EXIT;
+            CASE "Document Type" OF
+              "Document Type"::Quote:
+                PAGE.RUN(PAGE::"Sales Quote",SalesHeader);
+              "Document Type"::Order:
+                PAGE.RUN(PAGE::"Sales Order",SalesHeader);
+              "Document Type"::Invoice:
+                PAGE.RUN(PAGE::"Sales Invoice",SalesHeader);
+              "Document Type"::"Credit Memo":
+                PAGE.RUN(PAGE::"Sales Credit Memo",SalesHeader);
+              "Document Type"::"Blanket Order":
+                PAGE.RUN(PAGE::"Blanket Sales Order",SalesHeader);
+              "Document Type"::"Return Order":
+                PAGE.RUN(PAGE::"Sales Return Order",SalesHeader);
+            END;
+          END;
+        DATABASE::"Purchase Header":
+          BEGIN
+            IF NOT PurchHeader.GET("Document Type","Document No.") THEN
+              EXIT;
+            CASE "Document Type" OF
+              "Document Type"::Quote:
+                PAGE.RUN(PAGE::"Purchase Quote",PurchHeader);
+              "Document Type"::Order:
+                PAGE.RUN(PAGE::"Purchase Order",PurchHeader);
+              "Document Type"::Invoice:
+                PAGE.RUN(PAGE::"Purchase Invoice",PurchHeader);
+              "Document Type"::"Credit Memo":
+                PAGE.RUN(PAGE::"Purchase Credit Memo",PurchHeader);
+              "Document Type"::"Blanket Order":
+                PAGE.RUN(PAGE::"Blanket Purchase Order",PurchHeader);
+              "Document Type"::"Return Order":
+                PAGE.RUN(PAGE::"Purchase Return Order",PurchHeader);
+            END;
+          END;
+        ELSE
+          EXIT;
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

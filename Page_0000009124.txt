@@ -1,0 +1,128 @@
+OBJECT Page 9124 Service Line FactBox
+{
+  OBJECT-PROPERTIES
+  {
+    Date=03/13/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36281;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Service Line Details;
+               ESM=Detalles l¡neas servicio;
+               FRC=D‚tails ligne service;
+               ENC=Service Line Details];
+    SourceTable=Table5902;
+    PageType=CardPart;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 8   ;1   ;Field     ;
+                Lookup=No;
+                CaptionML=[ENU=Item No.;
+                           ESM=N§ producto;
+                           FRC=Nø d'article;
+                           ENC=Item No.];
+                SourceExpr="No.";
+                OnDrillDown=BEGIN
+                              ShowDetails;
+                            END;
+                             }
+
+    { 3   ;1   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Availability;
+                           ESM=Disponibilidad;
+                           FRC=Disponibilit‚;
+                           ENC=Availability];
+                DecimalPlaces=2:0;
+                SourceExpr=STRSUBSTNO('%1',ServInfoPaneMgt.CalcAvailability(Rec));
+                Editable=TRUE;
+                OnDrillDown=BEGIN
+                              ItemAvailFormsMgt.ShowItemAvailFromServLine(Rec,ItemAvailFormsMgt.ByEvent);
+                            END;
+                             }
+
+    { 5   ;1   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Substitutions;
+                           ESM=Sustituciones;
+                           FRC=Substitutions;
+                           ENC=Substitutions];
+                SourceExpr=STRSUBSTNO('%1',ServInfoPaneMgt.CalcNoOfSubstitutions(Rec));
+                Editable=TRUE;
+                OnDrillDown=BEGIN
+                              ShowItemSub;
+                              CurrPage.UPDATE;
+                            END;
+                             }
+
+    { 7   ;1   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Sales Prices;
+                           ESM=Precios ventas;
+                           FRC=Prix de vente;
+                           ENC=Sales Prices];
+                SourceExpr=STRSUBSTNO('%1',ServInfoPaneMgt.CalcNoOfSalesPrices(Rec));
+                Editable=TRUE;
+                OnDrillDown=BEGIN
+                              ShowPrices;
+                              CurrPage.UPDATE;
+                            END;
+                             }
+
+    { 11  ;1   ;Field     ;
+                DrillDown=Yes;
+                CaptionML=[ENU=Sales Line Discounts;
+                           ESM=Descuentos l¡nea ventas;
+                           FRC=Escomptes de ligne de vente;
+                           ENC=Sales Line Discounts];
+                SourceExpr=STRSUBSTNO('%1',ServInfoPaneMgt.CalcNoOfSalesLineDisc(Rec));
+                Editable=TRUE;
+                OnDrillDown=BEGIN
+                              ShowLineDisc;
+                              CurrPage.UPDATE;
+                            END;
+                             }
+
+  }
+  CODE
+  {
+    VAR
+      ServHeader@1000 : Record 5900;
+      ServInfoPaneMgt@1003 : Codeunit 5972;
+      SalesPriceCalcMgt@1001 : Codeunit 7000;
+      ItemAvailFormsMgt@1002 : Codeunit 353;
+
+    PROCEDURE ShowDetails@1102601000();
+    VAR
+      Item@1102601000 : Record 27;
+    BEGIN
+      IF Type = Type::Item THEN BEGIN
+        Item.GET("No.");
+        PAGE.RUN(PAGE::"Item Card",Item);
+      END;
+    END;
+
+    PROCEDURE ShowPrices@15();
+    BEGIN
+      ServHeader.GET("Document Type","Document No.");
+      CLEAR(SalesPriceCalcMgt);
+      SalesPriceCalcMgt.GetServLinePrice(ServHeader,Rec);
+    END;
+
+    PROCEDURE ShowLineDisc@16();
+    BEGIN
+      ServHeader.GET("Document Type","Document No.");
+      CLEAR(SalesPriceCalcMgt);
+      SalesPriceCalcMgt.GetServLineLineDisc(ServHeader,Rec);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,133 @@
+OBJECT Page 1215 Post Exch Line Def Part
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36366;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Post Exch Line Def Part;
+               ESM=Elemento def. l¡nea intercambio registro;
+               FRC=Partie d‚f. ligne ‚chge report;
+               ENC=Post Exch Line Def Part];
+    SourceTable=Table1227;
+    PageType=ListPart;
+    CardPageID=Post Exch Mapping Card;
+    OnAfterGetCurrRecord=VAR
+                           PostingExchDef@1000 : Record 1222;
+                         BEGIN
+                           PostingExchDef.GET("Posting Exch. Def Code");
+                           IsBankStatementImportType := PostingExchDef.CheckEnableDisableIsBankStatementImportType;
+                           IsXMLFileType := NOT PostingExchDef.CheckEnableDisableIsNonXMLFileType;
+                           IF (NOT IsXMLFileType) OR (NOT IsBankStatementImportType) THEN
+                             Namespace := '';
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 7       ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Field Mapping;
+                                 ESM=Mapeo de campos;
+                                 FRC=Correspondance de champ;
+                                 ENC=Field Mapping];
+                      Promoted=No;
+                      PromotedIsBig=Yes;
+                      Image=MapAccounts;
+                      RunPageMode=Edit;
+                      OnAction=VAR
+                                 PostingExchMapping@1001 : Record 1224;
+                                 PostingExchFieldMapping@1000 : Record 1225;
+                                 PostingExchColumnDef@1003 : Record 1223;
+                                 PostingExchDef@1002 : Record 1222;
+                                 ResultingTemplateMessage@1005 : Text;
+                               BEGIN
+                                 PostingExchDef.GET("Posting Exch. Def Code");
+
+                                 IF PostingExchDef.IsBankOrPayrollType THEN
+                                   IF PostingExchMapping.SetupMappingDefaults("Posting Exch. Def Code",Code) THEN BEGIN
+                                     IF PostingExchDef.CheckCreateTemplateColumns(ResultingTemplateMessage) THEN
+                                       SetupColumnDefsAndFieldMapping(PostingExchColumnDef,PostingExchFieldMapping,PostingExchMapping);
+                                     MESSAGE(CombineMessage(ResultingTemplateMessage,STRSUBSTNO(PostingExchangeMappingCreatedMsg,PostingExchMapping.COUNT)));
+                                   END;
+
+                                 IF NOT PostingExchMapping.HASFILTER THEN BEGIN
+                                   PostingExchMapping.SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+                                   PostingExchMapping.SETRANGE("Posting Exch. Line Def Code",Code);
+                                 END;
+
+                                 PAGE.RUN(PAGE::"Post Exch Mapping Card",PostingExchMapping);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Posting Exch. Def Code";
+                Visible=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Column Count" }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Data Line Tag" }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr=Namespace;
+                Editable=IsXMLFileType AND IsBankStatementImportType }
+
+  }
+  CODE
+  {
+    VAR
+      CreateDefaultFieldMappingQst@1000 : TextConst 'ENU=Posting Line Definition: %1 has no Posting Column Definitions. Do you wish to create template Column Definitons and default Field Mapping for the Posting Exchange Mapping?;ESM=Definici¢n de l¡nea de registro: %1 no tiene definiciones de columna de registro. ¨Desea crear la plantilla Definiciones de columna y el mapeo de campos predeterminado para el mapeo de intercambio de registro?;FRC=D‚finition de la ligne de report: %1 n''a pas de d‚finition de colonne de report. Voulez-vous cr‚er des modŠles de d‚finitions de colonne et une correspondance de champ par d‚faut pour la Correspondance de change de report?;ENC=Posting Line Definition: %1 has no Posting Column Definitions. Do you wish to create template Column Definitons and default Field Mapping for the Posting Exchange Mapping?';
+      PostingExchangeMappingCreatedMsg@1001 : TextConst 'ENU=%1 mapping records created.\In the Mapping Definition window, use the Previous/Next actions to navigate between the created mapping records.;ESM=Se crearon %1 registros de mapeo.\En la ventana Definici¢n de mapeo, use las acciones Anterior/Siguiente para navegar entre los registros de mapeo creados.;FRC=%1 enregistrements de correspondance cr‚‚s.\Dans la fenˆtre D‚finition de correspondance, utilisez les actions Pr‚c‚dent/Suivant pour naviguer entre les enregistrements de correspondance cr‚‚s.;ENC=%1 mapping records created.\In the Mapping Definition window, use the Previous/Next actions to navigate between the created mapping records.';
+      IsBankStatementImportType@1003 : Boolean;
+      IsXMLFileType@1002 : Boolean;
+
+    PROCEDURE SetupColumnDefsAndFieldMapping@6(VAR PostingExchColumnDef@1001 : Record 1223;VAR PostingExchFieldMapping@1000 : Record 1225;PostingExchMapping@1002 : Record 1224);
+    BEGIN
+      PostingExchColumnDef.SETRANGE("Posting Exch. Def Code","Posting Exch. Def Code");
+      PostingExchColumnDef.SETRANGE("Posting Exch. Line Def Code",Code);
+      IF PostingExchColumnDef.ISEMPTY THEN
+        IF PostingExchColumnDef.CreateColumnDefinitions("Posting Exch. Def Code",Code,FALSE,CreateDefaultFieldMappingQst) THEN
+          PostingExchFieldMapping.SetupFieldMappingDefaults(PostingExchMapping);
+    END;
+
+    LOCAL PROCEDURE CombineMessage@1(Message1@1000 : Text;Message2@1001 : Text) : Text;
+    BEGIN
+      IF Message1 = '' THEN
+        EXIT(Message2);
+      IF Message2 = '' THEN
+        EXIT(Message1);
+
+      EXIT(STRSUBSTNO('%1\ \%2',Message1,Message2));
+    END;
+
+    PROCEDURE GetCreateDefaultFieldMappingQst@3() : Text;
+    BEGIN
+      EXIT(CreateDefaultFieldMappingQst);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

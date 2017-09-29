@@ -1,0 +1,262 @@
+OBJECT Page 9014 Job Resource Manager RC
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               ESM=µrea de tareas;
+               FRC=Tableau de bord;
+               ENC=Role Centre];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 7       ;1   ;Action    ;
+                      CaptionML=[ENU=Resource &Statistics;
+                                 ESM=E&stad¡sticas recurso;
+                                 FRC=&Statistiques des ressources;
+                                 ENC=Resource &Statistics];
+                      RunObject=Report 10199;
+                      Image=Report }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=Resource &Utilization;
+                                 ESM=Consumo de rec&ursos;
+                                 FRC=&Utilisation des ressources;
+                                 ENC=Resource &Utilization];
+                      RunObject=Report 10200;
+                      Image=Report }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Resource List;
+                                 ESM=Lista de recursos;
+                                 FRC=Liste des ressources;
+                                 ENC=Resource List];
+                      RunObject=Report 10197 }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=Cost &Breakdown;
+                                 ESM=&An lisis costos;
+                                 FRC=Distribution du &co–t;
+                                 ENC=Cost &Breakdown];
+                      RunObject=Report 10195 }
+      { 1480000 ;1   ;Action    ;
+                      CaptionML=[ENU=Completed Jobs;
+                                 ESM=Proyectos terminados;
+                                 FRC=Projets termin‚s;
+                                 ENC=Completed Jobs];
+                      RunObject=Report 10212;
+                      Image=Report }
+      { 1480001 ;1   ;Action    ;
+                      CaptionML=[ENU=Job List;
+                                 ESM=Lista de proyectos;
+                                 FRC=Liste des projets;
+                                 ENC=Job List];
+                      RunObject=Report 10216;
+                      Image=Report }
+      { 1480002 ;1   ;Action    ;
+                      CaptionML=[ENU=Job Cost Transaction Detail;
+                                 ESM=Movimientos costo proyecto;
+                                 FRC=D‚tails transact. co–ts projet;
+                                 ENC=Job Cost Transaction Detail];
+                      RunObject=Report 10220;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Resources;
+                                 ESM=Recursos;
+                                 FRC=Ressources;
+                                 ENC=Resources];
+                      RunObject=Page 77 }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=People;
+                                 ESM=Personas;
+                                 FRC=Gens;
+                                 ENC=People];
+                      RunObject=Page 77;
+                      RunPageView=WHERE(Type=FILTER(Person)) }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Machines;
+                                 ESM=M quinas;
+                                 FRC=Machines;
+                                 ENC=Machines];
+                      RunObject=Page 77;
+                      RunPageView=WHERE(Type=FILTER(Machine)) }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=Resource Groups;
+                                 ESM=Familia recursos;
+                                 FRC=Groupes de ressources;
+                                 ENC=Resource Groups];
+                      RunObject=Page 72 }
+      { 35      ;1   ;Action    ;
+                      CaptionML=[ENU=Resource Journals;
+                                 ESM=Diarios de recursos;
+                                 FRC=Journaux de ressources;
+                                 ENC=Resource Journals];
+                      RunObject=Page 272;
+                      RunPageView=WHERE(Recurring=CONST(No)) }
+      { 36      ;1   ;Action    ;
+                      CaptionML=[ENU=Recurring Resource Journals;
+                                 ESM=Diarios peri¢dicos recursos;
+                                 FRC=Journaux des ressources r‚currentes;
+                                 ENC=Recurring Resource Journals];
+                      RunObject=Page 272;
+                      RunPageView=WHERE(Recurring=CONST(Yes)) }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Jobs;
+                                 ESM=Proyectos;
+                                 FRC=Projets;
+                                 ENC=Jobs];
+                      RunObject=Page 89;
+                      Image=Job }
+      { 1       ;1   ;Action    ;
+                      CaptionML=[ENU=Time Sheets;
+                                 ESM=Hojas de horas;
+                                 FRC=Feuilles de temps;
+                                 ENC=Time Sheets];
+                      RunObject=Page 951 }
+      { 4       ;1   ;Action    ;
+                      CaptionML=[ENU=Manager Time Sheets;
+                                 ESM=Hojas de horas del administrador;
+                                 FRC=Feuilles de temps administrateur;
+                                 ENC=Manager Time Sheets];
+                      RunObject=Page 953 }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 61      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Administration;
+                                 ESM=Administraci¢n;
+                                 FRC=Administration;
+                                 ENC=Administration];
+                      Image=Administration }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Costs;
+                                 ESM=Precio costos recursos;
+                                 FRC=Co–ts des ressources;
+                                 ENC=Resource Costs];
+                      RunObject=Page 203 }
+      { 30      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Prices;
+                                 ESM=Precio de venta del recurso;
+                                 FRC=Prix des ressources;
+                                 ENC=Resource Prices];
+                      RunObject=Page 204 }
+      { 32      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Service Zones;
+                                 ESM=Zonas servicio recurso;
+                                 FRC=Zones de service de la ressource;
+                                 ENC=Resource Service Zones];
+                      RunObject=Page 6021;
+                      Image=Resource }
+      { 33      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Locations;
+                                 ESM=Situaciones recurso;
+                                 FRC=Emplacements ressource;
+                                 ENC=Resource Locations];
+                      RunObject=Page 6015;
+                      Image=Resource }
+      { 34      ;2   ;Action    ;
+                      CaptionML=[ENU=Work Types;
+                                 ESM=Tipos de trabajo;
+                                 FRC=Types de travaux;
+                                 ENC=Work Types];
+                      RunObject=Page 208 }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 17      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 ESM=Tareas;
+                                 FRC=Tƒches;
+                                 ENC=Tasks];
+                      IsHeader=Yes }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=Adjust R&esource Costs/Prices;
+                                 ESM=Modificar pr&ecios recursos;
+                                 FRC=Ajuster le co–t/prix des r&essources;
+                                 ENC=Adjust R&esource Costs/Prices];
+                      RunObject=Report 1195;
+                      Image=Report }
+      { 16      ;1   ;Action    ;
+                      CaptionML=[ENU=Resource P&rice Changes;
+                                 ESM=Cambios de p&recio en recursos;
+                                 FRC=Modifications de p&rix des ressources;
+                                 ENC=Resource P&rice Changes];
+                      RunObject=Page 493;
+                      Image=ResourcePrice }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Resource Pr&ice Chg from Resource;
+                                 ESM=Cambio prec&io recurso desde recurso;
+                                 FRC=Modification de pri&x des ressources (de Ressources);
+                                 ENC=Resource Pr&ice Chg from Resource];
+                      RunObject=Report 1191;
+                      Image=Report }
+      { 5       ;1   ;Action    ;
+                      CaptionML=[ENU=Resource Pri&ce Chg from Prices;
+                                 ESM=Cambio pre&cio recurso de precios;
+                                 FRC=Modification de pr&ix des ressources (de Prix);
+                                 ENC=Resource Pri&ce Chg from Prices];
+                      RunObject=Report 1192;
+                      Image=Report }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=I&mplement Resource Price Changes;
+                                 ESM=I&mplementar cambios precio recurso;
+                                 FRC=Appliquer &nouveau prix ressource;
+                                 ENC=I&mplement Resource Price Changes];
+                      RunObject=Report 1193;
+                      Image=ImplementPriceChange }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Create Time Sheets;
+                                 ESM=Crear hojas de horas;
+                                 FRC=Cr‚er des feuilles de temps;
+                                 ENC=Create Time Sheets];
+                      RunObject=Report 950;
+                      Image=NewTimesheet }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1904257908;2;Part   ;
+                PagePartID=Page9067;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                PartType=Page }
+
+    { 19  ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1903012608;2;Part   ;
+                PagePartID=Page9175;
+                PartType=Page }
+
+    { 1901377608;2;Part   ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+    { 18  ;2   ;Part      ;
+                PagePartID=Page972;
+                PartType=Page }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

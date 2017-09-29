@@ -1,0 +1,357 @@
+OBJECT Codeunit 8618 Config. Excel Exchange
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/01/14;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36366;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      ConfigPackage@1019 : Record 8623;
+      FileMgt@1003 : Codeunit 419;
+      ConfigXMLExchange@1023 : Codeunit 8614;
+      ConfigProgressBar@1004 : Codeunit 8615;
+      ConfigValidateMgt@1021 : Codeunit 8617;
+      Text017@1017 : TextConst 'ENU=Importing Excel data;ESM=Importando datos de Excel;FRC=Importation de donn‚es Excel;ENC=Importing Excel data';
+      Text018@1016 : TextConst 'ENU=Could not create XML Schema.;ESM=No se pudo crear el esquema XML.;FRC=Cr‚ation du sch‚ma XML impossible.;ENC=Could not create XML Schema.';
+      Text019@1015 : TextConst 'ENU=Could not create Excel instance.;ESM=No se pudo crear una instancia en Excel.;FRC=Cr‚ation de l''instance Excel impossible.;ENC=Could not create Excel instance.';
+      Text020@1014 : TextConst 'ENU=Excel does not contain XML mappings.;ESM=Excel no contiene asignaciones XML.;FRC=Excel ne contient pas de mappage XML.;ENC=Excel does not contain XML mappings.';
+      Text024@1011 : TextConst 'ENU=Creating Excel worksheet;ESM=Creando hoja de Excel;FRC=Cr‚ation de la feuille Excel;ENC=Creating Excel worksheet';
+      Text028@1008 : TextConst 'ENU=Import File;ESM=Importar archivo;FRC=Importer fichier;ENC=Import File';
+      Text030@1022 : TextConst 'ENU=Export File;ESM=Exportar archivo;FRC=Exporter fichier;ENC=Export File';
+      XlApp@1006 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.ApplicationClass" RUNONCLIENT;
+      XlBook@1002 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.WorkbookClass" RUNONCLIENT;
+      XlSheet@1001 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.WorksheetClass" RUNONCLIENT;
+      WrkBkWriter@1007 : DotNet "'Microsoft.Dynamics.Nav.OpenXml, Version=7.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'.Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorkbookWriter" RUNONCLIENT;
+      XlHelper@1012 : DotNet "'Microsoft.Dynamics.Nav.Integration.Office, Version=7.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'.Microsoft.Dynamics.Nav.Integration.Office.Excel.ExcelHelper" RUNONCLIENT;
+      HideDialog@1005 : Boolean;
+
+    PROCEDURE ExportExcelFromConfig@19(VAR ConfigLine@1006 : Record 8622);
+    VAR
+      ConfigPackageTable@1005 : Record 8613;
+      ConfigMgt@1000 : Codeunit 8616;
+      FileMgt@1004 : Codeunit 419;
+      XLSDataFile@1001 : Text;
+      Filter@1003 : Text;
+    BEGIN
+      XLSDataFile := FileMgt.SaveFileDialog(Text030,'.xlsx','');
+      IF XLSDataFile = '' THEN
+        EXIT;
+
+      ConfigLine.FINDFIRST;
+      ConfigPackageTable.SETRANGE("Package Code",ConfigLine."Package Code");
+      Filter := ConfigMgt.MakeTableFilter(ConfigLine,TRUE);
+      IF Filter <> '' THEN
+        ConfigPackageTable.SETFILTER("Table ID",Filter);
+
+      ConfigPackageTable.SETRANGE("Dimensions as Columns",TRUE);
+      IF ConfigPackageTable.FINDSET THEN
+        REPEAT
+          IF NOT (ConfigPackageTable.DimensionPackageDataExist OR (ConfigPackageTable.DimensionFieldsCount > 0)) THEN
+            ConfigPackageTable.InitDimensionFields;
+        UNTIL ConfigPackageTable.NEXT = 0;
+      ConfigPackageTable.SETRANGE("Dimensions as Columns");
+
+      IF ExportExcel(XLSDataFile,ConfigPackageTable,TRUE) THEN
+        OpenBook(XLSDataFile,TRUE);
+    END;
+
+    PROCEDURE ExportExcelFromPackage@20(ConfigPackage@1000 : Record 8623) : Boolean;
+    VAR
+      ConfigPackageTable@1006 : Record 8613;
+      FileMgt@1001 : Codeunit 419;
+      XLSDataFile@1004 : Text;
+    BEGIN
+      XLSDataFile := FileMgt.SaveFileDialog(Text030,'.xlsx','');
+      IF XLSDataFile = '' THEN
+        EXIT(FALSE);
+
+      ConfigPackageTable.SETRANGE("Package Code",ConfigPackage.Code);
+      EXIT(ExportExcel(XLSDataFile,ConfigPackageTable,FALSE));
+    END;
+
+    PROCEDURE ExportExcelFromTables@3(VAR ConfigPackageTable@1000 : Record 8613) : Boolean;
+    VAR
+      FileMgt@1003 : Codeunit 419;
+      XLSDataFile@1002 : Text;
+    BEGIN
+      XLSDataFile := FileMgt.SaveFileDialog(Text030,'.xlsx','');
+      IF XLSDataFile = '' THEN
+        EXIT(FALSE);
+
+      IF ExportExcel(XLSDataFile,ConfigPackageTable,FALSE) THEN BEGIN
+        OpenBook(XLSDataFile,TRUE);
+        EXIT(TRUE);
+      END;
+    END;
+
+    PROCEDURE ExportExcel@13(ExcelFile@1008 : Text;VAR ConfigPackageTable@1001 : Record 8613;ExportFromWksht@1010 : Boolean) : Boolean;
+    VAR
+      ConfigPackageField@1011 : Record 8616;
+      Field@1022 : Record 2000000041;
+      Dimension@1005 : Record 348;
+      ConfigDataSchema@1006 : XMLport 8610;
+      OStream@1007 : OutStream;
+      ListObject@1023 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.ListObject" RUNONCLIENT;
+      ListColumns@1017 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.ListColumns" RUNONCLIENT;
+      ListColumn@1016 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.ListColumn" RUNONCLIENT;
+      Range@1015 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.Range" RUNONCLIENT;
+      XMLMap@1014 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.XmlMap" RUNONCLIENT;
+      XlYesNoGuess@1009 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.XlYesNoGuess" RUNONCLIENT;
+      TempSchemaFile@1002 : File;
+      RecRef@1019 : RecordRef;
+      FieldRef@1020 : FieldRef;
+      TempSetupDataFileName@1000 : Text;
+      TempSetupDataFileNameCL@1003 : Text;
+      TempSchemaFileName@1004 : Text;
+      TempSchemaFileNameCL@1013 : Text;
+      TempXLSFile@1018 : Text;
+      i@1012 : Integer;
+      WrkShtNo@1025 : Integer;
+    BEGIN
+      TempSchemaFile.CREATETEMPFILE;
+      TempSchemaFileName := TempSchemaFile.NAME + '.xsd';
+      TempSchemaFile.CLOSE;
+
+      TempSchemaFile.CREATE(TempSchemaFileName);
+      TempSchemaFile.CREATEOUTSTREAM(OStream);
+      ConfigDataSchema.SETDESTINATION(OStream);
+      ConfigDataSchema.SETTABLEVIEW(ConfigPackageTable);
+      IF NOT ConfigDataSchema.EXPORT THEN
+        ERROR(Text018);
+      TempSchemaFile.CLOSE;
+
+      TempSetupDataFileName := FileMgt.ServerTempFileName('');
+      CLEAR(ConfigXMLExchange);
+      ConfigXMLExchange.SetExcelMode(TRUE);
+      ConfigXMLExchange.SetCalledFromCode(TRUE);
+      ConfigXMLExchange.SetExportFromWksht(ExportFromWksht);
+      ConfigXMLExchange.ExportPackageXML(ConfigPackageTable,TempSetupDataFileName);
+      ConfigXMLExchange.SetExcelMode(FALSE);
+
+      TempSetupDataFileNameCL := FileMgt.DownloadTempFile(TempSetupDataFileName);
+      TempSchemaFileNameCL := FileMgt.DownloadTempFile(TempSchemaFileName);
+      WrkShtNo := 1;
+
+      TempXLSFile := FileMgt.ClientTempFileName('xlsx');
+      CreateBook(TempXLSFile);
+
+      IF ConfigPackageTable.FINDSET THEN
+        REPEAT
+          ConfigPackageTable.CALCFIELDS("Table Name");
+          WrkBkWriter.AddWorksheet(ConfigXMLExchange.GetElementName(ConfigPackageTable."Table Name"));
+        UNTIL ConfigPackageTable.NEXT = 0;
+      WrkBkWriter.Close;
+
+      OpenBook(TempXLSFile,FALSE);
+      XlApp.DisplayAlerts(FALSE);
+
+      XlBook.XmlMaps.Add(TempSchemaFileNameCL,'DataList');
+      XMLMap := XlBook.XmlMaps.Item(1);
+
+      XlSheet := XlBook.Worksheets.Item(1);
+      XlSheet.Delete;
+
+      IF NOT HideDialog THEN
+        ConfigProgressBar.Init(ConfigPackageTable.COUNT,1,Text024);
+      IF ConfigPackageTable.FINDSET THEN
+        REPEAT
+          ConfigPackageTable.CALCFIELDS("Table Name");
+          IF NOT HideDialog THEN
+            ConfigProgressBar.Update(ConfigPackageTable."Table Name");
+          XlSheet := XlBook.Worksheets.Item(WrkShtNo);
+          XlSheet.Activate;
+          WrkShtNo += 1;
+
+          Range := XlSheet.Range('A1');
+          Range.Value := ConfigPackageTable."Package Code";
+          Range.XPath.SetValue(
+            XMLMap,
+            '/DataList/' +
+            (ConfigXMLExchange.GetElementName(ConfigPackageTable."Table Name") + 'List') +
+            '/' + ConfigXMLExchange.GetElementName(ConfigPackageTable.FIELDNAME("Package Code")),'',FALSE);
+
+          Range := XlSheet.Range('C1');
+          Range.Value := ConfigPackageTable."Table ID";
+          Range.XPath.SetValue(
+            XMLMap,
+            '/DataList/' +
+            (ConfigXMLExchange.GetElementName(ConfigPackageTable."Table Name") + 'List') +
+            '/' + ConfigXMLExchange.GetElementName(ConfigPackageTable.FIELDNAME("Table ID")),'',FALSE);
+
+          ConfigPackageField.RESET;
+          ConfigPackageField.SETCURRENTKEY("Package Code","Table ID","Processing Order");
+          ConfigPackageField.SETRANGE("Package Code",ConfigPackageTable."Package Code");
+          ConfigPackageField.SETRANGE("Table ID",ConfigPackageTable."Table ID");
+          ConfigPackageField.SETRANGE("Include Field",TRUE);
+          IF NOT ExportFromWksht THEN
+            ConfigPackageField.SETRANGE(Dimension,FALSE);
+          Range := XlSheet.Range('A3',FORMAT(GetXLColumnID(ConfigPackageField.COUNT)) + '3');
+          Range.Select;
+          ListObject := XlSheet.ListObjects.Add(1,Range,TRUE,XlYesNoGuess.xlNo,Range);
+          ListColumns := ListObject.ListColumns;
+
+          i := 1;
+          RecRef.OPEN(ConfigPackageTable."Table ID");
+          IF ConfigPackageField.FINDSET THEN
+            REPEAT
+              ListColumn := ListColumns.Item(i);
+              IF Field.GET(ConfigPackageField."Table ID",ConfigPackageField."Field ID") OR ConfigPackageField.Dimension THEN BEGIN
+                IF ConfigPackageField.Dimension THEN
+                  ListColumn.Name := ConfigPackageField."Field Caption" + ' ' + STRSUBSTNO('(%1)',Dimension.TABLECAPTION)
+                ELSE
+                  ListColumn.Name := ConfigPackageField."Field Caption";
+                ListColumn.XPath.SetValue(
+                  XMLMap,'/DataList/' + (ConfigXMLExchange.GetElementName(ConfigPackageTable."Table Name") + 'List') +
+                  '/' + ConfigXMLExchange.GetElementName(ConfigPackageTable."Table Name") +
+                  '/' + ConfigXMLExchange.GetElementName(ConfigPackageField."Field Name"),'',TRUE);
+                IF NOT ConfigPackageField.Dimension THEN BEGIN
+                  FieldRef := RecRef.FIELD(ConfigPackageField."Field ID");
+                  XlSheet.Range(FORMAT(GetXLColumnID(i)) + '3').AddComment(ConfigValidateMgt.AddComment(FieldRef));
+                END;
+                i := i + 1;
+              END;
+            UNTIL ConfigPackageField.NEXT = 0;
+          RecRef.CLOSE;
+
+          Range := XlSheet.Range('A1',FORMAT(GetXLColumnID(ConfigPackageField.COUNT)) + '3');
+          Range.Columns.AutoFit;
+        UNTIL ConfigPackageTable.NEXT = 0;
+
+      XMLMap.Import(TempSetupDataFileNameCL,TRUE);
+
+      IF FileMgt.GetExtension(ExcelFile) = '' THEN
+        ExcelFile := ExcelFile + '.xlsx';
+      XlBook.SaveCopyAs(ExcelFile);
+
+      CloseXlApp;
+
+      FILE.ERASE(TempSchemaFileName);
+      FILE.ERASE(TempSetupDataFileName);
+
+      IF NOT HideDialog THEN
+        ConfigProgressBar.Close;
+
+      EXIT(TRUE);
+    END;
+
+    PROCEDURE ImportExcelFromConfig@16(ConfigLine@1000 : Record 8622);
+    VAR
+      FileMgt@1005 : Codeunit 419;
+      XLSDataFile@1002 : Text;
+    BEGIN
+      XLSDataFile := FileMgt.OpenFileDialog(Text028,'.xlsx','');
+      IF XLSDataFile = '' THEN
+        EXIT;
+
+      ConfigLine.TESTFIELD("Line Type",ConfigLine."Line Type"::Table);
+      ConfigLine.TESTFIELD("Table ID");
+      IF ConfigPackage.GET(ConfigLine."Package Code") THEN
+        ImportExcel(XLSDataFile);
+    END;
+
+    PROCEDURE ImportExcelFromPackage@18() : Boolean;
+    VAR
+      FileMgt@1001 : Codeunit 419;
+      XLSDataFile@1004 : Text;
+    BEGIN
+      XLSDataFile := FileMgt.OpenFileDialog(Text028,'.xlsx','');
+      IF XLSDataFile = '' THEN
+        EXIT(FALSE);
+
+      EXIT(ImportExcel(XLSDataFile));
+    END;
+
+    PROCEDURE ImportExcel@24(XLSDataFile@1000 : Text) Imported : Boolean;
+    VAR
+      XmlMaps@1002 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.XmlMaps" RUNONCLIENT;
+      XmlMap@1001 : DotNet "'Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c'.Microsoft.Office.Interop.Excel.XmlMap" RUNONCLIENT;
+      TmpXmlFile@1004 : File;
+      InStream@1009 : InStream;
+      XMLDataFile@1005 : Text;
+      XMLDataFileServer@1007 : Text;
+    BEGIN
+      XlApp := XlApp.ApplicationClass;
+      IF ISNULL(XlApp) THEN
+        ERROR(Text019);
+
+      XlHelper.CallOpen(XlApp,XLSDataFile);
+      XlBook := XlApp.ActiveWorkbook;
+
+      XMLDataFile := ''; // To Avoid Precal
+      XmlMaps := XlBook.XmlMaps;
+      IF XmlMaps.Count <> 0 THEN BEGIN
+        TmpXmlFile.CREATETEMPFILE;
+        TmpXmlFile.CREATEINSTREAM(InStream);
+        DOWNLOADFROMSTREAM(InStream,'',FileMgt.Magicpath,'',XMLDataFile);
+        TmpXmlFile.CLOSE;
+
+        XmlMap := XmlMaps.Item(1);
+        XmlMap.Export(XMLDataFile,TRUE);
+
+        XMLDataFileServer := FileMgt.UploadFile(Text017,XMLDataFile);
+        ConfigXMLExchange.SetExcelMode(TRUE);
+        IF ConfigXMLExchange.ImportPackageXML(XMLDataFileServer) THEN
+          Imported := TRUE;
+        CloseXlApp;
+      END ELSE BEGIN
+        CloseXlApp;
+        ERROR(Text020);
+      END;
+
+      EXIT(Imported);
+    END;
+
+    PROCEDURE CloseXlApp@7();
+    BEGIN
+      CLEAR(WrkBkWriter);
+      CLEAR(XlSheet);
+      CLEAR(XlBook);
+      XlApp.Quit;
+      CLEAR(XlApp);
+    END;
+
+    LOCAL PROCEDURE CreateBook@27(XlsFile@1000 : Text);
+    BEGIN
+      WrkBkWriter := WrkBkWriter.Create(XlsFile);
+      IF ISNULL(WrkBkWriter) THEN
+        ERROR(Text019);
+    END;
+
+    PROCEDURE OpenBook@2(XLSDataFile@1000 : Text;Visible@1001 : Boolean);
+    BEGIN
+      XlApp := XlApp.ApplicationClass;
+      IF ISNULL(XlApp) THEN
+        ERROR(Text019);
+      XlHelper.CallOpen(XlApp,XLSDataFile);
+      XlBook := XlApp.ActiveWorkbook;
+      XlApp.Visible(Visible);
+    END;
+
+    PROCEDURE GetXLColumnID@14(ColumnNo@1003 : Integer) : Text[10];
+    VAR
+      ExcelBuf@1000 : Record 370;
+    BEGIN
+      ExcelBuf.INIT;
+      ExcelBuf.VALIDATE("Column No.",ColumnNo);
+      EXIT(ExcelBuf.xlColID);
+    END;
+
+    PROCEDURE SetHideDialog@1(NewHideDialog@1000 : Boolean);
+    BEGIN
+      HideDialog := NewHideDialog;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

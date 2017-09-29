@@ -1,0 +1,249 @@
+OBJECT Codeunit 452 Report Distribution Management
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      SaveFileDialogFilterMsg@1000 : TextConst 'ENU=PDF Files (*.pdf)|*.pdf;ESM=Archivos PDF (*.pdf)|*.pdf;FRC=Fichiers PDF (*.pdf)|*.pdf;ENC=PDF Files (*.pdf)|*.pdf';
+      OutlookNotInstalledSaveInsteadQst@1001 : TextConst 'ENU=To send sales documents by email, Microsoft Outlook 2010 or 2013 must be installed. \\Do you want to save the PDF file instead?;ESM=Para enviar documentos de venta por correo electr¢nico, Microsoft Outlook 2010 o 2013 debe estar instalado. \\¨Desea guardar el archivo PDF en su lugar?;FRC=Pour envoyer des documents vente par courrier ‚lectronique, Microsoft Outlook 2010 ou 2013 doit ˆtre install‚. \\Voulez-vous enregistrer le fichier PDF … la placeÿ?;ENC=To send sales documents by email, Microsoft Outlook 2010 or 2013 must be installed. \\Do you want to save the PDF file instead?';
+      SaveFileDialogTitleMsg@1002 : TextConst 'ENU=Save PDF file;ESM=Guardar archivo PDF;FRC=Enregistrer le fichier PDF;ENC=Save PDF file';
+      UnSupportedTableTypeErr@1003 : TextConst 'ENU=The table %1 is not supported.;ESM=No se admite la tabla %1.;FRC=La table %1 n''est pas prise en charge.;ENC=The table %1 is not supported.';
+      ServerSaveAsPdfFailedErr@1004 : TextConst 'ENU=An unexpected error occurred. Try the operation again or contact your system administrator.;ESM=Ha ocurrido un error inesperado. Intente la operaci¢n de nuevo o p¢ngase en contacto con el administrador del sistema.;FRC=Une erreur inattendue s''est produite. R‚essayez ou contactez votre administrateur systŠme.;ENC=An unexpected error occurred. Try the operation again or contact your system administrator.';
+      ServerSaveAsPdfAbortedErr@1006 : TextConst 'ENU=You must select a sales invoice.;ESM=Debe seleccionar una factura de venta.;FRC=Vous devez s‚lectionner une facture vente.;ENC=You must select a sales invoice.';
+      AttachmentFileNameCap@1005 : TextConst '@@@="%1 = Company Name. %2 = Document Type %3 = Invoice No.";ENU=%1 - %2 %3.pdf;ESM=%1 - %2 %3.pdf;FRC=%1 - %2 %3.pdf;ENC=%1 - %2 %3.pdf';
+      EmailSubjectCap@1007 : TextConst '@@@="%1 = Customer Name. %2 = Document Type %3 = Invoice No.";ENU=%1 - %2 %3;ESM=%1 - %2 %3;FRC=%1 - %2 %3;ENC=%1 - %2 %3';
+      WebEmailNotInstalledSaveInsteadQst@1008 : TextConst 'ENU=No email service exists for your web client. \\Do you want to save the PDF file instead?;ESM=No existe ning£n servicio de correo electr¢nico para el cliente web. \\¨Desea guardar el archivo PDF en su lugar?;FRC=Il n''existe pas de service de messagerie pour votre client Web. \\Voulez-vous enregistrer le fichier PDF … la placeÿ?;ENC=No email service exists for your web client. \\Do you want to save the PDF file instead?';
+      OutlookMessageHelper@1010 : DotNet "'Microsoft.Dynamics.Nav.Integration.Office, Version=7.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'.Microsoft.Dynamics.Nav.Integration.Office.Outlook.IOutlookMessage" RUNONCLIENT;
+      HideMailDialog@1009 : Boolean;
+      SendDocTo@1011 : 'Email,Disk';
+
+    PROCEDURE InitializeFrom@10(OutlookMessageHelperInstance@1000 : DotNet "'Microsoft.Dynamics.Nav.Integration.Office, Version=7.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'.Microsoft.Dynamics.Nav.Integration.Office.Outlook.IOutlookMessage";NewHideMailDialog@1001 : Boolean);
+    BEGIN
+      OutlookMessageHelper := OutlookMessageHelperInstance;
+      HideMailDialog := NewHideMailDialog;
+    END;
+
+    LOCAL PROCEDURE GetAttachmentFileName@1000(DocumentNo@1003 : Code[20];DocumentType@1005 : Text) : Text;
+    VAR
+      FileMgt@1000 : Codeunit 419;
+    BEGIN
+      EXIT(STRSUBSTNO(AttachmentFileNameCap,FileMgt.StripNotsupportChrInFileName(COMPANYNAME),DocumentType,DocumentNo));
+    END;
+
+    LOCAL PROCEDURE GetToAddress@7(BillToCustomerNo@1000 : Code[20]) : Text;
+    VAR
+      Customer@1002 : Record 18;
+      ToAddress@1001 : Text;
+    BEGIN
+      IF Customer.GET(BillToCustomerNo) THEN
+        ToAddress := Customer."E-Mail";
+
+      EXIT(ToAddress);
+    END;
+
+    LOCAL PROCEDURE GetEmailSubject@5(BillToName@1003 : Text;DocumentNo@1002 : Code[20];DocumentType@1001 : Text) : Text;
+    BEGIN
+      EXIT(STRSUBSTNO(EmailSubjectCap,BillToName,DocumentType,DocumentNo));
+    END;
+
+    LOCAL PROCEDURE SendSalesInvoiceReport@3(SalesInvHeader@1001 : Record 112;ReportID@1000 : Integer;SendTo@1004 : 'Email,Disk');
+    VAR
+      SalesHeader@1003 : Record 36;
+      FileManagement@1010 : Codeunit 419;
+      ServerAttachmentFilePath@1007 : Text;
+      DocumentType@1002 : Text;
+    BEGIN
+      ServerAttachmentFilePath := FileManagement.ServerTempFileName('pdf');
+
+      WITH SalesInvHeader DO BEGIN
+        SETRECFILTER;
+        IF NOT REPORT.SAVEASPDF(ReportID,ServerAttachmentFilePath,SalesInvHeader) THEN
+          ERROR(ServerSaveAsPdfFailedErr);
+
+        IF NOT EXISTS(ServerAttachmentFilePath) THEN
+          ERROR(ServerSaveAsPdfAbortedErr);
+
+        DocumentType := FORMAT(SalesHeader."Document Type"::Invoice);
+        SendAttachment("No.","Bill-to Customer No.","Bill-to Name",ServerAttachmentFilePath,DocumentType,SendTo)
+      END;
+    END;
+
+    PROCEDURE SendSalesCreditMemoReport@9(SalesCrMemoHeader@1001 : Record 114;ReportID@1000 : Integer;SendTo@1004 : 'Email,Disk');
+    VAR
+      SalesHeader@1003 : Record 36;
+      FileManagement@1007 : Codeunit 419;
+      ServerAttachmentFilePath@1006 : Text;
+      DocumentType@1002 : Text;
+    BEGIN
+      ServerAttachmentFilePath := FileManagement.ServerTempFileName('pdf');
+
+      WITH SalesCrMemoHeader DO BEGIN
+        SETRECFILTER;
+        IF NOT REPORT.SAVEASPDF(ReportID,ServerAttachmentFilePath,SalesCrMemoHeader) THEN
+          ERROR(ServerSaveAsPdfFailedErr);
+
+        IF NOT EXISTS(ServerAttachmentFilePath) THEN
+          ERROR(ServerSaveAsPdfAbortedErr);
+
+        DocumentType := FORMAT(SalesHeader."Document Type"::"Credit Memo");
+        SendAttachment("No.","Bill-to Customer No.","Bill-to Name",ServerAttachmentFilePath,DocumentType,SendTo)
+      END;
+    END;
+
+    PROCEDURE SendSalesQuoteReport@8(SalesHeader@1001 : Record 36;ReportID@1000 : Integer;SendTo@1003 : 'Email,Disk');
+    VAR
+      FileManagement@1007 : Codeunit 419;
+      ServerAttachmentFilePath@1006 : Text;
+      DocumentType@1002 : Text;
+    BEGIN
+      ServerAttachmentFilePath := FileManagement.ServerTempFileName('pdf');
+
+      WITH SalesHeader DO BEGIN
+        SETRECFILTER;
+        IF NOT REPORT.SAVEASPDF(ReportID,ServerAttachmentFilePath,SalesHeader) THEN
+          ERROR(ServerSaveAsPdfFailedErr);
+
+        IF NOT EXISTS(ServerAttachmentFilePath) THEN
+          ERROR(ServerSaveAsPdfAbortedErr);
+
+        DocumentType := FORMAT("Document Type"::Quote);
+        SendAttachment("No.","Bill-to Customer No.","Bill-to Name",ServerAttachmentFilePath,DocumentType,SendTo)
+      END;
+    END;
+
+    PROCEDURE SaveDocumentReport@11(HeaderDoc@1000 : Variant);
+    BEGIN
+      HandleDocumentReport(HeaderDoc,SendDocTo::Disk);
+    END;
+
+    PROCEDURE EmailDocumentReport@1(HeaderDoc@1000 : Variant);
+    BEGIN
+      HandleDocumentReport(HeaderDoc,SendDocTo::Email);
+    END;
+
+    LOCAL PROCEDURE HandleDocumentReport@13(HeaderDoc@1000 : Variant;SendTo@1001 : 'Email,Disk');
+    VAR
+      ReportSelections@1006 : Record 77;
+      SalesInvoiceHeader@1005 : Record 112;
+      SalesCrMemoHeader@1004 : Record 114;
+      SalesHeader@1003 : Record 36;
+      SalesHeaderRecRef@1002 : RecordRef;
+    BEGIN
+      SalesHeaderRecRef.GETTABLE(HeaderDoc);
+
+      CASE SalesHeaderRecRef.NUMBER OF
+        DATABASE::"Sales Invoice Header":
+          BEGIN
+            ReportSelections.SETRANGE(Usage,ReportSelections.Usage::"S.Invoice");
+            ReportSelections.FINDFIRST;
+            SalesHeaderRecRef.SETTABLE(SalesInvoiceHeader);
+            SendSalesInvoiceReport(SalesInvoiceHeader,ReportSelections."Report ID",SendTo)
+          END;
+        DATABASE::"Sales Cr.Memo Header":
+          BEGIN
+            ReportSelections.SETRANGE(Usage,ReportSelections.Usage::"S.Cr.Memo");
+            ReportSelections.FINDFIRST;
+            SalesHeaderRecRef.SETTABLE(SalesCrMemoHeader);
+            SendSalesCreditMemoReport(SalesCrMemoHeader,ReportSelections."Report ID",SendTo);
+          END;
+        DATABASE::"Sales Header":
+          BEGIN
+            SalesHeaderRecRef.SETTABLE(SalesHeader);
+            CASE SalesHeader."Document Type" OF
+              SalesHeader."Document Type"::Quote:
+                BEGIN
+                  ReportSelections.SETRANGE(Usage,ReportSelections.Usage::"S.Quote");
+                  ReportSelections.FINDFIRST;
+                  SendSalesQuoteReport(HeaderDoc,ReportSelections."Report ID",SendTo);
+                END;
+              ELSE
+                ERROR(STRSUBSTNO(UnSupportedTableTypeErr,FORMAT(SalesHeader."Document Type")));
+            END;
+          END;
+        ELSE
+          ERROR(STRSUBSTNO(UnSupportedTableTypeErr,SalesHeaderRecRef.NAME));
+      END;
+    END;
+
+    PROCEDURE DownloadPdfOnClient@12(ServerPdfFilePath@1000 : Text) : Text;
+    VAR
+      FileManagement@1003 : Codeunit 419;
+      ClientPdfFilePath@1002 : Text;
+    BEGIN
+      ClientPdfFilePath := FileManagement.DownloadTempFile(ServerPdfFilePath);
+      ERASE(ServerPdfFilePath);
+      EXIT(ClientPdfFilePath);
+    END;
+
+    LOCAL PROCEDURE SaveAsPdfOnClient@1002(ServerPdfFilePath@1000 : Text;AttachmentFilename@1005 : Text);
+    VAR
+      FileManagement@1004 : Codeunit 419;
+    BEGIN
+      FileManagement.DownloadHandler(ServerPdfFilePath,SaveFileDialogTitleMsg,'',SaveFileDialogFilterMsg,AttachmentFilename);
+    END;
+
+    LOCAL PROCEDURE SendAttachment@6(DocumentNo@1000 : Code[20];BillToCustomerNo@1001 : Code[20];BillToName@1003 : Text;AttachmentFilePath@1002 : Text;DocumentType@1005 : Text;SendTo@1009 : 'Email,Disk');
+    VAR
+      FileManagement@1004 : Codeunit 419;
+      AttachmentFileName@1006 : Text;
+      ToAddress@1008 : Text;
+      EmailSubject@1007 : Text;
+    BEGIN
+      AttachmentFileName := GetAttachmentFileName(DocumentNo,DocumentType);
+
+      IF SendTo = SendTo::Disk THEN BEGIN
+        SaveAsPdfOnClient(AttachmentFilePath,AttachmentFileName);
+        EXIT;
+      END;
+
+      IF FileManagement.IsWebClient THEN
+        SendMailOnWebClient(AttachmentFilePath,AttachmentFileName)
+      ELSE BEGIN
+        ToAddress := GetToAddress(BillToCustomerNo);
+        EmailSubject := GetEmailSubject(BillToName,DocumentNo,DocumentType);
+        SendMailOnWinClient(ToAddress,EmailSubject,AttachmentFilePath,AttachmentFileName);
+      END;
+    END;
+
+    LOCAL PROCEDURE SendMailOnWebClient@2(AttachmentFilePath@1000 : Text;AttachmentFileName@1001 : Text);
+    BEGIN
+      // We have currently no mail integration when running on WebClient. This will be implemented later
+      IF CONFIRM(WebEmailNotInstalledSaveInsteadQst) THEN
+        SaveAsPdfOnClient(AttachmentFilePath,AttachmentFileName);
+    END;
+
+    LOCAL PROCEDURE SendMailOnWinClient@4(SendToAddress@1008 : Text;Subject@1007 : Text;AttachmentFilePath@1000 : Text;AttachmentFileName@1001 : Text);
+    VAR
+      Mail@1003 : Codeunit 397;
+      FileManagement@1006 : Codeunit 419;
+      ClientAttachmentFilePath@1005 : Text;
+      ClientAttachmentFullName@1009 : Text;
+    BEGIN
+      Mail.InitializeFrom(OutlookMessageHelper);
+      IF Mail.TryInitializeOutlook THEN BEGIN
+        ClientAttachmentFilePath := DownloadPdfOnClient(AttachmentFilePath);
+        ClientAttachmentFullName := FileManagement.MoveAndRenameClientFile(ClientAttachmentFilePath,AttachmentFileName,'');
+        Mail.NewMessageAsync(SendToAddress,'',Subject,'',ClientAttachmentFullName,NOT HideMailDialog);
+        FileManagement.DeleteClientFile(ClientAttachmentFullName);
+        EXIT;
+      END;
+      IF CONFIRM(OutlookNotInstalledSaveInsteadQst) THEN
+        SaveAsPdfOnClient(AttachmentFilePath,AttachmentFileName);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

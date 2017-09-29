@@ -1,0 +1,259 @@
+OBJECT Page 1359 Mini Posted Purchase Invoices
+{
+  OBJECT-PROPERTIES
+  {
+    Date=11/10/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35701;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Purchase Invoices;
+               ESM=Posted Purchase Invoices;
+               FRC=Posted Purchase Invoices;
+               ENC=Posted Purchase Invoices];
+    SourceTable=Table122;
+    PageType=List;
+    CardPageID=Mini Posted Purchase Invoice;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Correct,Navigation;
+                                ESM=Nuevo,Proceso,Informe,Corregir,Exploraci¢n;
+                                FRC=Nouveau,Traitement,Rapport,Correct,Navigation;
+                                ENC=New,Process,Report,Correct,Navigation];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 21      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Navigation;
+                                 ESM=Exploraci¢n;
+                                 FRC=Navigation;
+                                 ENC=Navigation];
+                      Image=Invoice }
+      { 7       ;2   ;Action    ;
+                      Name=Vendor;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Vendor;
+                                 ESM=Proveedor;
+                                 FRC=Fournisseur;
+                                 ENC=Vendor];
+                      ToolTipML=[ENU=View or edit detailed information about the vendor on the selected posted purchase document.;
+                                 ESM=Vea o edite la informaci¢n detallada sobre el proveedor en el documento de compra registrado seleccionado.;
+                                 FRC=Affichez ou modifiez des informations d‚taill‚es concernant le fournisseur sur le document d'achat report‚ s‚lectionn‚.;
+                                 ENC=View or edit detailed information about the vendor on the selected posted purchase document.];
+                      RunObject=Page 1330;
+                      RunPageLink=No.=FIELD(Buy-from Vendor No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Vendor;
+                      PromotedCategory=Category5 }
+      { 9       ;2   ;Action    ;
+                      Name=ShowCreditMemo;
+                      CaptionML=[ENU=Show Corrective Credit Memo;
+                                 ESM=Mostrar nota de cr‚dito correctiva;
+                                 FRC=Afficher une note de cr‚dit corrective;
+                                 ENC=Show Corrective Credit Memo];
+                      RunObject=Page 1372;
+                      RunPageLink=No.=FIELD(Canceled By);
+                      Promoted=Yes;
+                      Enabled=Canceled;
+                      PromotedIsBig=Yes;
+                      Image=CreditMemo;
+                      PromotedCategory=Category5 }
+      { 27      ;2   ;Action    ;
+                      Name=Navigate;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      ToolTipML=[ENU=Find all entries and documents that exist for the document number and posting date on the selected posted purchase document.;
+                                 ESM=Busque todas las entradas y los documentos que existen para el n£mero de documento y la fecha de registro del documento de compra registrado seleccionado.;
+                                 FRC=Recherchez toutes les ‚critures et tous les documents qui existent pour le num‚ro de document et la date de report mentionn‚s sur le document d'achat report‚ s‚lectionn‚.;
+                                 ENC=Find all entries and documents that exist for the document number and posting date on the selected posted purchase document.];
+                      Promoted=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+      { 10      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Correct;
+                                 ESM=Corregir;
+                                 FRC=Corriger;
+                                 ENC=Correct] }
+      { 14      ;2   ;Action    ;
+                      Name=CorrectInvoice;
+                      CaptionML=[ENU=Correct;
+                                 ESM=Corregir;
+                                 FRC=Corriger;
+                                 ENC=Correct];
+                      ToolTipML=[ENU=Create a new open version of this posted purchase invoice where you can make the correction. This posted purchase invoice will be canceled.;
+                                 ESM=Cree una nueva versi¢n abierta de esta factura de compra registrada en la que pueda realizar la correcci¢n. Esta factura de compra registrada se cancelar .;
+                                 FRC=Cr‚ez une nouvelle version ouverte de cette facture d'achat report‚e dans laquelle vous pourrez apporter la correction. Cette facture d'achat report‚e sera annul‚e.;
+                                 ENC=Create a new open version of this posted purchase invoice where you can make the correction. This posted purchase invoice will be cancelled.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Undo;
+                      PromotedCategory=Category4;
+                      OnAction=BEGIN
+                                 CODEUNIT.RUN(CODEUNIT::"Correct PstdPurchInv (Yes/No)",Rec);
+                               END;
+                                }
+      { 12      ;2   ;Action    ;
+                      Name=CancelInvoice;
+                      CaptionML=[ENU=Cancel;
+                                 ESM=Cancelar;
+                                 FRC=Annuler;
+                                 ENC=Cancel];
+                      ToolTipML=[ENU=Create and post a purchase credit memo that reverses this posted purchase invoice. This posted purchase invoice will be canceled.;
+                                 ESM=Cree y registre una nota de cr‚dito de compra que revierta esta factura de compra registrada. Esta factura de compra registrada se cancelar .;
+                                 FRC=Cr‚ez et reportez une note de cr‚dit d'achat qui inverse cette facture d'achat report‚e. Cette facture d'achat report‚e sera annul‚e.;
+                                 ENC=Create and post a purchase credit memo that reverses this posted purchase invoice. This posted purchase invoice will be cancelled.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Cancel;
+                      PromotedCategory=Category4;
+                      OnAction=BEGIN
+                                 CODEUNIT.RUN(CODEUNIT::"Cancel PstdPurchInv (Yes/No)",Rec);
+                               END;
+                                }
+      { 2       ;2   ;Action    ;
+                      Name=CreateCreditMemo;
+                      CaptionML=[ENU=Create Corrective Credit Memo;
+                                 ESM=Create Corrective Credit Memo;
+                                 FRC=Create Corrective Credit Memo;
+                                 ENC=Create Corrective Credit Memo];
+                      Promoted=Yes;
+                      Image=CreateCreditMemo;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 PurchaseHeader@1001 : Record 38;
+                                 CorrectPostedPurchInvoice@1000 : Codeunit 1313;
+                               BEGIN
+                                 CorrectPostedPurchInvoice.CreateCreditMemoCopyDocument(Rec,PurchaseHeader);
+                                 PAGE.RUN(PAGE::"Mini Purchase Credit Memo",PurchaseHeader);
+                               END;
+                                }
+      { 8       ;1   ;ActionGroup;
+                      CaptionML=[ENU=Print;
+                                 ESM=Imprimir;
+                                 FRC=Imprimer;
+                                 ENC=Print] }
+      { 22      ;2   ;Action    ;
+                      Name=Print;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=Im&primir;
+                                 FRC=Im&primer;
+                                 ENC=&Print];
+                      Promoted=Yes;
+                      Image=Print;
+                      PromotedCategory=Report;
+                      OnAction=VAR
+                                 PurchInvHeader@1102 : Record 122;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(PurchInvHeader);
+                                 PurchInvHeader.PrintRecords(NOT AllowDotNetAddIn);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 11  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the posted invoice number.;
+                           ESM=Especifica el n£mero de la factura registrada.;
+                           FRC=Sp‚cifie le num‚ro de facture enregistr‚e.;
+                           ENC=Specifies the posted invoice number.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Vendor Name;
+                           ESM=Nombre proveedor;
+                           FRC=Nom du fournisseur;
+                           ENC=Vendor Name];
+                ToolTipML=[ENU=Specifies the name of the vendor who shipped the items.;
+                           ESM=Especifica el nombre del proveedor que envi¢ los productos.;
+                           FRC=Sp‚cifie le nom du fournisseur qui a exp‚di‚ les articles.;
+                           ENC=Specifies the name of the vendor who shipped the items.];
+                SourceExpr="Buy-from Vendor Name" }
+
+    { 1102601005;2;Field  ;
+                ToolTipML=[ENU=Specifies when the invoice is due. The program calculates the date using the Payment Terms Code and Document Date fields on the purchase header.;
+                           ESM=Especifica cuando vence la factura. El programa calcula la fecha a partir de los campos C¢d. t‚rminos pago y Fecha emisi¢n documento de la cabecera de compra.;
+                           FRC=Sp‚cifie la date d'‚ch‚ance de la facture. Le programme calcule la date … l'aide des champs Code modalit‚s de paiement et Date document de l'en-tˆte achat.;
+                           ENC=Specifies when the invoice is due. The program calculates the date using the Payment Terms Code and Document Date fields on the purchase header.];
+                SourceExpr="Due Date";
+                Visible=FALSE }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the total, in the currency of the invoice, of the amounts on all the invoice lines.;
+                           ESM=Especifica el total de los importes en todas las l¡neas de factura, en la divisa de la factura.;
+                           FRC=Indique le total des montants de toutes les lignes facture, dans la devise de la facture.;
+                           ENC=Specifies the total, in the currency of the invoice, of the amounts on all the invoice lines.];
+                SourceExpr=Amount;
+                OnDrillDown=BEGIN
+                              SETRANGE("No.");
+                              PAGE.RUNMODAL(PAGE::"Mini Posted Purchase Invoice",Rec)
+                            END;
+                             }
+
+    { 17  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the total, in the currency of the invoice, of the amounts on all the invoice lines - including VAT.;
+                           ESM=Especifica el importe total, en la divisa de la factura, en todas las l¡neas de factura, incluido el IVA.;
+                           FRC=Indique le total des montants de toutes les lignes facture, dans la devise de la facture, TVA comprise.;
+                           ENC=Specifies the total, in the currency of the invoice, of the amounts on all the invoice lines - including VAT.];
+                SourceExpr="Amount Including VAT";
+                OnDrillDown=BEGIN
+                              SETRANGE("No.");
+                              PAGE.RUNMODAL(PAGE::"Mini Posted Purchase Invoice",Rec)
+                            END;
+                             }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the amount that remains to be paid for the posted purchase invoice.;
+                           ESM=Especifica el importe pendiente de pago para la factura de compra registrada.;
+                           FRC=Sp‚cifie le montant qui reste … payer pour la facture achat valid‚e.;
+                           ENC=Specifies the amount that remains to be paid for the posted purchase invoice.];
+                SourceExpr="Remaining Amount" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted purchase invoice is paid.;
+                           ESM=Especifica si la factura de compra registrada se ha pagado.;
+                           FRC=Indique si la facture achat valid‚e est pay‚e.;
+                           ENC=Specifies if the posted purchase invoice is paid.];
+                SourceExpr=Paid }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted purchase invoice has been either corrected or canceled.;
+                           ESM=Especifica si se ha corregido o cancelado la factura de compra registrada.;
+                           FRC=Indique si la facture achat valid‚e a ‚t‚ corrig‚e ou annul‚e.;
+                           ENC=Specifies if the posted purchase invoice has been either corrected or cancelled.];
+                SourceExpr=Canceled }
+
+  }
+  CODE
+  {
+    VAR
+      AllowDotNetAddIn@1004 : Boolean INDATASET;
+
+    BEGIN
+    END.
+  }
+}
+

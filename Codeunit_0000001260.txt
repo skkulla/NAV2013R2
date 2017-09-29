@@ -1,0 +1,45 @@
+OBJECT Codeunit 1260 Process XML Gen. Jnl.  Lines
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    TableNo=81;
+    OnRun=VAR
+            PostingExch@1002 : Record 1220;
+            ProcessPostingExch@1001 : Codeunit 1201;
+            RecRef@1000 : RecordRef;
+          BEGIN
+            PostingExch.GET("Posting Exch. Entry No.");
+            RecRef.GETTABLE(Rec);
+
+            PreProcess(Rec);
+            ProcessPostingExch.ProcessColumnMapping(PostingExch,RecRef);
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE PreProcess@1(GenJnlLine@1000 : Record 81);
+    VAR
+      PostingExch@1006 : Record 1220;
+      GenJnlBatch@1002 : Record 232;
+      PrePostProcessXMLImport@1001 : Codeunit 1262;
+    BEGIN
+      GenJnlBatch.GET(GenJnlLine."Journal Template Name",GenJnlLine."Journal Batch Name");
+      PostingExch.GET(GenJnlLine."Posting Exch. Entry No.");
+      PrePostProcessXMLImport.PreProcessFile(PostingExch);
+      IF GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::"Bank Account" THEN
+        PrePostProcessXMLImport.PreProcessBankAccount(PostingExch,GenJnlLine."Bal. Account No.");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

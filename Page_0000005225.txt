@@ -1,0 +1,171 @@
+OBJECT Page 5225 Absence Overview by Periods
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Absence Overview by Periods;
+               ESM=Panorama ausencias en periodos;
+               FRC=Aper‡u absences par p‚riodes;
+               ENC=Absence Overview by Periods];
+    SaveValues=Yes;
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table5200;
+    DataCaptionExpr='';
+    PageType=Card;
+    OnOpenPage=BEGIN
+                 SetColumns(SetWanted::Initial);
+                 IF HASFILTER THEN
+                   CauseOfAbsenceFilter := GETFILTER("Cause of Absence Filter");
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 77      ;1   ;Action    ;
+                      Name=ShowMatrix;
+                      CaptionML=[ENU=&Show Matrix;
+                                 ESM=&Mostrar matriz;
+                                 FRC=&Afficher matrice;
+                                 ENC=&Show Matrix];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ShowMatrix;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 AbsOverviewByPeriodMatrix@1098 : Page 9247;
+                               BEGIN
+                                 AbsOverviewByPeriodMatrix.Load(MatrixColumnCaptions,MatrixRecords,CauseOfAbsenceFilter,QtyType);
+                                 AbsOverviewByPeriodMatrix.RUNMODAL;
+                               END;
+                                }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Previous Set;
+                                 ESM=Conjunto anterior;
+                                 FRC=Jeu pr‚c‚dent;
+                                 ENC=Previous Set];
+                      ToolTipML=[ENU=Previous Set;
+                                 ESM=Conjunto anterior;
+                                 FRC=Jeu pr‚c‚dent;
+                                 ENC=Previous Set];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PreviousSet;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 SetColumns(SetWanted::Previous);
+                               END;
+                                }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Next Set;
+                                 ESM=Conjunto siguiente;
+                                 FRC=Jeu suivant;
+                                 ENC=Next Set];
+                      ToolTipML=[ENU=Next Set;
+                                 ESM=Conjunto siguiente;
+                                 FRC=Jeu suivant;
+                                 ENC=Next Set];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=NextSet;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 SetColumns(SetWanted::Next);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 14  ;1   ;Group     ;
+                CaptionML=[ENU=Options;
+                           ESM=Opciones;
+                           FRC=Options;
+                           ENC=Options] }
+
+    { 4   ;2   ;Field     ;
+                Name=Cause Of Absence Filter;
+                CaptionML=[ENU=Cause of Absence Filter;
+                           ESM=Filtro causa ausencia;
+                           FRC=Filtre motif absence;
+                           ENC=Cause of Absence Filter];
+                SourceExpr=CauseOfAbsenceFilter;
+                TableRelation="Cause of Absence" }
+
+    { 1906098301;1;Group  ;
+                CaptionML=[ENU=Matrix Options;
+                           ESM=Opciones matriz;
+                           FRC=Options de matrice;
+                           ENC=Matrix Options] }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=View by;
+                           ESM=Ver por;
+                           FRC=Afficher par;
+                           ENC=View by];
+                OptionCaptionML=[ENU=Day,Week,Month,Quarter,Year,Accounting Period;
+                                 ESM=D¡a,Semana,Mes,Trimestre,A¤o,Periodo contable;
+                                 FRC=Jour,Semaine,Mois,Trimestre,Ann‚e,P‚riode comptable;
+                                 ENC=Day,Week,Month,Quarter,Year,Accounting Period];
+                SourceExpr=PeriodType;
+                OnValidate=BEGIN
+                             SetColumns(SetWanted::Initial);
+                           END;
+                            }
+
+    { 3   ;2   ;Field     ;
+                CaptionML=[ENU=View as;
+                           ESM=Ver como;
+                           FRC=Afficher en tant que;
+                           ENC=View as];
+                OptionCaptionML=[ENU=Net Change,Balance at Date;
+                                 ESM=Saldo periodo,Saldo a la fecha;
+                                 FRC=Variation nette,Solde en date du;
+                                 ENC=Net Change,Balance at Date];
+                SourceExpr=QtyType }
+
+    { 8   ;2   ;Field     ;
+                CaptionML=[ENU=Column Set;
+                           ESM=Conjunto de columnas;
+                           FRC=Jeu de colonnes;
+                           ENC=Column Set];
+                SourceExpr=ColumnSet;
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      MatrixRecords@1003 : ARRAY [32] OF Record 2000000007;
+      QtyType@1007 : 'Balance at Date,Net Change';
+      PeriodType@1001 : 'Day,Week,Month,Quarter,Year,Accounting Period';
+      CauseOfAbsenceFilter@1010 : Code[10];
+      MatrixColumnCaptions@1006 : ARRAY [32] OF Text[1024];
+      ColumnSet@1005 : Text[1024];
+      SetWanted@1009 : 'Initial,Previous,Same,Next';
+      PKFirstRecInCurrSet@1008 : Text[100];
+      CurrSetLength@1004 : Integer;
+
+    PROCEDURE SetColumns@11(SetWanted@1001 : 'Initial,Previous,Same,Next');
+    VAR
+      MatrixMgt@1000 : Codeunit 9200;
+    BEGIN
+      MatrixMgt.GeneratePeriodMatrixData(SetWanted,32,FALSE,PeriodType,'',
+        PKFirstRecInCurrSet,MatrixColumnCaptions,ColumnSet,CurrSetLength,MatrixRecords);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

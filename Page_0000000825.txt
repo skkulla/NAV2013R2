@@ -1,0 +1,203 @@
+OBJECT Page 825 DO Payment Connection Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Microsoft Dynamics ERP Payment Services Connection Setup;
+               ESM=Configuraci¢n de conexi¢n de servicios de pago de Microsoft Dynamics ERP;
+               FRC=D‚finition de la connexion des services de paiement de Microsoft Dynamics ERP;
+               ENC=Microsoft Dynamics ERP Payment Services Connection Setup];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table825;
+    PageType=Card;
+    OnOpenPage=BEGIN
+                 CreateDefaultSetup;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 12      ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 ESM=F&unciones;
+                                 FRC=F&onctions;
+                                 ENC=F&unctions];
+                      Image=Action }
+      { 13      ;2   ;Action    ;
+                      Name=SignUpNowAction;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Sign up Now;
+                                 ESM=Registrarse ahora;
+                                 FRC=S'inscrire maintenant;
+                                 ENC=Sign up Now];
+                      Image=SignUp;
+                      OnAction=BEGIN
+                                 SignUp;
+                               END;
+                                }
+      { 14      ;2   ;Action    ;
+                      Name=ManageAccountAction;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Manage Account;
+                                 ESM=Administrar cuenta;
+                                 FRC=G‚rer le compte;
+                                 ENC=Manage Account];
+                      Image=EditCustomer;
+                      OnAction=BEGIN
+                                 ManageAccount;
+                               END;
+                                }
+      { 15      ;2   ;Action    ;
+                      Name=DisassociateAccountAction;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Disassociate Account;
+                                 ESM=Desasociar cuenta;
+                                 FRC=Annuler l'association du compte;
+                                 ENC=Disassociate Account];
+                      Image=UnLinkAccount;
+                      OnAction=BEGIN
+                                 Disassociate;
+                                 MESSAGE(UnlinkMessage);
+                               END;
+                                }
+      { 3       ;1   ;ActionGroup;
+                      Name=EncryptionActionGroup;
+                      CaptionML=[ENU=Encryption;
+                                 ESM=Cifrado;
+                                 FRC=Chiffrement;
+                                 ENC=Encryption];
+                      ActionContainerType=NewDocumentItems }
+      { 5       ;2   ;Action    ;
+                      Name=GenerateKeyAction;
+                      CaptionML=[ENU=Generate Key;
+                                 ESM=Generar clave;
+                                 FRC=G‚n‚rer la cl‚;
+                                 ENC=Generate Key];
+                      Image=CreateDocument;
+                      OnAction=BEGIN
+                                 IF EncryptionMgt.HasKey THEN
+                                   IF NOT CONFIRM(OverwriteExistingKeyWarning) THEN
+                                     EXIT;
+
+                                 EncryptionMgt.CreateKey;
+                                 MESSAGE(KeyGeneratedMessage);
+                               END;
+                                }
+      { 6       ;2   ;Action    ;
+                      Name=DeleteKeyAction;
+                      CaptionML=[ENU=Delete Key;
+                                 ESM=Eliminar clave;
+                                 FRC=Supprimer la cl‚;
+                                 ENC=Delete Key];
+                      Image=Delete;
+                      OnAction=BEGIN
+                                 IF NOT EncryptionMgt.HasKey THEN
+                                   ERROR(KeyDoesNotExistError);
+
+                                 IF NOT CONFIRM(DeleteKeyWarning) THEN
+                                   EXIT;
+
+                                 EncryptionMgt.DeleteKey;
+                                 MESSAGE(KeyDeletedMessage);
+                               END;
+                                }
+      { 7       ;2   ;Action    ;
+                      Name=ExportKeyAction;
+                      CaptionML=[ENU=Download Key;
+                                 ESM=Descargar clave;
+                                 FRC=T‚l‚charger la cl‚;
+                                 ENC=Download Key];
+                      Image=Export;
+                      OnAction=VAR
+                                 FileMgt@1000 : Codeunit 419;
+                                 StdPasswordDialog@1004 : Page 9815;
+                                 ServerFilename@1001 : Text;
+                                 ClientFilename@1002 : Text;
+                                 PasswordText@1003 : Text;
+                               BEGIN
+                                 ServerFilename := FileMgt.ServerTempFileName('key');
+                                 StdPasswordDialog.EnableBlankPassword(FALSE);
+                                 IF StdPasswordDialog.RUNMODAL = ACTION::OK THEN
+                                   PasswordText := StdPasswordDialog.GetPasswordValue
+                                 ELSE
+                                   EXIT;
+
+                                 EncryptionMgt.Export(ServerFilename,PasswordText);
+                                 ClientFilename := 'Encryption.key';
+                                 IF DOWNLOAD(ServerFilename,'','','',ClientFilename) THEN;
+                                 ERASE(ServerFilename);
+                               END;
+                                }
+      { 8       ;2   ;Action    ;
+                      Name=ImportKeyAction;
+                      CaptionML=[ENU=Upload Key;
+                                 ESM=Cargar clave;
+                                 FRC=T‚l‚charger la cl‚;
+                                 ENC=Upload Key];
+                      Image=Import;
+                      OnAction=VAR
+                                 StdPasswordDialog@1002 : Page 9815;
+                                 ServerFilename@1000 : Text;
+                                 PasswordText@1001 : Text;
+                               BEGIN
+                                 IF UPLOAD('','','','',ServerFilename) THEN BEGIN
+                                   StdPasswordDialog.EnableBlankPassword(TRUE);
+                                   IF StdPasswordDialog.RUNMODAL = ACTION::OK THEN
+                                     PasswordText := StdPasswordDialog.GetPasswordValue
+                                   ELSE
+                                     EXIT;
+
+                                   IF EncryptionMgt.HasKey THEN
+                                     IF NOT CONFIRM(OverwriteExistingKeyWarning) THEN
+                                       EXIT;
+
+                                   EncryptionMgt.Import(ServerFilename,PasswordText);
+                                 END;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Active }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Run in Test Mode" }
+
+    { 17  ;2   ;Field     ;
+                SourceExpr="Service ID" }
+
+  }
+  CODE
+  {
+    VAR
+      EncryptionMgt@1000 : Codeunit 824;
+      OverwriteExistingKeyWarning@1100 : TextConst 'ENU=Changing the key may render existing data unreadable. Do you want to continue?;ESM=Si cambia la clave, es posible que no se puedan leer los datos existentes. ¨Desea continuar?;FRC=La modification de la cl‚ risque de rendre les donn‚es existantes illisibles. Voulez-vous continuer ?;ENC=Changing the key may render existing data unreadable. Do you want to continue?';
+      DeleteKeyWarning@1101 : TextConst 'ENU=Deleting the key will render existing data unreadable. Do you want to continue?;ESM=Si elimina la clave, es posible que no se puedan leer los datos existentes. ¨Desea continuar?;FRC=La suppression de la cl‚ va rendre les donn‚es existantes illisibles. Voulez-vous continuer ?;ENC=Deleting the key will render existing data unreadable. Do you want to continue?';
+      KeyDoesNotExistError@1001 : TextConst 'ENU=Encryption key does not exist.;ESM=La clave de cifrado no existe.;FRC=La cl‚ de chiffrement n''existe pas.;ENC=Encryption key does not exist.';
+      KeyDeletedMessage@1002 : TextConst 'ENU=Encryption key was successfully deleted.;ESM=La clave de cifrado se elimin¢ correctamente.;FRC=Cl‚ de chiffrement supprim‚e.;ENC=Encryption key was successfully deleted.';
+      KeyGeneratedMessage@1003 : TextConst 'ENU=Encryption key was successfully generated.;ESM=La clave de cifrado se cre¢ correctamente.;FRC=Cl‚ de chiffrement g‚n‚r‚e.;ENC=Encryption key was successfully generated.';
+      UnlinkMessage@1004 : TextConst 'ENU=Disassociation of the account has succeeded.;ESM=La desasociaci¢n de la cuenta se realiz¢ correctamente.;FRC=Association du compte annul‚e.;ENC=Disassociation of the account has succeeded.';
+
+    BEGIN
+    END.
+  }
+}
+

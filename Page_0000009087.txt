@@ -1,0 +1,141 @@
+OBJECT Page 9087 Sales Line FactBox
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sales Line Details;
+               ESM=Detalles l¡neas venta;
+               FRC=D‚tails de ligne de vente;
+               ENC=Sales Line Details];
+    SourceTable=Table37;
+    PageType=CardPart;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 8   ;1   ;Field     ;
+                Name=ItemNo;
+                Lookup=No;
+                CaptionML=[ENU=Item No.;
+                           ESM=N§ producto;
+                           FRC=Nø d'article;
+                           ENC=Item No.];
+                SourceExpr=ShowNo;
+                OnDrillDown=BEGIN
+                              ShowDetails;
+                            END;
+                             }
+
+    { 3   ;1   ;Field     ;
+                Name=Availability;
+                DrillDown=Yes;
+                CaptionML=[ENU=Availability;
+                           ESM=Disponibilidad;
+                           FRC=Disponibilit‚;
+                           ENC=Availability];
+                DecimalPlaces=2:0;
+                SourceExpr=STRSUBSTNO('%1',SalesInfoPaneMgt.CalcAvailability(Rec));
+                Editable=TRUE;
+                OnDrillDown=BEGIN
+                              ItemAvailFormsMgt.ShowItemAvailFromSalesLine(Rec,ItemAvailFormsMgt.ByEvent);
+                              CurrPage.UPDATE(TRUE);
+                            END;
+                             }
+
+    { 5   ;1   ;Field     ;
+                Name=Substitutions;
+                DrillDown=Yes;
+                CaptionML=[ENU=Substitutions;
+                           ESM=Sustituciones;
+                           FRC=Substitutions;
+                           ENC=Substitutions];
+                SourceExpr=STRSUBSTNO('%1',SalesInfoPaneMgt.CalcNoOfSubstitutions(Rec));
+                Editable=TRUE;
+                OnDrillDown=BEGIN
+                              ShowItemSub;
+                              CurrPage.UPDATE;
+                            END;
+                             }
+
+    { 7   ;1   ;Field     ;
+                Name=SalesPrices;
+                DrillDown=Yes;
+                CaptionML=[ENU=Sales Prices;
+                           ESM=Precios ventas;
+                           FRC=Prix de vente;
+                           ENC=Sales Prices];
+                SourceExpr=STRSUBSTNO('%1',SalesInfoPaneMgt.CalcNoOfSalesPrices(Rec));
+                Editable=TRUE;
+                OnDrillDown=BEGIN
+                              ShowPrices;
+                              CurrPage.UPDATE;
+                            END;
+                             }
+
+    { 11  ;1   ;Field     ;
+                Name=SalesLineDiscounts;
+                DrillDown=Yes;
+                CaptionML=[ENU=Sales Line Discounts;
+                           ESM=Descuentos l¡nea ventas;
+                           FRC=Escomptes de ligne de vente;
+                           ENC=Sales Line Discounts];
+                SourceExpr=STRSUBSTNO('%1',SalesInfoPaneMgt.CalcNoOfSalesLineDisc(Rec));
+                Editable=TRUE;
+                OnDrillDown=BEGIN
+                              ShowLineDisc;
+                              CurrPage.UPDATE;
+                            END;
+                             }
+
+  }
+  CODE
+  {
+    VAR
+      SalesHeader@1000 : Record 36;
+      SalesPriceCalcMgt@1002 : Codeunit 7000;
+      SalesInfoPaneMgt@1001 : Codeunit 7171;
+      ItemAvailFormsMgt@1003 : Codeunit 353;
+
+    PROCEDURE ShowDetails@1102601000();
+    VAR
+      Item@1102601000 : Record 27;
+    BEGIN
+      IF Type = Type::Item THEN BEGIN
+        Item.GET("No.");
+        PAGE.RUN(PAGE::"Item Card",Item);
+      END;
+    END;
+
+    PROCEDURE ShowPrices@15();
+    BEGIN
+      SalesHeader.GET("Document Type","Document No.");
+      CLEAR(SalesPriceCalcMgt);
+      SalesPriceCalcMgt.GetSalesLinePrice(SalesHeader,Rec);
+    END;
+
+    PROCEDURE ShowLineDisc@16();
+    BEGIN
+      SalesHeader.GET("Document Type","Document No.");
+      CLEAR(SalesPriceCalcMgt);
+      SalesPriceCalcMgt.GetSalesLineLineDisc(SalesHeader,Rec);
+    END;
+
+    PROCEDURE ShowNo@29() : Code[20];
+    BEGIN
+      IF Type <> Type::Item THEN
+        EXIT('');
+      EXIT("No.");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

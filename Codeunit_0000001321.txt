@@ -1,0 +1,119 @@
+OBJECT Codeunit 1321 Mini Getting Started Mgt.
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            IF IsGettingStartedVisible THEN
+              DisableGettingStartedForCurrentUser
+            ELSE
+              EnableGettingStartedForCurrentUser;
+
+            MESSAGE(GettingStartedRefreshThePageMsg);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      GettingStartedRefreshThePageMsg@1000 : TextConst 'ENU=Refresh the page (F5) to see the change.;ESM=Actualice la p gina (F5) para ver el cambio.;FRC=Actualisez la page (F5) pour afficher la modification.;ENC=Refresh the page (F5) to see the change.';
+      WelcomePageTxt@1001 : TextConst 'ENU=Welcome!;ESM=Bienvenido;FRC=Bienvenueÿ!;ENC=Welcome!';
+      SettingUpYourSystemPageTxt@1002 : TextConst 'ENU=Setting up Your System;ESM=Configuraci¢n del sistema;FRC=Param‚trage de votre systŠme;ENC=Setting up Your System';
+
+    PROCEDURE EnableGettingStartedForCurrentUser@9();
+    VAR
+      MiniUserRemovedInstructions@1000 : Record 1306;
+    BEGIN
+      MiniUserRemovedInstructions.EnableInstruction(GetGettingStartedCode);
+    END;
+
+    PROCEDURE DisableGettingStartedForCurrentUser@4();
+    VAR
+      MiniUserRemovedInstructions@1000 : Record 1306;
+    BEGIN
+      MiniUserRemovedInstructions.DisableInstruction(GetGettingStartedCode);
+    END;
+
+    PROCEDURE IsGettingStartedVisible@1() : Boolean;
+    VAR
+      MiniUserRemovedInstructions@1000 : Record 1306;
+    BEGIN
+      EXIT(NOT MiniUserRemovedInstructions.GET(USERID,GetGettingStartedCode));
+    END;
+
+    PROCEDURE PlayWelcomeVideoOnFirstLogin@3();
+    BEGIN
+      IF ShouldWelcomeVideoBePlayed THEN BEGIN
+        SetWelcomeVideoPlayed;
+        PlayWelcomeVideo;
+      END;
+    END;
+
+    PROCEDURE PlayWelcomeVideo@5();
+    VAR
+      MiniVideoPlayerPage@1000 : Page 1395;
+      Height@1004 : Integer;
+      Width@1003 : Integer;
+      Src@1002 : Text;
+      Caption@1001 : Text;
+    BEGIN
+      Caption := WelcomePageTxt;
+      Height := 415;
+      Width := 740;
+
+      Src := 'https://go.microsoft.com/fwlink/?LinkID=313938&clcid=0x409';
+      MiniVideoPlayerPage.SetParameters(Height,Width,Src,Caption);
+      MiniVideoPlayerPage.RUN;
+    END;
+
+    PROCEDURE PlaySettingUpYourSystemVideo@10();
+    VAR
+      MiniVideoPlayerPage@1000 : Page 1395;
+      Height@1004 : Integer;
+      Width@1003 : Integer;
+      Src@1002 : Text;
+      Caption@1001 : Text;
+    BEGIN
+      Caption := SettingUpYourSystemPageTxt;
+      Height := 415;
+      Width := 740;
+
+      Src := 'https://go.microsoft.com/fwlink/?LinkID=317639&clcid=0x409';
+      MiniVideoPlayerPage.SetParameters(Height,Width,Src,Caption);
+      MiniVideoPlayerPage.RUN;
+    END;
+
+    PROCEDURE ShouldWelcomeVideoBePlayed@18() : Boolean;
+    VAR
+      MiniUserRemovedInstructions@1000 : Record 1306;
+    BEGIN
+      EXIT(NOT MiniUserRemovedInstructions.GET(USERID,GetWelcomeVideoCode));
+    END;
+
+    LOCAL PROCEDURE SetWelcomeVideoPlayed@19();
+    VAR
+      MiniUserRemovedInstructions@1000 : Record 1306;
+    BEGIN
+      MiniUserRemovedInstructions.DisableInstruction(GetWelcomeVideoCode);
+    END;
+
+    LOCAL PROCEDURE GetGettingStartedCode@2() : Code[20];
+    BEGIN
+      EXIT('GETTINGSTARTED');
+    END;
+
+    LOCAL PROCEDURE GetWelcomeVideoCode@15() : Code[20];
+    BEGIN
+      EXIT('WELCOMEVIDEOPLAYED');
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

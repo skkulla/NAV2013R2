@@ -1,0 +1,246 @@
+OBJECT Page 1321 Mini Posted Sales Credit Memos
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Sales Credit Memos;
+               ESM=Notas de cr‚dito ventas registradas;
+               FRC=Notes cr‚dit ventes report‚es;
+               ENC=Posted Sales Credit Memos];
+    SourceTable=Table114;
+    PageType=List;
+    CardPageID=Mini Posted Sales Credit Memo;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Correct,Credit Memo;
+                                ESM=Nuevo,Proceso,Informe,Corregir,Nota de cr‚dito;
+                                FRC=Nouveau,Traitement,Rapport,Correct,Note de cr‚dit;
+                                ENC=New,Process,Report,Correct,Credit Memo];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 19      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Credit Memo;
+                                 ESM=Nota de cr‚dito;
+                                 FRC=Note de cr‚dit;
+                                 ENC=Credit Memo];
+                      Image=Invoice }
+      { 3       ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Customer;
+                                 ESM=Cliente;
+                                 FRC=Client;
+                                 ENC=Customer];
+                      ToolTipML=[ENU=View or edit detailed information about the customer on the selected posted sales document.;
+                                 ESM=Vea o edite la informaci¢n detallada sobre el cliente en el documento de venta registrado seleccionado.;
+                                 FRC=Affichez ou modifiez des informations d‚taill‚es concernant le client sur le document de vente report‚ s‚lectionn‚.;
+                                 ENC=View or edit detailed information about the customer on the selected posted sales document.];
+                      RunObject=Page 1300;
+                      RunPageLink=No.=FIELD(Sell-to Customer No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Customer;
+                      PromotedCategory=Category5 }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      ToolTipML=[ENU=Find all entries and documents that exist for the document number and posting date on the selected posted sales document.;
+                                 ESM=Buscar todas las entradas y los documentos que existen para el n£mero de documento y la fecha de registro del documento de venta registrado seleccionado.;
+                                 FRC=Recherchez toutes les ‚critures et tous les documents qui existent pour le num‚ro de document et la date de report mentionn‚s sur le document de vente report‚ s‚lectionn‚.;
+                                 ENC=Find all entries and documents that exist for the document number and posting date on the selected posted sales document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+      { 12      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Send;
+                                 ESM=Enviar;
+                                 FRC=Envoyer;
+                                 ENC=Send] }
+      { 33      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=Im&primir;
+                                 FRC=Im&primer;
+                                 ENC=&Print];
+                      ToolTipML=[ENU=Print the selected posted sales document.;
+                                 ESM=Imprima el documento de venta registrado seleccionado.;
+                                 FRC=Imprimez le document de vente report‚ s‚lectionn‚.;
+                                 ENC=Print the selected posted sales document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 SalesCrMemoHeader@1102 : Record 114;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(SalesCrMemoHeader);
+                                 SalesCrMemoHeader.PrintRecords(NOT AllowDotNetAddIn);
+                               END;
+                                }
+      { 4       ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Send PDF by &Email;
+                                 ESM=Enviar PDF por &correo electr¢nico;
+                                 FRC=Envoyer PDF par &courriel;
+                                 ENC=Send PDF by &Email];
+                      ToolTipML=[ENU=Attach the selected posted sales document to an email to the customer.;
+                                 ESM=Adjunte el documento de venta registrado seleccionado a un mensaje de correo electr¢nico para el cliente.;
+                                 FRC=Joignez le document vente report‚ s‚lectionn‚ … un courriel adress‚ au client.;
+                                 ENC=Attach the selected posted sales document to an email to the customer.];
+                      Promoted=Yes;
+                      Visible=AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=SendEmailPDF;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ReportDistributionManagement@1000 : Codeunit 452;
+                               BEGIN
+                                 ReportDistributionManagement.EmailDocumentReport(Rec);
+                               END;
+                                }
+      { 17      ;2   ;Action    ;
+                      Name=SaveCopy;
+                      CaptionML=[ENU=&Save PDF Document;
+                                 ESM=&Guardar documento PDF;
+                                 FRC=&Enregistrer document PDF;
+                                 ENC=&Save PDF Document];
+                      ToolTipML=[ENU=Save the posted sales document to your computer. You can then attach it to the email that you send to the customer.;
+                                 ESM=Guarde el documento de venta registrado en el ordenador. A continuaci¢n, podr  adjuntarlo al mensaje de correo electr¢nico que env¡e al cliente.;
+                                 FRC=Enregistrez le document vente report‚ sur votre ordinateur. Vous pouvez ensuite le joindre au courriel adress‚ au client.;
+                                 ENC=Save the posted sales document to your computer. You can then attach it to the email that you send to the customer.];
+                      Promoted=Yes;
+                      Visible=NOT AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ReportDistributionManagement@1000 : Codeunit 452;
+                               BEGIN
+                                 ReportDistributionManagement.SaveDocumentReport(Rec);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the posted credit memo number.;
+                           ESM=Especifica el n£mero de nota de cr‚dito registrada.;
+                           FRC=Sp‚cifie le num‚ro d'avoir valid‚.;
+                           ENC=Specifies the posted credit memo number.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Customer Name;
+                           ESM=Nombre cliente;
+                           FRC=Nom client;
+                           ENC=Customer Name];
+                ToolTipML=[ENU=Specifies the name of the customer that you shipped the items on the credit memo to.;
+                           ESM=Especifica el nombre del cliente al que se enviaron los productos de la nota de cr‚dito.;
+                           FRC=Affiche le nom du client auquel vous avez exp‚di‚ les articles qui figurent sur l'avoir initial.;
+                           ENC=Specifies the name of the customer that you shipped the items on the credit memo to.];
+                SourceExpr="Sell-to Customer Name" }
+
+    { 1102601007;2;Field  ;
+                ToolTipML=[ENU=Specifies the date on which the shipment is due for payment. The program calculates the date using the Payment Terms Code and Posting Date fields on the sales header.;
+                           ESM=Especifica la fecha en que vence el pago del env¡o. El programa calcula la fecha a partir de los campos C¢d. t‚rminos pago y Fecha registro de la cabecera de ventas.;
+                           FRC=Indique la date … laquelle l'exp‚dition doit ˆtre pay‚e. Le programme calcule la date … l'aide des champs Code modalit‚s de paiement et Date de report de l'en-tˆte vente.;
+                           ENC=Specifies the date on which the shipment is due for payment. The program calculates the date using the Payment Terms Code and Posting Date fields on the sales header.];
+                SourceExpr="Due Date" }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the total of the amounts on all the credit memo lines, in the currency of the credit memo. The amount does not include VAT.;
+                           ESM=Especifica el total de los importes de todas las l¡neas de la nota de cr‚dito, en la divisa de la nota de cr‚dito. El importe no incluye IVA.;
+                           FRC=Indique le total, dans la devise de l'avoir, des montants de toutes les lignes avoir. Ce montant n'inclut pas la TVA.;
+                           ENC=Specifies the total of the amounts on all the credit memo lines, in the currency of the credit memo. The amount does not include tax.];
+                SourceExpr=Amount;
+                OnDrillDown=BEGIN
+                              SETRANGE("No.");
+                              PAGE.RUNMODAL(PAGE::"Mini Posted Sales Credit Memo",Rec)
+                            END;
+                             }
+
+    { 15  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the total of the amounts in all the amount fields on the credit memo, in the currency of the credit memo. The amount includes VAT.;
+                           ESM=Especifica el total de todos los campos del importe de la nota de cr‚dito, en la divisa de la nota de cr‚dito. El importe incluye IVA.;
+                           FRC=Indique le total des montants de tous les champs montants de l'avoir, dans la devise de l'avoir. Le montant inclut la TVA.;
+                           ENC=Specifies the total of the amounts in all the amount fields on the credit memo, in the currency of the credit memo. The amount includes tax.];
+                SourceExpr="Amount Including VAT";
+                OnDrillDown=BEGIN
+                              SETRANGE("No.");
+                              PAGE.RUNMODAL(PAGE::"Mini Posted Sales Credit Memo",Rec)
+                            END;
+                             }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the amount that remains to be paid for the posted sales invoice that relates to this sales credit memo.;
+                           ESM=Especifica el importe que queda por pagar para la factura de venta registrada relacionada con esta nota de cr‚dito de venta.;
+                           FRC=Indique le montant restant d– pour la facture vente valid‚e li‚e … cet avoir vente.;
+                           ENC=Specifies the amount that remains to be paid for the posted sales invoice that relates to this sales credit memo.];
+                SourceExpr="Remaining Amount" }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted sales invoice that relates to this sales credit memo is paid.;
+                           ESM=Especifica si la factura de venta registrada relacionada con esta nota de cr‚dito de venta est  pagada.;
+                           FRC=Indique si la facture vente valid‚e li‚e … cet avoir vente a ‚t‚ pay‚e.;
+                           ENC=Specifies if the posted sales invoice that relates to this sales credit memo is paid.];
+                SourceExpr=Paid }
+
+    { 9   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted sales invoice that relates to this sales credit memo has been either corrected or canceled.;
+                           ESM=Especifica si se ha corregido o cancelado la factura de venta registrada relacionada con esta nota de cr‚dito de venta.;
+                           FRC=Indique si la facture vente valid‚e li‚e … cet avoir vente a ‚t‚ corrig‚e ou annul‚e.;
+                           ENC=Specifies if the posted sales invoice that relates to this sales credit memo has been either corrected or cancelled.];
+                SourceExpr=Canceled;
+                Editable=FALSE;
+                LookupPageID=Mini Posted Sales Invoices;
+                DrillDownPageID=Mini Posted Sales Invoices;
+                Style=Unfavorable;
+                StyleExpr=Canceled;
+                OnDrillDown=VAR
+                              SalesInvoiceHeader@1000 : Record 112;
+                            BEGIN
+                              IF Canceled THEN BEGIN
+                                SalesInvoiceHeader.SETRANGE("No.","Applies-to Doc. No.");
+                                PAGE.RUN(PAGE::"Mini Posted Sales Invoices",SalesInvoiceHeader);
+                              END;
+                            END;
+                             }
+
+  }
+  CODE
+  {
+    VAR
+      AllowDotNetAddIn@1000 : Boolean INDATASET;
+
+    BEGIN
+    END.
+  }
+}
+

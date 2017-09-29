@@ -1,0 +1,158 @@
+OBJECT Page 36721 Bank Rec. Check Lines Dyn
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Bank Rec. Check Lines Subform;
+               ESM=Subform. l¡ns. cheque concil.;
+               FRC=Sous-formulaire lignes chŠques rapprochement bancaire;
+               ENC=Bank Rec. Cheque Lines Subform];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table10121;
+    SourceTableView=SORTING(Bank Account No.,Statement No.,Record Type,Line No.)
+                    WHERE(Record Type=CONST(Check));
+    PageType=ListPart;
+    OnOpenPage=BEGIN
+                 OnActivateForm;
+               END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Posting Date";
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Document Type";
+                Editable=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Document No.";
+                Editable=FALSE }
+
+    { 1020018;2;Field     ;
+                SourceExpr="External Document No.";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Account Type";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Account No.";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr=Description;
+                Editable=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr=Amount;
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr=Cleared;
+                OnValidate=BEGIN
+                             ClearedOnAfterValidate;
+                           END;
+                            }
+
+    { 14  ;2   ;Field     ;
+                SourceExpr="Cleared Amount";
+                OnValidate=BEGIN
+                             ClearedAmountOnAfterValidate;
+                           END;
+                            }
+
+    { 1020012;2;Field     ;
+                CaptionML=[ENU=Difference;
+                           ESM=Diferencia;
+                           FRC=Diff‚rence;
+                           ENC=Difference];
+                SourceExpr="Cleared Amount" - Amount;
+                Editable=FALSE }
+
+    { 1020004;2;Field     ;
+                SourceExpr="Bal. Account Type";
+                Visible=FALSE }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Bal. Account No.";
+                Visible=FALSE }
+
+    { 1020008;2;Field     ;
+                SourceExpr="Currency Code";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 1020010;2;Field     ;
+                SourceExpr="Currency Factor";
+                Visible=FALSE;
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+
+    PROCEDURE SetupTotals@1020002();
+    BEGIN
+      // IF BankRecHdr.GET("Bank Account No.","Statement No.") THEN
+      // BankRecHdr.CALCFIELDS("Total Cleared Checks");
+      // CurrForm.BankStatementCleared.UPDATE;
+      // CurrForm.TotalCleared.UPDATE;
+    END;
+
+    PROCEDURE LookupLineDimensions@1020000();
+    BEGIN
+      ShowDimensions;
+      CurrPage.SAVERECORD;
+    END;
+
+    PROCEDURE GetTableID@1020001() : Integer;
+    VAR
+      Object@1020001 : Record 2000000001;
+    BEGIN
+      Object.SETRANGE(Type,Object.Type::Table);
+      Object.SETRANGE(Name,TABLENAME);
+      Object.FINDFIRST;
+      EXIT(Object.ID);
+    END;
+
+    LOCAL PROCEDURE ClearedOnAfterValidate@19021297();
+    BEGIN
+      CurrPage.UPDATE(TRUE);
+      SetupTotals;
+    END;
+
+    LOCAL PROCEDURE ClearedAmountOnAfterValidate@19016797();
+    BEGIN
+      CurrPage.UPDATE(TRUE);
+      SetupTotals;
+    END;
+
+    LOCAL PROCEDURE OnActivateForm@19002417();
+    BEGIN
+      SetupTotals;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,73 @@
+OBJECT Table 1250 Bank Statement Matching Buffer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Bank Statement Matching Buffer;
+               ESM=B£fer de conciliaci¢n de extractos bancarios;
+               FRC=Tampon correspondance relev‚ bancaire;
+               ENC=Bank Statement Matching Buffer];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              ESM=N§ l¡nea;
+                                                              FRC=Nø ligne;
+                                                              ENC=Line No.] }
+    { 2   ;   ;Entry No.           ;Integer       ;CaptionML=[ENU=Entry No.;
+                                                              ESM=N§ mov.;
+                                                              FRC=Nø s‚quence;
+                                                              ENC=Entry No.] }
+    { 3   ;   ;Quality             ;Integer       ;CaptionML=[ENU=Quality;
+                                                              ESM=Calidad;
+                                                              FRC=Qualit‚;
+                                                              ENC=Quality] }
+    { 4   ;   ;Account Type        ;Option        ;CaptionML=[ENU=Account Type;
+                                                              ESM=Tipo mov.;
+                                                              FRC=Type de compte;
+                                                              ENC=Account Type];
+                                                   OptionCaptionML=[ENU=G/L Account,Customer,Vendor;
+                                                                    ESM=Cuenta,Cliente,Proveedor;
+                                                                    FRC=Compte du grand livre,Client,Fournisseur;
+                                                                    ENC=G/L Account,Customer,Vendor];
+                                                   OptionString=G/L Account,Customer,Vendor }
+    { 5   ;   ;Account No.         ;Code20        ;CaptionML=[ENU=Account No.;
+                                                              ESM=N§ cuenta;
+                                                              FRC=Nø de compte;
+                                                              ENC=Account No.] }
+  }
+  KEYS
+  {
+    {    ;Line No.,Entry No.,Account No.          ;Clustered=Yes }
+    {    ;Quality                                  }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE AddMatchCandidate@18(LineNo@1001 : Integer;EntryNo@1002 : Integer;Quality@1003 : Integer;Type@1005 : Option;AccountNo@1006 : Code[20]);
+    VAR
+      BankStatementMatchingBuffer@1004 : Record 1250;
+    BEGIN
+      BankStatementMatchingBuffer.INIT;
+      BankStatementMatchingBuffer."Line No." := LineNo;
+      BankStatementMatchingBuffer."Entry No." := EntryNo;
+      BankStatementMatchingBuffer."Account No." := AccountNo;
+      BankStatementMatchingBuffer."Account Type" := Type;
+      BankStatementMatchingBuffer.Quality := Quality;
+      Rec := BankStatementMatchingBuffer;
+      INSERT;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

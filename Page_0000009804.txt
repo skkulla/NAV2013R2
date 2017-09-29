@@ -1,0 +1,215 @@
+OBJECT Page 9804 All Permission
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.36040;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=All Permission;
+               ESM=Todos los permisos;
+               FRC=Toutes les autorisations;
+               ENC=All Permission];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table2000000005;
+    PageType=List;
+    SourceTableTemporary=Yes;
+    OnOpenPage=BEGIN
+                 FillTempPermissions;
+               END;
+
+    OnNewRecord=BEGIN
+                  ActivateControls;
+                END;
+
+    OnModifyRecord=VAR
+                     Permission@1000 : Record 2000000005;
+                   BEGIN
+                     Permission := Rec;
+
+                     IF NOT Permission.INSERT THEN
+                       Permission.MODIFY;
+
+                     Rec := Permission;
+                     MODIFY(FALSE);
+
+                     IF (Permission."Read Permission" = 0) AND
+                        (Permission."Insert Permission" = 0) AND
+                        (Permission."Modify Permission" = 0) AND
+                        (Permission."Delete Permission" = 0) AND
+                        (Permission."Execute Permission" = 0)
+                     THEN
+                       Permission.DELETE;
+                   END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           ActivateControls;
+                         END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                CaptionML=[ENU=AllPermission;
+                           ESM=Todos los permisos;
+                           FRC=AllPermission;
+                           ENC=AllPermission];
+                GroupType=Repeater }
+
+    { 13  ;2   ;Field     ;
+                Name=PermissionSet;
+                CaptionML=[ENU=Permission Set;
+                           ESM=Conjunto de permisos;
+                           FRC=Ensemble d'autorisations;
+                           ENC=Permission Set];
+                SourceExpr="Role ID";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Object Type";
+                Editable=FALSE;
+                OnValidate=BEGIN
+                             ActivateControls;
+                           END;
+                            }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Object ID";
+                Editable=FALSE }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Object Name";
+                Editable=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Read Permission";
+                Enabled=IsTableData }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Insert Permission";
+                Enabled=IsTableData }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Modify Permission";
+                Enabled=IsTableData }
+
+    { 5   ;2   ;Field     ;
+                CaptionML=[ENU=Delete Permission;
+                           ESM=Eliminaci¢n;
+                           FRC=Permission de suppression;
+                           ENC=Delete Permission];
+                SourceExpr="Delete Permission";
+                Enabled=IsTableData }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Execute Permission";
+                Enabled=NOT IsTableData }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Security Filter";
+                Enabled=IsTableData;
+                OnAssistEdit=VAR
+                               TableFilter@1000 : Record 9805;
+                               TableFilterPage@1001 : Page 9805;
+                             BEGIN
+                               TableFilter.FILTERGROUP(2);
+                               TableFilter.SETRANGE("Table Number","Object ID");
+                               TableFilter.FILTERGROUP(0);
+                               TableFilterPage.SETTABLEVIEW(TableFilter);
+                               TableFilterPage.SetSourceTable(FORMAT("Security Filter"),"Object ID","Object Name");
+                               IF ACTION::OK = TableFilterPage.RUNMODAL THEN
+                                 EVALUATE("Security Filter",TableFilterPage.CreateTextTableFilter(FALSE));
+                             END;
+                              }
+
+  }
+  CODE
+  {
+    VAR
+      CurrentRoleID@1000 : Code[20];
+      IsTableData@1001 : Boolean INDATASET;
+
+    PROCEDURE FillTempPermissions@1003();
+    VAR
+      Permission@1002 : Record 2000000005;
+      AllObj@1001 : Record 2000000038;
+    BEGIN
+      FILTERGROUP(2);
+      SETRANGE("Role ID",CurrentRoleID);
+      Permission.COPYFILTERS(Rec);
+      "Role ID" := GETRANGEMIN("Role ID");
+      FILTERGROUP(0);
+
+      IF Permission.FIND('-') THEN
+        REPEAT
+          Rec := Permission;
+          INSERT;
+        UNTIL Permission.NEXT = 0;
+
+      FillTempPermissionsForZeroObjectID(Rec);
+      FillTempPermissionsForAllObjects(Rec,AllObj,0,0,0,0,0);
+
+      FINDFIRST;
+    END;
+
+    LOCAL PROCEDURE FillTempPermissionsForZeroObjectID@4(VAR Permission@1000 : Record 2000000005);
+    VAR
+      CopyPermission@1002 : TEMPORARY Record 2000000005;
+      AllObj@1001 : Record 2000000038;
+    BEGIN
+      CopyPermission.COPY(Permission,TRUE);
+      WITH CopyPermission DO BEGIN
+        SETRANGE("Role ID",Permission."Role ID");
+        SETRANGE("Object ID",0);
+        IF FINDSET THEN
+          REPEAT
+            AllObj.SETRANGE("Object Type","Object Type");
+            FillTempPermissionsForAllObjects(
+              Permission,AllObj,"Read Permission","Insert Permission","Modify Permission","Delete Permission","Execute Permission");
+          UNTIL NEXT = 0;
+      END;
+    END;
+
+    LOCAL PROCEDURE FillTempPermissionsForAllObjects@5(VAR Permission@1005 : Record 2000000005;VAR AllObj@1006 : Record 2000000038;NewReadValue@1000 : Option;NewInsertValue@1001 : Option;NewModifyValue@1002 : Option;NewDeleteValue@1003 : Option;NewExecuteValue@1004 : Option);
+    VAR
+      CopyPermission@1007 : TEMPORARY Record 2000000005;
+    BEGIN
+      CopyPermission.COPY(Permission,TRUE);
+      CopyPermission.INIT;
+      WITH CopyPermission DO
+        IF AllObj.FINDSET THEN
+          REPEAT
+            "Object Type" := AllObj."Object Type";
+            "Object ID" := AllObj."Object ID";
+            "Read Permission" := NewReadValue;
+            "Insert Permission" := NewInsertValue;
+            "Modify Permission" := NewModifyValue;
+            "Delete Permission" := NewDeleteValue;
+            "Execute Permission" := NewExecuteValue;
+            IF INSERT THEN;
+          UNTIL AllObj.NEXT = 0;
+    END;
+
+    PROCEDURE FilterByRole@1004(RoleID@1005 : Code[20]);
+    BEGIN
+      CurrentRoleID := RoleID;
+    END;
+
+    LOCAL PROCEDURE ActivateControls@1();
+    BEGIN
+      IsTableData := "Object Type" = "Object Type"::"Table Data"
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

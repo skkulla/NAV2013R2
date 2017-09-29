@@ -1,0 +1,270 @@
+OBJECT Codeunit 86 Sales-Quote to Order
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00,NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    TableNo=36;
+    OnRun=VAR
+            OldSalesCommentLine@1001 : Record 44;
+            Cust@1008 : Record 18;
+            ATOLink@1000 : Record 904;
+            ApprovalsManagement@1002 : Codeunit 439;
+          BEGIN
+            TESTFIELD("Document Type","Document Type"::Quote);
+            Cust.GET("Sell-to Customer No.");
+            Cust.CheckBlockedCustOnDocs(Cust,"Document Type"::Order,TRUE,FALSE);
+            CALCFIELDS("Amount Including VAT");
+            SalesOrderHeader := Rec;
+            IF GUIALLOWED AND NOT HideValidationDialog THEN
+              CustCheckCreditLimit.SalesHeaderCheck(SalesOrderHeader);
+            SalesOrderHeader."Document Type" := SalesOrderHeader."Document Type"::Order;
+
+            CheckAvailability(Rec);
+            CheckInProgressOpportunities(Rec);
+
+            SalesOrderHeader."No. Printed" := 0;
+            SalesOrderHeader.Status := SalesOrderHeader.Status::Open;
+            SalesOrderHeader."No." := '';
+            SalesOrderHeader."Quote No." := "No.";
+            SalesOrderLine.LOCKTABLE;
+            SalesOrderHeader.INSERT(TRUE);
+
+            SalesOrderHeader."Order Date" := "Order Date";
+            IF "Posting Date" <> 0D THEN
+              SalesOrderHeader."Posting Date" := "Posting Date";
+            SalesOrderHeader."Document Date" := "Document Date";
+            SalesOrderHeader."Shipment Date" := "Shipment Date";
+            SalesOrderHeader."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
+            SalesOrderHeader."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
+            SalesOrderHeader."Dimension Set ID" := "Dimension Set ID";
+
+            SalesOrderHeader."Location Code" := "Location Code";
+            SalesOrderHeader."Outbound Whse. Handling Time" := "Outbound Whse. Handling Time";
+            SalesOrderHeader."Ship-to Name" := "Ship-to Name";
+            SalesOrderHeader."Ship-to Name 2" := "Ship-to Name 2";
+            SalesOrderHeader."Ship-to Address" := "Ship-to Address";
+            SalesOrderHeader."Ship-to Address 2" := "Ship-to Address 2";
+            SalesOrderHeader."Ship-to City" := "Ship-to City";
+            SalesOrderHeader."Ship-to Post Code" := "Ship-to Post Code";
+            SalesOrderHeader."Ship-to County" := "Ship-to County";
+            SalesOrderHeader."Ship-to Country/Region Code" := "Ship-to Country/Region Code";
+            SalesOrderHeader."Ship-to Contact" := "Ship-to Contact";
+
+            SalesOrderHeader.Reserve := Reserve;
+            SalesOrderHeader."Prepayment %" := Cust."Prepayment %";
+            IF SalesOrderHeader."Posting Date" = 0D THEN
+              SalesOrderHeader."Posting Date" := WORKDATE;
+
+            SalesOrderHeader.MODIFY;
+
+            SalesQuoteLine.RESET;
+            SalesQuoteLine.SETRANGE("Document Type","Document Type");
+            SalesQuoteLine.SETRANGE("Document No.","No.");
+            IF SalesQuoteLine.FINDSET THEN
+              REPEAT
+                SalesOrderLine := SalesQuoteLine;
+                SalesOrderLine."Document Type" := SalesOrderHeader."Document Type";
+                SalesOrderLine."Document No." := SalesOrderHeader."No.";
+                SalesOrderLine."Shortcut Dimension 1 Code" := SalesQuoteLine."Shortcut Dimension 1 Code";
+                SalesOrderLine."Shortcut Dimension 2 Code" := SalesQuoteLine."Shortcut Dimension 2 Code";
+                SalesOrderLine."Dimension Set ID" := SalesQuoteLine."Dimension Set ID";
+                IF Cust."Prepayment %" <> 0 THEN
+                  SalesOrderLine."Prepayment %" := Cust."Prepayment %";
+                PrepmtMgt.SetSalesPrepaymentPct(SalesOrderLine,SalesOrderHeader."Posting Date");
+                SalesOrderLine.VALIDATE("Prepayment %");
+
+                SalesOrderLine.INSERT;
+                IF ATOLink.AsmExistsForSalesLine(SalesQuoteLine) THEN
+                  ATOLink.TransferQuoteToSalesOrderLine(SalesQuoteLine,SalesOrderLine);
+                ReserveSalesLine.TransferSaleLineToSalesLine(
+                  SalesQuoteLine,SalesOrderLine,SalesQuoteLine."Outstanding Qty. (Base)");
+                ReserveSalesLine.VerifyQuantity(SalesOrderLine,SalesQuoteLine);
+
+                IF SalesOrderLine.Reserve = SalesOrderLine.Reserve::Always THEN
+                  SalesOrderLine.AutoReserve(FALSE);
+
+              UNTIL SalesQuoteLine.NEXT = 0;
+
+            SalesSetup.GET;
+            IF SalesSetup."Archive Quotes and Orders" THEN
+              ArchiveManagement.ArchSalesDocumentNoConfirm(Rec);
+
+            IF SalesSetup."Default Posting Date" = SalesSetup."Default Posting Date"::"No Date" THEN BEGIN
+              SalesOrderHeader."Posting Date" := 0D;
+              SalesOrderHeader.MODIFY;
+            END;
+
+            SalesCommentLine.SETRANGE("Document Type","Document Type");
+            SalesCommentLine.SETRANGE("No.","No.");
+            IF NOT SalesCommentLine.ISEMPTY THEN BEGIN
+              SalesCommentLine.LOCKTABLE;
+              IF SalesCommentLine.FINDSET THEN
+                REPEAT
+                  OldSalesCommentLine := SalesCommentLine;
+                  SalesCommentLine.DELETE;
+                  SalesCommentLine."Document Type" := SalesOrderHeader."Document Type";
+                  SalesCommentLine."No." := SalesOrderHeader."No.";
+                  SalesCommentLine.INSERT;
+                  SalesCommentLine := OldSalesCommentLine;
+                UNTIL SalesCommentLine.NEXT = 0;
+            END;
+            SalesOrderHeader.COPYLINKS(Rec);
+
+            ItemChargeAssgntSales.RESET;
+            ItemChargeAssgntSales.SETRANGE("Document Type","Document Type");
+            ItemChargeAssgntSales.SETRANGE("Document No.","No.");
+            WHILE ItemChargeAssgntSales.FINDFIRST DO BEGIN
+              ItemChargeAssgntSales.DELETE;
+              ItemChargeAssgntSales."Document Type" := SalesOrderHeader."Document Type";
+              ItemChargeAssgntSales."Document No." := SalesOrderHeader."No.";
+              IF NOT (ItemChargeAssgntSales."Applies-to Doc. Type" IN
+                      [ItemChargeAssgntSales."Applies-to Doc. Type"::Shipment,
+                       ItemChargeAssgntSales."Applies-to Doc. Type"::"Return Receipt"])
+              THEN BEGIN
+                ItemChargeAssgntSales."Applies-to Doc. Type" := SalesOrderHeader."Document Type";
+                ItemChargeAssgntSales."Applies-to Doc. No." := SalesOrderHeader."No.";
+              END;
+              ItemChargeAssgntSales.INSERT;
+            END;
+
+            MoveWonLostOpportunites(Rec,SalesOrderHeader);
+
+            DELETELINKS;
+            DELETE;
+            ApprovalsManagement.DeleteApprovalEntry(DATABASE::"Sales Header","Document Type","No.");
+
+            SalesQuoteLine.DELETEALL;
+            COMMIT;
+            CLEAR(CustCheckCreditLimit);
+            CLEAR(ItemCheckAvail);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst '@@@=An open Opportunity is linked to this Quote. The Opportunity has to be closed before the Quote can be converted to an Order. Do you want to close the Opportunity now and continue the conversion?;ENU=An open %1 is linked to this %2. The %1 has to be closed before the %2 can be converted to an %3. Do you want to close the %1 now and continue the conversion?;ESM=Una %1 abierta se une a esta %2. La %1 tiene que estar cerrada antes de que %2 pueda convertirse en un %3. ¨Confirma que desea cerrar %1 y continuar la conversaci¢n?;FRC=Une %1 ouverte est li‚e … ce %2. L''%1 doit ˆtre cl“tur‚e avant de pouvoir convertir le %2 en %3. Souhaitez-vous fermer l''%1 maintenant et poursuivre la conversionÿ?;ENC=An open %1 is linked to this %2. The %1 has to be closed before the %2 can be converted to an %3. Do you want to close the %1 now and continue the conversion?';
+      Text001@1001 : TextConst '@@@=An open Opportunity is still linked to this Quote. The conversion to an Order was aborted.;ENU=An open %1 is still linked to this %2. The conversion to an %3 was aborted.;ESM=Una %1 abierta sigue vinculada a esta %2. Se cancel¢ la conversi¢n a un %3.;FRC=Une %1 ouverte est toujours li‚e … ce %2. La conversion en %3 a ‚t‚ abandonn‚e.;ENC=An open %1 is still linked to this %2. The conversion to an %3 was aborted.';
+      SalesQuoteLine@1004 : Record 37;
+      SalesLine@1005 : Record 37;
+      SalesOrderHeader@1006 : Record 36;
+      SalesOrderLine@1007 : Record 37;
+      SalesCommentLine@1008 : Record 44;
+      ItemChargeAssgntSales@1009 : Record 5809;
+      CustCheckCreditLimit@1011 : Codeunit 312;
+      ItemCheckAvail@1012 : Codeunit 311;
+      ReserveSalesLine@1013 : Codeunit 99000832;
+      PrepmtMgt@1016 : Codeunit 441;
+      HideValidationDialog@1014 : Boolean;
+      SalesSetup@1018 : Record 311;
+      ArchiveManagement@1019 : Codeunit 5063;
+
+    PROCEDURE GetSalesOrderHeader@1(VAR SalesHeader2@1000 : Record 36);
+    BEGIN
+      SalesHeader2 := SalesOrderHeader;
+    END;
+
+    PROCEDURE SetHideValidationDialog@14(NewHideValidationDialog@1000 : Boolean);
+    BEGIN
+      HideValidationDialog := NewHideValidationDialog;
+    END;
+
+    LOCAL PROCEDURE CheckInProgressOpportunities@2(VAR SalesHeader@1000 : Record 36);
+    VAR
+      Opp@1001 : Record 5092;
+      TempOpportunityEntry@1002 : TEMPORARY Record 5093;
+    BEGIN
+      Opp.RESET;
+      Opp.SETCURRENTKEY("Sales Document Type","Sales Document No.");
+      Opp.SETRANGE("Sales Document Type",Opp."Sales Document Type"::Quote);
+      Opp.SETRANGE("Sales Document No.",SalesHeader."No.");
+      Opp.SETRANGE(Status,Opp.Status::"In Progress");
+      IF Opp.FINDFIRST THEN BEGIN
+        IF NOT CONFIRM(Text000,TRUE,Opp.TABLECAPTION,Opp."Sales Document Type"::Quote,Opp."Sales Document Type"::Order) THEN
+          ERROR('');
+        TempOpportunityEntry.DELETEALL;
+        TempOpportunityEntry.INIT;
+        TempOpportunityEntry.VALIDATE("Opportunity No.",Opp."No.");
+        TempOpportunityEntry."Sales Cycle Code" := Opp."Sales Cycle Code";
+        TempOpportunityEntry."Contact No." := Opp."Contact No.";
+        TempOpportunityEntry."Contact Company No." := Opp."Contact Company No.";
+        TempOpportunityEntry."Salesperson Code" := Opp."Salesperson Code";
+        TempOpportunityEntry."Campaign No." := Opp."Campaign No.";
+        TempOpportunityEntry."Action Taken" := TempOpportunityEntry."Action Taken"::Won;
+        TempOpportunityEntry."Wizard Step" := 1;
+        TempOpportunityEntry.INSERT;
+        TempOpportunityEntry.SETRANGE("Action Taken",TempOpportunityEntry."Action Taken"::Won);
+        PAGE.RUNMODAL(PAGE::"Close Opportunity",TempOpportunityEntry);
+        Opp.RESET;
+        Opp.SETCURRENTKEY("Sales Document Type","Sales Document No.");
+        Opp.SETRANGE("Sales Document Type",Opp."Sales Document Type"::Quote);
+        Opp.SETRANGE("Sales Document No.",SalesHeader."No.");
+        Opp.SETRANGE(Status,Opp.Status::"In Progress");
+        IF Opp.FINDFIRST THEN
+          ERROR(Text001,Opp.TABLECAPTION,Opp."Sales Document Type"::Quote,Opp."Sales Document Type"::Order);
+        COMMIT;
+        SalesHeader.GET(SalesHeader."Document Type",SalesHeader."No.");
+      END;
+    END;
+
+    LOCAL PROCEDURE MoveWonLostOpportunites@3(VAR SalesQuoteHeader@1000 : Record 36;VAR SalesOrderHeader@1001 : Record 36);
+    VAR
+      Opp@1002 : Record 5092;
+      OpportunityEntry@1003 : Record 5093;
+    BEGIN
+      Opp.RESET;
+      Opp.SETCURRENTKEY("Sales Document Type","Sales Document No.");
+      Opp.SETRANGE("Sales Document Type",Opp."Sales Document Type"::Quote);
+      Opp.SETRANGE("Sales Document No.",SalesQuoteHeader."No.");
+      IF Opp.FINDFIRST THEN BEGIN
+        IF Opp.Status = Opp.Status::Won THEN BEGIN
+          Opp."Sales Document Type" := Opp."Sales Document Type"::Order;
+          Opp."Sales Document No." := SalesOrderHeader."No.";
+          Opp.MODIFY;
+          OpportunityEntry.RESET;
+          OpportunityEntry.SETCURRENTKEY(Active,"Opportunity No.");
+          OpportunityEntry.SETRANGE(Active,TRUE);
+          OpportunityEntry.SETRANGE("Opportunity No.",Opp."No.");
+          IF OpportunityEntry.FINDFIRST THEN BEGIN
+            OpportunityEntry."Calcd. Current Value (LCY)" := OpportunityEntry.GetSalesDocValue(SalesOrderHeader);
+            OpportunityEntry.MODIFY;
+          END;
+        END ELSE
+          IF Opp.Status = Opp.Status::Lost THEN BEGIN
+            Opp."Sales Document Type" := Opp."Sales Document Type"::" ";
+            Opp."Sales Document No." := '';
+            Opp.MODIFY;
+          END;
+      END;
+    END;
+
+    LOCAL PROCEDURE CheckAvailability@4(SalesQuoteHeader@1000 : Record 36);
+    BEGIN
+      SalesQuoteLine.SETRANGE("Document Type",SalesQuoteHeader."Document Type");
+      SalesQuoteLine.SETRANGE("Document No.",SalesQuoteHeader."No.");
+      SalesQuoteLine.SETRANGE(Type,SalesQuoteLine.Type::Item);
+      SalesQuoteLine.SETFILTER("No.",'<>%1','');
+      IF SalesQuoteLine.FINDSET THEN
+        REPEAT
+          IF SalesQuoteLine."Outstanding Quantity" > 0 THEN BEGIN
+            SalesLine := SalesQuoteLine;
+            SalesLine.VALIDATE("Reserved Qty. (Base)",0);
+            SalesLine."Outstanding Quantity" -= SalesLine."Qty. to Assemble to Order";
+            SalesLine."Outstanding Qty. (Base)" -= SalesLine."Qty. to Asm. to Order (Base)";
+            IF GUIALLOWED AND NOT HideValidationDialog THEN
+              IF ItemCheckAvail.SalesLineCheck(SalesLine) THEN
+                ItemCheckAvail.RaiseUpdateInterruptedError;
+          END;
+        UNTIL SalesQuoteLine.NEXT = 0;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

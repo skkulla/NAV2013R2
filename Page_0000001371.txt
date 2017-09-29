@@ -1,0 +1,207 @@
+OBJECT Page 1371 Mini Posted Purch. Cr. Memos
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Purchase Credit Memos;
+               ESM=Hist¢rico abono compra;
+               FRC=Notes de cr‚dit achat report‚es;
+               ENC=Posted Purchase Credit Memos];
+    SourceTable=Table124;
+    PageType=List;
+    CardPageID=Mini Posted Purch. Credit Memo;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Correct,Navigation,Send;
+                                ESM=Nuevo,Proceso,Informe,Corregir,Exploraci¢n,Enviar;
+                                FRC=Nouveau,Traitement,Rapport,Correct,Naviguer,Envoyer;
+                                ENC=New,Process,Report,Correct,Navigation,Send];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 19      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Navigation;
+                                 ESM=Exploraci¢n;
+                                 FRC=Navigation;
+                                 ENC=Navigation];
+                      Image=Invoice }
+      { 3       ;2   ;Action    ;
+                      Name=<Page Mini Vendor Card>;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Vendor;
+                                 ESM=Proveedor;
+                                 FRC=Fournisseur;
+                                 ENC=Vendor];
+                      ToolTipML=[ENU=View or edit detailed information about the vendor on the selected posted purchase document.;
+                                 ESM=Vea o edite la informaci¢n detallada sobre el proveedor en el documento de compra registrado seleccionado.;
+                                 FRC=Affichez ou modifiez des informations d‚taill‚es concernant le fournisseur sur le document d'achat report‚ s‚lectionn‚.;
+                                 ENC=View or edit detailed information about the vendor on the selected posted purchase document.];
+                      RunObject=Page 1330;
+                      RunPageLink=No.=FIELD(Buy-from Vendor No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Vendor;
+                      PromotedCategory=Category5 }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      ToolTipML=[ENU=Find all entries and documents that exist for the document number and posting date on the selected posted purchase document.;
+                                 ESM=Buscar todas las entradas y los documentos que existen para el n£mero de documento y la fecha de registro del documento de compra registrado seleccionado.;
+                                 FRC=Recherchez toutes les ‚critures et tous les documents qui existent pour le num‚ro de document et la date de report mentionn‚s sur le document d'achat report‚ s‚lectionn‚.;
+                                 ENC=Find all entries and documents that exist for the document number and posting date on the selected posted purchase document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+      { 27      ;1   ;ActionGroup;
+                      Name=Printing;
+                      CaptionML=[ENU=Printing;
+                                 ESM=Imprimiendo;
+                                 FRC=Impression;
+                                 ENC=Printing] }
+      { 14      ;2   ;Action    ;
+                      Name=Print;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=Im&primir;
+                                 FRC=Im&primer;
+                                 ENC=&Print];
+                      ToolTipML=[ENU=Print the posted purchase document.;
+                                 ESM=Imprima el documento de compra registrado.;
+                                 FRC=Imprimez le document d'achat report‚.;
+                                 ENC=Print the posted purchase document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Print;
+                      PromotedCategory=Category6;
+                      OnAction=VAR
+                                 PurchCrMemoHdr@1000 : Record 124;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(PurchCrMemoHdr);
+                                 PurchCrMemoHdr.PrintRecords(NOT AllowDotNetAddIn);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the posted credit memo number.;
+                           ESM=Especifica el n£mero de nota de cr‚dito registrada.;
+                           FRC=Sp‚cifie le num‚ro d'avoir valid‚.;
+                           ENC=Specifies the posted credit memo number.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Vendor Name;
+                           ESM=Nombre proveedor;
+                           FRC=Nom du fournisseur;
+                           ENC=Vendor Name];
+                ToolTipML=[ENU=Specifies the name of the vendor who shipped the items.;
+                           ESM=Especifica el nombre del proveedor que envi¢ los productos.;
+                           FRC=Sp‚cifie le nom du fournisseur qui a exp‚di‚ les articles.;
+                           ENC=Specifies the name of the vendor who shipped the items.];
+                SourceExpr="Buy-from Vendor Name" }
+
+    { 1102601007;2;Field  ;
+                ToolTipML=[ENU=Specifies when the credit memo is due. The program calculates the date using the Payment Terms Code and Posting Date fields on the purchase header.;
+                           ESM=Especifica cuando vence la nota de cr‚dito. El programa calcula la fecha a partir de los campos C¢d. t‚rminos pago y Fecha registro de la cabecera de compra.;
+                           FRC=Sp‚cifie la date d'‚ch‚ance de l'avoir. Le programme calcule la date … l'aide des champs Code modalit‚s de paiement et Date de report de l'en-tˆte achat.;
+                           ENC=Specifies when the credit memo is due. The program calculates the date using the Payment Terms Code and Posting Date fields on the purchase header.];
+                SourceExpr="Due Date" }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the total, in the currency of the credit memo, of the amounts on all the credit memo lines.;
+                           ESM=Especifica el total de los importes de todas las l¡neas de la nota de cr‚dito, en la divisa de la nota de cr‚dito.;
+                           FRC=Indique le total, dans la devise de l'avoir, des montants de toutes les lignes avoir.;
+                           ENC=Specifies the total, in the currency of the credit memo, of the amounts on all the credit memo lines.];
+                SourceExpr=Amount;
+                OnDrillDown=BEGIN
+                              SETRANGE("No.");
+                              PAGE.RUNMODAL(PAGE::"Mini Posted Purch. Credit Memo",Rec)
+                            END;
+                             }
+
+    { 15  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the total, in the currency of the credit memo, of the amounts on all the credit memo lines - including VAT.;
+                           ESM=Especifica el total, en la divisa de la nota de cr‚dito, de los importes en todas las l¡neas de nota de cr‚dito, incluido el IVA.;
+                           FRC=Indique le total, dans la devise de l'avoir, des montants TTC de toutes les lignes avoir.;
+                           ENC=Specifies the total, in the currency of the credit memo, of the amounts on all the credit memo lines - including VAT.];
+                SourceExpr="Amount Including VAT";
+                OnDrillDown=BEGIN
+                              SETRANGE("No.");
+                              PAGE.RUNMODAL(PAGE::"Mini Posted Purch. Credit Memo",Rec)
+                            END;
+                             }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the amount that remains to be paid for the posted purchase invoice that relates to this purchase credit memo.;
+                           ESM=Especifica el importe que queda por pagar para la factura de compra registrada relacionada con esta nota de cr‚dito de compra.;
+                           FRC=Indique le montant restant d– pour la facture achat valid‚e li‚e … cet avoir achat.;
+                           ENC=Specifies the amount that remains to be paid for the posted purchase invoice that relates to this purchase credit memo.];
+                SourceExpr="Remaining Amount" }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted purchase invoice that relates to this purchase credit memo is paid.;
+                           ESM=Especifica si se ha pagado la factura de compra registrada relacionada con esta nota de cr‚dito de compra.;
+                           FRC=Indique si la facture achat valid‚e li‚e … cet avoir achat a ‚t‚ pay‚e.;
+                           ENC=Specifies if the posted purchase invoice that relates to this purchase credit memo is paid.];
+                SourceExpr=Paid }
+
+    { 9   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted purchase invoice that relates to this purchase credit memo has been either corrected or canceled.;
+                           ESM=Especifica si se ha corregido o cancelado la factura de compra registrada relacionada con esta nota de cr‚dito de compra.;
+                           FRC=Indique si la facture achat valid‚e li‚e … cet avoir achat a ‚t‚ corrig‚e ou annul‚e.;
+                           ENC=Specifies if the posted purchase invoice that relates to this purchase credit memo has been either corrected or cancelled.];
+                SourceExpr=Canceled;
+                Editable=FALSE;
+                LookupPageID=Mini Posted Sales Invoices;
+                DrillDownPageID=Mini Posted Sales Invoices;
+                Style=Unfavorable;
+                StyleExpr=Canceled;
+                OnDrillDown=VAR
+                              PurchInvHeader@1000 : Record 122;
+                            BEGIN
+                              IF Canceled THEN BEGIN
+                                PurchInvHeader.SETRANGE("No.","Applies-to Doc. No.");
+                                PAGE.RUN(PAGE::"Posted Purchase Invoice",PurchInvHeader);
+                              END;
+                            END;
+                             }
+
+  }
+  CODE
+  {
+    VAR
+      AllowDotNetAddIn@1000 : Boolean INDATASET;
+
+    BEGIN
+    END.
+  }
+}
+

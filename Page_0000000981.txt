@@ -1,0 +1,403 @@
+OBJECT Page 981 Payment Registration
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Registration;
+               ESM=Registro de pago;
+               FRC=Enregistrement de paiement;
+               ENC=Payment Registration];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table981;
+    DataCaptionExpr=BalAccCaption;
+    PageType=Worksheet;
+    SourceTableTemporary=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Post,Navigate,Search;
+                                ESM=Nuevo,Proceso,Informe,Registrar,Navegar,Buscar;
+                                FRC=Nouveau,Traitement,Rapport,Reporter,Naviguer,Rechercher;
+                                ENC=New,Process,Report,Post,Navigate,Search];
+    OnOpenPage=BEGIN
+                 PaymentRegistrationMgt.RunSetup;
+                 FormatPageCaption;
+               END;
+
+    OnFindRecord=BEGIN
+                   Reload;
+                   PaymentRegistrationMgt.CalculateBalance(PostedBalance,UnpostedBalance);
+                   TotalBalance := PostedBalance + UnpostedBalance;
+                   EXIT(FIND(Which));
+                 END;
+
+    OnAfterGetRecord=BEGIN
+                       SetUserInteractions;
+                     END;
+
+    OnQueryClosePage=BEGIN
+                       EXIT(PaymentRegistrationMgt.ConfirmClose(Rec));
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 37      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 36      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Setup;
+                                 ESM=Configuraci¢n;
+                                 FRC=Configuration;
+                                 ENC=Setup];
+                      Image=Setup }
+      { 31      ;2   ;Action    ;
+                      Name=Setup;
+                      CaptionML=[ENU=Setup;
+                                 ESM=Configuraci¢n;
+                                 FRC=Configuration;
+                                 ENC=Setup];
+                      ToolTipML=[ENU=Adjust how payments are posted and which balancing account to use.;
+                                 ESM=Ajustar c¢mo se registran los pagos y qu‚ cuenta de contrapartida se debe usar.;
+                                 FRC=Ajustez le mode de validation des paiements et le compte de contrepartie … utiliser.;
+                                 ENC=Adjust how payments are posted and which balancing account to use.];
+                      Image=Setup;
+                      OnAction=BEGIN
+                                 IF PAGE.RUNMODAL(PAGE::"Payment Registration Setup") = ACTION::LookupOK THEN
+                                   FormatPageCaption
+                               END;
+                                }
+      { 21      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Related Information;
+                                 ESM=Informaci¢n relacionada;
+                                 FRC=Informations connexes;
+                                 ENC=Related Information];
+                      Image=Navigate }
+      { 30      ;2   ;Action    ;
+                      Name=Navigate;
+                      CaptionML=[ENU=Navigate;
+                                 ESM=Navegar;
+                                 FRC=Naviguer;
+                                 ENC=Navigate];
+                      ToolTipML=[ENU=View and link to all entries that exist for the document number on the selected line.;
+                                 ESM=Ver todas las entradas que existen para el n£mero de documento en la l¡nea seleccionada y vincular a ellas.;
+                                 FRC=Affichez et cr‚ez un lien vers toutes les ‚critures qui existent pour le num‚ro de document sur la ligne s‚lectionn‚e.;
+                                 ENC=View and link to all entries that exist for the document number on the selected line.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+      { 28      ;2   ;Action    ;
+                      Name=Details;
+                      CaptionML=[ENU=Details;
+                                 ESM=Detalles;
+                                 FRC=D‚tails;
+                                 ENC=Details];
+                      ToolTipML=[ENU=View additional information about the document on the selected line and link to the related customer card.;
+                                 ESM=Ver informaci¢n adicional sobre el documento en la l¡nea seleccionada y vincularla a la ficha de cliente relacionada.;
+                                 FRC=Affichez des informations suppl‚mentaires sur le document de la ligne s‚lectionn‚e et cr‚ez un lien vers la fiche client correspondante.;
+                                 ENC=View additional information about the document on the selected line and link to the related customer card.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ViewDetails;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 PAGE.RUNMODAL(PAGE::"Payment Registration Details",Rec);
+                               END;
+                                }
+      { 46      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Search;
+                                 ESM=Buscar;
+                                 FRC=Recherche;
+                                 ENC=Search] }
+      { 16      ;2   ;Action    ;
+                      Name=SearchCustomer;
+                      CaptionML=[ENU=Search Customers;
+                                 ESM=Buscar clientes;
+                                 FRC=Rechercher des clients;
+                                 ENC=Search Customers];
+                      ToolTipML=[ENU=Open the list of customers, for example to check missing payments from a specific customer.;
+                                 ESM=Abrir la lista de clientes, por ejemplo para comprobar los pagos pendientes de un cliente concreto.;
+                                 FRC=Ouvrez la liste des clients, par exemple pour v‚rifier les paiements manquants d'un client sp‚cifique.;
+                                 ENC=Open the list of customers, for example to check missing payments from a specific customer.];
+                      RunObject=Page 22;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category6 }
+      { 17      ;2   ;Action    ;
+                      Name=SearchDocument;
+                      CaptionML=[ENU=Search Documents;
+                                 ESM=Buscar documentos;
+                                 FRC=Rechercher des documents;
+                                 ENC=Search Documents];
+                      ToolTipML=[ENU=Find documents that are not fully invoiced, for example to post an invoice so the received payment can be processed.;
+                                 ESM=Buscar documentos que no est n completamente facturados, por ejemplo para registrar una factura para que se pueda procesar el pago recibido.;
+                                 FRC=Recherchez des documents qui ne sont pas complŠtement factur‚s, par exemple, pour reporter une facture afin que le paiement re‡u puisse ˆtre trait‚.;
+                                 ENC=Find documents that are not fully invoiced, for example to post an invoice so the received payment can be processed.];
+                      RunObject=Page 985;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category6 }
+      { 13      ;0   ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 14      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Post;
+                                 ESM=Registrar;
+                                 FRC=Reporter;
+                                 ENC=Post];
+                      Image=Post }
+      { 15      ;2   ;Action    ;
+                      Name=PostPayments;
+                      ShortCutKey=F9;
+                      CaptionML=[ENU=Post Payments;
+                                 ESM=Registrar pagos;
+                                 FRC=Reporter les paiements;
+                                 ENC=Post Payments];
+                      ToolTipML=[ENU=Post payment of amounts on the line(s) where the Payment Made check box is selected.;
+                                 ESM=Registrar el pago de los importes de las l¡neas con la casilla Pago realizado activada.;
+                                 FRC=Reporter le paiement des montants des lignes sur lesquelles la case … cocher Paiement effectu‚ est activ‚e.;
+                                 ENC=Post payment of amounts on the line(s) where the Payment Made check box is selected.];
+                      Promoted=Yes;
+                      Image=PostOrder;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 PaymentRegistrationMgt.ConfirmPost(Rec);
+                               END;
+                                }
+      { 22      ;2   ;Action    ;
+                      Name=PostAsLump;
+                      CaptionML=[ENU=Post as Lump Payment;
+                                 ESM=Registrar como pago total;
+                                 FRC=Reporter le paiement par regroupement;
+                                 ENC=Post as Lump Payment];
+                      ToolTipML=[ENU=Post payment as a lump sum of amounts on lines where the Payment Made check box is selected.;
+                                 ESM=Registrar el pago como suma total de los importes de las l¡neas con la casilla Pago realizado activada.;
+                                 FRC=Reporter le paiement comme somme forfaitaire des montants des lignes sur lesquelles la case … cocher Paiement effectu‚ est activ‚e.;
+                                 ENC=Post payment as a lump sum of amounts on lines where the Payment Made check box is selected.];
+                      Promoted=Yes;
+                      Image=PostBatch;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 PaymentRegistrationMgt.ConfirmPostLumpPayment(Rec);
+                               END;
+                                }
+      { 38      ;1   ;ActionGroup;
+                      CaptionML=[ENU=New Documents;
+                                 ESM=Nuevos documentos;
+                                 FRC=Nouveaux documents;
+                                 ENC=New Documents] }
+      { 19      ;2   ;Action    ;
+                      Name=OpenGenJnl;
+                      CaptionML=[ENU=General Journal;
+                                 ESM=Diario general;
+                                 FRC=Journal g‚n‚ral;
+                                 ENC=General Journal];
+                      ToolTipML=[ENU=Open the general journal, for example in order to record or post a payment that has no related document.;
+                                 ESM=Abrir el diario general, por ejemplo para registrar un pago que no tiene documentos relacionados.;
+                                 FRC=Ouvrez le journal g‚n‚ral, par exemple, pour enregistrer ou reporter un paiement qui n'a aucun document associ‚.;
+                                 ENC=Open the general journal, for example in order to record or post a payment that has no related document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=GLRegisters;
+                      OnAction=BEGIN
+                                 PaymentRegistrationMgt.OpenGenJnl
+                               END;
+                                }
+      { 18      ;2   ;Action    ;
+                      Name=FinanceChargeMemo;
+                      CaptionML=[ENU=Finance Charge Memo;
+                                 ESM=Documento inter‚s;
+                                 FRC=Note de frais financiers;
+                                 ENC=Finance Charge Memo];
+                      ToolTipML=[ENU=Create a finance charge memo for the customer on the selected line, for example to issue a finance charge for late payment.;
+                                 ESM=Crear un documento de inter‚s para el cliente en la l¡nea seleccionada, por ejemplo para emitir un inter‚s por pago vencido.;
+                                 FRC=Cr‚ez une note de frais financiers pour le client sur la ligne s‚lectionn‚e, par exemple pour appliquer ces frais aux paiements tardifs.;
+                                 ENC=Create a finance charge memo for the customer on the selected line, for example to issue a finance charge for late payment.];
+                      RunObject=Page 446;
+                      RunPageLink=Customer No.=FIELD(Source No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=FinChargeMemo;
+                      RunPageMode=Create }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Source No.";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                DrillDown=Yes;
+                SourceExpr=Name;
+                Editable=FALSE;
+                OnDrillDown=VAR
+                              Customer@1000 : Record 18;
+                            BEGIN
+                              Customer.GET("Source No.");
+                              PAGE.RUN(PAGE::"Customer Card",Customer);
+                            END;
+                             }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Document No.";
+                Visible=FALSE;
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              Navigate;
+                            END;
+                             }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Document Type";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr=Description;
+                Editable=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Due Date";
+                Editable=FALSE;
+                StyleExpr=DueDateStyle }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Remaining Amount";
+                Editable=FALSE;
+                StyleExpr=PmtDiscStyle }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Payment Made";
+                OnValidate=BEGIN
+                             SetUserInteractions;
+                           END;
+                            }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Date Received";
+                StyleExpr=DueDateStyle;
+                OnValidate=BEGIN
+                             SetUserInteractions;
+                           END;
+                            }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Amount Received";
+                OnValidate=BEGIN
+                             SetUserInteractions;
+                           END;
+                            }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr="Pmt. Discount Date";
+                AutoFormatType=1;
+                Visible=FALSE;
+                StyleExpr=PmtDiscStyle;
+                OnValidate=BEGIN
+                             SetUserInteractions
+                           END;
+                            }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Rem. Amt. after Discount";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 32  ;1   ;Group     ;
+                CaptionML=[ENU=Bal. Account Details;
+                           ESM=Detalles de la cuenta de contrapartida;
+                           FRC=D‚tails du compte de contrepartie;
+                           ENC=Bal. Account Details];
+                GroupType=GridLayout }
+
+    { 33  ;2   ;Field     ;
+                Name=PostedBalance;
+                CaptionML=[ENU=Posted Balance;
+                           ESM=Saldo registrado;
+                           FRC=Solde report‚;
+                           ENC=Posted Balance];
+                SourceExpr=PostedBalance;
+                Editable=FALSE }
+
+    { 34  ;2   ;Field     ;
+                Name=UnpostedBalance;
+                CaptionML=[ENU=Unposted Balance;
+                           ESM=Saldo no registrado;
+                           FRC=Solde non report‚;
+                           ENC=Unposted Balance];
+                SourceExpr=UnpostedBalance;
+                Editable=FALSE }
+
+    { 35  ;2   ;Field     ;
+                Name=TotalBalance;
+                CaptionML=[ENU=Total Balance;
+                           ESM=Saldo total;
+                           FRC=Solde total;
+                           ENC=Total Balance];
+                SourceExpr=TotalBalance;
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 27  ;1   ;Group      }
+
+    { 26  ;2   ;Group     ;
+                GroupType=FixedLayout }
+
+    { 24  ;3   ;Group     ;
+                GroupType=Group }
+
+    { 23  ;4   ;Field     ;
+                SourceExpr=Warning;
+                Editable=FALSE;
+                Style=Unfavorable;
+                StyleExpr=TRUE }
+
+  }
+  CODE
+  {
+    VAR
+      PaymentRegistrationMgt@1001 : Codeunit 980;
+      BalAccCaption@1002 : Text;
+      PmtDiscStyle@1000 : Text;
+      DueDateStyle@1004 : Text;
+      Warning@1003 : Text;
+      PostedBalance@1005 : Decimal;
+      UnpostedBalance@1006 : Decimal;
+      TotalBalance@1007 : Decimal;
+
+    LOCAL PROCEDURE FormatPageCaption@1();
+    VAR
+      PaymentRegistrationSetup@1000 : Record 980;
+    BEGIN
+      PaymentRegistrationSetup.GET(USERID);
+      BalAccCaption := FORMAT(PaymentRegistrationSetup."Bal. Account Type") + ' - ' + PaymentRegistrationSetup."Bal. Account No.";
+    END;
+
+    LOCAL PROCEDURE SetUserInteractions@2();
+    BEGIN
+      PmtDiscStyle := GetPmtDiscStyle;
+      DueDateStyle := GetDueDateStyle;
+      Warning := GetWarning;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

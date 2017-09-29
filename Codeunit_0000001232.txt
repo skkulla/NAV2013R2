@@ -1,0 +1,46 @@
+OBJECT Codeunit 1232 SEPA DD-Prepare Source
+{
+  OBJECT-PROPERTIES
+  {
+    Date=12/02/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10.00.35800;
+  }
+  PROPERTIES
+  {
+    TableNo=1208;
+    OnRun=VAR
+            DirectDebitCollectionEntry@1000 : Record 1208;
+          BEGIN
+            DirectDebitCollectionEntry.COPYFILTERS(Rec);
+            DirectDebitCollectionEntry.SETFILTER(
+              Status,'%1|%2',DirectDebitCollectionEntry.Status::New,DirectDebitCollectionEntry.Status::"File Created");
+            CopyLines(DirectDebitCollectionEntry,Rec);
+          END;
+
+  }
+  CODE
+  {
+
+    LOCAL PROCEDURE CopyLines@4(VAR FromDirectDebitCollectionEntry@1000 : Record 1208;VAR ToDirectDebitCollectionEntry@1001 : Record 1208);
+    BEGIN
+      IF FromDirectDebitCollectionEntry.FINDSET THEN
+        REPEAT
+          ToDirectDebitCollectionEntry := FromDirectDebitCollectionEntry;
+          ToDirectDebitCollectionEntry.INSERT;
+        UNTIL FromDirectDebitCollectionEntry.NEXT = 0
+      ELSE
+        CreateTempCollectionEntries(FromDirectDebitCollectionEntry,ToDirectDebitCollectionEntry);
+    END;
+
+    LOCAL PROCEDURE CreateTempCollectionEntries@1(VAR FromDirectDebitCollectionEntry@1001 : Record 1208;VAR ToDirectDebitCollectionEntry@1000 : Record 1208);
+    BEGIN
+      // To fill ToDirectDebitCollectionEntry from the source identified by filters set on FromDirectDebitCollectionEntry
+      ToDirectDebitCollectionEntry := FromDirectDebitCollectionEntry;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

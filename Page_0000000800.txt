@@ -1,0 +1,95 @@
+OBJECT Page 800 Online Map Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Online Map Setup;
+               ESM=Configuraci¢n Online Map;
+               FRC=Configuration Online Map;
+               ENC=Online Map Setup];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table800;
+    PageType=Card;
+    OnOpenPage=VAR
+                 OnlineMapMgt@1000 : Codeunit 802;
+               BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   OnlineMapMgt.SetupDefault;
+                   GET;
+                 END;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=&Parameter Setup;
+                                 ESM=&Configuraci¢n par metros;
+                                 FRC=Configuration des &paramŠtres;
+                                 ENC=&Parameter Setup];
+                      RunObject=Page 804;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=EditList;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 600 ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           ESM=General;
+                           FRC=G‚n‚ral;
+                           ENC=General] }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Map Parameter Setup Code";
+                LookupPageID=Online Map Parameter Setup }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Show Distance in;
+                           ESM=Mostrar distancia en;
+                           FRC=Afficher la distance en;
+                           ENC=Show Distance in];
+                SourceExpr="Distance In" }
+
+    { 8   ;2   ;Field     ;
+                CaptionML=[ENU=Route (Quickest/Shortest);
+                           ESM=Ruta (M s r pida/M s corta);
+                           FRC=Itin‚raire (Le plus rapide/Le plus court);
+                           ENC=Route (Quickest/Shortest)];
+                SourceExpr=Route }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

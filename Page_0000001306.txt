@@ -1,0 +1,393 @@
+OBJECT Page 1306 Mini Sales Invoice List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Sales Invoices;
+               ESM=Facturas venta;
+               FRC=Factures vente;
+               ENC=Sales Invoices];
+    SourceTable=Table36;
+    SourceTableView=WHERE(Document Type=CONST(Invoice));
+    PageType=List;
+    CardPageID=Mini Sales Invoice;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Invoice,Posting;
+                                ESM=Nuevo,Proceso,Informe,Factura,Registro;
+                                FRC=Nouveau,Traitement,Rapport,Facture,Report;
+                                ENC=New,Process,Report,Invoice,Posting];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1102601019;1 ;ActionGroup;
+                      Name=Invoice;
+                      CaptionML=[ENU=&Invoice;
+                                 ESM=&Factura;
+                                 FRC=Fa&cture;
+                                 ENC=&Invoice];
+                      Image=Invoice }
+      { 4       ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Customer;
+                                 ESM=Cliente;
+                                 FRC=Client;
+                                 ENC=Customer];
+                      ToolTipML=[ENU=View or edit detailed information about the customer on the selected sales document.;
+                                 ESM=Vea o edite la informaci¢n detallada sobre el cliente en el documento de venta seleccionado.;
+                                 FRC=Affichez ou modifiez des informations dÇtaillÇes concernant le client sur le document vente sÇlectionnÇ.;
+                                 ENC=View or edit detailed information about the customer on the selected sales document.];
+                      RunObject=Page 1300;
+                      RunPageLink=No.=FIELD(Sell-to Customer No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Customer;
+                      PromotedCategory=Category4 }
+      { 49      ;1   ;ActionGroup;
+                      Name=Posting;
+                      CaptionML=[ENU=P&osting;
+                                 ESM=&Registro;
+                                 FRC=Rep&ort;
+                                 ENC=P&osting];
+                      Image=Post }
+      { 51      ;2   ;Action    ;
+                      Name=Post;
+                      ShortCutKey=F9;
+                      CaptionML=[ENU=P&ost;
+                                 ESM=&Registrar;
+                                 FRC=&Reporter;
+                                 ENC=P&ost];
+                      ToolTipML=[ENU=Finalize the selected sales document. Posting updates the books with the document's amounts and quantities.;
+                                 ESM=Finalice el documento de venta seleccionado. El registro actualiza los libros con los importes y las cantidades del documento.;
+                                 FRC=Finalisez le document de vente sÇlectionnÇ. Le report met Ö jour la comptabilitÇ avec les montants et les quantitÇs du document.;
+                                 ENC=Finalize the selected sales document. Posting updates the books with the document's amounts and quantities.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostOrder;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Post(CODEUNIT::"Sales-Post (Yes/No)");
+                               END;
+                                }
+      { 1001    ;2   ;Action    ;
+                      Name=Printer;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=Im&primir;
+                                 FRC=Im&primer;
+                                 ENC=&Print];
+                      ToolTipML=[ENU=Finalize and print the selected sales document.;
+                                 ESM=Finalice e imprima el documento de venta seleccionado.;
+                                 FRC=Finalisez et imprimez le document vente sÇlectionnÇ.;
+                                 ENC=Finalize and print the selected sales document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Print;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 PostAndPrint(CODEUNIT::"Sales-Post");
+                               END;
+                                }
+      { 1002    ;2   ;Action    ;
+                      Name=Email as PDF;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Send PDF by &Email;
+                                 ESM=Enviar PDF por &correo electr¢nico;
+                                 FRC=Envoyer PDF par &courriel;
+                                 ENC=Send PDF by &Email];
+                      ToolTipML=[ENU=Finalize and attach the selected sales document to an email to the customer.;
+                                 ESM=Finalice y adjunte el documento de venta seleccionado a un mensaje de correo electr¢nico para el cliente.;
+                                 FRC=Finalisez et joignez le document de vente sÇlectionnÇ Ö un courriel adressÇ au client.;
+                                 ENC=Finalize and attach the selected sales document to an email to the customer.];
+                      Promoted=Yes;
+                      Visible=AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=SendEmailPDF;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Post(CODEUNIT::"Sales-Post + Email");
+                               END;
+                                }
+      { 32      ;2   ;Action    ;
+                      Name=SaveCopy;
+                      CaptionML=[ENU=&Save PDF Document;
+                                 ESM=&Guardar documento PDF;
+                                 FRC=&Enregistrer document PDF;
+                                 ENC=&Save PDF Document];
+                      ToolTipML=[ENU=Finalize the selected sales document and save it to your computer. You can then attach it to the email that you send to the customer.;
+                                 ESM=Finalice el documento de venta seleccionado y gu†rdelo en el ordenador. A continuaci¢n, podr† adjuntarlo al mensaje de correo electr¢nico que env°e al cliente.;
+                                 FRC=Finalisez le document de vente sÇlectionnÇ et enregistrez-le sur votre ordinateur. Vous pouvez ensuite le joindre au courriel adressÇ au client.;
+                                 ENC=Finalize the selected sales document and save it to your computer. You can then attach it to the email that you send to the customer.];
+                      Promoted=Yes;
+                      Visible=NOT AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Post(CODEUNIT::"Sales-Post + Email");
+                               END;
+                                }
+      { 19      ;1   ;ActionGroup;
+                      Name=Reports;
+                      CaptionML=[ENU=Reports;
+                                 ESM=Informes;
+                                 FRC=Rapports;
+                                 ENC=Reports];
+                      ActionContainerType=Reports }
+      { 18      ;2   ;ActionGroup;
+                      Name=SalesReports;
+                      CaptionML=[ENU=Sales Reports;
+                                 ESM=Informes de ventas;
+                                 FRC=Rapports vente;
+                                 ENC=Sales Reports];
+                      Image=Report }
+      { 17      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Top 10 List;
+                                 ESM=Cliente - Listado 10 mejores;
+                                 FRC=Client - Liste des 10 meilleurs;
+                                 ENC=Customer - Top 10 List];
+                      ToolTipML=[ENU=View, print, or save an overview of the customers that purchase the most or that owe the most in a selected period. Only customers that have either purchases during the period or a balance at the end of the period will be included.;
+                                 ESM=Ver, imprimir o guardar un resumen de los clientes que m†s compran o que m†s deben en un per°odo seleccionado. Solo se incluir†n clientes que hayan comprado durante el periodo seleccionado o que tengan alg£n saldo al final del mismo.;
+                                 FRC=Affichez, imprimez ou enregistrez un aperáu des clients qui achätent le plus ou de ceux qui doivent le plus d'argent au cours d'une pÇriode sÇlectionnÇe. Seuls les clients qui ont des achats pour cette pÇriode ou un solde Ö la fin de la pÇriode sont inclus.;
+                                 ENC=View, print, or save an overview of the customers that purchase the most or that owe the most in a selected period. Only customers that have either purchases during the period or a balance at the end of the period will be included.];
+                      RunObject=Report 111;
+                      Image=Report }
+      { 16      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Sales List;
+                                 ESM=Lista ventas - cliente;
+                                 FRC=Client - Liste des ventes;
+                                 ENC=Customer - Sales List];
+                      ToolTipML=[ENU=View, print, or save customer sales in a period, for example, to report sales activity to customs and tax authorities.;
+                                 ESM=Ver, imprimir o guardar las ventas a clientes en un per°odo, por ejemplo, para informar de la actividad de ventas a las autoridades fiscales y aduaneras.;
+                                 FRC=Affichez, imprimez ou enregistrez les ventes client au cours d'une pÇriode, par exemple, pour signaler une activitÇ vente aux autoritÇs douaniäres et fiscales.;
+                                 ENC=View, print, or save customer sales in a period, for example, to report sales activity to customs and tax authorities.];
+                      RunObject=Report 119;
+                      Image=Report }
+      { 15      ;3   ;Action    ;
+                      CaptionML=[ENU=Sales Statistics;
+                                 ESM=Estad°sticas ventas;
+                                 FRC=Statistiques de ventes;
+                                 ENC=Sales Statistics];
+                      ToolTipML=[ENU=View, print, or save the customer's total cost, sale, and profit over time, for example, to analyze earnings trends. The report shows amounts for original and adjusted cost, sales, profit, invoice discount, payment discount, and profit percentage in three adjustable periods.;
+                                 ESM=Vea, imprima o guarde los datos de costo total, venta y beneficios totales de los clientes, por ejemplo, para analizar las tendencias de ganancias. El informe muestra los importes de costo original y ajustado, venta, beneficios, descuento en factura, descuento por pronto pago y porcentaje de beneficios en tres periodos ajustables.;
+                                 FRC=Affichez, imprimez ou enregistrez le coñt total, les ventes et le profit Ö long terme du client, par exemple, pour analyser ses tendances bÇnÇficiaires. Le rapport affiche les montants des coñts originaux et ajustÇs, des ventes, du profit, de l'escompte facture et de l'escompte de paiement, ainsi que le pourcentage de profit au cours de troisˇpÇriodes sÇlectionnables.;
+                                 ENC=View, print, or save the customer's total cost, sale, and profit over time, for example, to analyse earnings trends. The report shows amounts for original and adjusted cost, sales, profit, invoice discount, payment discount, and profit percentage in three adjustable periods.];
+                      RunObject=Report 112;
+                      Image=Report }
+      { 14      ;2   ;ActionGroup;
+                      Name=FinanceReports;
+                      CaptionML=[ENU=Finance Reports;
+                                 ESM=Informes financieros;
+                                 FRC=Rapports financiers;
+                                 ENC=Finance Reports];
+                      Image=Report }
+      { 13      ;3   ;Action    ;
+                      CaptionML=[ENU=Statement;
+                                 ESM=Estado de cuenta;
+                                 FRC=RelevÇ;
+                                 ENC=Statement];
+                      ToolTipML=[ENU=View, print, or save a list of a customer's transactions for a selected period, for example, to send to the customer at the close of an accounting period. You can choose to have all overdue balances displayed regardless of the period specified, or you can choose to include an aging band.;
+                                 ESM=Ver, imprimir o guardar una lista de transacciones del cliente durante un per°odo seleccionado, por ejemplo, para enviar al cliente al cierre de un per°odo contable. Permite visualizar todos los saldos vencidos, sea cual sea el per°odo especificado, o bien elegir que se incluya una ficha desplegable de antigÅedad.;
+                                 FRC=Affichez, imprimez ou enregistrez une liste des transactions d'un client pendant une pÇriode sÇlectionnÇe, par exemple, pour l'envoyer au client Ö la clìture d'une pÇriode comptable. Vous pouvez choisir d'afficher tous les soldes Çchus, sans tenir compte de la pÇriode spÇcifiÇe, ou d'inclure une bande chronologique.;
+                                 ENC=View, print, or save a list of a customer's transactions for a selected period, for example, to send to the customer at the close of an accounting period. You can choose to have all overdue balances displayed regardless of the period specified, or you can choose to include an aging band.];
+                      RunObject=Report 116;
+                      Image=Report }
+      { 12      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Balance to Date;
+                                 ESM=Cliente - Saldo por fechas;
+                                 FRC=Client - Solde Ö ce jour;
+                                 ENC=Customer - Balance to Date];
+                      ToolTipML=[ENU=View, print, or save customers' balances on a certain date. You can use the report to extract your total sales income at the close of an accounting period or fiscal year.;
+                                 ESM=Ver, imprimir o guardar los saldos de los clientes en una fecha determinada. Puede usar el informe para extraer el ingreso total de venta al cierre de un per°odo contable o del a§o fiscal.;
+                                 FRC=Affichez, imprimez ou enregistrez les soldes des clients Ö une certaine date. Vous pouvez utiliser ce rapport pour extraire vos revenus de vente totaux Ö la clìture d'une pÇriode comptable ou d'un exercice financier.;
+                                 ENC=View, print, or save customers' balances on a certain date. You can use the report to extract your total sales income at the close of an accounting period or fiscal year.];
+                      RunObject=Report 121;
+                      Image=Report }
+      { 11      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Trial Balance;
+                                 ESM=Cliente - Balance sumas y saldos;
+                                 FRC=Client - Balance de vÇrification;
+                                 ENC=Customer - Trial Balance];
+                      ToolTipML=[ENU=View, print, or save the beginning and ending balance for customers with entries within a specified period. The report can be used to verify that the balance for a customer posting group is equal to the balance on the corresponding general ledger account on a certain date.;
+                                 ESM=Ver, imprimir o guardar el saldo inicial y final de los clientes con entradas durante un per°odo especificado. El informe se puede usar para comprobar que el saldo de un grupo contable de clientes es igual que el saldo de la cuenta contable correspondiente en una fecha determinada.;
+                                 FRC=Affichez, imprimez ou enregistrez le solde d'ouverture et final pour les clients prÇsentant des Çcritures au cours d'une pÇriode spÇcifiÇe. Le rapport peut àtre utilisÇ pour vÇrifier que le solde pour un groupe de report client est Çgal Ö celui du compte GL correspondant Ö une certaine date.;
+                                 ENC=View, print, or save the beginning and ending balance for customers with entries within a specified period. The report can be used to verify that the balance for a customer posting group is equal to the balance on the corresponding general ledger account on a certain date.];
+                      RunObject=Report 129;
+                      Image=Report }
+      { 10      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Detail Trial Bal.;
+                                 ESM=Cliente - Movimientos;
+                                 FRC=Client - Balance de vÇrification dÇtaillÇe;
+                                 ENC=Customer - Detail Trial Bal.];
+                      ToolTipML=[ENU=View, print, or save the balance for customers with balances on a specified date. For example, the report can be used at the close of an accounting period or for an audit.;
+                                 ESM=Ver, imprimir o guardar el saldo de los clientes con saldos en una fecha determinada. Por ejemplo, el informe puede usarse al cierre de un ejercicio econ¢mico o de una auditor°a.;
+                                 FRC=Affichez, imprimez ou enregistrez le solde des clients prÇsentant des soldes Ö une date donnÇe. Par exemple, ce rapport peut àtre utilisÇ Ö la clìture d'une pÇriode comptable ou pour un audit.;
+                                 ENC=View, print, or save the balance for customers with balances on a specified date. For example, the report can be used at the close of an accounting period or for an audit.];
+                      RunObject=Report 104;
+                      Image=Report }
+      { 9       ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Summary Aging;
+                                 ESM=Deuda cliente por vencimientos;
+                                 FRC=Client - Chronologie sommaire;
+                                 ENC=Customer - Summary Aging];
+                      ToolTipML=[ENU=View, print, or save a summary of each customer's total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer's creditworthiness, or to prepare liquidity analyses.;
+                                 ESM=Ver, imprimir o guardar un resumen de pagos pendientes totales de cada cliente, dividida en tres per°odos de tiempo. El informe se puede usar para decidir cuando emitir recordatorios, valorar el crÇdito de un cliente o preparar an†lisis liquidez.;
+                                 FRC=Affichez, imprimez ou enregistrez un rÇsumÇ des totaux dus de chaque client, divisÇ en troisˇpÇriodes. Ce rapport sert Ö dÇcider quand Çmettre des rappels, Ö Çvaluer la solvabilitÇ d'un client ou Ö prÇparer des analyses de liquiditÇs.;
+                                 ENC=View, print, or save a summary of each customer's total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer's creditworthiness, or to prepare liquidity analyses.];
+                      RunObject=Report 105;
+                      Image=Report }
+      { 8       ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Detailed Aging;
+                                 ESM=Cliente - Deuda pendiente;
+                                 FRC=êcritures clients dÇtaillÇes;
+                                 ENC=Customer - Detailed Aging];
+                      ToolTipML=[ENU=View, print, or save a detailed list of each customer's total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer's creditworthiness, or to prepare liquidity analyses.;
+                                 ESM=Ver, imprimir o guardar una lista detallada de pagos pendientes totales de cada cliente, dividida en tres per°odos de tiempo. El informe se puede usar para decidir cuando emitir recordatorios, valorar el crÇdito de un cliente o preparar an†lisis liquidez.;
+                                 FRC=Affichez, imprimez ou enregistrez une liste dÇtaillÇe des totaux dus de chaque client, divisÇe en troisˇpÇriodes. Ce rapport sert Ö dÇcider quand Çmettre des rappels, Ö Çvaluer la solvabilitÇ d'un client ou Ö prÇparer des analyses de liquiditÇs.;
+                                 ENC=View, print, or save a detailed list of each customer's total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer's creditworthiness, or to prepare liquidity analyses.];
+                      RunObject=Report 106;
+                      Image=Report }
+      { 7       ;3   ;Action    ;
+                      CaptionML=[ENU=Aged Accounts Receivable;
+                                 ESM=AntigÅedad cobros;
+                                 FRC=ComptabilitÇ client ÉgÇe;
+                                 ENC=Aged Accounts Receivable];
+                      ToolTipML=[ENU=View, print, or save an overview of when customer payments are due or overdue, divided into four periods. You must specify the date you want aging calculated from and the length of the period that each column will contain data for.;
+                                 ESM=Ver, imprimir o guardar un resumen de fechas de vencimiento de los pagos del cliente, dividida en cuatro per°odos de tiempo. Debe especificar la fecha desde la que desea calcular la antigÅedad y la duraci¢n del per°odo para el que cada columna va a contener datos.;
+                                 FRC=Affichez, imprimez ou enregistrez un aperáu de la date d'ÇchÇance des paiements client, divisÇ en quatreˇpÇriodes. Vous devez spÇcifier la date Ö partir de laquelle vous souhaitez que le cumul soit calculÇ et la durÇe de la pÇriode pour laquelle chaque colonne contiendra des donnÇes.;
+                                 ENC=View, print, or save an overview of when customer payments are due or overdue, divided into four periods. You must specify the date you want aging calculated from and the length of the period that each column will contain data for.];
+                      RunObject=Report 120;
+                      Image=Report }
+      { 5       ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Payment Receipt;
+                                 ESM=Clientes - Recepci¢n pago;
+                                 FRC=Client - Reáu de paiement;
+                                 ENC=Customer - Payment Receipt];
+                      ToolTipML=[ENU=View, print, or save a document showing which customer ledger entries that a payment has been applied to. This report can be used as a payment receipt that you send to the customer.;
+                                 ESM=Ver, imprimir o guardar un documento que muestra los movimientos de los clientes con los que se ha liquidado un pago. Este informe puede utilizarse como recepci¢n de pago para enviar al cliente.;
+                                 FRC=Affichez, imprimez ou enregistrez un document affichant les Çcritures client auxquelles un paiement a ÇtÇ affectÇ. Ce rapport peut àtre utilisÇ comme reáu de paiement Ö envoyer au client.;
+                                 ENC=View, print, or save a document showing which customer ledger entries that a payment has been applied to. This report can be used as a payment receipt that you send to the customer.];
+                      RunObject=Report 211;
+                      Image=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the sales header you are setting up: a quote, order, invoice, or credit memo.;
+                           ESM=Especifica el n£mero de la cabecera de ventas que est† configurando: cotizaci¢n, pedido, factura o nota de crÇdito.;
+                           FRC=Indique le numÇro de l'en-tàte vente que vous crÇezˇ: un devis, une commande, une facture ou un avoir.;
+                           ENC=Specifies the number of the sales header you are setting up: a quote, order, invoice, or credit memo.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Customer Name;
+                           ESM=Nombre cliente;
+                           FRC=Nom client;
+                           ENC=Customer Name];
+                ToolTipML=[ENU=Specifies the name of the customer that the items on the invoice will be shipped to.;
+                           ESM=Especifica el nombre de del cliente al que se enviar†n los productos del la factura.;
+                           FRC=SpÇcifie le nom du client Ö qui les articles de la facture seront expÇdiÇs.;
+                           ENC=Specifies the name of the customer that the items on the invoice will be shipped to.];
+                SourceExpr="Sell-to Customer Name" }
+
+    { 23  ;2   ;Field     ;
+                CaptionML=[ENU=Contact;
+                           ESM=Contacto;
+                           FRC=Contact;
+                           ENC=Contact];
+                ToolTipML=[ENU=Specifies the name of the person to contact at the customer that the items on the invoice will be shipped to.;
+                           ESM=Especifica el nombre de la persona que representa al cliente al que env°a los productos de la factura y con la que debe ponerse en contacto.;
+                           FRC=Indique le nom de la personne Ö contacter chez le donneur d'ordre.;
+                           ENC=Specifies the name of the person to contact at the customer that the items on the invoice will be shipped to.];
+                SourceExpr="Sell-to Contact" }
+
+    { 28  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date when the posting of the sales document will be recorded. By default, today's date is entered.;
+                           ESM=Especifica la fecha en que se registrar† el registro del documento de venta. De manera predeterminada, se introduce la fecha actual.;
+                           FRC=Indique la date Ö laquelle la validation du document vente sera validÇe. Par dÇfaut, la date du jour est indiquÇe.;
+                           ENC=Specifies the date when the posting of the sales document will be recorded. By default, today's date is entered.];
+                SourceExpr="Posting Date" }
+
+    { 1102601009;2;Field  ;
+                ToolTipML=[ENU=Specifies when the sales invoice must be paid. By default, the field is calculated as the date in the Shipment Date field plus the period defined in the Payment Terms Code field.;
+                           ESM=Especifica cu†ndo la factura de venta se debe pagar. De manera predeterminada, el campo se calcula como la fecha del campo Fecha env°o m†s el periodo definido en el campo C¢d. tÇrminos pago.;
+                           FRC=SpÇcifie la date Ö laquelle la facture vente doit àtre payÇe. Par dÇfaut, le champ est calculÇ comme la date dans le champ Date de livraison plus la pÇriode dÇfinie dans le champ Code modalitÇs de paiement.;
+                           ENC=Specifies when the sales invoice must be paid. By default, the field is calculated as the date in the Shipment Date field plus the period defined in the Payment Terms Code field.];
+                SourceExpr="Due Date" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the sum of amounts in the Line Amount field on the sales order lines. It is used to calculate the invoice discount of the sales order.;
+                           ESM=Especifica la suma de los importes en el Importe l°nea campo de las l°neas de pedido de venta. Se utiliza para calcular el descuento en factura del pedido de venta.;
+                           FRC=SpÇcifie la somme des montants du champ Montant ligne sur les lignes commande vente. Il permet de calculer la remise facture de la commande vente.;
+                           ENC=Specifies the sum of amounts in the Line Amount field on the sales order lines. It is used to calculate the invoice discount of the sales order.];
+                SourceExpr=Amount }
+
+  }
+  CODE
+  {
+    VAR
+      MiniLinesInstructionMgt@1002 : Codeunit 1320;
+      AllowDotNetAddIn@1000 : Boolean INDATASET;
+      OpenPostedSalesInvQst@1003 : TextConst 'ENU=The invoice has been posted and moved to the Posted Sales Invoice list.\\Do you want to open the posted invoice?;ESM=La factura se ha registrado y se movi¢ a la lista de facturas de venta registradas.\\®Desea abrir la factura registrada?;FRC=La facture a ÇtÇ reportÇe et dÇplacÇe dans la liste des factures de vente reportÇes.\\Souhaitez-vous ouvrir la facture reportÇe?;ENC=The invoice has been posted and moved to the Posted Sales Invoice list.\\Do you want to open the posted invoice?';
+      PostAndPrintQst@1001 : TextConst 'ENU=Do you want to post and print the invoice?;ESM=®Confirma que desea registrar e imprimir la factura?;FRC=Souhaitez-vous reporter et imprimer la facture?;ENC=Do you want to post and print the invoice?';
+
+    LOCAL PROCEDURE Post@4(PostingCodeunitID@1000 : Integer);
+    BEGIN
+      MiniLinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
+      SendToPosting(PostingCodeunitID);
+      ShowPostedConfirmationMessage;
+    END;
+
+    LOCAL PROCEDURE PostAndPrint@1(PostingCodeunitID@1000 : Integer);
+    VAR
+      SalesInvHeader@1001 : Record 112;
+    BEGIN
+      MiniLinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
+
+      IF NOT CONFIRM(PostAndPrintQst,FALSE) THEN
+        EXIT;
+
+      SendToPosting(PostingCodeunitID);
+      IF SalesInvHeader.GET("Last Posting No.") THEN BEGIN
+        SalesInvHeader.SETRECFILTER;
+        COMMIT;
+        SalesInvHeader.PrintRecords(NOT AllowDotNetAddIn);
+        ShowPostedConfirmationMessage;
+      END;
+    END;
+
+    LOCAL PROCEDURE ShowPostedConfirmationMessage@7();
+    VAR
+      SalesInvoiceHeader@1000 : Record 112;
+    BEGIN
+      SalesInvoiceHeader.SETFILTER("Pre-Assigned No.","No.");
+      IF SalesInvoiceHeader.FINDFIRST THEN
+        IF DIALOG.CONFIRM(OpenPostedSalesInvQst,FALSE) THEN
+          PAGE.RUN(PAGE::"Mini Posted Sales Invoice",SalesInvoiceHeader);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,220 @@
+OBJECT Page 36600 Human Resources Role Center
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Home;
+               ESM=Inicio;
+               FRC=Origine;
+               ENC=Home];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1480013 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Labels;
+                                 ESM=Empleado - Etiquetas;
+                                 FRC=Employ‚ - ‚tiquettes;
+                                 ENC=Employee - Labels];
+                      RunObject=Report 5200 }
+      { 1480014 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - List;
+                                 ESM=Empleado - Lista;
+                                 FRC=Employ‚ - Liste;
+                                 ENC=Employee - List];
+                      RunObject=Report 5201 }
+      { 1480018 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Misc. Article Info.;
+                                 ESM=Empleado - Info. rec. diversos;
+                                 FRC=Employ‚ - Renseignements divers sur l'article;
+                                 ENC=Employee - Misc. Article Info.];
+                      RunObject=Report 5202 }
+      { 1480019 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Confidential Info.;
+                                 ESM=Empleado - Info. confidencial;
+                                 FRC=Employ‚s - Info. confidentielles;
+                                 ENC=Employee - Confidential Info.];
+                      RunObject=Report 5203 }
+      { 1480038 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Staff Absences;
+                                 ESM=Empleado - Ausencias trabaj.;
+                                 FRC=Employ‚ - Absences du personnel;
+                                 ENC=Employee - Staff Absences];
+                      RunObject=Report 5204 }
+      { 1480020 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Absences by Causes;
+                                 ESM=Empleado - Ausenc. por causas;
+                                 FRC=Employ‚ - Absences par motifs;
+                                 ENC=Employee - Absences by Causes];
+                      RunObject=Report 5205 }
+      { 1480024 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Qualifications;
+                                 ESM=Empleado - Habilidades;
+                                 FRC=Employ‚s - Comp‚tences;
+                                 ENC=Employee - Qualifications];
+                      RunObject=Report 5206 }
+      { 1480036 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Addresses;
+                                 ESM=Empleado - Direcciones;
+                                 FRC=Employ‚ - Adresses;
+                                 ENC=Employee - Addresses];
+                      RunObject=Report 5207 }
+      { 1480017 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Relatives;
+                                 ESM=Empleado - Familiares;
+                                 FRC=Employ‚ - Parents;
+                                 ENC=Employee - Relatives];
+                      RunObject=Report 5208 }
+      { 1480055 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Birthdays;
+                                 ESM=Empleado - Cumplea¤os;
+                                 FRC=Employ‚ - Dates de naissance;
+                                 ENC=Employee - Birthdays];
+                      RunObject=Report 5209 }
+      { 1480053 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Phone Nos.;
+                                 ESM=Empleado - Tel‚fonos;
+                                 FRC=Employ‚ - Num‚ros de t‚l‚phone;
+                                 ENC=Employee - Phone Nos.];
+                      RunObject=Report 5210 }
+      { 1480054 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Unions;
+                                 ESM=Empleado - Sindicatos;
+                                 FRC=Employ‚ - Syndicats;
+                                 ENC=Employee - Unions];
+                      RunObject=Report 5211 }
+      { 1480022 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Contracts;
+                                 ESM=Empleado - Contratos;
+                                 FRC=Employ‚ - Contrats;
+                                 ENC=Employee - Contracts];
+                      RunObject=Report 5212 }
+      { 1480031 ;1   ;Action    ;
+                      CaptionML=[ENU=Employee - Alt. Addresses;
+                                 ESM=Empleado - Direc. alterna;
+                                 FRC=Employ‚ - Autres adresses;
+                                 ENC=Employee - Alt. Addresses];
+                      RunObject=Report 5213 }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 1480009 ;1   ;Action    ;
+                      CaptionML=[ENU=Employees;
+                                 ESM=Empleados;
+                                 FRC=Employ‚s;
+                                 ENC=Employees];
+                      RunObject=Page 5201 }
+      { 1480012 ;1   ;Action    ;
+                      CaptionML=[ENU=Absence Registration;
+                                 ESM=Registro ausencias;
+                                 FRC=Saisie des absences;
+                                 ENC=Absence Registration];
+                      RunObject=Page 5212 }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Administration HR;
+                                 ESM=Administraci¢n RR.HH.;
+                                 FRC=Administration RH;
+                                 ENC=Administration HR];
+                      Image=HumanResources }
+      { 1480032 ;2   ;Action    ;
+                      CaptionML=[ENU=Human Resources Unit of Measure;
+                                 ESM=Unidad medida recursos humanos;
+                                 FRC=Unit‚ de mesure des ressources humaines;
+                                 ENC=Human Resources Unit of Measure];
+                      RunObject=Page 5236 }
+      { 1480033 ;2   ;Action    ;
+                      CaptionML=[ENU=Vend. Causes of Absence;
+                                 ESM=Causas de ausencia proveedor;
+                                 FRC=Motifs d'absence du fourn.;
+                                 ENC=Vend. Causes of Absence];
+                      RunObject=Page 5210 }
+      { 1480034 ;2   ;Action    ;
+                      CaptionML=[ENU=Causes of Inactivity;
+                                 ESM=Causas inactividad;
+                                 FRC=Motifs d'inactivit‚;
+                                 ENC=Causes of Inactivity];
+                      RunObject=Page 5214 }
+      { 1480035 ;2   ;Action    ;
+                      CaptionML=[ENU=Grounds for Termination;
+                                 ESM=Motivo terminaci¢n;
+                                 FRC=Motifs de fin d'emploi;
+                                 ENC=Grounds for Termination];
+                      RunObject=Page 5215 }
+      { 1480046 ;2   ;Action    ;
+                      CaptionML=[ENU=Unions;
+                                 ESM=Sindicatos;
+                                 FRC=Syndicats;
+                                 ENC=Unions];
+                      RunObject=Page 5213 }
+      { 1480047 ;2   ;Action    ;
+                      CaptionML=[ENU=Employment Contracts;
+                                 ESM=Contratos laborales;
+                                 FRC=Contrats de travail;
+                                 ENC=Employment Contracts];
+                      RunObject=Page 5217 }
+      { 1480048 ;2   ;Action    ;
+                      CaptionML=[ENU=Relatives;
+                                 ESM=Familiares;
+                                 FRC=Parents;
+                                 ENC=Relatives];
+                      RunObject=Page 5208;
+                      Image=Relatives }
+      { 1480049 ;2   ;Action    ;
+                      CaptionML=[ENU=Misc. Articles;
+                                 ESM=Recursos diversos;
+                                 FRC=Articles divers;
+                                 ENC=Misc. Articles];
+                      RunObject=Page 5218 }
+      { 1480050 ;2   ;Action    ;
+                      CaptionML=[ENU=Confidential;
+                                 ESM=Confidencial;
+                                 FRC=Confidentiel;
+                                 ENC=Confidential];
+                      RunObject=Page 5220 }
+      { 1480051 ;2   ;Action    ;
+                      CaptionML=[ENU=Qualifications;
+                                 ESM=Habilidades;
+                                 FRC=Comp‚tences;
+                                 ENC=Qualifications];
+                      RunObject=Page 5205;
+                      Image=Certificate }
+      { 1480052 ;2   ;Action    ;
+                      CaptionML=[ENU=Employee Statistics Groups;
+                                 ESM=Grupos estad¡sticos empleados;
+                                 FRC=Groupes de statistiques par employ‚;
+                                 ENC=Employee Statistics Groups];
+                      RunObject=Page 5216 }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1400022 ;1   ;Separator ;
+                      CaptionML=[ENU=Administration;
+                                 ESM=Administraci¢n;
+                                 FRC=Administration;
+                                 ENC=Administration];
+                      IsHeader=Yes }
+      { 1400023 ;1   ;Action    ;
+                      CaptionML=[ENU=Human Resources Setup;
+                                 ESM=Config. recursos humanos;
+                                 FRC=Configuration des ressources humaines;
+                                 ENC=Human Resources Setup];
+                      RunObject=Page 5233 }
+    }
+  }
+  CONTROLS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

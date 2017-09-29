@@ -1,0 +1,201 @@
+OBJECT Page 10060 Sales Tax Lines Serv. Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVNA7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sales Tax Lines Serv. Subform;
+               ESM=Subformulario serv. l¡neas impto. ventas;
+               FRC=Sous-form. serv. lignes taxes de vente;
+               ENC=Sales Tax Lines Serv. Subform];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table10011;
+    PageType=ListPart;
+    OnInit=BEGIN
+             "Tax AmountEditable" := TRUE;
+           END;
+
+    OnFindRecord=BEGIN
+                   TempSalesTaxLine.COPY(Rec);
+                   IF TempSalesTaxLine.FIND(Which) THEN BEGIN
+                     Rec := TempSalesTaxLine;
+                     EXIT(TRUE);
+                   END;
+                   EXIT(FALSE);
+                 END;
+
+    OnNextRecord=VAR
+                   ResultSteps@1001 : Integer;
+                 BEGIN
+                   TempSalesTaxLine.COPY(Rec);
+                   ResultSteps := TempSalesTaxLine.NEXT(Steps);
+                   IF ResultSteps <> 0 THEN
+                     Rec := TempSalesTaxLine;
+                   EXIT(ResultSteps);
+                 END;
+
+    OnModifyRecord=BEGIN
+                     ModifyRec;
+                     EXIT(FALSE);
+                   END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 1020000;2;Field     ;
+                SourceExpr="Tax Area Code";
+                Visible=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Tax Group Code" }
+
+    { 1020002;2;Field     ;
+                SourceExpr="Tax Jurisdiction Code" }
+
+    { 1020006;2;Field     ;
+                SourceExpr="Tax Type";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Tax %" }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Line Amount";
+                AutoFormatType=1;
+                AutoFormatExpr=CurrencyCode }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Tax Base Amount";
+                AutoFormatType=1;
+                AutoFormatExpr=CurrencyCode }
+
+    { 1020008;2;Field     ;
+                SourceExpr=Quantity;
+                Visible=FALSE }
+
+    { 20  ;2   ;Field     ;
+                DecimalPlaces=2:5;
+                SourceExpr="Tax Amount";
+                Editable="Tax AmountEditable";
+                OnValidate=BEGIN
+                             IF AllowVATDifference AND NOT AllowVATDifferenceOnThisTab THEN
+                               ERROR(Text000,FIELDCAPTION("Tax Amount"));
+                             "Amount Including Tax" := "Tax Amount" + "Tax Base Amount";
+
+                             FormCheckVATDifference;
+                             ModifyRec;
+                           END;
+                            }
+
+    { 26  ;2   ;Field     ;
+                DecimalPlaces=2:5;
+                SourceExpr="Tax Difference";
+                Visible=FALSE }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Amount Including Tax";
+                AutoFormatType=1;
+                AutoFormatExpr=CurrencyCode;
+                OnValidate=BEGIN
+                             FormCheckVATDifference;
+                           END;
+                            }
+
+    { 1020004;2;Field     ;
+                SourceExpr="Expense/Capitalize" }
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=%1 can only be modified on the Invoicing tab.;ESM=%1 puede ser modif. s¢lo en la pest. facturac.;FRC=%1 ne peut ˆtre modifi‚(e) que sur l''onglet Facturation.;ENC=%1 can only be modified on the Invoicing tab.';
+      Text001@1001 : TextConst 'ENU="The total %1 for a document must not exceed %2 = %3.";ESM="El total %1 para un doc. no debe exceder %2 = %3.";FRC="Le total %1 pour un document ne doit pas d‚passer %2=%3.";ENC="The total %1 for a document must not exceed %2 = %3."';
+      TempSalesTaxLine@1002 : TEMPORARY Record 10011;
+      Currency@1003 : Record 4;
+      CurrencyCode@1004 : Code[10];
+      AllowVATDifference@1005 : Boolean;
+      AllowVATDifferenceOnThisTab@1006 : Boolean;
+      PricesIncludingVAT@1007 : Boolean;
+      AllowInvDisc@1008 : Boolean;
+      VATBaseDiscPct@1009 : Decimal;
+      "Tax AmountEditable"@19052394 : Boolean INDATASET;
+
+    PROCEDURE SetTempTaxAmountLine@1(VAR NewSalesTaxLine@1000 : TEMPORARY Record 10011);
+    BEGIN
+      TempSalesTaxLine.DELETEALL;
+      IF NewSalesTaxLine.FIND('-') THEN
+        REPEAT
+          TempSalesTaxLine.COPY(NewSalesTaxLine);
+          TempSalesTaxLine.INSERT;
+        UNTIL NewSalesTaxLine.NEXT = 0;
+      CurrPage.UPDATE;
+    END;
+
+    PROCEDURE GetTempTaxAmountLine@5(VAR NewSalesTaxLine@1000 : TEMPORARY Record 10011);
+    BEGIN
+      NewSalesTaxLine.DELETEALL;
+      IF TempSalesTaxLine.FIND('-') THEN
+        REPEAT
+          NewSalesTaxLine.COPY(TempSalesTaxLine);
+          NewSalesTaxLine.INSERT;
+        UNTIL TempSalesTaxLine.NEXT = 0;
+    END;
+
+    PROCEDURE InitGlobals@2(NewCurrencyCode@1000 : Code[10];NewAllowVATDifference@1001 : Boolean;NewAllowVATDifferenceOnThisTab@1002 : Boolean;NewPricesIncludingVAT@1003 : Boolean;NewAllowInvDisc@1004 : Boolean;NewVATBaseDiscPct@1005 : Decimal);
+    BEGIN
+      CurrencyCode := NewCurrencyCode;
+      AllowVATDifference := NewAllowVATDifference;
+      AllowVATDifferenceOnThisTab := NewAllowVATDifferenceOnThisTab;
+      PricesIncludingVAT := NewPricesIncludingVAT;
+      AllowInvDisc := NewAllowInvDisc;
+      VATBaseDiscPct := NewVATBaseDiscPct;
+      "Tax AmountEditable" := AllowVATDifference;
+      IF CurrencyCode = '' THEN
+        Currency.InitRoundingPrecision
+      ELSE
+        Currency.GET(CurrencyCode);
+      CurrPage.UPDATE;
+    END;
+
+    PROCEDURE FormCheckVATDifference@4();
+    VAR
+      TaxAmountLine2@1000 : Record 10011;
+      TotalVATDifference@1001 : Decimal;
+    BEGIN
+      CheckTaxDifference(CurrencyCode,AllowVATDifference,PricesIncludingVAT);
+      TaxAmountLine2 := TempSalesTaxLine;
+      TotalVATDifference := ABS("Tax Difference") - ABS(xRec."Tax Difference");
+      IF TempSalesTaxLine.FIND('-') THEN
+        REPEAT
+          TotalVATDifference := TotalVATDifference + ABS(TempSalesTaxLine."Tax Difference");
+        UNTIL TempSalesTaxLine.NEXT = 0;
+      TempSalesTaxLine := TaxAmountLine2;
+      IF TotalVATDifference > Currency."Max. VAT Difference Allowed" THEN
+        ERROR(
+          Text001,FIELDCAPTION("Tax Difference"),
+          Currency.FIELDCAPTION("Max. VAT Difference Allowed"),Currency."Max. VAT Difference Allowed");
+    END;
+
+    LOCAL PROCEDURE ModifyRec@3();
+    BEGIN
+      TempSalesTaxLine := Rec;
+      TempSalesTaxLine.Modified := TRUE;
+      TempSalesTaxLine.MODIFY;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

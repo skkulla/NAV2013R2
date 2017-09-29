@@ -1,0 +1,264 @@
+OBJECT Page 5971 Posted Service Credit Memos
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10,NAVNA7.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Posted Service Credit Memos;
+               ESM=Notas de Cr‚dito servicio regis.;
+               FRC=Notes de cr‚dit de service report‚es;
+               ENC=Posted Service Credit Memos];
+    SourceTable=Table5994;
+    PageType=List;
+    CardPageID=Posted Service Credit Memo;
+    OnOpenPage=BEGIN
+                 SetSecurityFilterOnRespCenter;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 19      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Cr. Memo;
+                                 ESM=Nota &Cr‚dito;
+                                 FRC=Note de &cr‚dit;
+                                 ENC=&Cr. Memo];
+                      Image=CreditMemo }
+      { 31      ;2   ;Action    ;
+                      Name=Statistics;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 ESM=Estad¡sticas;
+                                 FRC=Statistiques;
+                                 ENC=Statistics];
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 IF "Tax Area Code" = '' THEN
+                                   PAGE.RUNMODAL(PAGE::"Service Credit Memo Statistics",Rec,"No.")
+                                 ELSE
+                                   PAGE.RUNMODAL(PAGE::"Service Credit Memo Stats.",Rec,"No.");
+                               END;
+                                }
+      { 32      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 ESM=C&omentarios;
+                                 FRC=Co&mmentaires;
+                                 ENC=Co&mments];
+                      RunObject=Page 5911;
+                      RunPageLink=Type=CONST(General),
+                                  Table Name=CONST(Service Cr.Memo Header),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1020003 ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Electronic Document;
+                                 ESM=Documento &electr¢nico;
+                                 FRC=&Document ‚lectronique;
+                                 ENC=&Electronic Document] }
+      { 1020002 ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=S&end;
+                                 ESM=&Enviar;
+                                 FRC=Envoy&er;
+                                 ENC=S&end];
+                      Image=SendTo;
+                      OnAction=BEGIN
+                                 RequestStampEDocument;
+                               END;
+                                }
+      { 1020001 ;2   ;Action    ;
+                      CaptionML=[ENU=Export E-Document as &XML;
+                                 ESM=Exportar documento electr¢nico como &XML;
+                                 FRC=Exporter le document ‚lectronique au format &XML;
+                                 ENC=Export E-Document as &XML];
+                      Image=ExportElectronicDocument;
+                      OnAction=BEGIN
+                                 ExportEDocument;
+                               END;
+                                }
+      { 1020004 ;2   ;Action    ;
+                      CaptionML=[ENU=&Cancel;
+                                 ESM=&Cancelar;
+                                 FRC=&Annuler;
+                                 ENC=&Cancel];
+                      Image=Cancel;
+                      OnAction=BEGIN
+                                 CancelEDocument;
+                               END;
+                                }
+      { 20      ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 ESM=&Imprimir;
+                                 FRC=&Imprimer;
+                                 ENC=&Print];
+                      Promoted=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 CurrPage.SETSELECTIONFILTER(ServCrMemoHeader);
+                                 ServCrMemoHeader.PrintRecords(TRUE);
+                               END;
+                                }
+      { 25      ;1   ;Action    ;
+                      CaptionML=[ENU=&Navigate;
+                                 ESM=&Navegar;
+                                 FRC=&Naviguer;
+                                 ENC=&Navigate];
+                      Promoted=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Customer No." }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 37  ;2   ;Field     ;
+                SourceExpr="Currency Code" }
+
+    { 27  ;2   ;Field     ;
+                SourceExpr="Post Code";
+                Visible=FALSE }
+
+    { 23  ;2   ;Field     ;
+                SourceExpr="Country/Region Code";
+                Visible=FALSE }
+
+    { 35  ;2   ;Field     ;
+                SourceExpr="Contact Name";
+                Visible=FALSE }
+
+    { 127 ;2   ;Field     ;
+                SourceExpr="Bill-to Customer No.";
+                Visible=FALSE }
+
+    { 125 ;2   ;Field     ;
+                SourceExpr="Bill-to Name";
+                Visible=FALSE }
+
+    { 33  ;2   ;Field     ;
+                SourceExpr="Bill-to Post Code";
+                Visible=FALSE }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr="Bill-to Country/Region Code";
+                Visible=FALSE }
+
+    { 115 ;2   ;Field     ;
+                SourceExpr="Bill-to Contact";
+                Visible=FALSE }
+
+    { 111 ;2   ;Field     ;
+                SourceExpr="Ship-to Code";
+                Visible=FALSE }
+
+    { 109 ;2   ;Field     ;
+                SourceExpr="Ship-to Name";
+                Visible=FALSE }
+
+    { 21  ;2   ;Field     ;
+                SourceExpr="Ship-to Post Code";
+                Visible=FALSE }
+
+    { 17  ;2   ;Field     ;
+                SourceExpr="Ship-to Country/Region Code";
+                Visible=FALSE }
+
+    { 99  ;2   ;Field     ;
+                SourceExpr="Ship-to Contact";
+                Visible=FALSE }
+
+    { 97  ;2   ;Field     ;
+                SourceExpr="Posting Date";
+                Visible=FALSE }
+
+    { 65  ;2   ;Field     ;
+                SourceExpr="Salesperson Code";
+                Visible=FALSE }
+
+    { 89  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code";
+                Visible=FALSE }
+
+    { 87  ;2   ;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code";
+                Visible=FALSE }
+
+    { 91  ;2   ;Field     ;
+                SourceExpr="Location Code";
+                Visible=TRUE }
+
+    { 1020005;2;Field     ;
+                SourceExpr="Electronic Document Status" }
+
+    { 1020007;2;Field     ;
+                SourceExpr="Date/Time Stamped";
+                Visible=FALSE }
+
+    { 1020009;2;Field     ;
+                SourceExpr="Date/Time Sent";
+                Visible=FALSE }
+
+    { 1020011;2;Field     ;
+                SourceExpr="Date/Time Canceled";
+                Visible=FALSE }
+
+    { 1020013;2;Field     ;
+                SourceExpr="Error Code";
+                Visible=FALSE }
+
+    { 1020015;2;Field     ;
+                SourceExpr="Error Description";
+                Visible=FALSE }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      ServCrMemoHeader@1000 : Record 5994;
+
+    BEGIN
+    END.
+  }
+}
+

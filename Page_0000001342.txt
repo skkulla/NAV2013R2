@@ -1,0 +1,228 @@
+OBJECT Page 1342 Mini Item Template Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/23/13;
+    Time=12:00:00 PM;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Item Template;
+               ESM=Plantilla de producto;
+               FRC=ModŠle article;
+               ENC=Item Template];
+    SourceTable=Table1301;
+    DataCaptionExpr="Template Name";
+    PageType=Card;
+    SourceTableTemporary=Yes;
+    CardPageID=Mini Item Template Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Reports,Master Data;
+                                ESM=Nuevo,Proceso,Informes,Datos Maestros;
+                                FRC=Nouveau,Traitement,Rapports,Donn‚es principales;
+                                ENC=New,Process,Reports,Master Data];
+    OnDeleteRecord=BEGIN
+                     CheckTemplateNameProvided
+                   END;
+
+    OnQueryClosePage=BEGIN
+                       IF Code <> '' THEN
+                         CheckTemplateNameProvided
+                     END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           SetInventoryPostingGroupEditable;
+                           SetDimensionsEnabled;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 22      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 3       ;1   ;ActionGroup;
+                      CaptionML=[ENU=Master Data;
+                                 ESM=Datos maestros;
+                                 FRC=Donn‚es principales;
+                                 ENC=Master Data] }
+      { 24      ;2   ;Action    ;
+                      Name=Default Dimensions;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 ESM=Dimensiones;
+                                 FRC=Dimensions;
+                                 ENC=Dimensions];
+                      ToolTipML=[ENU=View or edit any dimensions that are set up for the item that you want to reuse for the template.;
+                                 ESM=Vea o edite las dimensiones que se han configurado para el producto que desea reutilizar para la plantilla.;
+                                 FRC=Affichez ou modifiez les dimensions configur‚es pour l'article que vous souhaitez r‚utiliser pour le modŠle.;
+                                 ENC=View or edit any dimensions that are set up for the item that you want to reuse for the template.];
+                      RunObject=Page 1343;
+                      RunPageLink=Table Id=CONST(27),
+                                  Master Record Template Code=FIELD(Code);
+                      Promoted=Yes;
+                      Enabled=DimensionsEnabled;
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category4 }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=General;
+                GroupType=Group }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the template.;
+                           ESM=Especifica el nombre de la plantilla.;
+                           FRC=Indique le nom du modŠle.;
+                           ENC=Specifies the name of the template.];
+                SourceExpr="Template Name";
+                OnValidate=BEGIN
+                             SetDimensionsEnabled;
+                           END;
+                            }
+
+    { 18  ;1   ;Group     ;
+                Name=Item Setup;
+                GroupType=Group }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit in which the item is held on inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.;
+                           ESM=Especifica la unidad en la que se guarda el producto en existencias. La unidad de medida base tambi‚n se usa como base de la conversi¢n para las unidades de medida alternas.;
+                           FRC=Indique l'unit‚ dans laquelle l'article est stock‚. L'unit‚ de base sert ‚galement de base de conversion pour les unit‚s de remplacement.;
+                           ENC=Specifies the unit in which the item is held on inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.];
+                SourceExpr="Base Unit of Measure" }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the item card represents a physical item (Inventory) or a service (Service).;
+                           ESM=Especifica si la ficha de producto representa un producto f¡sico (Inventario) o un servicio (Servicio).;
+                           FRC=Sp‚cifie si la fiche article repr‚sente un article physique (Stock) ou un service (Service).;
+                           ENC=Specifies if the item card represents a physical item (Inventory) or a service (Service).];
+                SourceExpr=Type;
+                OnValidate=BEGIN
+                             SetInventoryPostingGroupEditable;
+                           END;
+                            }
+
+    { 16  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies that an extended text that you have set up will be added automatically on sales or purchase documents for this item.;
+                           ESM=Especifica que se agregar  autom ticamente un texto adicional configurado en los documentos de compra y de venta de este producto.;
+                           FRC=Indique qu'un texte ‚tendu que vous avez d‚fini sera automatiquement ajout‚ aux documents vente ou achat de cet article.;
+                           ENC=Specifies that an extended text that you have set up will be added automatically on sales or purchase documents for this item.];
+                SourceExpr="Automatic Ext. Texts" }
+
+    { 21  ;1   ;Group     ;
+                Name=Price;
+                GroupType=Group }
+
+    { 14  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Unit Price and Line Amount fields on sales document lines for this item should be shown with or without VAT.;
+                           ESM=Especifica si los campos Precio unitario y Importe l¡nea de las l¡neas de documento de venta de este art¡culo se deben mostrar con o sin IVA.;
+                           FRC=Sp‚cifie si les champs Prix unitaire et Montant ligne des lignes document vente pour cet article sont affich‚s avec ou sans la TVA.;
+                           ENC=Specifies if the Unit Price and Line Amount fields on sales document lines for this item should be shown with or without tax.];
+                SourceExpr="Price Includes VAT" }
+
+    { 10  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Profit % field, the Unit Price field, or neither field is calculated and filled. The value in the Profit % field is what is generally understood as the profit margin.;
+                           ESM=Especifica si se calcula el campo % Bf§ bruto, el campo Precio unitario o ninguno de los campos se calcula y se rellena. El valor del campo % Bf§ bruto es el se entender  normalmente como el margen de beneficio bruto.;
+                           FRC=Sp‚cifie si le champ % profit, le champ Prix unitaire, ou aucun des deux champs est calcul‚ et renseign‚. G‚n‚ralement, la valeur du champ % profit correspond … la marge b‚n‚ficiaire.;
+                           ENC=Specifies if the Profit % field, the Unit Price field, or neither field is calculated and filled. The value in the Profit % field is what is generally understood as the profit margin.];
+                SourceExpr="Price/Profit Calculation" }
+
+    { 11  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how much profit you have made from the customer in the current fiscal year, expressed as a percentage of the customer's total sales. The calculation takes into account any changes that occurred in purchase prices of the sold goods.;
+                           ESM=Especifica el beneficio que ha realizado del cliente en el ejercicio actual, expresado como porcentaje de las ventas totales del cliente. El c lculo tiene en cuenta los cambios que ocurrieran en los precios de compra de los productos vendidos.;
+                           FRC=Indique la marge que vous avez r‚alis‚e pour le client pour l'exercice comptable en cours, exprim‚e en pourcentage des ventes totales du client. Le calcul tient compte de toutes les modifications apport‚es aux prix d'achat des biens vendus.;
+                           ENC=Specifies how much profit you have made from the customer in the current fiscal year, expressed as a percentage of the customer's total sales. The calculation takes into account any changes that occurred in purchase prices of the sold goods.];
+                SourceExpr="Profit %" }
+
+    { 9   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the item should be included in the calculation of an invoice discount on documents where the item is traded.;
+                           ESM=Especifica si el producto se incluye en el c lculo de un descuento en factura en los documentos en los que se comercializa el producto.;
+                           FRC=Sp‚cifie si l'article doit ˆtre inclus dans le calcul d'une remise facture sur les documents dans lesquels l'article est achet‚ ou vendu.;
+                           ENC=Specifies if the item should be included in the calculation of an invoice discount on documents where the item is traded.];
+                SourceExpr="Allow Invoice Disc." }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies an item group code that can be used as a criterion to grant a discount when the item is sold to a certain customer.;
+                           ESM=Especifica un c¢digo del grupo de productos que se utilizar  como criterio para conceder un descuento cuando el producto se vende a un determinado cliente.;
+                           FRC=Indique le code groupe articles qui peut ˆtre utilis‚ comme critŠre pour obtenir un escompte lorsque l'article est vendu … un certain client.;
+                           ENC=Specifies an item group code that can be used as a criterion to grant a discount when the item is sold to a certain customer.];
+                SourceExpr="Item Disc. Group" }
+
+    { 20  ;1   ;Group     ;
+                Name=Cost;
+                GroupType=Group }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for this item with the general ledger to account for VAT amounts that result from trade with the item.;
+                           ESM=Vincula las transacciones de negocio realizadas para este producto con la contabilidad en la cuenta los importes de IVA que sean resultados del comercio con el producto.;
+                           FRC=Lie les transactions effectu‚es pour cet article avec les ‚critures comptables pour repr‚senter les montants de TVA d‚coulant de la vente de l'article.;
+                           ENC=Links business transactions made for this item with the general ledger to account for VAT amounts that result from trade with the item.];
+                SourceExpr="Costing Method" }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the percentage of the item's last purchase cost that includes indirect costs, such as freight that is associated with the purchase of the item.;
+                           ESM=Especifica el porcentaje del £ltimo costo de compra de un producto, que incluye los costos indirectos, como el flete asociado con la compra del producto.;
+                           FRC=Sp‚cifie le pourcentage du dernier co–t d'achat de l'article qui inclut les co–ts indirects comme la gestion du fret et des entrep“ts associ‚s … l'achat de l'article.;
+                           ENC=Specifies the percentage of the item's last purchase cost that includes indirect costs, such as freight that is associated with the purchase of the item.];
+                SourceExpr="Indirect Cost %" }
+
+    { 19  ;1   ;Group     ;
+                Name=Financial Details;
+                GroupType=Group }
+
+    { 15  ;2   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for this item with the general ledger to account for the value of trade with the item.;
+                           ESM=Vincula las transacciones de negocio realizadas para este producto con la contabilidad en la cuenta para el valor de comercio con el producto.;
+                           FRC=Lie les transactions effectu‚es pour cet article avec les ‚critures comptables pour repr‚senter la valeur commerciale de l'article.;
+                           ENC=Links business transactions made for this item with the general ledger to account for the value of trade with the item.];
+                SourceExpr="Gen. Prod. Posting Group" }
+
+    { 17  ;2   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for this item with the general ledger to account for VAT amounts that result from trade with the item.;
+                           ESM=Vincula las transacciones de negocio realizadas para este producto con la contabilidad en la cuenta los importes de IVA que sean resultados del comercio con el producto.;
+                           FRC=Lie les transactions effectu‚es pour cet article avec les ‚critures comptables pour repr‚senter les montants de TVA d‚coulant de la vente de l'article.;
+                           ENC=Links business transactions made for this item with the general ledger to account for VAT amounts that result from trade with the item.];
+                SourceExpr="VAT Prod. Posting Group" }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for the item with an inventory account in the general ledger to group amounts for that item type.;
+                           ESM=Vincula las transacciones de negocio realizadas para el producto con una cuenta de inventario en la contabilidad para agrupar los importes para ese tipo de producto.;
+                           FRC=Lie les transactions commerciales effectu‚es pour l'article avec un compte stock en comptabilit‚ pour regrouper les montants de ce type d'article.;
+                           ENC=Links business transactions made for the item with an inventory account in the general ledger to group amounts for that item type.];
+                SourceExpr="Inventory Posting Group";
+                Editable=InventoryPostingGroupEditable }
+
+  }
+  CODE
+  {
+    VAR
+      InventoryPostingGroupEditable@1000 : Boolean INDATASET;
+      DimensionsEnabled@1001 : Boolean INDATASET;
+      ProvideTemplateNameErr@1002 : TextConst '@@@=%1 Template Name;ENU=You must enter a %1.;ESM=Debe especificar un %1.;FRC=Vous devez entrer un %1.;ENC=You must enter a %1.';
+
+    PROCEDURE SetInventoryPostingGroupEditable@1();
+    BEGIN
+      InventoryPostingGroupEditable := Type = Type::Inventory;
+    END;
+
+    LOCAL PROCEDURE SetDimensionsEnabled@4();
+    BEGIN
+      DimensionsEnabled := "Template Name" <> '';
+    END;
+
+    LOCAL PROCEDURE CheckTemplateNameProvided@2();
+    BEGIN
+      IF "Template Name" = '' THEN
+        ERROR(STRSUBSTNO(ProvideTemplateNameErr,FIELDCAPTION("Template Name")));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

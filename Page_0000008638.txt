@@ -1,0 +1,89 @@
+OBJECT Page 8638 Configuration Completion
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/07/12;
+    Time=12:00:00 PM;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Configuration Completion;
+               ESM=Finalizaci¢n de la configuraci¢n;
+               FRC=Fin de la configuration;
+               ENC=Configuration Completion];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table8627;
+    PageType=Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Setup;
+                                ESM=Nuevo,Proceso,Informe,Configuraci¢n;
+                                FRC=Nouveau,Traitement,Rapport,Configuration;
+                                ENC=New,Process,Report,Setup];
+    ShowFilter=No;
+    OnClosePage=BEGIN
+                  SelectDefaultRoleCenter("Your Profile Code");
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 4       ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 9       ;1   ;ActionGroup;
+                      CaptionML=[ENU=Setup;
+                                 ESM=Configuraci¢n;
+                                 FRC=Configuration;
+                                 ENC=Setup] }
+      { 7       ;1   ;Action    ;
+                      CaptionML=[ENU=Users;
+                                 ESM=Usuarios;
+                                 FRC=Utilisateurs;
+                                 ENC=Users];
+                      RunObject=Page 9800;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=User;
+                      PromotedCategory=Category4 }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=Users Personalization;
+                                 ESM=Personalizaci¢n de usuarios;
+                                 FRC=Personnalisation utilisateurs;
+                                 ENC=Users Personalization];
+                      RunObject=Page 9173;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=UserSetup;
+                      PromotedCategory=Category4 }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Complete Setup;
+                GroupType=Group }
+
+    { 6   ;2   ;Group     ;
+                GroupType=Group }
+
+    { 5   ;3   ;Field     ;
+                CaptionML=[ENU=If you have finished setting up the company, select the profile that you want to use as your default, and then choose the OK button to close the page. Then restart the Microsoft Dynamics NAV client to apply the changes.;
+                           ESM=Si ha finalizado la configuraci¢n de la empresa, seleccione el perfil que desea usar como predeterminado y, a continuaci¢n, haga clic en el bot¢n Aceptar para cerrar la p gina. A continuaci¢n, reinicie el cliente de Microsoft Dynamics NAV para aplicar los cambios.;
+                           FRC=Si vous avez termin‚ de param‚trer la compagnie, s‚lectionnez le profil … utiliser par d‚faut et cliquez sur OK pour fermer la page. Red‚marrez ensuite le client Microsoft Dynamics NAV pour appliquer les changements.;
+                           ENC=If you finished setting up the company, select which Role Centre you want to use from now on and click OK to close the page. Then restart the Role Tailored client to apply the changes.] }
+
+    { 3   ;3   ;Field     ;
+                SourceExpr="Your Profile Code" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+
